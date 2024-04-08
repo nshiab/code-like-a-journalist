@@ -1,23 +1,17 @@
-# Nextra Docs Template 
+# Code Like a Journalist
 
-This is a template for creating documentation with [Nextra](https://nextra.site).
+Hi! 👋
 
-[**Live Demo →**](https://nextra-docs-template.vercel.app)
+My name is Nael Shiab. I am a computational journalist based in Montreal. I work for CBC News.
 
-[![](.github/screenshot.png)](https://nextra-docs-template.vercel.app)
+This is the repository for [Code Like a Journalist](https://www.code-like-a-journalist.com/), a free and open-source online course for anyone interested in data analysis and visualization with JavaScript/TypeScript.
 
-## Quick Start
+If you want to know when I'll start adding lessons, follow me on these platforms:
 
-Click the button to clone this repository and deploy it on Vercel:
+- [GitHub](https://github.com/nshiab)
+- [Mastodon](https://vis.social/@naelshiab)
+- [Bluesky](https://bsky.app/profile/naelshiab.bsky.social)
+- [LinkedIn](https://www.linkedin.com/mynetwork/)
+- [Twitter](https://twitter.com/NaelShiab)
 
-[![](https://vercel.com/button)](https://vercel.com/new/clone?s=https%3A%2F%2Fgithub.com%2Fshuding%2Fnextra-docs-template&showOptionalTeamCreation=false)
-
-## Local Development
-
-First, run `pnpm i` to install the dependencies.
-
-Then, run `pnpm dev` to start the development server and visit localhost:3000.
-
-## License
-
-This project is licensed under the MIT License.
+And add a star on the GitHub [repository](https://github.com/nshiab/code-like-a-journalist) to keep me motivated!
