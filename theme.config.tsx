@@ -1,11 +1,5 @@
 import React from "react";
 import { DocsThemeConfig } from "nextra-theme-docs";
-import {
-  EnvelopeClosedIcon,
-  GitHubLogoIcon,
-  LinkedInLogoIcon,
-  TwitterLogoIcon,
-} from "@radix-ui/react-icons";
 
 const config: DocsThemeConfig = {
   logo: <span>Code Like a Journalist</span>,
@@ -18,6 +12,11 @@ const config: DocsThemeConfig = {
   },
   feedback: {
     content: null,
+  },
+  useNextSeoProps() {
+    return {
+      titleTemplate: "%s",
+    };
   },
   footer: {
     text: (
