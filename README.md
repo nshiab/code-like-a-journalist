@@ -12,7 +12,9 @@ The lessons will be tailored for journalists, but I hope anyone interested in an
 
 To allow teachers and professors to reuse the course with their students, the content is released under the [Creative Commons Attribution 4.0 International Public License](https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1). The only condition is to give appropriate credit with a link to the [website](https://www.code-like-a-journalist.com/) or its [code repository](https://github.com/nshiab/code-like-a-journalist).
 
-If you want to know when I'll start adding lessons, follow me on these platforms:
+If you want to know when I'll start adding lessons, subscribe to the [newsletter](https://mailchi.mp/0db676437a2f/code-like-a-journalist).
+
+You can also follow me on these platforms:
 
 - [GitHub](https://github.com/nshiab)
 - [Mastodon](https://vis.social/@naelshiab)
