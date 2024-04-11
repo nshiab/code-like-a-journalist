@@ -18,7 +18,7 @@
   },
   "homepage": "https://www.code-like-a-journalist.com/",
   "dependencies": {
-    "next": "^13.0.6",
+    "next": "^14.1.4",
     "nextra": "latest",
     "nextra-theme-docs": "latest",
     "react": "^18.2.0",
