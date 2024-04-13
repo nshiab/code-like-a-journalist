@@ -24,6 +24,10 @@ const config: DocsThemeConfig = {
         property="og:description"
         content="A free online data analysis and data visualization course using JavaScript/TypeScript by computational journalist Nael Shiab."
       />
+      <meta
+        property="og:image"
+        content="https://www.code-like-a-journalist.com/img/sharing.jpg"
+      />
     </>
   ),
   footer: {
