@@ -18,6 +18,14 @@ const config: DocsThemeConfig = {
       titleTemplate: "%s",
     };
   },
+  head: (
+    <>
+      <meta
+        property="og:description"
+        content="Free online data analysis and data visualization course using JavaScript/TypeScript"
+      />
+    </>
+  ),
   footer: {
     text: (
       <div style={{ width: "100%" }}>
