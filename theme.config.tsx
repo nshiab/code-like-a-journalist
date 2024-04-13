@@ -22,7 +22,7 @@ const config: DocsThemeConfig = {
     <>
       <meta
         property="og:description"
-        content="Free online data analysis and data visualization course using JavaScript/TypeScript"
+        content="A free online data analysis and data visualization course using JavaScript/TypeScript by computational journalist Nael Shiab."
       />
     </>
   ),
