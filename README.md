@@ -6,7 +6,7 @@ My name is Nael Shiab. I am a [computational journalist](https://www.naelshiab.c
 
 This is the code repository for [Code Like a Journalist](https://www.code-like-a-journalist.com/). This website will be a free, open-source online data analysis and visualization course using JavaScript/TypeScript. It will be available in English and French.
 
-I'll work on it with the support of [Jean-Hugues Roy](https://github.com/jhroy), journalism professor at UQAM. I plan to take several months off from my current job to fully focus on building the course.
+I'll work on it with the support of [Jean-Hugues Roy](https://github.com/jhroy), journalism professor at UQAM. Thanks to the support of the [Michener Awards Foundation](https://www.michenerawards.ca/media-release/michener-awards-foundation-announces-its-2024-fellowships-winners/), I plan to take several months off from my current job to fully focus on building the course.
 
 The lessons will be tailored for journalists, but I hope anyone interested in answering questions of public interest with data and code will find it helpful.
 
