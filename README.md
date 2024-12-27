@@ -6,8 +6,10 @@ My name is Nael Shiab. I am a
 [computational journalist](https://www.naelshiab.com/) based in Montreal. I work
 for CBC News as a Senior Data Producer.
 
-This website is a free, open-source online data analysis and visualization
-course using JavaScript/TypeScript. It's available in English and French.
+This repository stores the code for
+[code-like-a-journalist](https://www.code-like-a-journalist.com/), a free,
+open-source online data analysis and visualization course using
+JavaScript/TypeScript. It's available in English and French.
 
 Thanks to the support of the
 [Michener Awards Foundation](https://www.michenerawards.ca/media-release/michener-awards-foundation-announces-its-2024-fellowships-winners/),
