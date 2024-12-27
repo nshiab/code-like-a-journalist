@@ -1,6 +1,7 @@
 // Nice example here: https://github.com/shuding/nextra/blob/v3/examples/swr-site/theme.config.tsx
 import { LocaleSwitch, useConfig } from "nextra-theme-docs";
 import { useRouter } from "nextra/hooks";
+import { formatDate } from "@nshiab/journalism/web";
 
 const TITLE = {
     en: "Code Like a Journalist",
@@ -44,6 +45,11 @@ const SEARCH = {
         en: "Search...",
         fr: "Rechercher...",
     },
+};
+
+const SCROLLTOP = {
+    en: "Back to top",
+    fr: "Retour en haut",
 };
 
 const FOOTER = {
@@ -97,7 +103,8 @@ export default {
     project: {
         link: "https://github.com/nshiab/code-like-a-journalist",
     },
-    docsRepositoryBase: "https://github.com/nshiab/code-like-a-journalist",
+    docsRepositoryBase:
+        "https://github.com/nshiab/code-like-a-journalist/blob/main",
     head() {
         const { asPath, defaultLocale, locale } = useRouter();
         const { frontMatter } = useConfig();
@@ -176,6 +183,21 @@ export default {
     ],
     navbar: {
         extraContent: LocaleSwitch,
+    },
+    toc: {
+        backToTop: function useText() {
+            const { locale } = useRouter();
+            return SCROLLTOP[locale];
+        },
+    },
+    gitTimestamp: function useText() {
+        const { locale } = useRouter();
+        if (locale === "fr") {
+            return `Dernière mise à jour le ${
+                formatDate(new Date(), "Month DD, YYYY", { style: "rc" })
+            }.`;
+        }
+        return `Last updated on ${formatDate(new Date(), "Month DD, YYYY")}.`;
     },
     // ... other theme options
 };
