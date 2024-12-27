@@ -1,6 +1,6 @@
 {
   "name": "code-like-a-journalist",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A free and open-source online course for anyone interested in data analysis and data visualization with JavaScript/TypeScript",
   "scripts": {
     "dev": "next dev",
@@ -18,14 +18,10 @@
   },
   "homepage": "https://www.code-like-a-journalist.com/",
   "dependencies": {
-    "next": "^14.1.4",
-    "nextra": "latest",
-    "nextra-theme-docs": "latest",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@types/node": "20.12.7",
-    "typescript": "^5.4.4"
+    "next": "^15.1.2",
+    "nextra": "^3.3.1",
+    "nextra-theme-docs": "^3.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }

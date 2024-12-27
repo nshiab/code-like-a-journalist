@@ -2,17 +2,32 @@
 
 Hi! 👋
 
-My name is Nael Shiab. I am a [computational journalist](https://www.naelshiab.com/) based in Montreal.
+My name is Nael Shiab. I am a
+[computational journalist](https://www.naelshiab.com/) based in Montreal. I work
+for CBC News as a Senior Data Producer.
 
-This is the code repository for [Code Like a Journalist](https://www.code-like-a-journalist.com/). This website will be a free, open-source online data analysis and visualization course using JavaScript/TypeScript. It will be available in English and French.
+This website is a free, open-source online data analysis and visualization
+course using JavaScript/TypeScript. It's available in English and French.
 
-I'll work on it with the help of [Jean-Hugues Roy](https://github.com/jhroy), journalism professor at UQAM. Thanks to the support of the [Michener Awards Foundation](https://www.michenerawards.ca/media-release/michener-awards-foundation-announces-its-2024-fellowships-winners/), I plan to take several months off from my current job to fully focus on building the course.
+Thanks to the support of the
+[Michener Awards Foundation](https://www.michenerawards.ca/media-release/michener-awards-foundation-announces-its-2024-fellowships-winners/),
+I took several months off from my current job to fully focus on building the
+course. I can also count on the support of
+[Jean-Hugues Roy](https://github.com/jhroy), data journalist at La Presse and
+former journalism professor at UQAM.
 
-The lessons will be tailored for journalists, but I hope anyone interested in answering questions of public interest with data and code will find it helpful.
+The lessons are tailored for journalists, but I think anyone interested in
+answering questions of public interest with data, code, and algorithms will find
+it helpful.
 
-To allow teachers and professors to reuse the course with their students, the content is released under the [Creative Commons Attribution 4.0 International Public License](https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1). The only condition is to give appropriate credit with a link to the [website](https://www.code-like-a-journalist.com/) or its [code repository](https://github.com/nshiab/code-like-a-journalist).
+To allow teachers and professors to reuse the course with their students, the
+content is released under the
+[Creative Commons Attribution 4.0 International Public License](https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1).
+The only condition is to give appropriate credit with my name and a link to the
+[website](https://www.code-like-a-journalist.com/).
 
-If you want to know when I'll start adding lessons, subscribe to the [newsletter](https://mailchi.mp/0db676437a2f/code-like-a-journalist).
+If you want to know when new lessons are available, subscribe to the
+[newsletter](https://mailchi.mp/0db676437a2f/code-like-a-journalist).
 
 You can also follow me on these platforms:
 
@@ -22,4 +37,6 @@ You can also follow me on these platforms:
 - [LinkedIn](https://www.linkedin.com/mynetwork/)
 - [Twitter](https://twitter.com/NaelShiab)
 
-And add a star to the GitHub [repository](https://github.com/nshiab/code-like-a-journalist) to keep me motivated!
+And add a star to the GitHub
+[repository](https://github.com/nshiab/code-like-a-journalist) to keep me
+motivated!
