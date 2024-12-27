@@ -109,11 +109,19 @@ export default {
         const { asPath, defaultLocale, locale } = useRouter();
         const { frontMatter } = useConfig();
         const url = "https://www.code-like-a-journalist.com/" +
-            (defaultLocale === locale ? asPath : `/${locale}${asPath}`);
+            (defaultLocale === locale ? asPath : `${locale}${asPath}`);
 
         return (
             <>
                 <meta property="og:url" content={url} />
+                <meta
+                    property="og:site_name"
+                    content={TITLE[locale]}
+                />
+                <meta
+                    property="title"
+                    content={frontMatter.title || TITLE[locale]}
+                />
                 <meta
                     property="og:title"
                     content={frontMatter.title || TITLE[locale]}
@@ -124,8 +132,13 @@ export default {
                         DESCRIPTION[locale]}
                 />
                 <meta
+                    property="description"
+                    content={frontMatter.description ||
+                        DESCRIPTION[locale]}
+                />
+                <meta
                     property="og:image"
-                    content="https://www.code-like-a-journalist.com/img/sharing.jpg"
+                    content="https://www.code-like-a-journalist.com/assets/sharing.jpg"
                 />
             </>
         );
