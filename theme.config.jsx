@@ -140,6 +140,20 @@ export default {
                     property="og:image"
                     content="https://www.code-like-a-journalist.com/assets/sharing.jpg"
                 />
+                <meta
+                    property="twitter:image"
+                    content="https://www.code-like-a-journalist.com/assets/sharing.jpg"
+                />
+                <meta property="twitter:card" content="summary_large_image" />
+                <meta
+                    property="twitter:title"
+                    content={frontMatter.title || TITLE[locale]}
+                />
+                <meta
+                    property="twitter:description"
+                    content={frontMatter.description ||
+                        DESCRIPTION[locale]}
+                />
             </>
         );
     },
