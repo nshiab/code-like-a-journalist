@@ -217,14 +217,14 @@ export default {
             return SCROLLTOP[locale];
         },
     },
-    gitTimestamp: function useText() {
+    gitTimestamp: function useText({ timestamp }) {
         const { locale } = useRouter();
         if (locale === "fr") {
             return `Dernière mise à jour le ${
-                formatDate(new Date(), "Month DD, YYYY", { style: "rc" })
+                formatDate(timestamp, "Month DD, YYYY", { style: "rc" })
             }.`;
         }
-        return `Last updated on ${formatDate(new Date(), "Month DD, YYYY")}.`;
+        return `Last updated on ${formatDate(timestamp, "Month DD, YYYY")}.`;
     },
     // ... other theme options
 };
