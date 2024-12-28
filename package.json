@@ -6,9 +6,9 @@
     "dev": "next dev",
     "build": "VERCEL_DEEP_CLONE=true next build",
     "start": "next start",
-    "patch": "npm run incrementVersion.js patch",
-    "minor": "npm run incrementVersion.js minor",
-    "major": "npm run incrementVersion.js major"
+    "patch": "node incrementVersion.js patch",
+    "minor": "node incrementVersion.js minor",
+    "major": "node incrementVersion.js major"
   },
   "repository": {
     "type": "git",
