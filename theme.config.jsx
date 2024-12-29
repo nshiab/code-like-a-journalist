@@ -28,6 +28,11 @@ const EDIT = {
     fr: "Suggérez une modification pour cette page sur GitHub →",
 };
 
+const TOC = {
+    en: "On this page",
+    fr: "Sur cette page",
+};
+
 const SEARCH = {
     emptyResult: {
         en: "No results found.",
@@ -215,6 +220,10 @@ export default {
         backToTop: function useText() {
             const { locale } = useRouter();
             return SCROLLTOP[locale];
+        },
+        title: function useText() {
+            const { locale } = useRouter();
+            return TOC[locale];
         },
     },
     gitTimestamp: function useText({ timestamp }) {
