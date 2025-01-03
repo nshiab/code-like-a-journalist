@@ -1,0 +1,107 @@
+---
+title: Installation
+description: Installons tout ce dont nous avons besoin.
+---
+
+import { Callout } from 'nextra/components'
+
+# Installation
+
+Tout d'abord, installons tout ce dont nous avons besoin.
+
+<Callout type="warning" emoji="⚠️">
+    Vous pourriez avoir besoin de droits administrateur. Si vous êtes sur votre ordinateur de travail et que vous ne les avez pas, demandez l'aide de votre service informatique.
+</Callout>
+
+## Éditeur de code
+
+Le code n'est que du texte. Vous pouvez écrire votre code dans n'importe quel éditeur de texte, mais il est plus pratique d'utiliser un éditeur de code qui offre de nombreuses fonctionnalités utiles.
+
+Vous avez de nombreuses options gratuites et intéressantes, mais la plus populaire est [Visual Studio Code](https://code.visualstudio.com/), et c'est ce que nous allons utiliser. C'est un [projet en code ouvert](https://github.com/microsoft/vscode) maintenu par Microsoft.
+
+Téléchargez-le à partir du [site web](https://code.visualstudio.com/) et installez-le.
+
+Une fois installé, ouvrez-le. Il devrait ressembler à ceci. Ce n'est pas grave si vous avez différents onglets ouverts.  
+
+![Une capture d'écran de l'éditeur de code Visual Studio Code.](/assets/first-steps/vscode.png)
+
+## Moteur d'exécution (runtime)
+
+Pour que votre ordinateur comprenne TypeScript et l'exécute, vous avez besoin d'un moteur d'exécution.
+
+Encore une fois, vous avez de nombreuses excellentes options en code ouvert, mais je trouve [Deno](https://deno.com/) particulièrement facile à utiliser. Deno est maintenu par [Deno Land Inc.](https://deno.com/company), avec Ryan Dahl comme PDG. Dahl a également créé [Node.js](https://nodejs.org/), un autre moteur très populaire.
+
+Pour l'installer, visitez le [site web](https://deno.com/) et copiez la commande appropriée pour votre système d'exploitation.
+
+Ne vous inquiétez pas si vous avez une version différente. Tant que c'est une v2.x.x, tout ira bien.
+
+![Une capture d'écran du site web de Deno.](/assets/first-steps/deno.png)
+
+Ensuite, suivez ces étapes :
+
+1. Ouvrez un nouveau terminal dans VS Code.
+2. Collez la commande que vous avez copiée juste avant et appuyez sur la touche Entrée pour l'exécuter.
+
+La commande téléchargera et installera Deno sur votre ordinateur.
+
+![Une capture d'écran montrant comment installer Deno depuis le terminal de VS Code.](/assets/first-steps/deno-install.png)
+
+Si on vous demande d'ajouter Deno à votre chemin d'accès (path), tapez `Y` et appuyez sur Entrée. Cela garantit que Deno est facilement accessible depuis votre terminal.
+
+![Une capture d'écran montrant une option lors de l'installation de Deno.](/assets/first-steps/deno-path.png)
+
+Et si on vous demande de configurer les suggestions automatiques (completions), choisissez bash ou zsh en fonction de votre système d'exploitation en utilisant les touches haut et bas et en appuyant sur la barre d'espace. Ensuite, appuyez sur Entrée.
+
+![Une capture d'écran montrant comment configurer les complétions lors de l'installation de Deno.](/assets/first-steps/deno-completions.png)
+
+Maintenant, tout devrait être correctement installé.
+
+Quittez et redémarrez VS Code. Ensuite, tapez `deno --version` dans votre terminal et appuyez sur Entrée pour afficher votre version de Deno. Vous devriez voir quelque chose comme ceci !
+
+![Une capture d'écran montrant comment afficher la version de Deno.](/assets/first-steps/deno-version.png)
+
+## Extensions
+
+VS Code dispose d'un merveilleux écosystème d'extensions et l'équipe de Deno en a créé une très utile pour vous aider à coder efficacement.
+
+Suivez ces étapes pour l'installer :
+
+1. Cliquez sur l'onglet Extensions sur le côté gauche de VS Code.
+2. Recherchez l'extension Deno.
+3. Installez l'extension Deno. Assurez-vous que `Mise à jour automatique` est cochée.
+
+![Une capture d'écran montrant comment installer l'extension Deno.](/assets/first-steps/deno-extension.png)
+
+## Exécutons un script
+
+Pour vérifier que tout fonctionne comme prévu, nous allons écrire un petit script et l'exécuter.
+
+Pour démarrer un nouveau projet dans VS Code, suivez ces étapes :
+
+1. Créez un nouveau dossier quelque part sur votre ordinateur.
+2. Dans VS Code, cliquez sur l'onglet Explorer.
+3. Cliquez sur `Open Folder` et sélectionnez le dossier que vous venez de créer.
+
+![Une capture d'écran montrant comment ouvrir un nouveau dossier dans VS Code.](/assets/first-steps/deno-open-folder.png)
+
+Maintenant que VS Code a ouvert votre dossier, nous pouvons créer un nouveau fichier.
+
+1. Faites un clic droit sur l'Explorateur.
+2. Cliquez sur `New File...`.
+3. Nommez votre nouveau fichier `main.ts`. Si le fichier ne s'ouvre pas en tant que nouvel onglet, cliquez dessus.
+4. Dans l'onglet `main.ts`, tapez `console.log("This is going to be fun!");`.
+
+Ce code dit à votre ordinateur d'afficher *Ça va être amusant !* dans votre terminal.
+
+![Une capture d'écran montrant comment créer un nouveau fichier TypeScript dans VS Code.](/assets/first-steps/deno-new-file.png)
+
+Nous pouvons maintenant exécuter ce script.
+
+1. Affichez le terminal.
+2. Tapez `deno run main.ts` dans le terminal et appuyez sur Entrée.
+
+Cela demande à votre ordinateur d'utiliser Deno pour exécuter le script `main.ts`. Par conséquent, vous devriez voir *Ça va être amusant !* dans votre terminal.
+
+Félicitations ! Vous êtes maintenant prêt à coder. On va bien s'amuser ! 🤩
+
+![Une capture d'écran montrant comment exécuter un fichier TypeScript dans VS Code.](/assets/first-steps/deno-run.png)

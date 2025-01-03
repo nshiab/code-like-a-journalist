@@ -1,0 +1,107 @@
+---
+title: Setup
+description: Let's install everything we need.
+---
+
+import { Callout } from 'nextra/components'
+
+# Setup
+
+First, let's install everything we need.
+
+<Callout type="warning" emoji="⚠️">
+  You might need administrator rights. If you are on your work computer and don't have them, ask your IT department.
+</Callout>
+
+## Code editor
+
+Code is just text. You can write your code in any text editor, but it's more convenient to use a code editor that comes with many useful features.
+
+You have many free and interesting options, but the most popular is [Visual Studio Code](https://code.visualstudio.com/), and it's the one we will use. It's an [open-source project](https://github.com/microsoft/vscode) maintained by Microsoft.
+
+Download it from the [website](https://code.visualstudio.com/) and install it.
+
+Once installed, open it. It should look like this. It's okay if you have different tabs open.  
+
+![A screenshot of the code editor Visual Studio Code.](/assets/first-steps/vscode.png)
+
+## Runtime
+
+For your computer to understand TypeScript and execute it, you need a runtime.
+
+Again, you have many great open-source options out there, but I find [Deno](https://deno.com/) particularly easy to use. Deno is maintained by [Deno Land Inc.](https://deno.com/company), with Ryan Dahl as the CEO. Dahl also created [Node.js](https://nodejs.org/), another open-source runtime that is very popular.
+
+To install it, visit the [website](https://deno.com/) and copy the relevant command for your operating system.
+
+Don't worry if you have a different version. As long as it's v2.x.x, you will be fine.
+
+![A screenshot of Deno's website.](/assets/first-steps/deno.png)
+
+Then, follow these steps:
+
+1. Open a new terminal in VS Code.
+2. Paste the command you copied just before and press enter to run it.
+
+The command will download and install Deno on your computer.
+
+![A screenshot showing how to install Deno from VS Code terminal.](/assets/first-steps/deno-install.png)
+
+If you are asked to add Deno to your path, type `Y` and press enter. This ensures Deno is easily accessible from your terminal.
+
+![A screenshot showing an option when installing Deno.](/assets/first-steps/deno-path.png)
+
+And if you are asked to set up completions, choose bash or zsh depending on your operating system by using the up and down keys and pressing the space bar. Then press enter. This provides a handy auto-completion helper in the terminal.
+
+![A screenshot showing how to set up completions when installing Deno.](/assets/first-steps/deno-completions.png)
+
+Now, everything should be properly installed.
+
+Quit and restart VS Code. Then type `deno --version` in your terminal and press enter to display your Deno version. You should see something like this!
+
+![A screenshot showing how to display Deno version.](/assets/first-steps/deno-version.png)
+
+## Extensions
+
+VS Code has a wonderful extensions ecosystem and the Deno team created a very useful one to help you code efficiently.
+
+Follow these steps to install it:
+
+1. Click on the Extensions tab on the left side of VS Code.
+2. Search for the Deno extension.
+3. Install the Deno extension. Make sure `Auto update` is checked.
+
+![A screenshot showing how to install Deno extension.](/assets/first-steps/deno-extension.png)
+
+## Let's run a script
+
+To double-check that everything is working as expected, we are going to write a little script and run it.
+
+To start a new project in VS Code, follow these steps:
+
+1. Create a new folder somewhere handy on your computer.
+2. In VS Code, click on the Explorer tab.
+3. Click on `Open Folder` and select the folder you just created.
+
+![A screenshot showing how to open a new folder in VS Code.](/assets/first-steps/deno-open-folder.png)
+
+Now that VS Code has opened your folder, we can create a new file.
+
+1. Right-click on the Explorer.
+2. Click on `New file...`.
+3. Name your new file `main.ts`. If the file doesn't open as a new tab, click on it.
+4. In the `main.ts` tab, type `console.log("This is going to be fun!");`.
+
+This code tells your computer to log *This is going to be fun!* in your terminal.
+
+![A screenshot showing how to create a new TypeScript file in VS Code.](/assets/first-steps/deno-new-file.png)
+
+We can now run this script.
+
+1. Toggle the terminal.
+2. Type `deno run main.ts` in the terminal and press enter.
+
+This asks your computer to use Deno to run the script `main.ts`. As a result, you should see *This is going to be fun!* in your terminal.
+
+Congratulations! You are now ready to write amazing code. 🤩
+
+![A screenshot showing how to run a TypeScript file in VS Code.](/assets/first-steps/deno-run.png)
