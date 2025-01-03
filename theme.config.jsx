@@ -2,6 +2,7 @@
 import { LocaleSwitch, useConfig } from "nextra-theme-docs";
 import { useRouter } from "nextra/hooks";
 import { formatDate } from "@nshiab/journalism/web";
+import { Analytics } from "@vercel/analytics/next";
 
 const TITLE = {
     en: "Code Like a Journalist",
@@ -292,5 +293,9 @@ export default {
         }
         return `Last updated on ${formatDate(timestamp, "Month DD, YYYY")}.`;
     },
+    main: ({ children }) => (<>
+        {children}
+        <Analytics />
+    </>),
     // ... other theme options
 };
