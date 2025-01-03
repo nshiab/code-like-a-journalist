@@ -9,13 +9,13 @@ const TITLE = {
 };
 
 const DESCRIPTION = {
-    en: "A free online data analysis and data visualization course using JavaScript/TypeScript by computational journalist Nael Shiab.",
-    fr: "Un cours gratuit sur l'analyse et la visualisation de données avec JavaScript/TypeScript par le journaliste computationnel Nael Shiab.",
+    en: "A free online data analysis and data visualization course using TypeScript by computational journalist Nael Shiab.",
+    fr: "Un cours gratuit sur l'analyse et la visualisation de données avec TypeScript par le journaliste computationnel Nael Shiab.",
 };
 
 const BANNER = {
-    en: "Work in progress... 👨‍💻",
-    fr: "Site en construction... 👨‍💻",
+    en: `<a href="{link}">Work in progress... 👨‍💻 Problems? Reach out →</a>`,
+    fr: `<a href="{link}">En construction... 👨‍💻 Problèmes? Contactez moi →</a>`,
 };
 
 const FEEDBACK = {
@@ -60,42 +60,90 @@ const SCROLLTOP = {
 const FOOTER = {
     en: (
         <div
-            style={{ textAlign: "center", margin: "0 auto", width: "100%" }}
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                width: "100%",
+                gap: "1rem",
+                textAlign: "center",
+            }}
         >
-            Code Like a Journalist © {new Date().getFullYear()} by{" "}
-            <a
-                href="https://www.naelshiab.com/"
-                style={{ textDecoration: "underline" }}
-            >
-                Nael Shiab
-            </a>{" "}
-            is licensed under{" "}
-            <a
-                href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
-                style={{ textDecoration: "underline" }}
-            >
-                Creative Commons Attribution 4.0 International
-            </a>.
+            <div>
+                Code Like a Journalist © {new Date().getFullYear()} by{" "}
+                <a
+                    href="https://www.naelshiab.com/"
+                    style={{ textDecoration: "underline" }}
+                >
+                    Nael Shiab
+                </a>{" "}
+                is licensed under{" "}
+                <a
+                    href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+                    style={{ textDecoration: "underline" }}
+                >
+                    Creative Commons Attribution 4.0 International
+                </a>.
+            </div>
+            <div>
+                This project was funded by the{" "}
+                <a
+                    href="https://www.michenerawards.ca/media-release/michener-awards-foundation-announces-its-2024-fellowships-winners/"
+                    style={{ textDecoration: "underline" }}
+                >
+                    Michener-L. Richard O’Hagan Fellowship
+                </a>{" "}
+                from the Michener Awards Foundation.
+            </div>
+            <div>
+                <a href="/contact" style={{ textDecoration: "underline" }}>
+                    Contact
+                </a>
+            </div>
         </div>
     ),
     fr: ((
         <div
-            style={{ textAlign: "center", margin: "0 auto", width: "100%" }}
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                width: "100%",
+                gap: "1rem",
+                textAlign: "center",
+            }}
         >
-            Codez comme un journaliste © {new Date().getFullYear()} par{" "}
-            <a
-                href="https://www.naelshiab.com/"
-                style={{ textDecoration: "underline" }}
-            >
-                Nael Shiab
-            </a>{" "}
-            est publié sous la licence{" "}
-            <a
-                href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
-                style={{ textDecoration: "underline" }}
-            >
-                Creative Commons Attribution 4.0 International
-            </a>.
+            <div>
+                Codez comme un journaliste © {new Date().getFullYear()} par{" "}
+                <a
+                    href="https://www.naelshiab.com/"
+                    style={{ textDecoration: "underline" }}
+                >
+                    Nael Shiab
+                </a>{" "}
+                est publié sous la licence{" "}
+                <a
+                    href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+                    style={{ textDecoration: "underline" }}
+                >
+                    Creative Commons Attribution 4.0 International
+                </a>.
+            </div>
+            <div>
+                Ce project a été financé par la{" "}
+                <a
+                    href="https://www.prixmichener.ca/media-release/la-fondation-des-prix-michener-devoile-les-laureat-e-s-de-ses-bourses-pour-lannee-2024/"
+                    style={{ textDecoration: "underline" }}
+                >
+                    Bourse Michener – L. Richard O’Hagan
+                </a>{" "}
+                de la Fondation des Prix Michener.
+            </div>
+            <div>
+                <a href="/contact" style={{ textDecoration: "underline" }}>
+                    Contact
+                </a>
+            </div>
         </div>
     )),
 };
@@ -167,7 +215,16 @@ export default {
         key: "wip",
         content: function useText() {
             const { locale } = useRouter();
-            return <span>{BANNER[locale]}</span>;
+            return (
+                <span
+                    dangerouslySetInnerHTML={{
+                        __html: BANNER[locale].replace(
+                            "{link}",
+                            `/${locale}/contact`,
+                        ),
+                    }}
+                />
+            );
         },
     },
     search: {
