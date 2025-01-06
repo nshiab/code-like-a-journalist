@@ -192,11 +192,11 @@ export default {
                 />
                 <meta
                     property="og:image"
-                    content="https://www.code-like-a-journalist.com/assets/sharing.jpg"
+                    content="https://www.code-like-a-journalist.com/assets/sharing-v1.jpg"
                 />
                 <meta
                     property="twitter:image"
-                    content="https://www.code-like-a-journalist.com/assets/sharing.jpg"
+                    content="https://www.code-like-a-journalist.com/assets/sharing-v1.jpg"
                 />
                 <meta property="twitter:card" content="summary_large_image" />
                 <meta
