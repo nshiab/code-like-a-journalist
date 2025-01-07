@@ -1,43 +1,62 @@
 ---
-title: Pourquoi TypeScript ?
-description: TypeScript est un excellent choix pour l'analyse et la visualisation de données. Voici pourquoi.
+title: Pourquoi coder ? Et pourquoi TypeScript ?
+description: TypeScript est devenu un excellent choix pour l'analyse et la visualisation de données. Voici pourquoi.
 ---
 
-# Pourquoi TypeScript ?
+# Pourquoi coder ? Et pourquoi TypeScript ?
 
-À chaque fois que je parle de ce cours à des connaissances férues en analyse de données, la même question revient : pourquoi TypeScript ? Python ou R ne seraient-ils pas mieux ?
+Au fil des années, j’ai été invité à présenter mes projets à des étudiants de divers domaines, à des universitaires, des chercheurs, des professionnels de tout acabit, et lors de conférences. J’ai eu d’innombrables appels vidéo avec des personnes qui ont vu [mon travail](https://www.naelshiab.com/portfolio) et s’intéressaient au journalisme computationnel, à l’analyse de données et à la visualisation de données.
 
-Si vous êtes nouveau dans le monde des données, [Python](https://www.python.org/) et [R](https://www.r-project.org/) sont des langages de programmation gratuits et en code ouvert traditionnellement utilisés pour l'analyse de données. Ces langages sont fantastiques, soutenus par des communautés dynamiques qui créent continuellement des outils incroyables. Et je les ai utilisés avec joie pendant des années.
+Et les mêmes questions revenaient année après année :
+- Ai-je vraiment besoin d’apprendre à coder ?
+- Et si oui, quel langage devrais-je apprendre ?
 
-Toutefois, TypeScript présente un avantage majeur : il se transpile en JavaScript, le langage du Web.
+Voici donc mes réflexions et pourquoi j’ai décidé de créer ce cours !
 
-Lorsque j'ai commencé ma carrière de journaliste computationnel, j'ai appris à coder en Python, comme de nombreux analystes et scientifiques de données. Automatiser la collecte de données publiées sur des sites web (*web scraping*), traiter de gigantesques fichiers et les analyser en Python était enivrant !
+## Pourquoi coder ?
 
-Mais chaque fois que je voulais partager les résultats de mes analyses, je me heurtais à un mur. Pour communiquer efficacement mes conclusions, j'avais besoin de publier des visualisations de données interactives sur le site Web de mon média. Et le Web fonctionne avec JavaScript.
+Les outils basés sur des interfaces cliquables comme [Google Sheets](https://workspace.google.com/products/sheets/) et [Datawrapper](https://www.datawrapper.de/) permettent déjà de faire beaucoup. Ils sont fantastiques pour analyser et visualiser rapidement des ensembles de données.
 
-Alors, j'ai commencé à apprendre JavaScript...
+Mais ces outils ont leurs limites.
 
-Pendant les premières années de ma carrière, je réalisais mes projets en deux grandes étapes :
+Par exemple, vous ne pouvez pas traiter de gros volumes de données avec ces outils. De plus, il y aura inévitablement des moments où vous penserez : *"Ah ! J’aimerais pouvoir faire ÇA !"*, sans pouvoir trouver un moyen d'y arriver à cause des capacités limitées de ces outils.
 
-1. Collecter, nettoyer et analyser les données avec Python.
+Avec le code, c’est différent. D’une certaine manière, la programmation informatique vous donne un super-pouvoir.
+
+- Si vous avez des fichiers volumineux contenant des millions de points de données, vous pouvez exploiter la puissance brute de votre ordinateur pour les traiter.
+- Si une fonctionnalité n’existe pas, vous pouvez la coder vous-même.
+- Si vous avez besoin d’effectuer des tâches répétitives, vous pouvez les automatiser.
+
+Et tout cela peut se faire sur votre ordinateur ou sur un serveur dans l'infonuagique. N’est-ce pas formidable ?
+
+Le code est également plus facile à déboguer et à réutiliser.
+
+Par exemple, imaginez que vous avez créé une feuille de calcul et y avez entré des données. Pour produire votre analyse, vous effectuez 10 étapes impliquant des clics, des sélections de menus et des saisies manuelles dans les cellules. Que se passe-t-il si vous avez fait une erreur à l’étape 3 ? La plupart du temps, vous devrez tout recommencer. C’est lent, frustrant et difficile de vous souvenir exactement de comment vous en êtes arrivé là.
+
+Avec le code, c’est différent. Si vous avez 10 lignes de code et que la troisième ligne est incorrecte, vous corrigez simplement cette ligne. Les autres restent telles quelles. Tout est écrit et sauvegardé, vous pouvez donc toujours y revenir plus tard.
+
+Aussi, le code est juste du texte. Il est facile à partager. Si je dois vérifier vos chiffres, je peux lire votre code ligne par ligne, l’exécuter moi-même pour reproduire vos résultats ou le modifier pour explorer d’autres possibilités. Si vous souhaitez être transparent avec vos lecteurs, vous pouvez également le publier, augmentant ainsi leur confiance dans votre travail.
+
+Et en plus de tout cela, il existe aussi beaucoup de cours de programmation formidables, comme celui-ci. 😉
+
+## Quel langage ?
+
+Il existe de nombreux langages de programmation gratuits et en code ouvert, mais les plus populaires pour l’analyse de données sont [Python](https://www.python.org/) et [R](https://www.r-project.org/). Les deux sont fantastiques, soutenus par des communautés dynamiques qui créent des outils formidables. J’ai personnellement pris beaucoup de plaisir à les utiliser pendant des années.
+
+Cependant, ils ne sont pas idéaux pour publier sur le web, car le web fonctionne dans un autre langage : JavaScript. Et en journalisme comme pour de nombreux autres domaines, publier sur le web est devenu un incontournable.
+
+En parallèle, JavaScript n’était pas un très bon choix pour traiter des données dans le passé, mais il disposait (et dispose encore) de librairies exceptionnelles pour créer des visualisations sur mesure de très grandes qualités.
+
+Cela a conduit à une création en deux étapes pour la plupart des projets de données publiés sur le web :
+1. Collecter, nettoyer et analyser les données avec Python ou R.
 2. Visualiser et communiquer les résultats avec JavaScript.
 
-Cela nécessitait l'utilisation de différents outils et environnements de travail. Je devais souvent traduire du code Python en JavaScript (ou vice versa) à mesure que les projets évoluaient. C'était fastidieux et long. Maintenir et améliorer mes compétences dans les deux langages me demandait beaucoup d'énergie.
+Mais au fil des années, JavaScript a évolué. Le langage a bénéficié d’une mise à niveau majeure avec TypeScript, rendant l’écriture et la gestion de code et de données complexes plus aisée. Les environnements d’exécution JavaScript/TypeScript sont devenus plus accessibles et puissants, et de nouveaux outils sont apparus pour traiter des ensembles de données massifs à des vitesses remarquables.
 
-Plus tard, R a commencé à gagner en popularité dans la communauté du journalisme de données. J'ai remplacé Python par R pour certains projets, explorant son riche écosystème. Mais j'étais toujours obligé de passer par du JavaScript pour la visualisation.
+À mon niveau, j’ai essayé de contribuer au domaine en créant [simple-data-analysis](https://github.com/nshiab/simple-data-analysis), une librairie pour traiter facilement et efficacement les données. J’ai commencé à travailler dessus en avril 2022 et l’ai utilisée pour [tous mes projets](https://www.naelshiab.com/portfolio) depuis.
 
-Entre-temps, l'écosystème JavaScript évoluait rapidement. Le langage a bénéficié d'une amélioration majeure avec TypeScript, qui permet de travailler plus facilement sur des projets et des données complexes. Les environnements d'exécution JavaScript/TypeScript sont devenus plus accessibles et puissants, et de nouveaux outils ont émergé pour traiter d'énormes ensembles de données à des vitesses époustouflantes.
+Donc, si je devais recommander un langage aujourd’hui, ce serait TypeScript. Avec lui, vous pouvez répondre à des questions importantes en exploitant des millions et des millions de points de données, tout en communiquant efficacement vos résultats avec le monde entier, sur le web, comme le font les journalistes computationnels.
 
-À ce moment-là, je me suis demandé : pourquoi est-ce que je ne coderai pas tout en TypeScript ?
+Et c’est ce que je veux vous enseigner : comment coder un projet axé sur les données avec des visualisations interactives en TypeScript, de A à Z.
 
-L'obstacle principal était évident : TypeScript disposait d'outils exceptionnels pour la visualisation de données (comme [D3.js](https://d3js.org/)), mais il manquait d'outils d'analyse de données faciles à utiliser.
-
-Alors, inspiré par [Pandas](https://pandas.pydata.org/) en Python et le [Tidyverse](https://www.tidyverse.org/) en R, j'ai décidé de créer [simple-data-analysis](https://github.com/nshiab/simple-data-analysis).
-
-J'ai écrit les premières lignes de code en avril 2022 et je l'utilise depuis dans [tous mes projets](https://www.naelshiab.com/portfolio).
-
-Le parcours a été long et difficile, mais je peux désormais utiliser TypeScript de A à Z pour réaliser mes projets. Et c'est ce que je veux partager avec vous.
-
-J'espère que ce cours rendra l'analyse et la visualisation de données plus accessibles. Mon objectif est de fournir à chacun les outils nécessaires pour répondre à des questions importantes avec des données, comme le font les journalistes computationnels.
-
-Alors, codons comme des journalistes ! 😁
+Je suis sûr que nous allons nous bien nous amuser en chemin. Alors, codons comme des journalistes ! 😁

@@ -1,43 +1,62 @@
 ---
-title: Why TypeScript?
-description: TypeScript is an excellent choice for data analysis and visualization. Here's why.
+title: Why code? And why TypeScript?
+description: TypeScript has become an excellent choice for data analysis and visualization. Here's why.
 ---
 
-# Why TypeScript?
+# Why code? And why TypeScript?
 
-Every time I talk about this course to data-savvy acquaintances, the same question pops up: why TypeScript? Wouldn't Python or R be better?
+Over the years, I’ve been invited to give talks, often to students in various fields, academics, researchers, professionals of all kinds, and at conferences. I’ve also had countless video calls with people who saw [my work](https://www.naelshiab.com/portfolio) and were interested in computational journalism, data analysis, and data visualization.
 
-If you're new to the data world, [Python](https://www.python.org/) and [R](https://www.r-project.org/) are free and open-source programming languages traditionally used for data analysis. These languages are fantastic, backed by vibrant communities that continuously create amazing tools. I've personally enjoyed using them for years.
+The same questions came up year after year:
+- Do I really need to learn how to code?
+- And if so, which language should I learn?
 
-However, TypeScript has a major advantage: it transpiles to JavaScript, the language of the Web.
+So here are my thoughts and why I decided to create this course!
 
-When I started my career as a computational journalist, I, like many data analysts and scientists, learned Python. Scraping data, crunching massive datasets, and deriving insights with Python was exhilarating!
+## Why code?
 
-But every time I wanted to share the results of my analysis, I hit a wall. To effectively communicate my findings, I needed to publish interactive data visualizations on my media outlet's website. And the web runs on JavaScript.
+Point-and-click tools like [Google Sheets](https://workspace.google.com/products/sheets/) and [Datawrapper](https://www.datawrapper.de/) can do a lot. They are fantastic for quickly analyzing and visualizing datasets.
 
-So, I started learning JavaScript...
+But they have their limits.
 
-For the first few years of my career, I followed a two-step workflow:
+For example, you can’t process large datasets with these tools. Also, there will inevitably be moments when you think, *"Ah! I wish I could do THAT!"*, but you can’t because the tool’s capabilities constrain you.
 
-1. Gather, clean, and analyze data with Python.
-2. Visualize and communicate the results with JavaScript.
+With code, it’s different. In a way, it gives you a superpower.
 
-This workflow required using different tools and coding environments. Often, I had to translate Python code into JavaScript (or vice versa) as projects evolved. It was tedious and time-consuming. Maintaining and improving my skills in both languages consumed a significant amount of energy.
+- If you have massive files with millions of data points, you can harness your computer's raw power to process them.
+- If a feature doesn’t exist, you can build it.
+- If you need to perform repetitive tasks, you can automate them.
 
-Later, R started gaining traction within the data journalism community. I replaced Python with R for some projects, exploring its rich ecosystem. But I was still tied to JavaScript for visualization.
+And all of this can happen on your computer or a server in the cloud. Isn't that amazing?
 
-Meanwhile, the JavaScript ecosystem was rapidly evolving. The language received a significant upgrade with TypeScript, making it easier to handle complex code and data. JavaScript/TypeScript runtimes became more accessible and powerful, and new tools emerged to process massive datasets at remarkable speeds.
+Code is also easier to debug and reuse.
 
-At that point, I wondered: why couldn't I do everything in TypeScript?
+For instance, imagine you’ve created a spreadsheet and filled it with data. To produce your analysis, you go through 10 steps involving clicks, menu selections, and cell typing. What happens if you made a mistake at step 3? You’ll have to scrap everything and start over most of the time. It’s slow, frustrating, and hard to remember exactly how you got there.
 
-The main obstacle was clear: TypeScript had exceptional data visualization libraries (like [D3.js](https://d3js.org/)), but it lacked easy-to-use data analysis tools.
+With code, it’s different. If you have 10 lines of code and the third line is wrong, you just fix that line. The rest stays as it is. Everything is written down, so you can always revisit it later.
 
-So, inspired by [Pandas](https://pandas.pydata.org/) in Python and the [Tidyverse](https://www.tidyverse.org/) in R, I decided to create [simple-data-analysis](https://github.com/nshiab/simple-data-analysis).
+Code is just text. It’s easy to share. If I need to double-check your numbers, I can read your code line by line, run it myself to reproduce your results or tweak it to explore other possibilities. If you want to be transparent with your readers, you can also easily publish it, increasing their trust in your work.
 
-I wrote the first lines of code in April 2022 and have been using it for [all of my projects](https://www.naelshiab.com/portfolio) ever since.
+On top of all that, there are also a lot of amazing coding courses, like this one. 😉
 
-The journey was long and challenging, but now I can use TypeScript end-to-end to create my projects. And this is what I want to share with you.
+## Which Language?
 
-My hope is that this course will make data analysis and visualization more accessible. I aim to provide everyone with the tools needed to answer important questions with data, just like computational journalists do.
+There are many free and open-source programming languages, but the most popular ones for data analysis are [Python](https://www.python.org/) and [R](https://www.r-project.org/). Both are fantastic, supported by vibrant communities, and packed with amazing tools. I’ve personally enjoyed using them for years.
 
-So, let's code like journalists! 😁
+However, they’re not ideal for publishing on the web because the web runs in another language: JavaScript. And in journalism, as in many other fields, publishing on the web has become essential.
+
+At the same time, JavaScript was not a very good choice for data processing in the past, but it had (and still has) exceptional libraries for creating highly customized, high-quality visualizations.
+
+This led to a two-step workflow for most digital data projects:
+1. Gather, clean, and analyze data with Python or R.
+2. Visualize and communicate results using JavaScript.
+
+But over the years, JavaScript has evolved. The language significantly upgraded with TypeScript, making writing and managing complex code and data easier. JavaScript/TypeScript runtimes became more accessible and powerful, and new tools emerged to process massive datasets at remarkable speeds.
+
+At my level, I’ve tried to contribute to the field by creating [simple-data-analysis](https://github.com/nshiab/simple-data-analysis), a library to easily and efficiently process data. I started working on it in April 2022 and have used it for [all my projects](https://www.naelshiab.com/portfolio) since.
+
+So, if I were to recommend a language today, it would be TypeScript. With it, you can answer important questions by leveraging millions upon millions of data points, while effectively communicating your results to the world, on the web, just like computational journalists do.
+
+And this is what I want to teach you: how to code data-driven projects with interactive data visualizations using TypeScript, from start to finish.
+
+I am sure we'll have a lot of fun along the way. So, let’s code like journalists! 😁
