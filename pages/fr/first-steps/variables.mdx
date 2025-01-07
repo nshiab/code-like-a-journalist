@@ -92,6 +92,15 @@ Nous avons une autre erreur ! Cette fois, l'éditeur nous indique que `message` 
 
 ![Une capture d'écran montrant une erreur de type dans VS Code.](/assets/first-steps/variable-number.png)
 
+Ici, si nous voulons afficher un message texte et un nombre, il est préférable de créer deux variables.
+
+```ts showLineNumbers filename="main.ts"
+const message = "This is going to be very fun!";
+console.log(message);
+const number = 2;
+console.log(number);
+```
+
 À ce stade, vous pourriez penser : *Pourquoi est-ce si compliqué ? Laisse-moi remplacer ce que je veux, stupide ordinateur !*
 
 Mais croyez-moi : cela vous évitera des bogues à la pelle. En tant que journaliste de données et computationnel, j'ai appris cela à la dure. 😅

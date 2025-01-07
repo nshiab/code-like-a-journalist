@@ -92,6 +92,15 @@ We have another error! This time, the editor tells us that `message` is supposed
 
 ![A screenshot showing a type error in VS Code.](/assets/first-steps/variable-number.png)
 
+Here, if we want to log a text message and a number, it’s best to create two variables.
+
+```ts showLineNumbers filename="main.ts"
+const message = "This is going to be very fun!";
+console.log(message);
+const number = 2;
+console.log(number);
+```
+
 At this point, you might think, *Why is this so complicated? Let me overwrite whatever I want, stupid computer!*
 
 But trust me: this will save you from nasty bugs. As an experienced data and computational journalist, I've learned that the hard way. 😅
