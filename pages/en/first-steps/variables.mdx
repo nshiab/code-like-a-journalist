@@ -1,0 +1,103 @@
+# Variables
+
+Let's start your first TypeScript lesson with variables!
+
+Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+- `main.ts` in which we will code. You can add `console.log("This is going to be fun!");` to it.
+- `deno.json` so VS Code knows this is a Deno project and will enable the Deno extension. You can tweak your settings in it, but we will keep it empty for now.
+
+Toggle the terminal and run `deno run main.ts`.
+
+`console.log` instructs the computer to log something to the terminal. This "something" here is `This is going to be fun!`, which is text. For your computer to understand it's text, it needs to be wrapped in quotes.
+
+![A screenshot showing VS Code with main.ts and deno.json files.](/assets/first-steps/variable-log.png)
+
+Now, this runs just once. It's a little bit annoying. We don't want to switch to the terminal and rerun the command every time we make a change.
+
+Let's use the option `--watch` so anytime we save a change, Deno will rerun our code automatically. While at it, we will also use the option `--check` so Deno will ensure our code is okay before running it.
+
+Type and run `deno run --watch --check main.ts` in the terminal, then add `very` before `fun` and save with the shortcut (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+
+Deno will now clear the terminal and rerun `main.ts` any time you save it. Very convenient!
+
+If you want to stop watching, click in the terminal and press `CMD` + `C` or `CTRL` + `C`, but we will keep it watching for the rest of the lesson.
+
+![A screenshot showing VS Code watching main.ts.](/assets/first-steps/variable-watch.png)
+
+Let's talk about the code now.
+
+`console.log("This is going to be very fun!");` is just logging text to the terminal.
+
+Let's create a variable and put the text inside instead. Copy the code below and paste it into your `main.ts`:
+
+```ts showLineNumbers filename="main.ts"
+const message = "This is going to be very fun!";
+console.log(message);
+```
+
+If you save, you'll notice that the result in the terminal is the same. But there is a big difference in your code: your text is now in the variable `message`!
+
+Variables are like big boxes. You can put stuff in them. And when you invoke them, Deno will look at what's inside and use it. It's very convenient because you can reuse the same variable throughout your code.
+
+There are two main ways to create variables:
+- With `const`, if you intend to keep the content constant, which should be your go-to.
+- With `let`, if you need to overwrite the content.
+
+Let's try to overwrite the content in our code without changing `const`. Update your code and save.
+
+```ts showLineNumbers filename="main.ts"
+const message = "This is going to be very fun!";
+message = "Yo";
+console.log(message);
+```
+
+Oh! We have a red squiggly line, and we see an error in the terminal.
+
+We tried to overwrite the content of a constant variable, which is forbidden. So Deno refuses to run our code.
+
+![A screenshot showing a VS Code error in the terminal.](/assets/first-steps/variable-error-const.png)
+
+Let's switch `const` to `let`.
+
+```ts showLineNumbers filename="main.ts"
+let message = "This is going to be very fun!";
+message = "Yo!";
+console.log(message);
+```
+
+Now it runs without problem!
+
+Let's explain the code so far:
+- On line `1`, we create a new variable and put `This is going to be very fun!` in it.
+- On line `2`, we overwrite the content with `Yo!`.
+- The result is that line `3` now logs `Yo!` instead of `This is going to be fun!`.
+
+As mentioned before, it's best to use `const` as the default way to create variables. It will save you from a few bugs. But sometimes, you need to overwrite variables with `let`, and we will see examples of that, notably when working with loops.
+
+There is something else to know about variables: **The data type matters**. This is why it's called... TypeScript!
+
+For example, if you hover over `message` right now, you'll see that it is of type `string`, which means it's a string of characters (text), because you put text in it.
+
+![A screenshot showing a variable of type string in VS Code.](/assets/first-steps/variable-string.png)
+
+Let's overwrite `message` with a number and see what happens. As mentioned before, text needs to be wrapped in quotes, but numbers don't need to be wrapped.
+
+```ts showLineNumbers filename="main.ts"
+let message = "This is going to be very fun!";
+message = 2;
+console.log(message);
+```
+
+We have another error! This time, the editor tells us that `message` is supposed to be a `string`, but we are overwriting it with a `number`. It doesn't make any sense!
+
+![A screenshot showing a type error in VS Code.](/assets/first-steps/variable-number.png)
+
+At this point, you might think, *Why is this so complicated? Let me overwrite whatever I want, stupid computer!*
+
+But trust me: this will save you from nasty bugs. As an experienced data and computational journalist, I've learned that the hard way. 😅
+
+The `const` will prevent you from overwriting important variables or data by mistake, and the types will make sure you are not mixing `text`, `number`, `date`, and other data types.
+
+At the end of the day, you want valid results. You want to avoid publishing wrong information at all costs. Using `const` instead of `let` and having strict `types` helps you write clean and reliable code.
+
+So, when you'll be swearing at TypeScript errors, take a big breath and repeat this out loud: *It's working for me, not against me!*

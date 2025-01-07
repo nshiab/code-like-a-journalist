@@ -1,0 +1,103 @@
+# Variables
+
+Commençons votre première leçon de TypeScript avec les variables !
+
+Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code et créez deux fichiers :
+- `main.ts` dans lequel nous coderons. Vous pouvez ajouter `console.log("This is going to be fun!");` à celui-ci.
+- `deno.json` pour que VS Code sache qu'il s'agit d'un projet Deno et activera l'extension Deno. Vous pourrez ajuster vos paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+
+Ouvrez le terminal et exécutez `deno run main.ts`.
+
+`console.log` indique à l'ordinateur d'afficher quelque chose dans le terminal. Ce "quelque chose" ici est `This is going to be fun!`, qui est du texte. Pour que votre ordinateur comprenne qu'il s'agit de texte, ça doit être entouré de guillemets.
+
+![Une capture d'écran montrant VS Code avec les fichiers main.ts et deno.json.](/assets/first-steps/variable-log.png)
+
+En ce moment, ce code ne s'exécute qu'une seule fois. C'est embêtant. Nous ne voulons pas basculer vers le terminal et relancer la commande à chaque fois que nous faisons une modification.
+
+Utilisons l'option `--watch` pour qu'à chaque fois que nous enregistrons une modification, Deno exécute automatiquement notre code. Pendant que nous y sommes, utilisons également l'option `--check` pour que Deno s'assure que notre code est correct avant de l'exécuter.
+
+Tapez et exécutez `deno run --watch --check main.ts` dans le terminal, puis ajoutez `very` avant `fun` et enregistrez avec le raccourci (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+
+Deno effacera maintenant le contenu du terminal et relancera `main.ts` chaque fois que vous l'enregistrerez. Très pratique !
+
+Si vous souhaitez arrêter tout ça, cliquez sur le terminal et appuyez sur `CMD` + `C` ou `CTRL` + `C`. Mais nous allons garder le tout actif pour le reste de la leçon.
+
+![Une capture d'écran montrant VS Code surveillant main.ts.](/assets/first-steps/variable-watch.png)
+
+Parlons maintenant du code.
+
+`console.log("This is going to be very fun!");` ne fait qu'afficher du texte dans le terminal.
+
+Créons une variable et mettons le texte à l'intérieur. Copiez le code ci-dessous et collez-le dans votre `main.ts` :
+
+```ts showLineNumbers filename="main.ts"
+const message = "This is going to be very fun!";
+console.log(message);
+```
+
+Si vous enregistrez, vous remarquerez que le résultat dans le terminal est le même. Mais il y a une grande différence dans votre code : votre texte est maintenant dans la variable `message` !
+
+Les variables sont comme de grandes boîtes. Vous pouvez y mettre des choses. Et lorsque vous les invoquez, Deno regarde ce qu'elles contiennent et l'utilise. C'est très pratique car vous pouvez réutiliser la même variable dans tout votre code.
+
+Il existe deux façons principales de créer des variables :
+- Avec `const`, si vous avez l'intention de garder le contenu identique, ce qui devrait être votre choix par défaut.
+- Avec `let`, si vous devez remplacer le contenu.
+
+Essayons de remplacer le contenu dans notre code sans changer `const`. Mettez à jour votre code et enregistrez.
+
+```ts showLineNumbers filename="main.ts"
+const message = "This is going to be very fun!";
+message = "Yo";
+console.log(message);
+```
+
+Oh ! Nous avons une ligne ondulée rouge, et nous voyons une erreur dans le terminal.
+
+Nous avons essayé de remplacer le contenu d'une variable constante, ce qui est interdit. Deno refuse donc d'exécuter notre code.
+
+![Une capture d'écran montrant une erreur dans le terminal de VS Code.](/assets/first-steps/variable-error-const.png)
+
+Passons de `const` à `let`.
+
+```ts showLineNumbers filename="main.ts"
+let message = "This is going to be very fun!";
+message = "Yo!";
+console.log(message);
+```
+
+Maintenant, le code s'exécute sans problème !
+
+Expliquons le code jusqu'à présent :
+- À la ligne `1`, nous créons une nouvelle variable et y mettons `This is going to be very fun!`.
+- À la ligne `2`, nous remplaçons le contenu par `Yo!`.
+- Le résultat est que la ligne `3` affiche maintenant `Yo!` au lieu de `This is going to be fun!`.
+
+Comme mentionné précédemment, il est préférable d'utiliser `const` par défaut pour créer des variables. Cela vous évitera quelques bogues. Mais parfois, vous devez remplacer des variables avec `let`, et nous verrons des exemples de cela, notamment lorsque nous travaillerons avec des boucles.
+
+Il y a autre chose à savoir sur les variables : **Le type de données est important**. C'est pour cela que ce langage s'appelle... TypeScript !
+
+Par exemple, si vous mettez votre curseur sur `message` maintenant, vous verrez qu'il est de type `string`, ce qui signifie qu'il s'agit d'une chaîne de caractères (du texte), parce que vous y avez mis du texte.
+
+![Une capture d'écran montrant une variable de type string dans VS Code.](/assets/first-steps/variable-string.png)
+
+Essayons de remplacer `message` par un nombre et voyons ce qui se passe. Comme mentionné précédemment, le texte doit être entouré de guillemets, mais les nombres n'ont pas besoin de l'être.
+
+```ts showLineNumbers filename="main.ts"
+let message = "This is going to be very fun!";
+message = 2;
+console.log(message);
+```
+
+Nous avons une autre erreur ! Cette fois, l'éditeur nous indique que `message` est censé être un `string`, mais nous essayons de le remplacer par un `number`. Ça n'a aucun sens !
+
+![Une capture d'écran montrant une erreur de type dans VS Code.](/assets/first-steps/variable-number.png)
+
+À ce stade, vous pourriez penser : *Pourquoi est-ce si compliqué ? Laisse-moi remplacer ce que je veux, stupide ordinateur !*
+
+Mais croyez-moi : cela vous évitera des bogues à la pelle. En tant que journaliste de données et computationnel, j'ai appris cela à la dure. 😅
+
+Le `const` vous empêchera de remplacer par erreur des variables ou des données importantes, et les `types` garantiront que vous ne mélangez pas des `text`, `number`, `date` et d'autres types de données.
+
+Au final, vous voulez des résultats valides. Vous voulez éviter de publier des informations erronées à tout prix. Utiliser `const` au lieu de `let` et appliquer des `types` stricts vous aide à écrire un code propre et fiable.
+
+Alors, lorsque vous pesterez contre les erreurs de TypeScript, prenez une grande inspiration et répétez à haute voix : *C'est pour mon bien, ce n'est pas contre moi !*
