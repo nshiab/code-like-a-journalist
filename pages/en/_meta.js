@@ -2,5 +2,8 @@ export default {
     index: "Welcome!",
     preamble: "Preamble",
     "first-steps": "First steps",
-    contact: "Contact",
+    "more": "More to come...",
+    contact: {
+        display: "hidden",
+    },
 };
