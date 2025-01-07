@@ -208,6 +208,23 @@ export default {
                     content={frontMatter.description ||
                         DESCRIPTION[locale]}
                 />
+                <link
+                    rel="apple-touch-icon"
+                    sizes="180x180"
+                    href="https://www.code-like-a-journalist.com/assets/apple-touch-icon.png"
+                />
+                <link
+                    rel="icon"
+                    type="image/png"
+                    sizes="32x32"
+                    href="https://www.code-like-a-journalist.com/assets/favicon-32x32.png"
+                />
+                <link
+                    rel="icon"
+                    type="image/png"
+                    sizes="16x16"
+                    href="https://www.code-like-a-journalist.com/assets/favicon-16x16.png"
+                />
             </>
         );
     },
@@ -293,9 +310,11 @@ export default {
         }
         return `Last updated on ${formatDate(timestamp, "Month DD, YYYY")}.`;
     },
-    main: ({ children }) => (<>
-        {children}
-        <Analytics />
-    </>),
+    main: ({ children }) => (
+        <>
+            {children}
+            <Analytics />
+        </>
+    ),
     // ... other theme options
 };
