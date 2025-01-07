@@ -1,6 +1,6 @@
 export default {
     index: "Bienvenue!",
-    preamble: "Pourquoi TypeScript?",
+    preamble: "Préambule",
     "first-steps": "Premiers pas",
     contact: "Contact",
 };
