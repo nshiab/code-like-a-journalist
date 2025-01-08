@@ -50,11 +50,11 @@ The command will download and install Deno on your computer.
 
 ![A screenshot showing how to install Deno from VS Code terminal.](/assets/first-steps/setup/deno-install.png)
 
-If you are asked to add Deno to your path, type `Y` and press enter. This ensures Deno is easily accessible from your terminal.
+If you are asked to add Deno to your path, type `Y` and press enter. This ensures Deno is easily accessible from your terminal. If you're not asked, it's okay.
 
 ![A screenshot showing an option when installing Deno.](/assets/first-steps/setup/deno-path.png)
 
-And if you are asked to set up completions, choose bash or zsh depending on your operating system by using the up and down keys and pressing the space bar. Then press enter. This provides a handy auto-completion helper in the terminal.
+And if you are asked to set up completions, choose bash or zsh depending on your operating system by using the up and down keys and pressing the space bar. Then press enter. This provides a handy auto-completion helper in the terminal. Again, if you're not asked, it's okay.
 
 ![A screenshot showing how to set up completions when installing Deno.](/assets/first-steps/setup/deno-completions.png)
 
@@ -76,6 +76,23 @@ Follow these steps to install it:
 
 ![A screenshot showing how to install Deno extension.](/assets/first-steps/setup/deno-extension.png)
 
+One of the great features of the Deno extension is its formatter. Let's update the VS Code settings so it will automatically format our code when we save a file. This will help keep everything clean and tidy.
+
+- On Mac, go to `Code => Preferences => Settings`.
+- On Windows, go to `File => Preferences => Settings`.
+
+![A screenshot showing VS Code settings.](/assets/first-steps/setup/vscode-settings.png)
+
+Search for `Default Formatter` in the search bar and select `Deno` from the dropdown menu.
+
+![A screenshot showing VS Code formatter settings.](/assets/first-steps/setup/vscode-formatter.png)
+
+Search for `Format On Save` and check the box to enable it.
+
+![A screenshot showing VS Code format on save settings.](/assets/first-steps/setup/vscode-format-on-save.png)
+
+The settings are saved automatically, so you can now close the `Settings` tab. You're all set!
+
 ## Let's run a script
 
 To double-check that everything is working as expected, we are going to write a little script and run it.
@@ -84,7 +101,7 @@ To start a new project in VS Code, follow these steps:
 
 1. Create a new folder somewhere handy on your computer.
 2. In VS Code, click on the Explorer tab.
-3. Click on `Open Folder` and select the folder you just created.
+3. Click on `Open Folder` and select the folder you just created. If you are asked whether you trust the authors of the files, say "Yes" to proceed.
 
 ![A screenshot showing how to open a new folder in VS Code.](/assets/first-steps/setup/deno-open-folder.png)
 

@@ -50,11 +50,11 @@ La commande téléchargera et installera Deno sur votre ordinateur.
 
 ![Une capture d'écran montrant comment installer Deno depuis le terminal de VS Code.](/assets/first-steps/setup/deno-install.png)
 
-Si on vous demande d'ajouter Deno à votre chemin d'accès (path), tapez `Y` et appuyez sur Entrée. Cela garantit que Deno est facilement accessible depuis votre terminal.
+Si on vous demande d'ajouter Deno à votre chemin d'accès (path), tapez `Y` et appuyez sur Entrée. Cela garantit que Deno est facilement accessible depuis votre terminal. Si on ne vous le demande pas, ce n'est pas un problème.
 
 ![Une capture d'écran montrant une option lors de l'installation de Deno.](/assets/first-steps/setup/deno-path.png)
 
-Et si on vous demande de configurer les suggestions automatiques (completions), choisissez bash ou zsh en fonction de votre système d'exploitation en utilisant les touches haut et bas et en appuyant sur la barre d'espace. Ensuite, appuyez sur Entrée.
+Et si on vous demande de configurer les suggestions automatiques (completions), choisissez bash ou zsh en fonction de votre système d'exploitation en utilisant les touches haut et bas et en appuyant sur la barre d'espace. Ensuite, appuyez sur Entrée. Encore une fois, si on ne vous le demande pas, ce n'est pas un problème.
 
 ![Une capture d'écran montrant comment configurer les complétions lors de l'installation de Deno.](/assets/first-steps/setup/deno-completions.png)
 
@@ -76,6 +76,23 @@ Suivez ces étapes pour l'installer :
 
 ![Une capture d'écran montrant comment installer l'extension Deno.](/assets/first-steps/setup/deno-extension.png)
 
+Une des fonctionnalités très pratique de l'extension Deno est son formateur de code. Mettons à jour les paramètres de VS Code pour qu'il formate automatiquement notre code à chaque sauvegarde de fichier. Cela aidera à garder tout propre et bien organisé.
+
+- Sur Mac, allez dans `Code => Preferences => Settings`.
+- Sur PC, allez dans `File => Preferences => Settings`.
+
+![Capture d'écran montrant les paramètres de VS Code.](/assets/first-steps/setup/vscode-settings.png)
+
+Recherchez `Default Formatter` dans la barre de recherche et sélectionnez `Deno` dans le menu déroulant.
+
+![Capture d'écran montrant les paramètres du formateur de VS Code.](/assets/first-steps/setup/vscode-formatter.png)
+
+Recherchez `Format On Save` et cochez la case pour l'activer.
+
+![Capture d'écran montrant les paramètres du formatage à la sauvegarde de VS Code.](/assets/first-steps/setup/vscode-format-on-save.png)
+
+Les paramètres sont enregistrés automatiquement, vous pouvez donc fermer l'onglet `Settings`. Tout est prêt !
+
 ## Exécutons un script
 
 Pour vérifier que tout fonctionne comme prévu, nous allons écrire un petit script et l'exécuter.
@@ -84,7 +101,7 @@ Pour démarrer un nouveau projet dans VS Code, suivez ces étapes :
 
 1. Créez un nouveau dossier quelque part sur votre ordinateur.
 2. Dans VS Code, cliquez sur l'onglet Explorer.
-3. Cliquez sur `Open Folder` et sélectionnez le dossier que vous venez de créer.
+3. Cliquez sur `Open Folder` et sélectionnez le dossier que vous venez de créer. Si on vous demande si vous faites confiance aux auteurs des fichiers, répondez "Oui" pour continuer.
 
 ![Une capture d'écran montrant comment ouvrir un nouveau dossier dans VS Code.](/assets/first-steps/setup/deno-open-folder.png)
 
