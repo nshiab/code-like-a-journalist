@@ -1,0 +1,215 @@
+---
+title: Variables in TypeScript
+description: Learn how to use variables and the importance of data types.
+---
+
+import { Callout } from 'nextra/components'
+
+# Variables
+
+Let's start your first TypeScript lesson with variables!
+
+Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+- `main.ts` where we will code. You can add `console.log(2 + 3);` to it.
+- `deno.json` to let VS Code know this is a Deno project and enable the Deno extension. You can tweak your settings in it, but we will keep it empty for now.
+
+Toggle the terminal and run `deno run main.ts`.
+
+`console.log` instructs the computer to log something to the terminal. The "something" here is the calculation `2 + 3`. Your computer runs the calculation and logs the result, which is `5`.
+
+![A screenshot showing VS Code with main.ts and deno.json files.](/assets/first-steps/variables/run.png)
+
+<Callout type="info" emoji="💡">
+    You may have noticed that your code is written with multiple colors. This is called *code highlighting*. In code, each word has a different role and is assigned a color. For example, here `console` is a class, and `log` is a method. Also, while typing, you may see auto-complete suggestions and pop-ups. This is called *IntelliSense*. It's your editor trying to guess what you might want to write and providing documentation for you. For now, you can ignore this, but we will make great use of it later.
+</Callout>
+
+## `watch` and `check`
+
+Currently, this runs just once. It's a little annoying to switch to the terminal and rerun the command every time we make a change.
+
+Let's use the `--watch` option so Deno automatically reruns our code anytime we save a change. While we're at it, we'll also use the `--check` option so Deno ensures our code is correct before running it.
+
+Type and run `deno run --watch --check main.ts` in the terminal. You'll see your script executing. Now, change `3` to `4` in your code and save your file (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+
+Deno will clear the terminal and rerun `main.ts` every time you save it. Very convenient!
+
+If you want to stop watching, click in the terminal and press `CMD` + `C` on Mac or `CTRL` + `C` on PC. But we will keep it watching for the rest of the lesson.
+
+![A screenshot showing VS Code watching main.ts.](/assets/first-steps/variables/watch.png)
+
+## Variables with `const`
+
+Now, let's add variables to our code.
+
+Variables are like containers. You can put stuff in them, and when you reference them, Deno will look at what's inside and use it. This is very convenient because you can reuse the same variable throughout your code.
+
+Let's modify our code to put the first number in the variable `a` and the second number in `b`. We'll also store the result of the calculation in the variable `c`. Copy the code below and paste it into your `main.ts`.
+
+Your computer will run this code from top to bottom. Line 1 will execute, then line 2, and so on.
+
+```ts showLineNumbers filename="main.ts"
+const a = 2;
+const b = 4;
+const c = a + b;
+console.log(c);
+```
+
+<Callout type="info" emoji="💡">
+    Have you noticed all the semicolons? They're there to ensure your computer knows when a statement ends. Don't worry if you forget them. If you followed the [Setup](/first-steps/setup) steps, they will be added automatically when you save a file.
+</Callout>
+
+If you save, you'll notice that the result in the terminal is the same. But there is a big difference in your code: you are using variables!
+
+`c` is the result of the sum of `a` and `b`, so if you change `a` to `3`, it will change the value in `c`. Instead of `6`, your computer will log `7`. Try it!
+
+Variables are everywhere in code because they let you abstract and reuse your logic.
+
+## Variables with `let`
+
+There are two main ways to create variables:
+- With `const`, if you intend to keep the content constant, which should be your go-to.
+- With `let`, if you need to overwrite the content.
+
+Let's try to overwrite the content in our code without changing `const` to `let`.
+
+Update your code ⚠️ **BUT DON'T SAVE IT YET** ⚠️! I want to show you something first.
+
+```ts showLineNumbers filename="main.ts"
+const a = 3;
+const b = 4;
+const c = a + b;
+console.log(c);
+
+c = 10;
+console.log(c);
+```
+
+While typing, your editor checks your code. And now we see red popping up all over the place! What's going on?
+
+To figure it out, hover over the `c` underlined with the squiggly line.
+
+![A screenshot showing VS Code showing an error.](/assets/first-steps/variables/const-error-before-save.png)
+
+Oh! It says that we are trying to overwrite the content of a constant variable, which is forbidden. Thank you, code editor. I’m glad you caught that **before running the code**.
+
+What you are witnessing here is an awesome feature of VS Code and TypeScript. The error was caught **before** we ran the code. When working on complex analyses that can take seconds, minutes, or sometimes hours to compute, you'll be grateful to catch errors beforehand instead of wasting time waiting for a script that will inevitably crash.
+
+Now, let's execute this code anyway, just for the sake of curiosity. Save the file.
+
+As expected, the code crashes, and the error is displayed in the terminal too.
+
+![A screenshot showing a VS Code error in the terminal.](/assets/first-steps/variables/const-error.png)
+
+<Callout type="info" emoji="💡">
+    When throwing an error, Deno will tell you where the problematic code is. Here, it's saying the problem is at `.../main.ts:7:1`, which means in the `main.ts` file, at the seventh line and first character. If you press `CMD` on Mac or `CTRL` on PC and click on this file path, it will take you directly to it. This is very convenient when you start working with a lot of files.
+</Callout>
+
+But how do we fix this error?
+
+Well, if we want to overwrite the content of a variable, we need to switch `const` to `let` when creating the `c` variable on line 3.
+
+```ts showLineNumbers filename="main.ts"
+const a = 3;
+const b = 4;
+let c = a + b;
+console.log(c);
+
+c = 10;
+console.log(c);
+```
+
+Now it runs without any problems! If you update your code and save it, you will see the first value of `c` being logged in your terminal, followed by the second value.
+
+We can also reuse `c` to overwrite... itself! The last two lines in the code below replace `c` with `c` squared (`c` multiplied by itself).
+
+```ts showLineNumbers filename="main.ts"
+const a = 3;
+const b = 4;
+let c = a + b;
+console.log(c);
+
+c = 10;
+console.log(c);
+
+c = c * c;
+console.log(c);
+```
+
+Here's the result of the code above:
+
+![A screenshot showing a squared result in the terminal.](/assets/first-steps/variables/squared.png)
+
+## Typed variables
+
+There is something else to know about variables: **The data type matters**. This is why it's called... TypeScript!
+
+For example, if you hover over `c` right now, you'll see that it has a type of `number`. This is because the sum of `a` and `b` is a number. The type here is **inferred**.
+
+![A screenshot showing a variable of type number in VS Code.](/assets/first-steps/variables/type-number.png)
+
+Now, let's overwrite `c` with text on line `6`. In TypeScript, text is called a `string` because it's a string of characters. For your computer to recognize something as text, it needs to be wrapped in quotes.
+
+Update your code ⚠️ **BUT DON'T SAVE IT YET** ⚠️! Sorry, I screamed again. 😬
+
+```ts showLineNumbers filename="main.ts"
+const a = 3;
+const b = 4;
+let c = a + b;
+console.log(c);
+
+c = "Hey! What's up?";
+console.log(c);
+
+c = c * c;
+console.log(c);
+```
+
+We have an error saying that we are trying to put text in `c` while `c` is supposed to be a number! And if you think about it, it is indeed a mistake.
+
+If we switch `c` to text on line 6, what happens to line 9? What would be the squared value of `"Hey! What's up?"`? It makes no sense to multiply text by itself!
+
+Once again, the editor caught the error **before running the code**. In TypeScript, **variables are typed**, which helps us write reliable and robust code.
+
+![A screenshot showing a type error in VS Code when hovering.](/assets/first-steps/variables/type-error-hover.png)
+
+And if we save the file, the script crashes, as expected.
+
+![A screenshot showing a type error in VS Code.](/assets/first-steps/variables/type-error.png)
+
+## Conclusion
+
+At this point, you might think, *Why is this so complicated? Let me code whatever I want, stupid computer!*
+
+But trust me: this will save you from nasty bugs. As an experienced data and computational journalist, I've learned that the hard way. 😅
+
+Using `const` will prevent you from accidentally overwriting important variables or data, and the types will ensure you are not mixing `text`, `number`, `Date`, or other data types that we will explore in the next lessons.
+
+At the end of the day, you want valid results. You want to avoid publishing incorrect information at all costs. Using `const` instead of `let` and adhering to strict `types` helps you write reliable code.
+
+So, when you're swearing at TypeScript errors, take a deep breath and repeat this out loud: *It's working for me, not against me!*
+
+While it might seem complicated right now, after a little bit of practice, it will all become natural. Trust me. 🙂
+
+And just because I would be a very bad teacher if I let you end a lesson on an error, let's update the code one last time, with comments.
+
+```ts showLineNumbers filename="main.ts"
+// We create constant variables.
+const a = 3;
+const b = 4;
+
+// We use let to overwrite c later on.
+let c = a + b;
+console.log(c);
+
+// c is typed as a number, so we can only overwrite with numbers.
+c = 10;
+console.log(c);
+
+// We can overwrite c by using c itself.
+c = c * c;
+console.log(c);
+```
+
+<Callout type="info" emoji="💡">
+    To leave comments in your code, use `//` at the beginning of the line, like above. If you want to comment out multiple lines, wrap everything with `/*` at the beginning and `*/` at the end. Comments are ignored by your computer, so they are a great way to explain what your code does or to temporarily disable parts of your code.
+</Callout>

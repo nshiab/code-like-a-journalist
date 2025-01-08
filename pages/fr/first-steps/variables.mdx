@@ -1,0 +1,217 @@
+---
+title: Variables en TypeScript
+description: Apprenez à utiliser les variables et l'importance des types de données.
+---
+
+import { Callout } from 'nextra/components'
+
+# Variables
+
+Commençons votre première leçon de TypeScript avec les variables !
+
+Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
+- `main.ts` où nous coderons. Vous pouvez y ajouter `console.log(2 + 3);`.
+- `deno.json` pour indiquer à VS Code qu'il s'agit d'un projet Deno et activer l'extension Deno. Vous pouvez ajuster vos paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+
+Ouvrez le terminal et exécutez `deno run main.ts`.
+
+`console.log` indique à l'ordinateur d'afficher quelque chose dans le terminal. Ici, le "quelque chose" est le calcul `2 + 3`. Votre ordinateur effectue le calcul et affiche le résultat, qui est `5`.
+
+![Une capture d'écran montrant VS Code avec les fichiers main.ts et deno.json.](/assets/first-steps/variables/run.png)
+
+<Callout type="info" emoji="💡">
+    Vous avez peut-être remarqué que votre code s'affiche avec plusieurs couleurs. Cela s'appelle *code highlighting*. Dans le code, chaque mot a un rôle différent et se voit attribuer une couleur. Par exemple, ici `console` est une classe, et `log` est une méthode. De plus, en tapant, vous pouvez voir des suggestions d'auto-complétion et des infobulles. Cela s'appelle l'*IntelliSense*. C'est votre éditeur qui essaie de deviner ce que vous pourriez vouloir écrire et fournit une documentation. Pour l'instant, vous pouvez ignorer tout cela, mais nous l'utiliserons plus tard.
+</Callout>
+
+## `watch` et `check`
+
+Actuellement, ce script ne s'exécute qu'une seule fois. C'est un peu embêtant de devoir clicker sur le terminal et de le relancer manuellement à chaque modification.
+
+Utilisons l'option `--watch` pour que Deno relance automatiquement notre code chaque fois que nous enregistrons une modification. Pendant que nous y sommes, nous utiliserons également l'option `--check` pour que Deno s'assure que notre code est correct avant de l'exécuter.
+
+Tapez et exécutez `deno run --watch --check main.ts` dans le terminal. Vous verrez votre script s'exécuter. Maintenant, changez `3` en `4` dans votre code et enregistrez votre fichier (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+
+Deno effacera le terminal et relancera `main.ts` à chaque fois que vous l'enregistrez. Très pratique !
+
+Si vous voulez arrêter le tout, cliquez dans le terminal et appuyez sur `CMD` + `C` sur Mac ou `CTRL` + `C` sur PC. Mais nous garderons la surveillance pour le reste de la leçon.
+
+![Une capture d'écran montrant VS Code surveillant main.ts.](/assets/first-steps/variables/watch.png)
+
+## Variables avec `const`
+
+Ajoutons maintenant des variables à notre code.
+
+Les variables sont comme des conteneurs. Vous pouvez y mettre des choses, et lorsque vous les référencez, Deno regardera ce qu'il y a à l'intérieur et l'utilisera. C'est très pratique, car vous pouvez réutiliser la même variable à différent endroit dans votre code.
+
+Modifions notre code pour mettre le premier nombre dans la variable `a` et le deuxième nombre dans `b`. Nous stockerons également le résultat du calcul dans la variable `c`. Copiez le code ci-dessous et collez-le dans votre fichier `main.ts`.
+
+Votre ordinateur exécutera ce code de haut en bas. La ligne 1 sera exécutée, puis la ligne 2, et ainsi de suite.
+
+```ts showLineNumbers filename="main.ts"
+const a = 2;
+const b = 4;
+const c = a + b;
+console.log(c);
+```
+
+<Callout type="info" emoji="💡">
+    Avez-vous remarqué tous les points-virgules ? Ils sont là pour s'assurer que votre ordinateur sache quand une instruction se termine. Ne vous inquiétez pas si vous les oubliez. Si vous avez suivi les étapes d'[Installation](/first-steps/setup), ils seront ajoutés automatiquement lorsque vous enregistrez un fichier.
+</Callout>
+
+Si vous enregistrez, vous remarquerez que le résultat dans le terminal est le même. Mais il y a une grande différence dans votre code : vous utilisez des variables !
+
+`c` est le résultat de la somme de `a` et `b`, donc si vous changez `a` en `3`, cela changera la valeur dans `c`. Au lieu de `6`, votre ordinateur affichera `7`. Essayez-le !
+
+Les variables sont omniprésentes dans le code car elles permettent d'abstraire et de réutiliser votre logique.
+
+## Variables avec `let`
+
+Il existe deux principales manières de créer des variables :
+- Avec `const`, si vous avez l'intention de garder le contenu constant, ce qui devrait être votre premier choix.
+- Avec `let`, si vous devez remplacer le contenu.
+
+Essayons de remplacer le contenu dans notre code sans changer `const` en `let`.
+
+Mettez à jour votre code ⚠️ **MAIS NE L'ENREGISTREZ PAS ENCORE** ⚠️ ! Je veux d'abord vous montrer quelque chose.
+
+```ts showLineNumbers filename="main.ts"
+const a = 3;
+const b = 4;
+const c = a + b;
+console.log(c);
+
+c = 10;
+console.log(c);
+```
+
+En tapant, votre éditeur vérifie votre code. Et maintenant, nous voyons du rouge apparaître un peu partout ! Que se passe-t-il ?
+
+Pour le savoir, survolez le `c` souligné par une ligne ondulée.
+
+![Une capture d'écran montrant une erreur dans VS Code.](/assets/first-steps/variables/const-error-before-save.png)
+
+Oh ! Cela indique que nous essayons de remplacer le contenu d'une variable constante, ce qui est interdit. Merci, éditeur de code. Je suis content que tu aies détecté cela **avant d'exécuter le code**.
+
+Ce que vous voyez ici est une fonctionnalité très pratique de VS Code et TypeScript. L'erreur a été détectée **avant** que nous n'exécutions le code. Lorsque vous travaillez sur des analyses complexes qui peuvent prendre des secondes, des minutes, ou parfois des heures de calculs, vous serez reconnaissant de détecter les erreurs au préalable au lieu de perdre votre temps à attendre un script qui finira inévitablement par planter.
+
+Maintenant, exécutons ce code, juste par curiosité. Enregistrez le fichier.
+
+Comme prévu, le code plante, et l'erreur s'affiche également dans le terminal.
+
+![Une capture d'écran montrant une erreur dans le terminal de VS Code.](/assets/first-steps/variables/const-error.png)
+
+<Callout type="info" emoji="💡">
+    Lorsqu'une erreur est générée, Deno vous indique où se trouve le code problématique. Ici, il dit que le problème est à `.../main.ts:7:1`, ce qui signifie dans le fichier `main.ts`, à la septième ligne et au premier caractère. Si vous appuyez sur `CMD` sur Mac ou `CTRL` sur PC et cliquez sur ce chemin de fichier, cela vous y mènera directement. C'est très pratique lorsque vous commencez à travailler avec beaucoup de fichiers.
+</Callout>
+
+Mais comment corriger cette erreur ?
+
+Si nous voulons remplacer le contenu d'une variable, nous devons remplacer `const` par `let` lors de la création de la variable `c` à la ligne 3.
+
+```ts showLineNumbers filename="main.ts"
+const a = 3;
+const b = 4;
+let c = a + b;
+console.log(c);
+
+c = 10;
+console.log(c);
+```
+
+Maintenant, le code s'exécute sans problème ! Si vous mettez à jour votre code et l'enregistrez, vous verrez la première valeur de `c` s'afficher dans votre terminal, suivie de la deuxième valeur.
+
+Nous pouvons également réutiliser `c` pour le remplacer... par lui-même ! Les deux dernières lignes du code ci-dessous remplacent `c` par `c` au carré (`c` multiplié par lui-même).
+
+```ts showLineNumbers filename="main.ts"
+const a = 3;
+const b = 4;
+let c = a + b;
+console.log(c);
+
+c = 10;
+console.log(c);
+
+c = c * c;
+console.log(c);
+```
+
+Voici le résultat du code ci-dessus :
+
+![Une capture d'écran montrant un résultat au carré dans le terminal.](/assets/first-steps/variables/squared.png)
+
+## Variables typées
+
+Il y a autre chose à savoir sur les variables : **le type de données est important**. C'est pourquoi cela s'appelle... TypeScript !
+
+Par exemple, si vous survolez `c` maintenant, vous verrez qu'il a un type `number`. Cela est dû au fait que la somme de `a` et `b` est un nombre. Le type ici est **inféré**.
+
+![Une capture d'écran montrant une variable de type number dans VS Code.](/assets/first-steps/variables/type-number.png)
+
+Maintenant, remplaçons `c` par du texte à la ligne `6`. En TypeScript, le texte est appelé un `string`, car c'est une chaîne (*string* en anglais) de caractères. Pour que votre ordinateur le reconnaisse comme du texte, il doit être entouré de guillemets.
+
+Mettez à jour votre code ⚠️ **MAIS NE L'ENREGISTREZ PAS ENCORE** ⚠️ ! Désolé, j'ai encore crié. 😬
+
+```ts showLineNumbers filename="main.ts"
+const a = 3;
+const b = 4;
+let c = a + b;
+console.log(c);
+
+c = "Hey! What's up?";
+console.log(c);
+
+c = c * c;
+console.log(c);
+```
+
+Nous avons une erreur disant que nous essayons de mettre du texte dans `c`, alors que `c` est censé être un nombre ! Et si l'on y réfléchit, c'est effectivement une erreur.
+
+Si nous remplaçons `c` par du texte à la ligne 6, que se passe-t-il à la ligne 9 ? Quelle serait la valeur au carré de `"Hey! What's up?"` ? Cela n'a aucun sens de multiplier du texte par lui-même !
+
+Encore une fois, l'éditeur a détecté l'erreur **avant d'exécuter le code**. En TypeScript, **les variables sont typées**, ce qui nous aide à écrire du code fiable et robuste.
+
+![Une capture d'écran montrant une erreur de type dans VS Code lors d'un survol.](/assets/first-steps/variables/type-error-hover.png)
+
+Et si nous enregistrons le fichier, le script plante, comme prévu.
+
+![Une capture d'écran montrant une erreur de type dans VS Code.](/assets/first-steps/variables/type-error.png)
+
+## Conclusion
+
+À ce stade, vous pourriez penser : *Pourquoi est-ce si compliqué ? Laisse-moi coder ce que je veux, stupide ordinateur !*
+
+Mais croyez-moi : cela vous évitera de pernicieux bogues. En tant que journaliste computationnel d'expérience, j'ai appris cela à mes dépens. 😅
+
+Utiliser `const` vous empêchera d'écraser accidentellement des variables ou des données importantes, et les types garantiront que vous ne mélangez pas `text`, `number`, `Date`, ou d'autres types de données que nous explorerons dans les prochaines leçons.
+
+Au bout du compte, vous voulez des résultats valides. Vous voulez éviter à tout prix de publier des informations incorrectes. Utiliser `const` au lieu de `let` et respecter des `types` stricts vous aidera à écrire du code fiable.
+
+Alors, quand vous pesterez contre les erreurs TypeScript, prenez une grande inspiration et répétez à voix haute : *C'est pour m'aider, ce n'est pas contre moi !*
+
+Bien que cela puisse sembler compliqué pour l'instant, après un peu de pratique, tout deviendra naturel. Faites-moi confiance. 🙂
+
+Et comme je serais un très mauvais enseignant si je vous laissais terminer une leçon sur une erreur, mettons à jour le code une dernière fois, avec des commentaires cette fois-ci.
+
+```ts showLineNumbers filename="main.ts"
+// Nous créons des variables constantes.
+const a = 3;
+const b = 4;
+
+// Nous utilisons let pour pouvoir modifier c plus tard.
+let c = a + b;
+console.log(c);
+
+// c est typé comme un nombre, donc nous ne pouvons
+// le remplacer que par des nombres.
+c = 10;
+console.log(c);
+
+// Nous pouvons remplacer c en utilisant c lui-même.
+c = c * c;
+console.log(c);
+
+```
+
+<Callout type="info" emoji="💡">
+    Pour laisser des commentaires dans votre code, utilisez `//` au début de la ligne, comme ci-dessus. Si vous souhaitez commenter plusieurs lignes, encadrez tout avec `/*` au début et `*/` à la fin. Les commentaires sont ignorés par votre ordinateur, ils sont donc un excellent moyen d'expliquer ce que fait votre code ou de désactiver temporairement certaines parties de votre code.
+</Callout>

@@ -23,11 +23,11 @@ Téléchargez-le à partir du [site web](https://code.visualstudio.com/) et inst
 
 Une fois installé, ouvrez-le. Il devrait ressembler à ceci. Ce n'est pas grave si vous avez différents onglets ouverts.  
 
-![Une capture d'écran de l'éditeur de code Visual Studio Code.](/assets/first-steps/vscode.png)
+![Une capture d'écran de l'éditeur de code Visual Studio Code.](/assets/first-steps/setup/vscode.png)
 
 Personnellement, je trouve que l'interface est trop petite et je l'ajuste toujours pour qu'elle soit un peu plus grande lorsque je configure une nouvelle machine. Pour ce faire, cliquez sur le menu `View => Appearance => Zoom In`.
 
-![Une capture d'écran du menu Affichage dans VS Code.](/assets/first-steps/vscode-zoom.png)
+![Une capture d'écran du menu Affichage dans VS Code.](/assets/first-steps/setup/vscode-zoom.png)
 
 ## Moteur d'exécution (runtime)
 
@@ -39,7 +39,7 @@ Pour l'installer, visitez le [site web](https://deno.com/) et copiez la commande
 
 Ne vous inquiétez pas si vous avez une version différente. Tant que c'est une v2.x.x, tout ira bien.
 
-![Une capture d'écran du site web de Deno.](/assets/first-steps/deno.png)
+![Une capture d'écran du site web de Deno.](/assets/first-steps/setup/deno.png)
 
 Ensuite, suivez ces étapes :
 
@@ -48,21 +48,21 @@ Ensuite, suivez ces étapes :
 
 La commande téléchargera et installera Deno sur votre ordinateur.
 
-![Une capture d'écran montrant comment installer Deno depuis le terminal de VS Code.](/assets/first-steps/deno-install.png)
+![Une capture d'écran montrant comment installer Deno depuis le terminal de VS Code.](/assets/first-steps/setup/deno-install.png)
 
-Si on vous demande d'ajouter Deno à votre chemin d'accès (path), tapez `Y` et appuyez sur Entrée. Cela garantit que Deno est facilement accessible depuis votre terminal.
+Si on vous demande d'ajouter Deno à votre chemin d'accès (path), tapez `Y` et appuyez sur Entrée. Cela garantit que Deno est facilement accessible depuis votre terminal. Si on ne vous le demande pas, ce n'est pas un problème.
 
-![Une capture d'écran montrant une option lors de l'installation de Deno.](/assets/first-steps/deno-path.png)
+![Une capture d'écran montrant une option lors de l'installation de Deno.](/assets/first-steps/setup/deno-path.png)
 
-Et si on vous demande de configurer les suggestions automatiques (completions), choisissez bash ou zsh en fonction de votre système d'exploitation en utilisant les touches haut et bas et en appuyant sur la barre d'espace. Ensuite, appuyez sur Entrée.
+Et si on vous demande de configurer les suggestions automatiques (completions), choisissez bash ou zsh en fonction de votre système d'exploitation en utilisant les touches haut et bas et en appuyant sur la barre d'espace. Ensuite, appuyez sur Entrée. Encore une fois, si on ne vous le demande pas, ce n'est pas un problème.
 
-![Une capture d'écran montrant comment configurer les complétions lors de l'installation de Deno.](/assets/first-steps/deno-completions.png)
+![Une capture d'écran montrant comment configurer les complétions lors de l'installation de Deno.](/assets/first-steps/setup/deno-completions.png)
 
 Maintenant, tout devrait être correctement installé.
 
 Quittez et redémarrez VS Code. Ensuite, tapez `deno --version` dans votre terminal et appuyez sur Entrée pour afficher votre version de Deno. Vous devriez voir quelque chose comme ceci !
 
-![Une capture d'écran montrant comment afficher la version de Deno.](/assets/first-steps/deno-version.png)
+![Une capture d'écran montrant comment afficher la version de Deno.](/assets/first-steps/setup/deno-version.png)
 
 ## Extensions
 
@@ -74,7 +74,24 @@ Suivez ces étapes pour l'installer :
 2. Recherchez l'extension Deno.
 3. Installez l'extension Deno. Assurez-vous que `Mise à jour automatique` est cochée.
 
-![Une capture d'écran montrant comment installer l'extension Deno.](/assets/first-steps/deno-extension.png)
+![Une capture d'écran montrant comment installer l'extension Deno.](/assets/first-steps/setup/deno-extension.png)
+
+Une des fonctionnalités très pratique de l'extension Deno est son formateur de code. Mettons à jour les paramètres de VS Code pour qu'il formate automatiquement notre code à chaque sauvegarde de fichier. Cela aidera à garder tout propre et bien organisé.
+
+- Sur Mac, allez dans `Code => Preferences => Settings`.
+- Sur PC, allez dans `File => Preferences => Settings`.
+
+![Capture d'écran montrant les paramètres de VS Code.](/assets/first-steps/setup/vscode-settings.png)
+
+Recherchez `Default Formatter` dans la barre de recherche et sélectionnez `Deno` dans le menu déroulant.
+
+![Capture d'écran montrant les paramètres du formateur de VS Code.](/assets/first-steps/setup/vscode-formatter.png)
+
+Recherchez `Format On Save` et cochez la case pour l'activer.
+
+![Capture d'écran montrant les paramètres du formatage à la sauvegarde de VS Code.](/assets/first-steps/setup/vscode-format-on-save.png)
+
+Les paramètres sont enregistrés automatiquement, vous pouvez donc fermer l'onglet `Settings`. Tout est prêt !
 
 ## Exécutons un script
 
@@ -84,9 +101,9 @@ Pour démarrer un nouveau projet dans VS Code, suivez ces étapes :
 
 1. Créez un nouveau dossier quelque part sur votre ordinateur.
 2. Dans VS Code, cliquez sur l'onglet Explorer.
-3. Cliquez sur `Open Folder` et sélectionnez le dossier que vous venez de créer.
+3. Cliquez sur `Open Folder` et sélectionnez le dossier que vous venez de créer. Si on vous demande si vous faites confiance aux auteurs des fichiers, répondez "Oui" pour continuer.
 
-![Une capture d'écran montrant comment ouvrir un nouveau dossier dans VS Code.](/assets/first-steps/deno-open-folder.png)
+![Une capture d'écran montrant comment ouvrir un nouveau dossier dans VS Code.](/assets/first-steps/setup/deno-open-folder.png)
 
 Maintenant que VS Code a ouvert votre dossier, nous pouvons créer un nouveau fichier.
 
@@ -97,7 +114,7 @@ Maintenant que VS Code a ouvert votre dossier, nous pouvons créer un nouveau fi
 
 Ce code dit à votre ordinateur d'afficher *Ça va être amusant !* dans votre terminal.
 
-![Une capture d'écran montrant comment créer un nouveau fichier TypeScript dans VS Code.](/assets/first-steps/deno-new-file.png)
+![Une capture d'écran montrant comment créer un nouveau fichier TypeScript dans VS Code.](/assets/first-steps/setup/deno-new-file.png)
 
 Nous pouvons maintenant exécuter ce script.
 
@@ -108,7 +125,7 @@ Cela demande à votre ordinateur d'utiliser Deno pour exécuter le script `main.
 
 Félicitations ! Vous êtes maintenant prêt à coder. On va bien s'amuser ! 🤩
 
-![Une capture d'écran montrant comment exécuter un fichier TypeScript dans VS Code.](/assets/first-steps/deno-run.png)
+![Une capture d'écran montrant comment exécuter un fichier TypeScript dans VS Code.](/assets/first-steps/setup/deno-run.png)
 
 ## À propos de l'IA
 
