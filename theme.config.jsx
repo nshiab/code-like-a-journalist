@@ -66,7 +66,9 @@ const FOOTER = {
                 flexDirection: "column",
                 justifyContent: "center",
                 width: "100%",
+                maxWidth: "600px",
                 gap: "1rem",
+                margin: "0 auto",
                 textAlign: "center",
             }}
         >
@@ -84,10 +86,7 @@ const FOOTER = {
                     style={{ textDecoration: "underline" }}
                 >
                     Creative Commons Attribution 4.0 International
-                </a>.
-            </div>
-            <div>
-                This project was funded by the{" "}
+                </a>. This project was funded by the{" "}
                 <a
                     href="https://www.michenerawards.ca/media-release/michener-awards-foundation-announces-its-2024-fellowships-winners/"
                     style={{ textDecoration: "underline" }}
@@ -97,9 +96,20 @@ const FOOTER = {
                 from the Michener Awards Foundation.
             </div>
             <div>
+                To reach out,{"  "}
                 <a href="/contact" style={{ textDecoration: "underline" }}>
-                    Contact
+                    head over here
                 </a>
+                .
+            </div>
+            <div>
+                Built with{" "}
+                <a
+                    href="https://nextra.site/"
+                    style={{ textDecoration: "underline" }}
+                >
+                    Nextra ❤️
+                </a>.
             </div>
         </div>
     ),
@@ -110,7 +120,9 @@ const FOOTER = {
                 flexDirection: "column",
                 justifyContent: "center",
                 width: "100%",
+                maxWidth: "600px",
                 gap: "1rem",
+                margin: "0 auto",
                 textAlign: "center",
             }}
         >
@@ -128,10 +140,7 @@ const FOOTER = {
                     style={{ textDecoration: "underline" }}
                 >
                     Creative Commons Attribution 4.0 International
-                </a>.
-            </div>
-            <div>
-                Ce project a été financé par la{" "}
+                </a>. Ce project a été financé par la{" "}
                 <a
                     href="https://www.prixmichener.ca/media-release/la-fondation-des-prix-michener-devoile-les-laureat-e-s-de-ses-bourses-pour-lannee-2024/"
                     style={{ textDecoration: "underline" }}
@@ -141,9 +150,20 @@ const FOOTER = {
                 de la Fondation des Prix Michener.
             </div>
             <div>
+                Pour me contacter,{"  "}
                 <a href="/contact" style={{ textDecoration: "underline" }}>
-                    Contact
+                    c'est par ici
                 </a>
+                .
+            </div>
+            <div>
+                Ce site web utilise{"  "}
+                <a
+                    href="https://nextra.site/"
+                    style={{ textDecoration: "underline" }}
+                >
+                    Nextra ❤️
+                </a>.
             </div>
         </div>
     )),
