@@ -3,7 +3,5 @@ export default {
     preamble: "Preamble",
     "first-steps": "First steps",
     "more": "More to come...",
-    contact: {
-        display: "hidden",
-    },
+    contact: "Contact",
 };
