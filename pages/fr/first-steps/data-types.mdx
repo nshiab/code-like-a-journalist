@@ -1,0 +1,266 @@
+---
+title: Types de données en TypeScript
+description: Une introduction aux types de données en TypeScript, incluant le texte, les nombres, les booléens et les dates.
+---
+
+import { Callout } from 'nextra/components'
+
+# Types de données
+
+Les types de données sont essentiels en TypeScript. Ce sont les blocs de construction sur lesquelles vos analyses se baseront.
+
+Cette leçon est juste une introduction. Nous approfondirons le sujet lorsque nous coderons des projets plus concrets.
+
+D'abord, configurons notre environnement.
+
+Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code et créez deux fichiers :
+- `main.ts` où nous coderons. Vous pouvez y ajouter `console.log("Hello!");`.
+- `deno.json` pour indiquer à VS Code qu'il s'agit d'un projet Deno et activer l'extension Deno. Vous pouvez modifier vos paramètres dedans, mais nous le laisserons vide pour l'instant.
+
+Ouvrez le terminal et exécutez `deno run --watch --check main.ts`. Deno effacera le terminal et relancera `main.ts` à chaque fois que vous l'enregistrez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+
+Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
+
+![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/first-steps/data-types/watch.png)
+
+## Texte (`string`)
+
+Le texte est appelé `string` en TypeScript (comme dans de nombreux langages) parce que c'est une *chaîne* de caractères.
+
+Les chaînes de caractères sont toujours entourées de guillemets. Vous pouvez utiliser des guillemets simples, doubles ou des *backticks*.
+
+Si vous avez besoin d'un texte multiligne, vous devez utiliser des backticks. Si vous voulez utiliser des guillemets simples ou doubles dans votre texte, utilisez également des backticks.
+
+```ts showLineNumbers filename="main.ts"
+// Cela fonctionne.
+const text1 = "Hello!";
+
+// Cela fonctionne aussi. Même si le
+// formateur Deno remplace souvent ' par ".
+const text2 = 'How are you doing?';
+
+// Et cela aussi.
+const text3 = `It's been a while!`;
+
+// Et voici une chaîne de caractères multiligne !
+const text4 = `Hello!
+How are you doing?
+It's been a while.`;
+
+// Changez la variable ci-dessous
+// pour voir le résultat dans votre terminal.
+console.log(text1)
+```
+Pour vérifier si quelque chose est une chaîne de caractères, vous pouvez utiliser l'opérateur `typeof`.
+
+```ts showLineNumbers filename="main.ts"
+const name = "Nael Shiab"
+console.log(typeof name)
+```
+![Une capture d'écran montrant VS Code affichant un `typeof` string.](/assets/first-steps/data-types/typeof-string.png)
+
+## Nombres
+
+Les nombres n'ont pas besoin d'être entourés de quoi que ce soit. Vous pouvez les utiliser directement, mais il existe différentes façons de les écrire.
+
+```ts showLineNumbers filename="main.ts"
+// Le nombre directement.
+const number1 = 1000;
+console.log(number1);
+
+// Utilisation de _ comme séparateur de milliers.
+const number2 = 1_000;
+console.log(number2);
+
+// Utilisation de la notation scientifique.
+const number3 = 1e3;
+console.log(number3);
+```
+
+Vous pouvez écrire des entiers et des décimaux, positifs ou négatifs.
+
+```ts showLineNumbers filename="main.ts"
+const positiveInteger = 1234;
+console.log(positiveInteger);
+
+const negativeInteger = -1234;
+console.log(negativeInteger);
+
+const positiveDecimal = 1.234;
+console.log(positiveDecimal);
+
+const negativeDecimal = -1.234;
+console.log(negativeDecimal);
+```
+
+Il existe également des nombres spéciaux, comme `Infinity`.
+
+```ts showLineNumbers filename="main.ts"
+const positiveInfinity = Infinity;
+const negativeInfinity = -Infinity;
+
+console.log(positiveInfinity, negativeInfinity)
+```
+
+<Callout type="info" emoji="💡">
+    Si vous voulez afficher plusieurs éléments avec `console.log`, séparez-les par une virgule, comme montré ci-dessus. Les éléments affichés seront séparés par un espace.
+</Callout>
+
+`NaN` est également un nombre spécial, qui signifie paradoxalement *Not A Number* (Pas un Nombre). Il peut apparaître lorsque vous essayez de convertir une chaîne de caractères en nombre, par exemple.
+
+```ts showLineNumbers filename="main.ts"
+// parseInt est une fonction globale que
+// vous pouvez appeler pour convertir une
+// chaîne de caractères en nombre.
+
+// Ici, nous convertissons la chaîne "42"
+// en le nombre 42.
+console.log(parseInt("42"));
+
+// Mais si nous essayons de convertir
+// quelque chose qui n'est pas un nombre,
+// nous obtiendrons un NaN.
+console.log(parseInt("hello"));
+```
+
+![Une capture d'écran montrant VS Code affichant une valeur NaN.](/assets/first-steps/data-types/nan.png)
+
+Pour vérifier si quelque chose est un nombre, vous pouvez utiliser l'opérateur `typeof`.
+
+```ts showLineNumbers filename="main.ts"
+const integer = 1000;
+console.log(integer, "=>", typeof integer);
+
+const decimal = 10.5;
+console.log(decimal, "=>", typeof decimal);
+
+const infiniteNumber = Infinity;
+console.log(infiniteNumber, "=>", typeof infiniteNumber);
+
+const notNumber = NaN;
+console.log(notNumber, "=>", typeof notNumber);
+```
+
+![Une capture d'écran montrant VS Code affichant un `typeof` number.](/assets/first-steps/data-types/typeof-number.png)
+
+## Booléens
+
+Un booléen peut être `true` ou `false`. C'est tout !
+
+Les booléens sont très utiles lorsque vous travaillez avec des conditions (nous en parlerons plus tard).
+
+```ts showLineNumbers filename="main.ts"
+const bool1 = true;
+console.log(bool1);
+
+const bool2 = false;
+console.log(bool2);
+
+// Si vous comparez des choses,
+// vous obtiendrez un booléen.
+// Ici, nous vérifions si 3 est
+// plus grand que 2.
+const comparison = 3 > 2
+console.log("Is 3 greater than 2?", comparison);
+```
+
+![Une capture d'écran montrant VS Code affichant une comparaison.](/assets/first-steps/data-types/booleans-comparison.png)
+
+Pour vérifier si quelque chose est un booléen, vous pouvez utiliser l'opérateur `typeof`.
+
+```ts showLineNumbers filename="main.ts"
+const bool1 = true;
+console.log(bool1);
+
+const bool2 = false;
+console.log(bool2);
+```
+
+![Une capture d'écran montrant VS Code affichant un `typeof` boolean.](/assets/first-steps/data-types/typeof-booleans.png)
+
+## Dates
+
+Les dates ne sont pas un type en soi... mais nous les utilisons tellement en analyse de données que je voulais les inclure ici.
+
+Les dates sont représentées comme le nombre de millisecondes écoulées depuis le 1er janvier 1970, UTC.
+
+Pour créer un objet date, vous devez utiliser le constructeur `Date`. Remarquez le mot-clé `new` et les paramètres passés entre parenthèses dans le code ci-dessous.
+
+```ts showLineNumbers filename="main.ts"
+// Sans paramètres.
+const currentTime = new Date();
+console.log("currentTime:", currentTime);
+
+// Avec un nombre spécifique de millisecondes.
+const oneSecondAfter1970 = new Date(1_000);
+console.log("oneSecondAfter1970:", oneSecondAfter1970);
+
+// Avec une chaîne de caractères normalisée.
+const christmasMorning = new Date("2025-12-25T00:08:00Z");
+console.log("christmasMorning:", christmasMorning);
+
+// Date invalide.
+const invalidDate = new Date("Hi! I'm not a date!");
+console.log("invalidDate:", invalidDate);
+```
+
+![Une capture d'écran montrant VS Code affichant une date.](/assets/first-steps/data-types/dates.png)
+
+Pour vérifier si quelque chose est une `Date`, vous ne pouvez pas utiliser l'opérateur `typeof` car les dates ne sont pas un type.
+
+À la place, vous devez utiliser l'opérateur `instanceof`, car les dates sont des instances de la **classe** `Date` (nous parlerons davantage des classes plus tard).
+
+```ts showLineNumbers filename="main.ts"
+const currentTime = new Date();
+
+// Faux ! Les dates ne sont pas un type.
+// Cela retournera "object".
+console.log("typeof:", typeof currentTime);
+
+// Correct ! Les dates sont une instance de la classe Date.
+// Cela retournera true.
+console.log("instanceof Date:", currentTime instanceof Date);
+```
+
+![Une capture d'écran montrant VS Code vérifiant si une valeur est une date.](/assets/first-steps/data-types/instanceof-date.png)
+
+## Autres
+
+Il existe deux autres types de données que vous rencontrerez souvent : `undefined` et `null`.
+
+```ts showLineNumbers filename="main.ts"
+// Si vous créez une variable sans lui
+// attribuer de valeur, elle sera
+// undefined.
+let something;
+console.log(something);
+
+// Vous pouvez également attribuer
+// explicitement la valeur undefined
+// à une variable, mais ce n'est
+// pas très courant.
+const undefinedValue = undefined;
+console.log(undefinedValue);
+
+// Si vous voulez attribuer explicitement
+// une variable sans valeur, il est préférable
+// d'utiliser null.
+const nullValue = null;
+console.log(nullValue);
+```
+
+Pour vérifier si quelque chose est `undefined` ou `null`, vous pouvez utiliser l'opérateur d'égalité stricte (`===`).
+
+```ts showLineNumbers filename="main.ts"
+let undefinedVariable;
+// Ceci affiche "true".
+console.log(undefinedVariable === undefined);
+
+const nullVariable = null;
+// Ceci affiche "true".
+console.log(nullVariable === null);
+```
+
+Félicitations ! Vous êtes prêt à vous amuser en construisant vos premières structures de données ! 👷
+
+PS : J'ai une confession à faire... Il existe encore quelques types de données, comme `bigInt`, `object` et `function`. Mais nous les aborderons lorsque pertinents dans des projets concrets.
