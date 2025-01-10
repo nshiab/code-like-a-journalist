@@ -51,7 +51,7 @@ It's been a while.`;
 // pour voir le résultat dans votre terminal.
 console.log(text1)
 ```
-Pour vérifier si quelque chose est une chaîne de caractères, vous pouvez utiliser l'opérateur `typeof`.
+Pour vérifier si quelque chose est une chaîne de caractères, vous pouvez utiliser l'opérateur `typeof` (ou passer votre curseur sur la variable).
 
 ```ts showLineNumbers filename="main.ts"
 const name = "Nael Shiab"
@@ -125,7 +125,7 @@ console.log(parseInt("hello"));
 
 ![Une capture d'écran montrant VS Code affichant une valeur NaN.](/assets/first-steps/data-types/nan.png)
 
-Pour vérifier si quelque chose est un nombre, vous pouvez utiliser l'opérateur `typeof`.
+Pour vérifier si quelque chose est un nombre, vous pouvez utiliser l'opérateur `typeof` (ou passer votre curseur sur la variable).
 
 ```ts showLineNumbers filename="main.ts"
 const integer = 1000;
@@ -166,7 +166,7 @@ console.log("Is 3 greater than 2?", comparison);
 
 ![Une capture d'écran montrant VS Code affichant une comparaison.](/assets/first-steps/data-types/booleans-comparison.png)
 
-Pour vérifier si quelque chose est un booléen, vous pouvez utiliser l'opérateur `typeof`.
+Pour vérifier si quelque chose est un booléen, vous pouvez utiliser l'opérateur `typeof` (ou passer votre curseur sur la variable).
 
 ```ts showLineNumbers filename="main.ts"
 const bool1 = true;
@@ -210,6 +210,8 @@ Pour vérifier si quelque chose est une `Date`, vous ne pouvez pas utiliser l'op
 
 À la place, vous devez utiliser l'opérateur `instanceof`, car les dates sont des instances de la **classe** `Date` (nous parlerons davantage des classes plus tard).
 
+Vous pouvez aussi passer votre curseur sur la variable pour voir son type ou sa valeur.
+
 ```ts showLineNumbers filename="main.ts"
 const currentTime = new Date();
 
@@ -249,7 +251,7 @@ const nullValue = null;
 console.log(nullValue);
 ```
 
-Pour vérifier si quelque chose est `undefined` ou `null`, vous pouvez utiliser l'opérateur d'égalité stricte (`===`).
+Pour vérifier si quelque chose est `undefined` ou `null`, vous pouvez utiliser l'opérateur d'égalité stricte (`===`) ou passer votre curseur sur la variable.
 
 ```ts showLineNumbers filename="main.ts"
 let undefinedVariable;
