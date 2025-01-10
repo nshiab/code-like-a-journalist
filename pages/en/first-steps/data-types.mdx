@@ -52,7 +52,7 @@ It's been a while.`;
 console.log(text1)
 ```
 
-To check if something is a string, you can use the `typeof` operator.
+To check if something is a string, you can use the `typeof` operator (or hover over the variable to see its type).
 
 ```ts showLineNumbers filename="main.ts"
 const name = "Nael Shiab"
@@ -124,7 +124,7 @@ console.log(parseInt("hello"));
 
 ![A screenshot showing VS Code logging a NaN value.](/assets/first-steps/data-types/nan.png)
 
-To check if something is a number, you can use the `typeof` operator.
+To check if something is a number, you can use the `typeof` operator (or hover over the variable to see its type).
 
 ```ts showLineNumbers filename="main.ts"
 const integer = 1000;
@@ -163,7 +163,7 @@ console.log("Is 3 greater than 2?", comparison);
 
 ![A screenshot showing VS code logging a comparison.](/assets/first-steps/data-types/booleans-comparison.png)
 
-To check if something is a boolean, you can use the `typeof` operator.
+To check if something is a boolean, you can use the `typeof` operator (or hover over the variable to see its type).
 
 ```ts showLineNumbers filename="main.ts"
 const bool1 = true;
@@ -207,6 +207,8 @@ To check if something is a `Date`, you can't use the `typeof` operator because d
 
 Instead, you must use the `instanceof` operator, because dates are instances of the `Date` **class** (more about classes later).
 
+You can also hover over the variable to see what's in it.
+
 ```ts showLineNumbers filename="main.ts"
 const currentTime = new Date();
 
@@ -245,7 +247,7 @@ const nullValue = null;
 console.log(nullValue);
 ```
 
-To check if something is `undefined` or `null`, you can use the strict equality operator (`===`).
+To check if something is `undefined` or `null`, you can use the strict equality operator (`===`) or hover over the variable to see its value or type.
 
 ```ts showLineNumbers filename="main.ts"
 let undefinedVariable;
