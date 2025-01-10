@@ -64,6 +64,20 @@ Si vous enregistrez, vous remarquerez que le résultat dans le terminal est le m
 
 Les variables sont omniprésentes dans le code car elles permettent d'abstraire et de réutiliser votre logique.
 
+Nous avons utilisé `a`, `b` et `c` comme noms de variables, mais vous pouvez utiliser n'importe quel nom tant qu'il ne contient pas d'espaces ou de caractères spéciaux (sauf `_`). N'oubliez pas que le langage est sensible à la casse.
+
+Par exemple, j'ai mis à jour notre code précédent avec des noms de variables différents. Si vous l'exécutez, le résultat sera le même dans le terminal.
+
+```ts showLineNumbers filename="main.ts"
+const banana = 2;
+const super_apple = 4;
+const POTATO = banana + super_apple;
+console.log(POTATO);
+```
+<Callout type="info" emoji="💡">
+    Pour éviter toute confusion dans le code, il est important de nommer les variables de manière réfléchie. Lorsqu'un nom de variable est composé de plusieurs mots, nous utilisons par convention le *camel case*. Cela signifie que le premier mot est en minuscules, suivi des mots suivants avec une majuscule. Par exemple, `first name` deviendrait `firstName`. Différents langages et contextes utilisent différents styles de casse, comme le [snake case](https://fr.wikipedia.org/wiki/Snake_case) en Python (`first_name`) ou le délicieux kebab case pour le développement web (`first-name`).
+</Callout>
+
 ## Variables avec `let`
 
 Il existe deux principales manières de créer des variables :

@@ -64,6 +64,20 @@ If you save, you'll notice that the result in the terminal is the same. But ther
 
 Variables are everywhere in code because they let you abstract and reuse your logic.
 
+We used `a`, `b`, and `c` for the variable names, but you can use anything as long as the names don't include spaces or special characters (except for `_`). Remember that the language is case-sensitive.
+
+For example, I updated our previous code with different variable names. If you run it, the result is the same in the terminal.
+
+```ts showLineNumbers filename="main.ts"
+const banana = 2;
+const super_apple = 4;
+const POTATO = banana + super_apple;
+console.log(POTATO);
+```
+<Callout type="info" emoji="💡">
+    To avoid confusion in the code, it's important to thoughtfully name variables. When a variable name is composed of multiple words, we use camel case by convention. This means that the first word is lowercase, followed by the next words capitalized. For example, `first name` would be `firstName`. Different languages and contexts use different casing styles, such as [snake case](https://en.wikipedia.org/wiki/Snake_case) in Python (`first_name`) or the delicious kebab case for web development (`first-name`).
+</Callout>
+
 ## Variables with `let`
 
 There are two main ways to create variables:
