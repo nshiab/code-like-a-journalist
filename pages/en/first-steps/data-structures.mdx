@@ -23,13 +23,13 @@ Open the terminal and run the following command:
 
 This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
 
-You can use this setup to test the code provided in this lesson.
+You can use this setup to test the code provided in this lesson. (Yes, I forgot to include the `deno.json` file before taking all the screenshots for this lesson. Learn from my mistake and do better! 🥲)
 
 ![A screenshot showing VS Code running and watching a TypeScript file.](/assets/first-steps/data-structures/watch.png)
 
 ## Objects
 
-Objects store data as **key-value pairs** enclosed in curly brackets (`{}`), with each pair separated by a comma. The **keys** are strings, and the **values** can be any data type.
+Objects store data as **key-value pairs** enclosed in curly brackets (`{}`), with each pair separated by a comma. The **keys** are plain identifiers, and the **values** can be any data type.
 
 For example, the object below stores data about a student. The keys are `firstName`, `lastName`, `gender`, and `age`. The corresponding values are `"Nael"`, `"Shiab"`, `"man"`, and `22` (that's Nael from a long time ago 😅):
 
@@ -75,7 +75,7 @@ console.log(student.firstName);
 
 You use the same syntax to modify a value in an object as you do to access it, but with the `=` operator.
 
-As discussed in the [Variables](/first-steps/variables) lesson, you must respect the type of the value when modifying it. For example, if a key's value is initially a `number`, it can only be updated with another `number`.
+As discussed in the [Variables](/first-steps/variables) lesson, you must respect the type of the value when modifying it. For example, if a key's value is initially a `number` (like with `age`), it can only be updated with another `number`.
 
 ```ts showLineNumbers filename="main.ts"
 const student = {
@@ -111,7 +111,7 @@ Many bugs and errors are caused by simple typos. With this feature, TypeScript h
 
 It's time to talk about another data structure: arrays!
 
-Arrays store data in a specific order, enclosed within square brackets (`[` and `]`). You can store any type of data in an array, including strings, numbers, objects, or even other arrays.
+Arrays store data in a specific order, enclosed within square brackets (`[` and `]`). You can store any type of data in an array.
 
 For example, here is an array of student names.
 
@@ -316,7 +316,7 @@ console.log(newMarks);
 ```
 
 <Callout type="info" emoji="💡">
-So far in our code, each line has ended with a `;`. However, from line 8 to line 13, there are no semicolons because we are chaining methods. Everything between these lines is part of the same statement. Technically, you could write it all on one line, but that would make the code less readable.
+So far in our code, each line has ended with a `;`. However, from line 8 to line 11, there are no semicolons because we are chaining methods. Everything between these lines is part of the same statement. Technically, you could write it all on one line, but that would make the code less readable. Since TypeScript doesn't care about line breaks or indentation, it's up to the user to format the code as they prefer. In our case, we let the Deno formatter handle that for us.
 </Callout>
 
 #### Others
@@ -324,6 +324,12 @@ So far in our code, each line has ended with a `;`. However, from line 8 to line
 There are many other array methods, but the ones above are the ones you'll use the most.
 
 If you're curious, you can check out the [W3Schools documentation](https://www.w3schools.com/js/js_array_methods.asp) for more information.
+
+You can also use *IntelliSense* directly in VS Code. Type `.` right after a variable referencing an array to see a list of properties and methods pop up. Use your up and down arrow keys to explore.
+
+Additionally, methods are typed. So, don't worry if you make a typo. It will be caught before you run your code and cause everything to crash. 🤓
+
+![A screenshot showing VS Code displaying methods available for a list.](/assets/first-steps/data-structures/pop-up-methods-arrays.png)
 
 ## Arrays of... objects!
 
@@ -363,6 +369,8 @@ const students = [
   { name: "Jennifer", mark: 98 },
 ];
 
+// Notice how we access the mark key
+// for each student object.
 const studentAbove50 = students.filter((student) => student.mark > 50);
 
 // The original array is not changed.
@@ -379,6 +387,6 @@ console.table(studentAbove50);
 
 There’s much more to explore about objects and arrays... And there are other data structures like `Map` and `Set`. However, I think this is already a solid foundation for you.
 
-What we’ve covered represents about 90% of what you’ll use on a daily basis. I don’t want to overload your brain too soon! (Too late? 😬)
+What we’ve covered represents about 90% of what you’ll use on a daily basis. And I don’t want to overload your brain too soon! (Too late? 😬)
 
 Now, let’s dive into loops and conditions. We’re closer than ever to building our first actual project!
