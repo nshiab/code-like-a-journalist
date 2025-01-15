@@ -1,0 +1,154 @@
+---
+title: Conditions in TypeScript
+description: To do.
+---
+
+import { Callout } from "nextra/components";
+
+# Conditions
+
+You are constantly using conditions statements in your everyday lives. Is the water boiling in the pot? If it does, put in the pasta. Otherwise, wait a few more minutes. 🧑‍🍳
+
+It's the same thing in your code. Depending on data, you can ask your program or algorithm to do act differently.
+
+Let's set things up for this lesson.
+
+Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+
+- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
+- `deno.json`, which lets VS Code know this is a Deno project and enables the Deno extension. You can tweak settings in this file, but we'll keep it empty for now.
+
+Open the terminal and run the following command: `deno run --watch --check main.ts`
+
+This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+
+You can use this setup to test the code provided in this lesson.
+
+![A screenshot showing VS Code running and watching a TypeScript file.](/assets/first-steps/conditions/setup.png)
+
+## Conditional statements
+
+To write conditions, we use the conditional statements `if`, `else if` and `else`.
+
+The first condition should always be tested with `if`. The condition should be between `()`. If the condition is met, the computer will execute what is found between the following `{}`.
+
+If we want to test more than one condition, we use `else if` with a condition between `()` and following by code to be executed between `{}`. But you don't always need to test multiple conditions.
+
+If we want run some code if none of the conditions were met, we use `else`. Because `else` doesn't test any condition, we don't need `()` but we must provide the code be executed between `{}`. Nothing forces you to finish with an `else`, but it often helps to avoid unexpected bugs.
+
+For example, the code below compares `myAge` and `yourAge`:
+- If `myAge` is greater than `yourAge` (line 6), we log `I am older than you!` in the terminal. The rest of the conditions statements are skipped and ignored.
+- If the first condition is not met, we check another condition with `else if` (line 8). If `myAge` is smaller than `your age`, we log `You are older than me!`. The rest of the conditions statements are skipped and ignored.
+- Finally, if none of the conditions above are met, it means that we are the same age. In this case, we use `else` (line 11) to log `We are the same age!`.
+
+```ts showLineNumbers filename="main.ts"
+// Change the ages
+// to test the different outcomes.
+const myAge = 36;
+const yourAge = 25;
+
+if (myAge > yourAge) {
+  console.log("I am older than you!");
+} else if (myAge < yourAge) {
+  console.log("You are older than me!");
+} else {
+  console.log("We are the same age!");
+}
+```
+
+![A screenshot showing VS Code running a TypeScript file with if, else if and else statements.](/assets/first-steps/conditions/conditions-age.png)
+
+## Comparison operators
+
+The previous example works because we used the comparison operators `>` and `<` and they return a `boolean`.
+
+Here are the main comparison operators you'll use in your daily work:
+- `>`: greater than
+- `>=`: greater than or equal to
+- `<`: less than
+- `<=`: less than or equal to
+- `===`: equal to
+- `!==`: not equal to
+
+<Callout type="info" emoji="💡">
+    You might see examples around the web with `==` and `!=`. These operators don't check for the type values, so it's best to stick with `===` and `!==` which check for strict equality.
+</Callout>
+
+And here are the operators in action.
+
+```ts showLineNumbers filename="main.ts"
+// Change the ages to test the different operators.
+// Don't worry about the `: number` for now.
+const myAge: number = 36;
+const yourAge: number = 25;
+
+const greater = myAge > yourAge;
+console.log("greater =>", greater);
+
+const greaterOrEqual = myAge >= yourAge;
+console.log("greaterOrEqual =>", greaterOrEqual);
+
+const younger = myAge < yourAge;
+console.log("younger =>", younger);
+
+const youngerOrEqual = myAge <= yourAge;
+console.log("youngerOrEqual =>", youngerOrEqual);
+
+const sameAge = myAge === yourAge;
+console.log("sameAge =>", sameAge);
+
+const differentAge = myAge !== yourAge;
+console.log("differentAge =>", differentAge);
+```
+
+![A screenshot showing VS Code running a TypeScript file with comparison operators.](/assets/first-steps/conditions/operators.png)
+
+## Logical operators
+
+Sometimes, you want to check multiple things in one conditional statement. This is where logical operators `&&` and `||` are handy.
+
+For example, let's say we need an algorithm to check if you are old enough to have a dring in a bar in Quebec (at least 18) or Ontario (at least 19).
+
+Without logicial operators, it could look like this, with nested conditions. It works, but nested conditions can easily be difficult to read and debug.
+
+```ts showLineNumbers filename="main.ts"
+// Change the age and province to test the conditions.
+// Don't worry about the `: number` and `: string` for now.
+const myAge: number = 18;
+const myProvince: string = "Quebec";
+
+if (myProvince === "Quebec") {
+  if (myAge >= 18) {
+    console.log("You are allowed!");
+  } else {
+    console.log("You are not allowed!");
+  }
+} else if (myProvince === "Ontario") {
+  if (myAge >= 19) {
+    console.log("You are allowed!");
+  } else {
+    console.log("You are not allowed!");
+  }
+} else {
+  console.log("I don't know this province!");
+}
+```
+
+Here's the same code with logical operators that allow us to check the `age` and `province` at the same time. Simpler to understand and easier to debug!
+
+```ts showLineNumbers filename="main.ts"
+// Change the age and province to test the conditions.
+// Don't worry about the `: number` and `: string` for now.
+const myAge: number = 18;
+const myProvince: string = "Quebec";
+
+if (myProvince === "Quebec" && myAge >= 18) {
+  console.log("You are allowed!");
+} else if (myProvince === "Ontario" && myAge >= 19) {
+  console.log("You are allowed!");
+} else if (myProvince !== "Quebec" && myProvince !== "Ontario") {
+  console.log("I don't know this province!");
+} else {
+  console.log("You are not allowed!");
+}
+```
