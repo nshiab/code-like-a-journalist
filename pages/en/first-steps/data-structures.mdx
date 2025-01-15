@@ -1,0 +1,392 @@
+---
+title: Data Structures in TypeScript
+description: Learn how to keep your data tidy using objects, arrays, and... arrays of objects!
+---
+
+import { Callout } from "nextra/components";
+
+# Data structures
+
+To keep your data tidy and efficiently process it, you need to structure it. The two most common data structures are objects and arrays (also called lists).
+
+In this lesson, we'll use these structures to store data about a classroom. Buckle up—there are a lot of fundamental concepts here!
+
+Before diving in, let's set things up.
+
+Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+
+- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
+- `deno.json`, which lets VS Code know this is a Deno project and enables the Deno extension. You can tweak settings in this file, but we'll keep it empty for now.
+
+Open the terminal and run the following command:  
+`deno run --watch --check main.ts`
+
+This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+
+You can use this setup to test the code provided in this lesson. (Yes, I forgot to include the `deno.json` file before taking all the screenshots for this lesson. Learn from my mistake and do better! 🥲)
+
+![A screenshot showing VS Code running and watching a TypeScript file.](/assets/first-steps/data-structures/watch.png)
+
+## Objects
+
+Objects store data as **key-value pairs** enclosed in curly brackets (`{}`), with each pair separated by a comma. The **keys** are plain identifiers, and the **values** can be any data type.
+
+For example, the object below stores data about a student. The keys are `firstName`, `lastName`, `gender`, and `age`. The corresponding values are `"Nael"`, `"Shiab"`, `"man"`, and `22` (that's Nael from a long time ago 😅):
+
+```ts showLineNumbers filename="main.ts"
+const student = {
+  firstName: "Nael",
+  lastName: "Shiab",
+  gender: "man",
+  age: 22,
+};
+console.log(student);
+```
+
+<Callout type="info" emoji="💡">
+  In an object, keys can be written as plain identifiers (no spaces or special characters) or as strings. For example, you could replace `firstName` with `"first name"`. However, as we’ll see below, avoiding spaces will make your life much easier.
+</Callout>
+
+To know what's in an object and the types of its values, you can hover over the object name in VS Code.
+
+![A screenshot showing VS Code with a pop-up displaying an object type.](/assets/first-steps/data-structures/object-types.png)
+
+### Accessing values
+
+To access the value of a specific key, use a `.` directly after the variable that references the object.
+
+For example, the following code will log `Nael` to your terminal:
+
+```ts showLineNumbers filename="main.ts"
+const student = {
+  firstName: "Nael",
+  lastName: "Shiab",
+  gender: "man",
+  age: 22,
+};
+console.log(student.firstName);
+```
+
+<Callout type="info" emoji="💡">
+  If the key `firstName` was written with a space, like `"first name"`, you would need to write `student["first name"]` to access its value. This is less straightforward and can make your code harder to read and maintain. For this reason, avoiding spaces in keys is usually recommended.
+</Callout>
+
+### Modifying values
+
+You use the same syntax to modify a value in an object as you do to access it, but with the `=` operator.
+
+As discussed in the [Variables](/first-steps/variables) lesson, you must respect the type of the value when modifying it. For example, if a key's value is initially a `number` (like with `age`), it can only be updated with another `number`.
+
+```ts showLineNumbers filename="main.ts"
+const student = {
+  firstName: "Nael",
+  lastName: "Shiab",
+  gender: "man",
+  age: 22,
+};
+
+// Making myself very old.
+student.age = 100;
+
+console.log(student);
+```
+
+![A screenshot showing VS Code and a script modifying an object.](/assets/first-steps/data-structures/object-update.png)
+
+### Autocompletion and checks
+
+When working with objects, you can take advantage of the handy autocompletion feature (also called _IntelliSense_).
+
+If you type `.` after a variable referencing an object, a pop-up will appear showing the list of available keys. You can use the up and down arrow keys to navigate through the keys and see their types. Press **Enter** to select the key you want.
+
+![A screenshot showing VS Code and its IntelliSense feature.](/assets/first-steps/data-structures/object-auto-completion.png)
+
+Additionally, because objects are typed, if you try to access a key that doesn't exist in the object, TypeScript will throw an error before you even run the script. This is shown in the screenshot below.
+
+Many bugs and errors are caused by simple typos. With this feature, TypeScript helps you catch those mistakes early, saving you time and frustration. 🙏
+
+![A screenshot showing VS Code and an error caused by accessing a key that doesn't exist in an object.](/assets/first-steps/data-structures/object-no-key.png)
+
+## Arrays
+
+It's time to talk about another data structure: arrays!
+
+Arrays store data in a specific order, enclosed within square brackets (`[` and `]`). You can store any type of data in an array.
+
+For example, here is an array of student names.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+console.log(names);
+```
+
+If you hover over the variable `names`, you'll see that its type is `string[]`, meaning it’s an array composed exclusively of strings. It's generally best to create arrays containing only one data type (or one type and `null`, as we will see later).
+
+![A screenshot showing VS Code with a `string[]` type on hovering.](/assets/first-steps/data-structures/string-array-type.png)
+
+### Indexes
+
+Because arrays are ordered, we can retrieve a specific data point using an **index**. Indexes start at `0`.
+
+For example:
+- To retrieve the name of the first student, use the index `0`.
+- For the second student, use the index `1`, and so on.
+
+To access an array value using an index, place the index inside square brackets (`[]`) immediately after the array or the variable referencing the array.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+// Change the index to see what's being logged.
+// If you put a number greater than 3,
+// the values will be undefined because
+// there are only four items in the array!
+const student = names[0];
+console.log(student);
+```
+
+![A screenshot showing VS Code logging a string from an array.](/assets/first-steps/data-structures/names-index.png)
+
+You can also modify a value in an array using its index and the `=` operator. Remember that arrays are typed in TypeScript. For example, if the type of `names` is `string[]`, you can only replace a value with another `string`.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+// Changing the string
+// at index 0.
+names[0] = "Nael";
+
+console.log(names);
+```
+
+![A screenshot showing VS Code showing a script updating a string value in an array.](/assets/first-steps/data-structures/array-updating.png)
+
+### Properties
+
+Arrays have a property called `length`, which returns the number of items in the array. This is useful for determining the size of the array, whether for iteration, validation, or other operations.
+
+To access a property, type a `.` right after the array or the variable referencing it.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+console.log(names.length);
+```
+
+![A screenshot showing VS Code logging an array length.](/assets/first-steps/data-structures/array-length.png)
+
+### Methods
+
+One of the most powerful features of arrays is their **methods**. These methods allow you to easily process and manipulate your data.
+
+To access methods, type a `.` right after the array or the variable referencing it, just like accessing properties. The difference is that methods must be called with `()` to trigger them. Often, you'll need to provide one or more arguments inside the parentheses (more on that later).
+
+Here are a few examples of commonly used array methods.
+
+#### `.push()`
+
+The `.push()` method adds one or more items to the end of an array.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+names.push("Nael");
+
+console.log(names);
+// Logs => [ "James", "John", "Patricia", "Jennifer", "Nael" ]
+```
+
+#### `.sort()`
+
+The `.sort()` method sorts the array in ascending order by default.
+
+It's also possible to pass an argument to sort the array in a specific manner, such as descending order, but we will cover that later.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+names.sort();
+
+console.log(names);
+// Logs => [ "James", "Jennifer", "John", "Patricia" ]
+```
+
+#### `.includes()`
+
+The `.includes()` method checks if a value exists in the array and returns a boolean.
+
+```ts showLineNumbers filename="main.ts"
+const marks = [33, 45, 78, 98];
+
+console.log(marks.includes(45));
+// Logs => true
+
+console.log(marks.includes(100));
+// Logs => false
+```
+
+#### `.find()`
+
+The `.find()` method searches for a value in the array. If no value matches the condition, it returns `undefined`. If multiple values match the condition, it returns the first one.
+
+This method requires a `function` as an argument. We'll cover functions in the next lessons.
+
+```ts showLineNumbers filename="main.ts"
+const marks = [33, 45, 78, 98];
+
+// Find the first mark greater than 50
+// and put it in a variable.
+const above50 = marks.find((mark) => mark > 50);
+console.log(above50);
+// Logs => 78
+
+// Find the first mark greater than 100.
+const above100 = marks.find((mark) => mark > 100);
+// There is none, so the value is undefined.
+console.log(above100);
+// Logs => undefined
+```
+
+#### `.filter()`
+
+The `.filter()` method creates a new array containing only the items that match a specific condition.
+
+This method requires a `function` as an argument. We'll cover functions in the next lessons.
+
+```ts showLineNumbers filename="main.ts"
+const marks = [33, 45, 78, 98];
+
+// Create a new array with
+// marks above 50.
+const above50 = marks.filter((mark) => mark > 50);
+
+// The original array is unchanged.
+console.log(marks);
+// Logs => [33, 45, 78, 98]
+
+// The new array contains only
+// marks above 50.
+console.log(above50);
+// Logs => [78, 98]
+```
+
+#### `.map()`
+
+The `.map()` method allows you to transform each item in the array into a new value and places the result in a new array.
+
+This method requires a `function` as an argument. We'll cover functions in the next lessons.
+
+For example, the code below doubles each mark.
+
+```ts showLineNumbers filename="main.ts"
+const allMarks = [33, 45, 78, 98];
+
+// Here, we multiply each mark by 2
+// and store the result in a new array.
+const marksMultiplied = allMarks.map((mark) => mark * 2);
+
+// The original array is not changed.
+console.log(allMarks);
+// Logs => [33, 45, 78, 98]
+
+// The new array contains the marks
+// multiplied by 2.
+console.log(marksMultiplied);
+// Logs => [ 66, 90, 156, 196 ]
+```
+
+#### Chaining
+
+Another advantage of using array methods is that they can be chained. Since they return an array, you can call one method after another.
+
+```ts showLineNumbers filename="main.ts"
+const allMarks = [33, 45, 78, 98];
+
+// Here we chain the array methods.
+// First, we multiply each mark by 2.
+// Then we filter out the marks that are
+// less than or equal to 100.
+// Finally, we sort the marks in descending order.
+const newMarks = allMarks
+    .map((mark) => mark * 2)
+    .filter((mark) => mark > 100)
+    .sort((a, b) => b - a);
+
+console.log(newMarks);
+// Logs => [196, 156]
+```
+
+<Callout type="info" emoji="💡">
+So far in our code, each line has ended with a `;`. However, from line 8 to line 11, there are no semicolons because we are chaining methods. Everything between these lines is part of the same statement. Technically, you could write it all on one line, but that would make the code less readable. Since TypeScript doesn't care about line breaks or indentation, it's up to the user to format the code as they prefer. In our case, we let the Deno formatter handle that for us.
+</Callout>
+
+#### Others
+
+There are many other array methods, but the ones above are the ones you'll use the most.
+
+If you're curious, you can check out the [W3Schools documentation](https://www.w3schools.com/js/js_array_methods.asp) for more information.
+
+You can also use *IntelliSense* directly in VS Code. Type `.` right after a variable referencing an array to see a list of properties and methods pop up. Use your up and down arrow keys to explore.
+
+Additionally, methods are typed. So, don't worry if you make a typo. It will be caught before you run your code and cause everything to crash. 🤓
+
+![A screenshot showing VS Code displaying methods available for a list.](/assets/first-steps/data-structures/pop-up-methods-arrays.png)
+
+## Arrays of... objects!
+
+Objects are great for storing data in an intuitive format, while arrays come with handy methods to easily process data. So why not combine the two?
+
+Say hello to **arrays of objects**!
+
+This is one of the most common ways to represent data: an array of objects where each object shares the same keys.
+
+Here's an example using our students' names and marks. Each object stores data about one student, with all students having the same keys. These objects are then grouped together in an array.
+
+You can think of each object as a row in a table. In fact, you can switch `console.log` to `console.table` and see a beautiful table displayed in your terminal!
+
+```ts showLineNumbers filename="main.ts"
+const students = [
+  { name: "James", mark: 33 },
+  { name: "John", mark: 45 },
+  { name: "Patricia", mark: 78 },
+  { name: "Jennifer", mark: 98 },
+];
+console.table(students);
+```
+
+![A screenshot showing VS Code logging an array of objects as a table in the terminal.](/assets/first-steps/data-structures/table.png)
+
+Now things are getting interesting. This pattern provides a flexible way to work with data.
+
+For example, you can filter based on a specific key while preserving the rest of the data for each student.
+
+It's the best of both worlds!
+
+```ts showLineNumbers filename="main.ts"
+const students = [
+  { name: "James", mark: 33 },
+  { name: "John", mark: 45 },
+  { name: "Patricia", mark: 78 },
+  { name: "Jennifer", mark: 98 },
+];
+
+// Notice how we access the mark key
+// for each student object.
+const studentAbove50 = students.filter((student) => student.mark > 50);
+
+// The original array is not changed.
+console.table(students);
+
+// The new array contains only students
+// with marks above 50.
+console.table(studentAbove50);
+```
+
+![A screenshot showing VS Code filtering an array of objects.](/assets/first-steps/data-structures/array-objects-filter.png)
+
+## Conclusion
+
+There’s much more to explore about objects and arrays... And there are other data structures like `Map` and `Set`. However, I think this is already a solid foundation for you.
+
+What we’ve covered represents about 90% of what you’ll use on a daily basis. And I don’t want to overload your brain too soon! (Too late? 😬)
+
+Now, let’s dive into loops and conditions. We’re closer than ever to building our first actual project!

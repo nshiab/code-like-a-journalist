@@ -1,0 +1,391 @@
+---
+title: Structures de données en TypeScript
+description: Apprenez à organiser vos données avec des objets, des listes et... des listes d'objets !
+---
+
+import { Callout } from "nextra/components";
+
+# Structures de données
+
+Pour organiser vos données et les traiter efficacement, vous devez les structurer. Les deux structures de données les plus courantes sont les objets et les listes (*arrays*).
+
+Dans cette leçon, nous allons utiliser ces structures pour stocker des données à propos d'étudiants. Préparez-vous, il y a beaucoup de concepts fondamentaux ici !
+
+Avant de plonger dans le vif du sujet, configurons notre environnement de travail.
+
+Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
+
+- `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez y ajouter `console.log("Hello!");`.
+- `deno.json`, qui informe VS Code qu'il s'agit d'un projet Deno et active l'extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+
+Ouvrez le terminal et exécutez la commande suivante :  `deno run --watch --check main.ts`
+
+Cette commande efface le terminal et relance `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+
+Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon. (Oui, j'ai oublié d'inclure le fichier `deno.json` avant de prendre toutes les captures d'écran de cette leçon. Soyez plus attentifs que moi ! 🥲)
+
+![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/first-steps/data-structures/watch.png)
+
+## Objets
+
+Les objets stockent les données sous forme de **paires clé-valeur** encadrées par des accolades (`{}`), avec chaque paire séparée par une virgule. Les **clés** sont de simples identifiants, et les **valeurs** peuvent être de n'importe quel type de données.
+
+Par exemple, l'objet ci-dessous stocke des données sur un étudiant. Les clés sont `firstName`, `lastName`, `gender` et `age`. Les valeurs correspondantes sont `"Nael"`, `"Shiab"`, `"man"`, et `22` (c'est un Nael d'il y a quelques années 😅) :
+
+
+```ts showLineNumbers filename="main.ts"
+const student = {
+  firstName: "Nael",
+  lastName: "Shiab",
+  gender: "man",
+  age: 22,
+};
+console.log(student);
+```
+
+<Callout type="info" emoji="💡">
+ Dans un objet, les clés peuvent être écrites sous forme d'identifiants simples (sans espaces ni caractères spéciaux) ou sous forme de chaînes de caractères. Par exemple, vous pourriez remplacer `firstName` par `"first name"`. Cependant, comme nous le verrons ci-dessous, éviter les espaces vous simplifiera grandement la vie.
+</Callout>
+
+Pour savoir ce qu'un objet contient et connaître les types de ses valeurs, vous pouvez survoler avec votre curseur le nom de l'objet dans VS Code.
+
+![Une capture d'écran montrant VS Code avec une fenêtre contextuelle affichant le type d'un objet.](/assets/first-steps/data-structures/object-types.png)
+
+### Accéder aux valeurs
+
+Pour accéder à la valeur d'une clé spécifique, utilisez un `.` directement après la variable qui fait référence à l'objet.
+
+Par exemple, le code suivant affichera `Nael` dans votre terminal :
+
+```ts showLineNumbers filename="main.ts"
+const student = {
+  firstName: "Nael",
+  lastName: "Shiab",
+  gender: "man",
+  age: 22,
+};
+console.log(student.firstName);
+```
+
+<Callout type="info" emoji="💡">
+  Si la clé `firstName` était écrite avec un espace, comme `"first name"`, vous devriez écrire `student["first name"]` pour accéder à sa valeur. Cela est moins intuitif et peut rendre votre code plus difficile à lire et à maintenir. Pour cette raison, il est généralement recommandé d'éviter les espaces dans les clés.
+</Callout>
+
+### Modifier des valeurs
+
+Vous utilisez la même syntaxe pour modifier une valeur dans un objet que pour y accéder, mais avec l'opérateur `=`.
+
+Comme mentionné dans la leçon sur les [Variables](/first-steps/variables), vous devez respecter le type de la valeur lorsque vous la modifiez. Par exemple, si la valeur d'une clé est initialement un `number` (comme avec `age`), elle ne peut être mise à jour qu'avec un autre `number`.
+
+```ts showLineNumbers filename="main.ts"
+const student = {
+  firstName: "Nael",
+  lastName: "Shiab",
+  gender: "man",
+  age: 22,
+};
+
+// Me voici très vieux.
+student.age = 100;
+
+console.log(student);
+```
+
+![Une capture d'écran montrant VS Code et un script modifiant un objet.](/assets/first-steps/data-structures/object-update.png)
+
+### Autocomplétion et vérifications
+
+Lorsque vous travaillez avec des objets, vous pouvez profiter de la fonctionnalité pratique d'autocomplétion (également appelée _IntelliSense_).
+
+Si vous tapez un `.` après une variable faisant référence à un objet, une fenêtre contextuelle apparaîtra avec la liste des clés disponibles. Vous pouvez utiliser les flèches haut et bas pour naviguer parmi les clés et voir leurs types. Appuyez sur **Entrée** pour sélectionner la clé souhaitée.
+
+![Une capture d'écran montrant VS Code et sa fonctionnalité IntelliSense.](/assets/first-steps/data-structures/object-auto-completion.png)
+
+De plus, comme les objets sont typés, si vous essayez d'accéder à une clé qui n'existe pas dans l'objet, TypeScript générera une erreur avant même que vous n'exécutiez le script. Cela est illustré dans la capture d'écran ci-dessous.
+
+De nombreux bogues et erreurs sont causés par de simples fautes de frappe. Grâce à cette fonctionnalité, TypeScript vous aide à détecter ces erreurs en amont. 🙏
+
+![Une capture d'écran montrant VS Code et une erreur causée par l'accès à une clé inexistante dans un objet.](/assets/first-steps/data-structures/object-no-key.png)
+
+## Listes
+
+Il est temps de parler d'une autre structure de données : les listes !
+
+Les listes stockent des données dans un ordre spécifique, encadrées par des crochets (`[` et `]`). Vous pouvez stocker n'importe quel type de données dans une liste.
+
+Par exemple, voici une liste de noms d'étudiants.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+console.log(names);
+```
+
+Si vous survolez la variable `names`, vous verrez que son type est `string[]`, ce qui signifie qu’il s’agit d’une liste composée exclusivement de chaînes de caractères. Il est généralement préférable de créer des listes contenant un seul type de données (ou un type et `null`, comme nous le verrons plus tard).
+
+![Une capture d'écran montrant VS Code avec un type `string[]` au survol.](/assets/first-steps/data-structures/string-array-type.png)
+
+### Index
+
+Étant donné que les listes sont ordonnées, nous pouvons récupérer un élément spécifique en utilisant un **index**. Les index commencent à `0`.
+
+Par exemple :
+- Pour récupérer le nom du premier étudiant, utilisez l’index `0`.
+- Pour le deuxième étudiant, utilisez l’index `1`, et ainsi de suite.
+
+Pour accéder à une valeur d'une liste en utilisant un index, placez l’index entre crochets (`[]`) immédiatement après la liste ou la variable référant à la liste.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+// Modifiez l’index pour voir ce qui est affiché dans le terminal.
+// Si vous entrez un nombre supérieur à 3, vous verrez un undefined
+// parce qu’il n’y a que quatre éléments dans la liste !
+const student = names[0];
+console.log(student);
+```
+
+![Une capture d'écran montrant VS Code affichant une chaîne de caractères provenant d'une liste.](/assets/first-steps/data-structures/names-index.png)
+
+Vous pouvez également modifier une valeur dans une liste en utilisant son index et l'opérateur `=`. Rappelez-vous que les listes sont typées en TypeScript. Par exemple, si le type de `names` est `string[]`, vous ne pouvez remplacer une valeur que par un autre `string`.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+// Modification de la chaîne
+// à l'index 0.
+names[0] = "Nael";
+
+console.log(names);
+```
+
+![Une capture d'écran montrant VS Code affichant un script modifiant une valeur de chaîne dans une liste.](/assets/first-steps/data-structures/array-updating.png)
+
+### Propriétés
+
+Les listes ont une propriété appelée `length`, qui renvoie le nombre d'éléments dans la liste. Cela est utile pour déterminer la taille de la liste, que ce soit pour des itérations, des validations ou d'autres opérations.
+
+Pour accéder à une propriété, tapez un `.` juste après la liste ou la variable qui la référence.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+console.log(names.length);
+```
+
+![Une capture d'écran montrant VS Code affichant la longueur d'une liste.](/assets/first-steps/data-structures/array-length.png)
+
+### Méthodes
+
+L'une des fonctionnalités les plus puissantes des listes est leurs **méthodes**. Ces méthodes vous permettent de traiter et de manipuler facilement vos données.
+
+Pour accéder aux méthodes, tapez un `.` juste après la liste ou la variable qui la référence, comme pour accéder aux propriétés. La différence est que les méthodes doivent être appelées avec des `()` pour être déclenchées. Souvent, vous devrez fournir un ou plusieurs arguments entre les parenthèses (nous y reviendrons plus tard).
+
+Voici quelques exemples de méthodes couramment utilisées pour les listes.
+
+#### `.push()`
+
+La méthode `.push()` ajoute un ou plusieurs éléments à la fin d'une liste.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+names.push("Nael");
+
+console.log(names);
+// => [ "James", "John", "Patricia", "Jennifer", "Nael" ]
+```
+
+#### `.sort()`
+
+La méthode `.sort()` trie la liste par ordre croissant par défaut.
+
+Il est également possible de passer un argument pour trier la liste d'une manière spécifique, comme par ordre décroissant, mais nous aborderons cela plus tard.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+names.sort();
+
+console.log(names);
+// => [ "James", "Jennifer", "John", "Patricia" ]
+```
+
+#### `.includes()`
+
+La méthode `.includes()` vérifie si une valeur existe dans la liste et renvoie un booléen.
+
+```ts showLineNumbers filename="main.ts"
+const marks = [33, 45, 78, 98];
+
+console.log(marks.includes(45));
+// => true
+
+console.log(marks.includes(100));
+// => false
+```
+
+#### `.find()`
+
+La méthode `.find()` recherche une valeur dans la liste. Si aucune valeur ne correspond à la condition, elle renvoie `undefined`. Si plusieurs valeurs correspondent à la condition, elle renvoie la première.
+
+Cette méthode nécessite une `function` comme argument. Nous aborderons les fonctions dans les prochaines leçons.
+
+```ts showLineNumbers filename="main.ts"
+const marks = [33, 45, 78, 98];
+
+// Trouve la première note supérieure à 50
+// et la stocke dans une variable.
+const above50 = marks.find((mark) => mark > 50);
+console.log(above50);
+//=> 78
+
+// Trouve la première note supérieure à 100.
+const above100 = marks.find((mark) => mark > 100);
+// Il n'y en a pas, donc la valeur est undefined.
+console.log(above100);
+// => undefined
+```
+
+#### `.filter()`
+
+La méthode `.filter()` crée une nouvelle liste contenant uniquement les éléments qui correspondent à une condition spécifique.
+
+Cette méthode nécessite une `function` comme argument. Nous aborderons les fonctions dans les prochaines leçons.
+
+```ts showLineNumbers filename="main.ts"
+const marks = [33, 45, 78, 98];
+
+// Crée une nouvelle liste avec
+// des notes supérieures à 50.
+const above50 = marks.filter((mark) => mark > 50);
+
+// La liste originale reste inchangée.
+console.log(marks);
+// => [33, 45, 78, 98]
+
+// La nouvelle liste contient uniquement
+// des notes supérieures à 50.
+console.log(above50);
+// => [78, 98]
+```
+
+#### `.map()`
+
+La méthode `.map()` vous permet de transformer chaque élément de la liste en une nouvelle valeur et place le résultat dans une nouvelle liste.
+
+Cette méthode nécessite une `function` comme argument. Nous aborderons les fonctions dans les prochaines leçons.
+
+Par exemple, le code ci-dessous double chaque note.
+
+```ts showLineNumbers filename="main.ts"
+const allMarks = [33, 45, 78, 98];
+
+// Ici, nous multiplions chaque note par 2
+// et stockons le résultat dans une nouvelle liste.
+const marksMultiplied = allMarks.map((mark) => mark * 2);
+
+// La liste originale n'est pas modifiée.
+console.log(allMarks);
+// => [33, 45, 78, 98]
+
+// La nouvelle liste contient les notes
+// multipliées par 2.
+console.log(marksMultiplied);
+// => [ 66, 90, 156, 196 ]
+```
+
+#### Enchaînement
+
+Un autre avantage de l'utilisation des méthodes de liste est qu'elles peuvent être enchaînées. Puisqu'elles renvoient une liste, vous pouvez appeler une méthode après l'autre.
+
+```ts showLineNumbers filename="main.ts"
+const allMarks = [33, 45, 78, 98];
+
+// Ici, nous enchaînons les méthodes de liste.
+// D'abord, nous multiplions chaque note par 2.
+// Ensuite, nous filtrons les notes inférieures
+// ou égales à 100.
+// Enfin, nous trions les notes par ordre décroissant.
+const newMarks = allMarks
+    .map((mark) => mark * 2)
+    .filter((mark) => mark > 100)
+    .sort((a, b) => b - a);
+
+console.log(newMarks);
+// Logs => [196, 156]
+```
+
+<Callout type="info" emoji="💡">
+Jusqu'à présent dans notre code, chaque ligne se terminait par un `;`. Cependant, des lignes 8 à 11, il n'y a pas de point-virgule parce que nous enchaînons des méthodes. Tout ce qui se trouve entre ces lignes fait partie de la même instruction. Techniquement, vous pourriez tout écrire sur une seule ligne, mais cela rendrait le code moins lisible. Comme TypeScript ne prend pas en compte les sauts de ligne ou l'indentation, c'est à l'utilisateur de formater le code comme il le souhaite. Dans notre cas, nous laissons le formateur Deno s'en charger pour nous.
+</Callout>
+
+#### Autres
+
+Il existe de nombreuses autres méthodes pour les listes, mais celles mentionnées ci-dessus sont celles que vous utiliserez le plus souvent.
+
+Si vous êtes curieux, vous pouvez consulter la [documentation de W3Schools](https://www.w3schools.com/js/js_array_methods.asp) pour en savoir plus.
+
+Vous pouvez également utiliser *IntelliSense* directement dans VS Code. Tapez un `.` juste après une variable faisant référence à une liste pour voir apparaître une liste des propriétés et méthodes disponibles. Utilisez les flèches haut et bas pour explorer.
+
+De plus, les méthodes sont typées. Pas d'inquiétude si vous faites une faute de frappe : elle sera détectée avant l'exécution de votre code et évitera un plantage complet. 🤓
+
+![Une capture d'écran montrant VS Code affichant les méthodes disponibles pour une liste.](/assets/first-steps/data-structures/pop-up-methods-arrays.png)
+
+## Listes d'objets !
+
+Les objets sont excellents pour stocker des données dans un format intuitif, tandis que les listes offrent des méthodes pratiques pour traiter facilement les données. Alors pourquoi ne pas combiner les deux ?
+
+Voici les **listes d'objets** !
+
+C'est l'une des façons les plus courantes de représenter des données : une liste d'objets où chaque objet partage les mêmes clés.
+
+Voici un exemple utilisant les noms et notes de nos étudiants. Chaque objet stocke des données sur un étudiant, et tous les étudiants ont les mêmes clés. Ces objets sont ensuite regroupés dans une liste.
+
+Vous pouvez considérer chaque objet comme une ligne dans un tableur. En fait, vous pouvez remplacer `console.log` par `console.table` et voir un magnifique tableau s'afficher dans votre terminal!
+
+```ts showLineNumbers filename="main.ts"
+const students = [
+  { name: "James", mark: 33 },
+  { name: "John", mark: 45 },
+  { name: "Patricia", mark: 78 },
+  { name: "Jennifer", mark: 98 },
+];
+console.table(students);
+```
+
+![Une capture d'écran montrant VS Code affichant une liste d'objets sous forme de tableau dans le terminal.](/assets/first-steps/data-structures/table.png)
+
+Les choses deviennent intéressantes. Ce modèle offre une manière flexible de travailler avec des données.
+
+Par exemple, vous pouvez filtrer en fonction d'une clé spécifique tout en préservant le reste des données pour chaque étudiant.
+
+C'est le meilleur des deux mondes !
+
+```ts showLineNumbers filename="main.ts"
+const students = [
+  { name: "James", mark: 33 },
+  { name: "John", mark: 45 },
+  { name: "Patricia", mark: 78 },
+  { name: "Jennifer", mark: 98 },
+];
+
+// Remarquez comment nous accédons à la clé mark
+// pour chaque objet étudiant.
+const studentAbove50 = students.filter((student) => student.mark > 50);
+
+// La liste originale n'est pas modifiée.
+console.table(students);
+
+// La nouvelle liste contient uniquement les étudiants
+// ayant des notes supérieures à 50.
+console.table(studentAbove50);
+```
+
+![Une capture d'écran montrant VS Code filtrant une liste d'objets.](/assets/first-steps/data-structures/array-objects-filter.png)
+
+## Conclusion
+
+Il y a encore beaucoup à explorer sur les objets et les listes... Et il existe d'autres structures de données comme `Map` et `Set`. Cependant, je pense que ceci constitue déjà une base solide pour vous.
+
+Ce que nous avons couvert représente environ 90 % de ce que vous utiliserez au quotidien. Et je ne veux pas surcharger votre cerveau trop vite ! (Trop tard ? 😬)
+
+Passons maintenant aux boucles et aux conditions. Nous sommes plus proches que jamais de construire notre tout premier projet concret !
