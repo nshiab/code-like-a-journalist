@@ -223,7 +223,7 @@ console.log("instanceof Date:", currentTime instanceof Date);
 
 ![A screenshot showing VS Code checking for dates.](/assets/first-steps/data-types/instanceof-date.png)
 
-## Others
+## Other types
 
 There are two other data types that you will often encounter in the wild: `undefined` and `null`.
 
@@ -258,6 +258,36 @@ const nullVariable = null;
 // This logs "true".
 console.log(nullVariable === null);
 ```
+
+## Properties and methods
+
+When you type `.` right after a variable, you'll see a list of properties and methods available for that variable.
+
+For example, strings have a property called `length`, which returns the number of characters in the string:
+
+```ts showLineNumbers filename="main.ts"
+const sentence = "Where is Bryan?";
+
+// This logs 15.
+console.log(sentence.length);
+```
+
+But they also have methods, like `.toUpperCase()`.
+
+```ts showLineNumbers filename="main.ts"
+const sentence = "Where is Bryan?";
+
+// This logs "WHERE IS BRYAN?"
+console.log(sentence.toUpperCase());
+```
+
+Different data types come with their own properties and methods. Don't worry too much about them now. We'll cover the most useful ones in the upcoming lessons and projects.
+
+However, if you're curious, you can type `.` after a variable to see a list of properties and methods available for that specific variable and its data type. Use the up and down arrow keys to navigate through the list and highlight the one that interests you, as shown in the screenshot below with a variable storing a `number`.
+
+![A screenshot showing VS Code displaying a list of properties and methods.](/assets/first-steps/data-types/methods.png)
+
+## Conclusion
 
 Congrats! You are ready to have fun building your first data structures! 👷
 

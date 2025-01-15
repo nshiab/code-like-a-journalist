@@ -226,7 +226,7 @@ console.log("instanceof Date:", currentTime instanceof Date);
 
 ![Une capture d'écran montrant VS Code vérifiant si une valeur est une date.](/assets/first-steps/data-types/instanceof-date.png)
 
-## Autres
+## Autres types de données
 
 Il existe deux autres types de données que vous rencontrerez souvent : `undefined` et `null`.
 
@@ -262,6 +262,37 @@ const nullVariable = null;
 // Ceci affiche "true".
 console.log(nullVariable === null);
 ```
+
+## Propriétés et méthodes
+
+Lorsque vous tapez un `.` juste après une variable, vous voyez apparaître une liste des propriétés et des méthodes disponibles pour cette variable.
+
+Par exemple, les chaînes de caractères ont une propriété appelée `length`, qui renvoie le nombre de caractères dans le texte :
+
+```ts showLineNumbers filename="main.ts"
+const sentence = "Where is Bryan?";
+
+// Cela affiche 15 dans le terminal.
+console.log(sentence.length);
+```
+
+Mais les chaînes de caractères ont également des méthodes, comme `.toUpperCase()`.
+
+```ts showLineNumbers filename="main.ts"
+const sentence = "Where is Bryan?";
+
+// Cela affiche "WHERE IS BRYAN?"
+// dans le terminal.
+console.log(sentence.toUpperCase());
+```
+
+Les différents types de données ont leurs propres propriétés et méthodes. Ne vous inquiétez pas trop à ce sujet pour l'instant. Nous couvrirons les plus utiles dans les prochaines leçons et projets.
+
+Cependant, si vous êtes curieux, vous pouvez taper un `.` après une variable pour voir une liste des propriétés et méthodes disponibles pour cette variable spécifique et son type de données. Utilisez les flèches haut et bas pour naviguer dans la liste et mettre en surbrillance celle qui vous intéresse, comme illustré dans la capture d'écran ci-dessous avec une variable contenant un `number`.
+
+![Une capture d'écran montrant VS Code affichant une liste de propriétés et de méthodes.](/assets/first-steps/data-types/methods.png)
+
+## Conclusion
 
 Félicitations ! Vous êtes prêt à vous amuser en construisant vos premières structures de données ! 👷
 
