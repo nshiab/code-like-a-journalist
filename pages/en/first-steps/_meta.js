@@ -4,4 +4,5 @@ export default {
     "data-types": "Data types",
     "data-structures": "Data structures",
     conditions: "Conditions",
+    loops: "Loops",
 };
