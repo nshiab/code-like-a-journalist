@@ -59,9 +59,13 @@ if (myAge > yourAge) {
 
 ![A screenshot showing VS Code running a TypeScript file with if, else if, and else statements.](/assets/first-steps/conditions/conditions-age.png)
 
+<Callout type="info" emoji="💡">
+  Have you noticed the absence of `;` on line 12? It's because when you use `{}`, you create a **block of code**. The closing curly bracket already tells the computer that it's the end of the block, so there's no need for an extra semicolon at the end.
+</Callout>
+
 ## Comparison operators
 
-When using `if` and `else if`, the condition inside the `()` should always result in a boolean value.
+When using `if` and `else if`, the condition inside the `()` should always result in a boolean value (`true` or `false`).
 
 The previous example works because we used the comparison operators `>` and `<`, which return a boolean.
 
@@ -77,7 +81,7 @@ Here are the main comparison operators you'll use in your daily work:
   You might see examples around the web with `==` and `!=`. These operators don't check for the type of values, so it's best to stick with `===` and `!==`, which check for strict equality.
 </Callout>
 
-And here are the operators in action.
+And here are the operators in action. We store the results in variables and log them:
 
 ```ts showLineNumbers filename="main.ts"
 // Change the ages to test the different operators.
@@ -140,12 +144,12 @@ if (myProvince === "Quebec") {
 }
 ```
 
-Here's the same code with the logical operator `&&` to make sure `age` **AND** `province` are specific values. Simpler to understand and easier to debug!
+Here's the same code with the logical operator `&&` to make sure `age` **AND** `province` meet specific conditions. This approach is simpler to understand and easier to debug!
 
 Here's what the code below does:
-- On line 6, we test if `myProvince` is `"Quebec"` **AND** `myAge` is greater or equal to `18`. If it's the case, you can order a drink.
-- On line 8, we test if `myProvince` is `"Ontario"` **AND** `myAge` is greater or equal to `19`. If it's the case, you can order a drink.
-- At this point, it's possible the province is something unexpected. On line 10, we test if `myProvince` is not `"Quebec"` **AND** not `"Ontario"`. If it's the case, we let the user know we don't know this province.
+- On line 6, we check if `myProvince` is `"Quebec"` **AND** `myAge` is greater than or equal to `18`. If this is true, you can order a drink.
+- On line 8, we check if `myProvince` is `"Ontario"` **AND** `myAge` is greater than or equal to `19`. If this is true, you can order a drink.
+- By this point, it's possible the province is something unexpected. On line 10, we check if `myProvince` is not `"Quebec"` **AND** not `"Ontario"`. If this is true, we let the user know we don't recognize this province.
 - On line 12, the only remaining possibility is that the user is not allowed to order a drink.
 
 ```ts showLineNumbers filename="main.ts"
@@ -165,14 +169,14 @@ if (myProvince === "Quebec" && myAge >= 18) {
 }
 ```
 
-We could also write the same algorithm with a mix of `&&` and `||`. And we can also use variables to simplify the code while at it.
+We could also write the same algorithm with a mix of `&&` and `||`. Additionally, we can use variables to simplify the code.
 
 Here's what the code below does:
-- On line 6, we test if `myProvince` is `"Quebec"` **AND** `myAge` is greater or equal to `18`. We store the result in the variable `isAllowedInQuebec`. (If you hover over it, you'll see its type is `boolean`).
-- On line 7, we do the same thing but for Ontario.
-- On line 9, we check if `isAllowedInQuebec` is `true` **OR** `isAllowedInOntario` is `true`. Only one needs to be `true` for the following code between `{}` to be executed.
-- On line 11, we log a message to the user in case the province is something unexpected.
-- When the computer reaches line 13, the only possibility is that the user is not allowed to order a drink!
+- On line 6, we check if `myProvince` is `"Quebec"` **AND** `myAge` is greater than or equal to `18`. We store the result in the variable `isAllowedInQuebec`, which can only be `true` or `false`. (If you hover over it, you'll see its type is `boolean`.)
+- On line 7, we do the same for Ontario, storing the result in `isAllowedInOntario`.
+- On line 9, we check if `isAllowedInQuebec` is `true` **OR** `isAllowedInOntario` is `true`. Only one of these needs to be `true` for the code inside the following `{}` to execute.
+- On line 11, we log a message to the user if the province is something unexpected.
+- By the time the computer reaches line 13, the only remaining possibility is that the user is not allowed to order a drink!
 
 ```ts showLineNumbers filename="main.ts"
 // Change the age and province to test the conditions.
@@ -194,23 +198,22 @@ if (isAllowedInQuebec || isAllowedInOntario) {
 
 ## Conditional operator
 
-There another way to do simple conditional statements with the `condition ? if true : if false` syntax. This syntax is called the **conditional operator** (also called the **ternary operator**).
+There's another way to write simple conditional statements using the `condition ? if true : if false` syntax. This syntax is called the **conditional operator** (also known as the **ternary operator**).
 
-It's great for simple conditions. It allows you to replace `if` and `else` statements in one line.
+It's great for simple conditions, allowing you to replace `if` and `else` statements with a single line.
 
-Here's another variation of our algorithm with this syntax. One other big difference here is that instead of using `console.log` everywhere, we create a variable `message` and use `console.log` with it just at the end.
+Here's another variation of our algorithm using this syntax. One other notable difference is that instead of using `console.log` multiple times, we create a variable `message` and log it just once at the end.
 
 Here's what the code does:
-- On line 6, we create a variable `message` with an empty string. We use `let` so we can overwritte its value later.
-- On line 8, we check if `myProvince` equals to `"Quebec"`.
-- If the province is Quebec, line 9 gets executed:
-  - If `myAge` is greater or equal to `18`, `message` is overwritten with `"You are allowed!"`.
-  - Otherwise, `message` is overwritten with `"You are not allowed!"`
-- On line 10, we check if `myProvince` equals to `"Ontario"`.
-- If the province is Ontario, line 11 gets executed:
-  - If `myAge` is greater or equal to `19`, `message` is overwritten with `"You are allowed!"`.
-  - Otherwise, `message` is overwritten with `"You are not allowed!"`
-- The only possibility left on line 12 is that the province is not Quebec or Ontario. So we overwritte the message on line 13 with `"I don't know this province!"`.
+- On line 6, we create a variable `message` with an empty string. We use `let` so we can overwrite its value later.
+- On line 8, we check if `myProvince` is equal to `"Quebec"`. If the province is Quebec, line 9 gets executed:
+  - If `myAge` is greater than or equal to `18`, `message` is overwritten with `"You are allowed!"`.
+  - Otherwise, `message` is overwritten with `"You are not allowed!"`.
+- On line 10, we check if `myProvince` is equal to `"Ontario"`. If the province is Ontario, line 11 gets executed:
+  - If `myAge` is greater than or equal to `19`, `message` is overwritten with `"You are allowed!"`.
+  - Otherwise, `message` is overwritten with `"You are not allowed!"`.
+- By line 12, the only possibility left is that the province is not Quebec or Ontario. So we overwrite the message on line 13 with `"I don't know this province!"`.
+- On line 16, we log the updated `message`.
 
 ```ts showLineNumbers filename="main.ts"
 // Change the age and province to test the conditions.
@@ -233,10 +236,10 @@ console.log(message);
 
 ## Conclusion
 
-All of the algorithms checking if the user can order a drink will give the same results. So, which one is the best?
+All of the algorithms discussed above for checking if the user can order a drink will produce the same results. So, which one is the best?
 
-Well, it really depends on the context and your personnal preferences.
+Well, it really depends on the context and your personal preferences.
 
-Remember that you are learning a programming language. And as in any languages, there are many ways to say the same thing. As long as your computer and colleagues will understand you, you'll be fine! 🤖
+Remember, you are learning a programming language. And just like in any language, there are many ways to express the same idea. As long as your computer and colleagues can understand you, you'll be fine! 🤖
 
-It's now time for the next lesson. Let's discover loops!
+Now, it's time for the next lesson. Let's discover loops!
