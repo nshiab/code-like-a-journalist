@@ -1,15 +1,15 @@
 ---
 title: Conditions in TypeScript
-description: To do.
+description: This lesson covers the basics of conditional statements in TypeScript, including if, else if, else, comparison operators, logical operators, and the conditional (ternary) operator.
 ---
 
 import { Callout } from "nextra/components";
 
 # Conditions
 
-You are constantly using conditions statements in your everyday lives. Is the water boiling in the pot? If it does, put in the pasta. Otherwise, wait a few more minutes. 🧑‍🍳
+You are constantly using conditional statements in your everyday life. Is the water boiling in the pot? If it is, put in the pasta. Otherwise, wait a few more minutes. 🧑‍🍳
 
-It's the same thing in your code. Depending on data, you can ask your program or algorithm to do act differently.
+It's the same in your code. Depending on the data, you can instruct your program or algorithm to act differently.
 
 Let's set things up for this lesson.
 
@@ -28,18 +28,19 @@ You can use this setup to test the code provided in this lesson.
 
 ## Conditional statements
 
-To write conditions, we use the conditional statements `if`, `else if` and `else`.
+To write conditions, we use the conditional statements `if`, `else if`, and `else`.
 
-The first condition should always be tested with `if`. The condition should be between `()`. If the condition is met, the computer will execute what is found between the following `{}`.
+The first condition should always be tested with `if`. The condition should be enclosed in `()`. If the condition is met, the computer will execute the code inside the following `{}`.
 
-If we want to test more than one condition, we use `else if` with a condition between `()` and following by code to be executed between `{}`. But you don't always need to test multiple conditions.
+If we want to test more than one condition, we use `else if` with a condition in `()` followed by code to be executed inside `{}`. Testing multiple conditions isn't always necessary.
 
-If we want run some code if none of the conditions were met, we use `else`. Because `else` doesn't test any condition, we don't need `()` but we must provide the code be executed between `{}`. Nothing forces you to finish with an `else`, but it often helps to avoid unexpected bugs.
+If we want to run some code when none of the conditions are met, we use `else`. Since `else` doesn't test any condition, we don't need `()`, but we must provide the code to be executed inside `{}`. Although finishing with an `else` isn't mandatory, it often helps prevent unexpected bugs.
 
 For example, the code below compares `myAge` and `yourAge`:
-- If `myAge` is greater than `yourAge` (line 6), we log `I am older than you!` in the terminal. The rest of the conditions statements are skipped and ignored.
-- If the first condition is not met, we check another condition with `else if` (line 8). If `myAge` is smaller than `your age`, we log `You are older than me!`. The rest of the conditions statements are skipped and ignored.
-- Finally, if none of the conditions above are met, it means that we are the same age. In this case, we use `else` (line 11) to log `We are the same age!`.
+- If `myAge` is greater than `yourAge` (line 6), we log `I am older than you!` in the terminal. The remaining conditional statements are skipped.
+- If the first condition is not met, we check another condition with `else if` (line 8). If `myAge` is smaller than `yourAge`, we log `You are older than me!`. The remaining conditional statements are skipped.
+- Finally, if none of the conditions above are met, it means that we are the same age. In this case, we use `else` (line 10) to log `We are the same age!`.
+
 
 ```ts showLineNumbers filename="main.ts"
 // Change the ages
@@ -56,11 +57,13 @@ if (myAge > yourAge) {
 }
 ```
 
-![A screenshot showing VS Code running a TypeScript file with if, else if and else statements.](/assets/first-steps/conditions/conditions-age.png)
+![A screenshot showing VS Code running a TypeScript file with if, else if, and else statements.](/assets/first-steps/conditions/conditions-age.png)
 
 ## Comparison operators
 
-The previous example works because we used the comparison operators `>` and `<` and they return a `boolean`.
+When using `if` and `else if`, the condition inside the `()` should always result in a boolean value.
+
+The previous example works because we used the comparison operators `>` and `<`, which return a boolean.
 
 Here are the main comparison operators you'll use in your daily work:
 - `>`: greater than
@@ -71,7 +74,7 @@ Here are the main comparison operators you'll use in your daily work:
 - `!==`: not equal to
 
 <Callout type="info" emoji="💡">
-    You might see examples around the web with `==` and `!=`. These operators don't check for the type values, so it's best to stick with `===` and `!==` which check for strict equality.
+  You might see examples around the web with `==` and `!=`. These operators don't check for the type of values, so it's best to stick with `===` and `!==`, which check for strict equality.
 </Callout>
 
 And here are the operators in action.
@@ -105,11 +108,14 @@ console.log("differentAge =>", differentAge);
 
 ## Logical operators
 
-Sometimes, you want to check multiple things in one conditional statement. This is where logical operators `&&` and `||` are handy.
+Sometimes, you want to check multiple conditions in one statement. This is where logical operators `&&` and `||` are useful.
 
-For example, let's say we need an algorithm to check if you are old enough to have a dring in a bar in Quebec (at least 18) or Ontario (at least 19).
+- `&&` means **AND**
+- `||` means **OR**
 
-Without logicial operators, it could look like this, with nested conditions. It works, but nested conditions can easily be difficult to read and debug.
+For example, let's say we need an algorithm to check if you are old enough to have a drink in a bar in Quebec (at least 18) or Ontario (at least 19). In case you don't know, Quebec and Ontario are different Canadian provinces. 🥂🇨🇦
+
+Without logical operators, it could look like this, with nested conditions. It works, but nested conditions can be difficult to read and debug.
 
 ```ts showLineNumbers filename="main.ts"
 // Change the age and province to test the conditions.
@@ -134,7 +140,13 @@ if (myProvince === "Quebec") {
 }
 ```
 
-Here's the same code with logical operators that allow us to check the `age` and `province` at the same time. Simpler to understand and easier to debug!
+Here's the same code with the logical operator `&&` to make sure `age` **AND** `province` are specific values. Simpler to understand and easier to debug!
+
+Here's what the code below does:
+- On line 6, we test if `myProvince` is `"Quebec"` **AND** `myAge` is greater or equal to `18`. If it's the case, you can order a drink.
+- On line 8, we test if `myProvince` is `"Ontario"` **AND** `myAge` is greater or equal to `19`. If it's the case, you can order a drink.
+- At this point, it's possible the province is something unexpected. On line 10, we test if `myProvince` is not `"Quebec"` **AND** not `"Ontario"`. If it's the case, we let the user know we don't know this province.
+- On line 12, the only remaining possibility is that the user is not allowed to order a drink.
 
 ```ts showLineNumbers filename="main.ts"
 // Change the age and province to test the conditions.
@@ -152,3 +164,79 @@ if (myProvince === "Quebec" && myAge >= 18) {
   console.log("You are not allowed!");
 }
 ```
+
+We could also write the same algorithm with a mix of `&&` and `||`. And we can also use variables to simplify the code while at it.
+
+Here's what the code below does:
+- On line 6, we test if `myProvince` is `"Quebec"` **AND** `myAge` is greater or equal to `18`. We store the result in the variable `isAllowedInQuebec`. (If you hover over it, you'll see its type is `boolean`).
+- On line 7, we do the same thing but for Ontario.
+- On line 9, we check if `isAllowedInQuebec` is `true` **OR** `isAllowedInOntario` is `true`. Only one needs to be `true` for the following code between `{}` to be executed.
+- On line 11, we log a message to the user in case the province is something unexpected.
+- When the computer reaches line 13, the only possibility is that the user is not allowed to order a drink!
+
+```ts showLineNumbers filename="main.ts"
+// Change the age and province to test the conditions.
+// Don't worry about the `: number` and `: string` for now.
+const myAge: number = 18;
+const myProvince: string = "Quebec";
+
+const isAllowedInQuebec = myProvince === "Quebec" && myAge >= 18;
+const isAllowedInOntario = myProvince === "Ontario" && myAge >= 19;
+
+if (isAllowedInQuebec || isAllowedInOntario) {
+  console.log("You are allowed!");
+} else if (myProvince !== "Quebec" && myProvince !== "Ontario") {
+  console.log("I don't know this province!");
+} else {
+  console.log("You are not allowed!");
+}
+```
+
+## Conditional operator
+
+There another way to do simple conditional statements with the `condition ? if true : if false` syntax. This syntax is called the **conditional operator** (also called the **ternary operator**).
+
+It's great for simple conditions. It allows you to replace `if` and `else` statements in one line.
+
+Here's another variation of our algorithm with this syntax. One other big difference here is that instead of using `console.log` everywhere, we create a variable `message` and use `console.log` with it just at the end.
+
+Here's what the code does:
+- On line 6, we create a variable `message` with an empty string. We use `let` so we can overwritte its value later.
+- On line 8, we check if `myProvince` equals to `"Quebec"`.
+- If the province is Quebec, line 9 gets executed:
+  - If `myAge` is greater or equal to `18`, `message` is overwritten with `"You are allowed!"`.
+  - Otherwise, `message` is overwritten with `"You are not allowed!"`
+- On line 10, we check if `myProvince` equals to `"Ontario"`.
+- If the province is Ontario, line 11 gets executed:
+  - If `myAge` is greater or equal to `19`, `message` is overwritten with `"You are allowed!"`.
+  - Otherwise, `message` is overwritten with `"You are not allowed!"`
+- The only possibility left on line 12 is that the province is not Quebec or Ontario. So we overwritte the message on line 13 with `"I don't know this province!"`.
+
+```ts showLineNumbers filename="main.ts"
+// Change the age and province to test the conditions.
+// Don't worry about the `: number` and `: string` for now.
+const myAge: number = 18;
+const myProvince: string = "Quebec";
+
+let message = "";
+
+if (myProvince === "Quebec") {
+  message = myAge >= 18 ? "You are allowed!" : "You are not allowed!";
+} else if (myProvince === "Ontario") {
+  message = myAge >= 19 ? "You are allowed!" : "You are not allowed!";
+} else {
+  message = "I don't know this province!";
+}
+
+console.log(message);
+```
+
+## Conclusion
+
+All of the algorithms checking if the user can order a drink will give the same results. So, which one is the best?
+
+Well, it really depends on the context and your personnal preferences.
+
+Remember that you are learning a programming language. And as in any languages, there are many ways to say the same thing. As long as your computer and colleagues will understand you, you'll be fine! 🤖
+
+It's now time for the next lesson. Let's discover loops!
