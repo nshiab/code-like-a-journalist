@@ -1,10 +1,153 @@
 ---
 title: Les boucles en TypeScript
-description: 
+description: Cette leçon couvre les bases des boucles en TypeScript, y compris l'utilisation des listes avec les boucles, les boucles `for`, et l'instruction `break`.
 ---
 
 import { Callout } from "nextra/components";
 
-# Boucles
+# Les boucles
 
-Coucou!
+Nous utilisons souvent les ordinateurs pour effectuer des tâches répétitives rapidement et efficacement. Et c'est pour cela que les *boucles* existent : pour *itérer* !
+
+Préparons notre environnement de travail pour cette leçon.
+
+Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
+
+- `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
+- `deno.json`, qui permet à VS Code de savoir qu'il s'agit d'un projet Deno et active l'extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+
+Ouvrez le terminal et exécutez la commande suivante : `deno run --watch --check main.ts`
+
+Cette commande efface le terminal et réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+
+Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
+
+![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/first-steps/loops/setup.png)
+
+## Avec les listes
+
+Disons que nous avons dix nombres (de 1 à 10), que nous voulons multiplier chacun d'eux par 2 et afficher les résultats.
+
+Nous pourrions écrire ce code :
+
+```ts showLineNumbers filename="main.ts"
+console.log(1, "=>", 1 * 2);
+console.log(2, "=>", 2 * 2);
+console.log(3, "=>", 3 * 2);
+console.log(4, "=>", 4 * 2);
+console.log(5, "=>", 5 * 2);
+console.log(6, "=>", 6 * 2);
+console.log(7, "=>", 7 * 2);
+console.log(8, "=>", 8 * 2);
+console.log(9, "=>", 9 * 2);
+console.log(10, "=>", 10 * 2);
+```
+
+Mais c'est assez répétitif. Et que se passe-t-il si nous voulons faire la même chose avec 100 nombres ? Ou si nous voulons multiplier par 3 au lieu de 2 ? Tout écrire ou modifier prendrait beaucoup de temps !
+
+À la place, vous pouvez utiliser... des boucles et des listes ! Les listes sont *itérables*, ce qui signifie que vous pouvez les utiliser facilement avec des boucles.
+
+Pour créer une boucle, vous commencez par `for`, suivi des paramètres de la boucle entre `()`. Ensuite, vous devez indiquer à l'ordinateur ce qu'il doit faire à chaque itération à l'intérieur des `{}`.
+
+Réécrivons notre code, mais cette fois avec une liste et une boucle `for`.
+
+Voici ce qui se passe dans le code ci-dessous, étape par étape :
+- À la ligne 2, nous créons une liste `numbers`.
+- À la ligne 4, nous créons une nouvelle variable `n` qui stockera les valeurs de `numbers`, une par une.
+- Aux lignes 5 et 6, nous indiquons à l'ordinateur de multiplier la valeur de `n` par deux, de la stocker dans une nouvelle variable, puis de l'afficher. L'ordinateur fera cela pour chaque valeur de `numbers`, une par une.
+
+```ts showLineNumbers filename="main.ts"
+// Ajoutez ou supprimez des éléments dans la liste et sauvegardez.
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+for (const n of numbers) {
+  const multiple = n * 2;
+  console.log(n, "=>", multiple);
+}
+```
+
+![Une capture d'écran montrant VS Code exécutant une boucle for-of.](/assets/first-steps/loops/for-of-loop.png)
+
+Si l'ordinateur pouvait parler 🤖, voici ce qu'il dirait en exécutant ce script :
+- Ligne 1 : Ce n'est qu'un commentaire pour les humains. Je l'ignore.
+- Ligne 2 : Bonjour `numbers` ! Enchanté de faire ta connaissance.
+- Ligne 3 : Rien. Les humains adorent les espaces vides.
+- Ligne 4 : Oh, une boucle `for`. Salut `n` ! Je vais t'utiliser pour stocker chaque valeur de `numbers`, une par une.
+- Ligne 5-6 : Itérons !
+  - Je mets la première valeur de `numbers` dans `n`. Je multiplie `n` par 2 et je l'affiche.
+  - Je mets la deuxième valeur de `numbers` dans `n`. Je multiplie `n` par 2 et je l'affiche.
+  - [...]
+  - Je mets la dixième valeur de `numbers` dans `n`. Je multiplie `n` par 2 et je l'affiche.
+- Ligne 7 : J'ai itéré sur toutes les valeurs de `numbers`. J'ai terminé ! Sayonara ! 👋
+
+La beauté de cette syntaxe est que, peu importe le nombre de valeurs dans `numbers` (10, 1 000 ou 1 000 000), le code restera court et clair, et vous pouvez être sûr que toutes les valeurs seront traitées.
+
+De plus, le code des itérations est contenu entre les `{}`. Ainsi, si vous avez besoin de multiplier par 3 au lieu de 2, vous n'avez qu'à mettre à jour votre code à un seul endroit, ce qui réduit le risque d'oublier un autre bout de code à modifier et d'introduire des bogues.
+
+## Boucle `for` classique
+
+Bien qu'il soit pratique d'itérer avec une liste, vous n'en avez pas nécessairement besoin.
+
+Si vous voulez dire bonjour un million de fois, vous pouvez utiliser une boucle `for` classique, comme montré dans le code ci-dessous.
+
+La boucle nécessite trois expressions entre `()` avant d'exécuter le code à l'intérieur des `{}` qui suivent :
+- Tout d'abord, vous avez besoin d'une variable pour stocker un nombre. Par convention, on l'appelle `i`, mais vous pouvez lui donner le nom que vous voulez. Cette variable représente le point de départ pour l'itération. Ci-dessous, c'est `let i = 0`.
+- Ensuite, vous avez besoin d'une condition pour arrêter la boucle. Cela se fait généralement en utilisant des opérateurs de comparaison comme `<` ou `<=` avec la variable. Ci-dessous, c'est `i < 1_000_000`.
+- Enfin, vous devez spécifier comment incrémenter la variable. Ci-dessous, nous utilisons `i++`, ce qui signifie incrémenter de 1 à chaque étape.
+
+Ces expressions doivent être séparées par des `;` dans les `()`.
+
+Le résultat est une boucle commençant avec `i = 0` et s'arrêtant lorsque `i` atteint 999 999. Comme `i` s'incrémente de 1 à chaque itération, cette boucle s'exécute 1 000 000 de fois.
+
+```ts showLineNumbers filename="main.ts"
+for (let i = 0; i < 1_000_000; i++) {
+  console.log(i, "Hello!");
+}
+```
+
+![Une capture d'écran montrant VS Code exécutant une boucle for.](/assets/first-steps/loops/for-loop.png)
+
+Vous venez de demander à votre ordinateur de faire quelque chose UN MILLION DE FOIS ! Et avec seulement 3 lignes de code ! Ressentez-vous le POUVOIR entre vos mains ? 😈
+
+Vous pouvez jouer avec les expressions. Par exemple, essayez de faire ces modifications et voyez ce qui se passe :
+- Remplacez `let i = 0` par `let i = 1000`
+- Remplacez `i < 1_000_000` par `i <= 1_100`
+- Remplacez `i++` par `i += 10`
+
+## `break`
+
+Parfois, vous voulez arrêter votre boucle lorsqu'une condition spécifique est remplie. Pour cela, vous pouvez utiliser l'instruction `break`. Elle fonctionne dans toutes les boucles.
+
+Par exemple, dans le code ci-dessous, nous itérons à partir des valeurs de `names`, mais nous interrompons la boucle si l'un des noms commence par J. Comme `"Jerry"` remplit cette condition, c'est le dernier nom qui est affiché.
+
+```ts showLineNumbers filename="main.ts"
+const names = [
+  "Tom",
+  "Ivan",
+  "Jerry",
+  "John",
+  "Smith",
+  "Derek",
+  "Stuart",
+  "Dustin",
+  "Jenny",
+  "Jasmine",
+];
+
+for (const n of names) {
+  console.log(n);
+  if (n.startsWith("J")) {
+    break;
+  }
+}
+```
+
+![Une capture d'écran montrant VS Code exécutant une boucle for avec une instruction break.](/assets/first-steps/loops/break.png)
+
+## Conclusion
+
+Les boucles sont un outil incroyable pour l'analyse de données. Elles vous permettent d'itérer rapidement et efficacement à travers des volumes massifs de données avec seulement quelques lignes de code.
+
+Notez qu'il existe d'autres types de boucles, comme les boucles `while`. Cependant, elles sont rarement utilisées dans un contexte d'analyse de données.
+
+Et maintenant, je pense que nous pouvons nous attaquer à notre premier projet ! Nous avons couvert toutes les bases. Félicitations ! 🕺
