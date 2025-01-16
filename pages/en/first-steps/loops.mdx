@@ -1,13 +1,13 @@
 ---
 title: Loops in TypeScript
-description: 
+description: This lesson covers the basics of loops in TypeScript, including how to use arrays with loops, `for` loops, and the `break` statement.
 ---
 
 import { Callout } from "nextra/components";
 
 # Loops
 
-We usually use computers to do repetitive tasks over and over, and very quickly. And this is what *loops* are for: to *iterate*!
+We often use computers to perform repetitive tasks quickly and efficiently. And this is what *loops* are for: to *iterate*!
 
 Let's set things up for this lesson.
 
@@ -26,9 +26,9 @@ You can use this setup to test the code provided in this lesson.
 
 ## With arrays
 
-Let' say that we have ten numbers (1 to 10). We want to multiply them by 2 and log them.
+Let's say we have ten numbers (1 to 10), and we want to multiply each of them by 2 and log the results.
 
-We could write this code.
+We could write this code:
 
 ```ts showLineNumbers filename="main.ts"
 console.log(1, "=>", 1 * 2);
@@ -43,18 +43,18 @@ console.log(9, "=>", 9 * 2);
 console.log(10, "=>", 10 * 2);
 ```
 
-But it's pretty repetitive. And what happens if we want to do the same things but with 100 numbers? Or if we want to multiply by 3 instead of 2? Typing or modifying it all would take a long time!
+But it's pretty repetitive. And what happens if we want to do the same thing but with 100 numbers? Or if we want to multiply by 3 instead of 2? Typing or modifying it all would take a long time!
 
-Instead, you can use... arrays! Arrays are *iterable* which means you can use them easily with loops.
+Instead, you can use... loops and arrays! Arrays are *iterable*, which means you can use them easily with loops.
 
-To create a loop, you start with `for` followed by the loop parameters between `()`. Then you need to tell the computer what must be done at each iteration between `{}`.
+To create a loop, you start with `for`, followed by the loop parameters between `()`. Then you need to tell the computer what must be done at each iteration inside `{}`.
 
-Let's rewrite our code, but with an array and a `for` loop this time.
+Let's rewrite our code, but this time with an array and a `for` loop.
 
 Here's what's happening in the code below, step by step:
 - On line 2, we create an array `numbers`.
-- On line 4, we create a new variable `n` that will store the values from `numbers`, one by one, one after another.
-- On line 5 and 6, we tell the computer that it should multiply the `n` value by two and store it in a new variable, before logging it. It will do that for each value in `numbers`, one by one, one after another.
+- On line 4, we create a new variable `n` that will store the values from `numbers`, one by one.
+- On lines 5 and 6, we instruct the computer to multiply the `n` value by two, store it in a new variable, and log it. The computer will do this for each value in `numbers`, one by one.
 
 ```ts showLineNumbers filename="main.ts"
 // Add or remove items in the array and save.
@@ -68,7 +68,7 @@ for (const n of numbers) {
 
 ![A screenshot showing VS Code running a for-of loop.](/assets/first-steps/loops/for-of-loop.png)
 
-If the computer could talk, here's what he would say when running this script:
+If the computer could talk 🤖, here's what it would say when running this script: 
 - Line 1: This is just a comment for humans. I ignore it.
 - Line 2: Hello `numbers`! Nice to meet you.
 - Line 3: Nothing. Humans love empty spaces.
@@ -78,26 +78,26 @@ If the computer could talk, here's what he would say when running this script:
   - I put the second value of `numbers` in `n`. I multiply `n` by 2 and I log it.
   - [...]
   - I put the tenth value of `numbers` in `n`. I multiply `n` by 2 and I log it.
-- Line 7: I iterated over all values of `numbers`. I am done! Sayonara!
+- Line 7: I iterated over all values of `numbers`. I am done! Sayonara! 👋
 
-The beauty of this syntax is that no matter the number of values in `numbers` (10, 1,000 or 1,000,000), the code will stay fairly short and straighforward. 
+The beauty of this syntax is that no matter the number of values in `numbers` (10, 1,000, or 1,000,000), the code will remain short and straightforward, and you can be confident that all values will be processed.
 
-The actual code for the iterations is contained between the `{}`, so if you need to multiply by 3 instead of 2, you need to update your code just in one place and don't risk missing another spot.
+Also, the actual code for the iterations is contained between the `{}`. So, if you need to multiply by 3 instead of 2, you only need to update your code in one place, reducing the risk of missing another spot and introducing bugs.
 
 ## Regular `for` loop
 
 While it's convenient to loop over an array, you don't need one to iterate.
 
-If you want to say hello a million times, you can use a regular `for` loop, like shown in the code below.
+If you want to say hello a million times, you can use a regular `for` loop, as shown in the code below.
 
-The loop needs three expressions between `()` before running what's between the following `{}`:
-- First, it needs a variable storing a number. By convention, we call it `i`, but you can name it anything you want. It's the starting number to iterate. Below, it's `let i = 0`.
-- Second, you need to pass a condition to stop the loop. It's usually done by using the comparison operators `<` or `<=` with the variable. Below, it's `i < 1_000_000`.
-- Lastly, you need to specify how to increment the variable. Below, we are using `i++` which means incremement by 1 on each step.
+The loop requires three expressions between `()` before running the code inside the following `{}`:
+- First, you need a variable to store a number. By convention, we call it `i`, but you can name it anything you want. This variable represents the starting number to iterate. Below, it's `let i = 0`.
+- Second, you need a condition to stop the loop. This is usually done using comparison operators like `<` or `<=` with the variable. Below, it's `i < 1_000_000`.
+- Lastly, you need to specify how to increment the variable. Below, we use `i++`, which means increment by 1 on each step.
 
-These expressions must be separated with `;` between the `()`.
+These expressions must be separated by `;` within the `()`.
 
-The result is a loop starting with `i = 0` and stopping when `i` equals 999,999. Because `i` by one at each iteration, this loop iterates 1,000,000 times.
+The result is a loop starting with `i = 0` and stopping when `i` equals 999,999. Because `i` increments by 1 on each iteration, this loop iterates 1,000,000 times.
 
 ```ts showLineNumbers filename="main.ts"
 for (let i = 0; i < 1_000_000; i++) {
@@ -107,18 +107,18 @@ for (let i = 0; i < 1_000_000; i++) {
 
 ![A screenshot showing VS Code running a for loop.](/assets/first-steps/loops/for-loop.png)
 
-You just asked your computer to do something A MILLION TIMES! And just with 3 lines of code! Do you feel the POWER in your hands? 😈
+You just asked your computer to do something A MILLION TIMES! And with just 3 lines of code! Do you feel the POWER in your hands? 😈
 
-You can play with the expressions. For example, make these changes and see what happens:
+You can play with the expressions. For example, try making these changes and see what happens:
 - Replace `let i = 0` with `let i = 1000`
 - Replace `i < 1_000_000` with `i <= 1_100`
 - Replace `i++` with `i += 10`
 
 ## `break`
 
-Sometimes, you want to break your loop when something specific happens. To do that, you can use the `break` statement. It works in any loops.
+Sometimes, you might want to stop your loop when a specific condition is met. To do this, you can use the `break` statement. It works in any loop.
 
-For example, in the code below, we loop over `names`, but we break if one of the names start with J. Since `"Jerry"` meets this condition, it's the last name being logged.
+For example, in the code below, we loop over `names`, but we break the loop if one of the names starts with J. Since `"Jerry"` meets this condition, it's the last name being logged.
 
 ```ts showLineNumbers filename="main.ts"
 const names = [
@@ -146,8 +146,8 @@ for (const n of names) {
 
 ## Conclusion
 
-Loops are an incredibly tool for data analysis. They will allow you to iterate quickly and efficiently through massive volume of data, just in a few lines of code.
+Loops are an incredible tool for data analysis. They allow you to iterate quickly and efficiently through massive volumes of data with just a few lines of code.
 
-Note that there are other kind of loops, like `while` loops. But we rarely use them in a data analysis context.
+Note that there are other kinds of loops, like `while` loops. However, they are rarely used in a data analysis context.
 
-And now, I think it's time for our first project! We cover all the basics! Congrats !🕺
+And now, I think it's time for our first project! We've covered all the basics. Congrats! 🕺
