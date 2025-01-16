@@ -3,4 +3,5 @@ export default {
     variables: "Variables",
     "data-types": "Data types",
     "data-structures": "Data structures",
+    conditions: "Conditions",
 };
