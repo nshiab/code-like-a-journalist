@@ -1,0 +1,461 @@
+---
+title: Saving account calculator 💸
+description: Learn how to code a saving account calculator with TypeScript in this tutorial.
+---
+
+import { Callout } from "nextra/components";
+
+# Saving account calculator 💸
+
+Welcome to your first coding project! Note that I expect you to have completed the lessons in the *First steps* section. If you haven’t, [start here](/first-steps/setup).
+
+In this project, we will code a savings account calculator. It will help you practice the basics we've covered in previous lessons and reinforce these concepts with a concrete example.
+
+Here's what you'll see in your terminal when completing this project. Your calculator will randomize the annual interest rates so sometimes you'll win 📈, sometimes you'll loose! 📉
+
+![A screenshot showing VS Code terminal with a table and strings logged.](/assets/saving-account-calculator/results.png)
+
+## What's the question?
+
+In journalism (and many other fields), it's important to clearly identify the question we want to answer from the start.
+
+Here’s the question we want to answer today:
+- How much money could I make by putting it in a savings account?
+
+In my projects, I like to identify an indicator early on that will provide the answer to the question. Here, the indicator would be the difference between the starting amount and the final amount. We can call this **gains or losses**.
+
+Usually, there are also some variables or parameters that can be identified when starting a project. Here are a few factors that can impact the results:
+- The **starting amount** of money.
+- Regular **contributions** to the account.
+- The **interest rate** of the account.
+- The **fluctuation** of the interest rate.
+- The **number of years** the money will stay in the account.
+
+Also, to simplify our lives, let's decide we will work with annual rates, so we will need to update the account balance just once a year.
+
+With this in mind, we can start coding our calculator!
+
+## Setup
+
+Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+
+- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
+- `deno.json`, which lets VS Code know this is a Deno project and enables the Deno extension. You can tweak settings in this file, but we'll keep it empty for now.
+
+Open the terminal and run the following command:  
+`deno run --watch --check main.ts`
+
+This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+
+![A screenshot showing VS Code running and watching a TypeScript file.](/assets/saving-account-calculator/watch.png)
+
+## Number of years
+
+If the money stays in the saving account for 10 years, it means we need to update the balance 10 times, once every year.
+
+This sounds like a perfect job for a **loop**!
+
+Let's start by iterating over years. We could create a variable `years` so it will be easy to update the number of years we want and rerun the script.
+
+```ts showLineNumbers filename="main.ts"
+const years = 10;
+
+for (let year = 0; year < years; year++) {
+  console.log({ year });
+}
+```
+
+<Callout type="info" emoji="💡">
+    You might me wondering what is `{ year }` in the code above. It's a shorter way of writing `{ year: year }`. It tells your computer to create an object with a key `year` associated with the value in the variable `year`. Short and sweet, isn't it?
+</Callout>
+
+![A screenshot showing VS Code running a TypeScript file with a loop.](/assets/saving-account-calculator/loop.png)
+
+Instead of having numbers from `0` to `9`, it would be better to have actual years.
+
+Let's add a variable `startingYear` and update our code.
+
+Here's what's happening with our loop on line 3 now:
+- `let year = startingYear` means that our loop will start with the `year` 2025.
+- `year < startingYear + years` means that our loop will run while `year` is smaller than `2025 + 10`.
+- `year++` means that `year` will increment by 1 on each iteration.
+
+```ts showLineNumbers filename="main.ts" {1, 4}
+const startingYear = 2025;
+const years = 10;
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  console.log({ year });
+}
+```
+
+![A screenshot showing VS Code running a TypeScript file with a loop to log years.](/assets/saving-account-calculator/starting-year.png)
+
+While at it, we could store each object for each year in an array named `results` and log everything as a table.
+
+```ts showLineNumbers filename="main.ts" {4, 7, 10}
+const startingYear = 2025;
+const years = 10;
+
+const results = [];
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  results.push({ year });
+}
+
+console.table(results);
+```
+
+![A screenshot showing VS Code logging a table in the terminal.](/assets/saving-account-calculator/table.png)
+
+## Interest rate and balance
+
+Now, let's talk money!
+
+We could create three new variables:
+- `initialAmount` to store the money we put in the saving account at the beggining. I've put $5,000 in it.
+- `interestRate` to store the annual interest rate. I've set it at 2%.
+- `balance` which is the balance of the saving account. It should be created with `let` because we will update it every year in our loop. At creation, `balance` equals `initialAmount`.
+
+```ts showLineNumbers filename="main.ts" {1, 2, 6}
+const initialAmount = 5000;
+const interestRate = 2;
+const startingYear = 2025;
+const years = 10;
+
+let balance = initialAmount;
+
+const results = [];
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  results.push({ year });
+}
+
+console.table(results);
+```
+
+In our loop, we can now create the variable `gainsOrLosses` to store the gains or the losses for each year and then update `balance` with it.
+
+We can add `gainsOrLosses` and `balance` to our results.
+
+```ts showLineNumbers filename="main.ts" {11-17}
+const initialAmount = 5000;
+const interestRate = 2;
+const startingYear = 2025;
+const years = 10;
+
+let balance = initialAmount;
+
+const results = [];
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  const gainsOrLosses = balance * (interestRate / 100);
+
+  // This is a shorter way of writing:
+  // balance = balance + gainsOrLosses
+  balance += gainsOrLosses;
+
+  results.push({ year, gainsOrLosses, balance });
+}
+
+console.table(results);
+```
+
+<Callout type="info" emoji="💡">
+    Note that `gainsOrLosses` is created **inside** the loop curly brackets. It's **scoped** inside the code block delimited by the `{}`, which means it only exists in it. If you try to log it on line 17, you'll get an error. **Scoping** is an important feature that will you help avoid variables conflicts, but it also helps the computer to free up memory when something is not needed anymore.
+</Callout>
+
+![A screenshot showing VS Code with a basic saving account calculator.](/assets/saving-account-calculator/basics.png)
+
+It works! You already have a basic saving account calculator! Do you see the compounding interests making your money grow? 💵
+
+Now, let's improve it. 🛠️
+
+## Rounding values
+
+By default, our computers dont't round values. We need to tell them to do it.
+
+To do so, we need to rely on the `Math` built-in global object. It's something that is always available when you code. It contains a lot convenient methods and constants. In our case, we will use `Math.round()`, which rounds a `number` to the nearest integer.
+
+Here, we just need to round `gainsAndLosses`.
+
+```ts showLineNumbers filename="main.ts" {11}
+const initialAmount = 5000;
+const interestRate = 2;
+const startingYear = 2025;
+const years = 10;
+
+let balance = initialAmount;
+
+const results = [];
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  const gainsOrLosses = Math.round(balance * (interestRate / 100));
+
+  balance += gainsOrLosses;
+
+  results.push({ year, gainsOrLosses, balance });
+}
+
+console.table(results);
+```
+
+![A screenshot showing VS Code logging rounded values of a saving account calculator.](/assets/saving-account-calculator/round.png)
+
+## Randomizing interest rates
+
+This is working quite well but, in real life, interest rates fluctuates over time.
+
+Of course, we can't predict the future, but we could randomize the interest rate to make things a little more interesting.
+
+For that, we can use `Math.random()` which returns a number between `0` and `1`.
+
+Let see it in action by calling it in our loop. We can comment `console.table(results)` for now.
+
+```ts showLineNumbers filename="main.ts" {11, 20}
+const initialAmount = 5000;
+const interestRate = 2;
+const startingYear = 2025;
+const years = 10;
+
+let balance = initialAmount;
+
+const results = [];
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  console.log(Math.random());
+
+  const gainsOrLosses = Math.round(balance * (interestRate / 100));
+
+  balance += gainsOrLosses;
+
+  results.push({ year, gainsOrLosses, balance });
+}
+
+// console.table(results);
+```
+<Callout type="info" emoji="💡">
+    There are many random algorithms in the wild. `Math.random()` returns an approximately uniform distribution, which means you have roughly the same chance of getting any number between 0 and 1. Also, don't use it for anything related to security. It's not cryptographically secure.
+</Callout>
+
+![A screenshot showing VS Code logging random values.](/assets/saving-account-calculator/random.png)
+
+Unless we are extraodinarly lucky, you don't have the same numbers than me being logged. The only certitude is that we both have numbers between `0` and `1`.
+
+To randomize our interest rate (which is `2` right now), we would like to have something **less** or **more** than 2, randomly. This fluctuation could be **positive** or **negative**.
+
+To have a random number positive or negative, we could simply substract `0.5` to our random numbers.
+
+```ts showLineNumbers filename="main.ts" {11}
+const initialAmount = 5000;
+const interestRate = 2;
+const startingYear = 2025;
+const years = 10;
+
+let balance = initialAmount;
+
+const results = [];
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  console.log(Math.random() - 0.5);
+
+  const gainsOrLosses = Math.round(balance * (interestRate / 100));
+
+  balance += gainsOrLosses;
+
+  results.push({ year, gainsOrLosses, balance });
+}
+
+// console.table(results);
+```
+
+![A screenshot showing VS Code logging random values between -0.5 and 0.5.](/assets/saving-account-calculator/random-shift.png)
+
+Now that we have random numbers between `-0.5` and `0.5`, we need to decide on the range of these fluctuations.
+
+We can create a new variable `interestRateRange`. I set it to `20`.
+
+If we multiply our random numbers with our range, we now have random values between `-10` and `10`. That looks a great interest rate fluctuation!
+
+```ts showLineNumbers filename="main.ts" {3, 12-14}
+const initialAmount = 5000;
+const interestRate = 2;
+const interestRateRange = 20;
+const startingYear = 2025;
+const years = 10;
+
+let balance = initialAmount;
+
+const results = [];
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  const randomNumber = Math.random() - 0.5;
+  const randomFluctuation = randomNumber * interestRateRange;
+  console.log(randomFluctuation);
+
+  const gainsOrLosses = Math.round(balance * (interestRate / 100));
+
+  balance += gainsOrLosses;
+
+  results.push({ year, gainsOrLosses, balance });
+}
+
+// console.table(results);
+```
+
+![A screenshot showing VS Code logging random values between -10 and 10.](/assets/saving-account-calculator/random-fluctuation.png)
+
+We can now add this fluctation to our `interestRate`. Since `interestRate` is set at 2% in my code, this gives me an interest rate of **2% ± 10%** on a given year. It means that the interest rate will be randomly between **-8%** (a very bad year) and **10%** (an amazing performance)!
+
+Let's update our code and bring back our table. Now, everytime you save (`CMD` + `S` on Mac or `CTRL` + `S` on PC), you'll see different results!
+
+```ts showLineNumbers filename="main.ts" {14, 22, 28}
+const initialAmount = 5000;
+const interestRate = 2;
+const interestRateRange = 20;
+const startingYear = 2025;
+const years = 10;
+
+let balance = initialAmount;
+
+const results = [];
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  const randomNumber = Math.random() - 0.5;
+  const randomFluctuation = randomNumber * interestRateRange;
+  const randomInterestRate = Math.round(interestRate + randomFluctuation);
+
+  const gainsOrLosses = Math.round(balance * (randomInterestRate / 100));
+
+  balance += gainsOrLosses;
+
+  results.push({
+    year,
+    interestRate: randomInterestRate,
+    gainsOrLosses,
+    balance,
+  });
+}
+
+console.table(results);
+```
+
+![A screenshot showing VS Code logging random results.](/assets/saving-account-calculator/random-results.png)
+
+## Answering the question
+
+We now have everything at hand to answer our question.
+
+First, let's retrieve the last object in our array. It's storing the final balance.
+
+With it, we can check if it's greater than the initial amount, smaller, or the identical, and log the appropriate answer.
+
+```ts showLineNumbers filename="main.ts" {28-39}
+const initialAmount = 5000;
+const interestRate = 2;
+const interestRateRange = 20;
+const startingYear = 2025;
+const years = 10;
+
+let balance = initialAmount;
+
+const results = [];
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  const randomNumber = Math.random() - 0.5;
+  const randomFluctuation = randomNumber * interestRateRange;
+  const randomInterestRate = Math.round(interestRate + randomFluctuation);
+
+  const gainsOrLosses = Math.round(balance * (randomInterestRate / 100));
+
+  balance += gainsOrLosses;
+
+  results.push({
+    year,
+    interestRate: randomInterestRate,
+    gainsOrLosses,
+    balance,
+  });
+}
+
+// Because the indexes start at 0,
+// the index of the last element
+// is the number of elements minus 1.
+const lastResult = results[results.length - 1];
+
+if (lastResult.balance > initialAmount) {
+  console.log("\nCongratulations! You've made money!");
+} else if (lastResult.balance < initialAmount) {
+  console.log("\nSorry! You've lost money!");
+} else {
+  console.log("\nYou've neither lost nor gained money!");
+}
+
+console.table(results);
+```
+<Callout type="info" emoji="💡">
+    The `\n` at the beggining of the strings on line 31, 33, and 34 is a special character indicating a line break. It's often used in the terminal to add empty lines and make things more readable.
+</Callout>
+
+It would be great to add more details, like the gains made in percentage.
+
+```ts showLineNumbers filename="main.ts" {29-31, 35-36, 39-40}
+const initialAmount = 5000;
+const interestRate = 2;
+const interestRateRange = 20;
+const startingYear = 2025;
+const years = 10;
+
+let balance = initialAmount;
+
+const results = [];
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  const randomNumber = Math.random() - 0.5;
+  const randomFluctuation = randomNumber * interestRateRange;
+  const randomInterestRate = Math.round(interestRate + randomFluctuation);
+
+  const gainsOrLosses = Math.round(balance * (randomInterestRate / 100));
+
+  balance += gainsOrLosses;
+
+  results.push({
+    year,
+    interestRate: randomInterestRate,
+    gainsOrLosses,
+    balance,
+  });
+}
+
+const lastResult = results[results.length - 1];
+const perc = Math.round(
+  ((lastResult.balance - initialAmount) / initialAmount) * 100,
+);
+
+if (lastResult.balance > initialAmount) {
+  console.log("\nCongratulations! You've made money!");
+  console.log(`Initial amount: $${initialAmount}`);
+  console.log(`Final amount: $${lastResult.balance} (+${perc}%)\n`);
+} else if (lastResult.balance < initialAmount) {
+  console.log("\nSorry! You've lost money!");
+  console.log(`Initial amount: $${initialAmount}`);
+  console.log(`Final amount: $${lastResult.balance} (${perc}%)\n`);
+} else {
+  console.log("\nYou've neither lost nor gained money!\n");
+}
+
+console.table(results);
+```
+
+<Callout type="info" emoji="💡">
+    The lines added here (35, 36, 39, 40) are using **template literals**. When you write strings with backticks (`` ` ``), you can insert variables or code within the string by using `${}`. For example, `` ` Two multiplied by two gives ${2 * 2}` `` will create the string `"Two multiplied by two gives 4"`.
+</Callout>
+
+![A screenshot showing VS Code logging the results of a saving account calculator.](/assets/saving-account-calculator/random-results.png)
+
+## Congrats!
+
+Wow! You just coded your first concrete project with TypeScript. You can be proud of yourself.
+
+And this is just the beggining of your journey! Now that you know the basics, who knows where you coding journey will bring you?  🚀
+
