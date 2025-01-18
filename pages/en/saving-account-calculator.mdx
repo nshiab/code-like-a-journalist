@@ -74,7 +74,7 @@ Instead of having numbers from `0` to `9`, it would be better to have actual yea
 
 Let's add a variable `startingYear` and update our code.
 
-Here's what's happening with our loop on line 3 now:
+Here's what's happening with our loop on line 4 now:
 - `let year = startingYear` means that our loop will start with the `year` 2025.
 - `year < startingYear + years` means that our loop will run while `year` is smaller than `2025 + 10`.
 - `year++` means that `year` will increment by 1 on each iteration.
@@ -348,7 +348,7 @@ We now have everything we need to answer our question.
 
 First, let's retrieve the last object in our `results` array. This object stores the final balance.
 
-Using it, we can check whether the final balance is greater than, smaller than, or equal to the initial amount and log the appropriate answer.
+Using it, we can calculate the final losses or gains and log the appropriate answer.
 
 ```ts showLineNumbers filename="main.ts" {28-40}
 const initialAmount = 5000;
