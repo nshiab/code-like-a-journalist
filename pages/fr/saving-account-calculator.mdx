@@ -385,9 +385,9 @@ const lastResult = results[results.length - 1];
 const finalGainsOrLosses = lastResult.balance - initialAmount;
 
 if (finalGainsOrLosses > 0) {
-  console.log("\nCongratulations! You've made money!");
+  console.log("\nCongratulations! You've made money!\n");
 } else if (finalGainsOrLosses < 0) {
-  console.log("\nSorry! You've lost money!");
+  console.log("\nSorry! You've lost money!\n");
 } else {
   console.log("\nYou've neither lost nor gained money!\n");
 }
@@ -395,12 +395,12 @@ if (finalGainsOrLosses > 0) {
 console.table(results);
 ```
 <Callout type="info" emoji="💡">
-    Le `\n` au début des textes aux lignes 35, 37 et 39 est un caractère spécial qui indique un saut de ligne. Il est souvent utilisé dans le terminal pour ajouter des lignes vides et rendre le tout plus lisible.
+   Le `\n` au début et à la fin du texte aux lignes 35, 37 et 39 est un caractère spécial qui indique un saut de ligne. Il est souvent utilisé dans le terminal pour ajouter des lignes vides et rendre le tout plus lisible.
 </Callout>
 
 Ce serait une bonne chose d’ajouter plus de détails, comme les gains ou pertes réalisés, à la fois en chiffres absolus et en pourcentage.
 
-```ts showLineNumbers filename="main.ts" {28-32, 36-40, 43-45}
+```ts showLineNumbers filename="main.ts" {28-32, 35-40, 42-47}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -435,17 +435,19 @@ const perc = Math.round(
 );
 
 if (finalGainsOrLosses > 0) {
-  console.log("\nCongratulations! You've made money!");
-  console.log(`Initial amount: $${initialAmount}`);
-  console.log(`Final amount: $${lastResult.balance}`);
-  console.log(
-    `Gains: $${finalGainsOrLosses} (+${perc}%)\n`,
-  );
+  console.log(`
+Congratulations! You've made money!
+Initial amount: $${initialAmount}
+Final amount: $${lastResult.balance}
+Gains: $${finalGainsOrLosses} (+${perc}%)
+`);
 } else if (finalGainsOrLosses < 0) {
-  console.log("\nSorry! You've lost money!");
-  console.log(`Initial amount: $${initialAmount}`);
-  console.log(`Final amount: $${lastResult.balance}`);
-  console.log(`Losses: $${finalGainsOrLosses} (${perc}%)\n`);
+  console.log(`
+Sorry! You've lost money!
+Initial amount: $${initialAmount}
+Final amount: $${lastResult.balance}
+Losses: $${finalGainsOrLosses} (${perc}%)
+`);
 } else {
   console.log("\nYou've neither lost nor gained money!\n");
 }
@@ -454,7 +456,7 @@ console.table(results);
 ```
 
 <Callout type="info" emoji="💡">
-    Les lignes ajoutées ici (35, 36, 39, 40) utilisent des **template literals**. Lorsque vous écrivez du texte avec des backticks (`` ` ``), vous pouvez insérer des variables ou du code dans le texte en utilisant `${}`. Par exemple, `` `Deux multiplié par deux donne ${2 * 2}` `` créera le texte `"Deux multiplié par deux donne 4"`.
+   Les lignes ajoutées ici (35-40, 42-47) utilisent des **template literals**. Lorsque vous écrivez du texte avec des backticks (`` ` ``), vous pouvez créer du texte sur plusieurs lignes. Vous pouvez également insérer des variables ou du code dans le texte en utilisant `${}`. Par exemple, `` `Deux multiplié par deux donne ${2 * 2}` `` créera le texte `"Deux multiplié par deux donne 4"`. Les template literals sont très utiles pour créer du texte dynamique qui change en fonction de vos données et des résultats de vos analyses.
 </Callout>
 
 ![Une capture d'écran montrant VS Code affichant les résultats d'un calculateur de compte épargne.](/assets/saving-account-calculator/results.png)
