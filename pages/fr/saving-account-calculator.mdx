@@ -19,7 +19,7 @@ Voici ce que vous verrez dans votre terminal à la fin de ce projet. Votre calcu
 
 En journalisme (et dans de nombreux autres domaines), il est important d’identifier clairement la question à laquelle on veut répondre dès le début.
 
-Voici la question que nous voulons attaquer aujourd'hui :
+Voici la question à laquelle nous voulons attaquer aujourd'hui :
 - Combien pourrais-je gagner en plaçant mon argent dans un compte épargne ?
 
 Dans mes projets, j’aime identifier un indicateur dès le début qui répondra à la question. Ici, l’indicateur serait la **différence** entre le **montant initial** et le **solde final** du compte.
@@ -70,7 +70,7 @@ for (let year = 0; year < years; year++) {
 
 ![Une capture d'écran montrant VS Code exécutant un fichier TypeScript avec une boucle.](/assets/saving-account-calculator/loop.png)
 
-Au lieu d’avoir des nombres de `0` à `9`, il serait préférable d’avoir des années réelles.
+Au lieu d’avoir des nombres de `0` à `9`, il serait préférable d’avoir des années.
 
 Ajoutons une variable `startingYear` et mettons à jour notre code.
 
@@ -150,7 +150,7 @@ const results = [];
 for (let year = startingYear; year < startingYear + years; year++) {
   const gainsOrLosses = balance * (interestRate / 100);
 
-  // This is a shorter way of writing:
+  // C'est une façon plus courte d'écrire :
   // balance = balance + gainsOrLosses
   balance += gainsOrLosses;
 
@@ -161,7 +161,7 @@ console.table(results);
 ```
 
 <Callout type="info" emoji="💡">
-    Notez que `gainsOrLosses` est créé **à l’intérieur** des accolades de la boucle. Il est **scopé** dans le bloc de code délimité par les `{}`, ce qui signifie qu’il n’existe qu’à l’intérieur de ce bloc. Si vous essayez de l’afficher à la ligne 17, vous obtiendrez une erreur. Le **scoping** est une fonctionnalité importante qui aide à éviter les conflits de variables, mais qui permet également à l’ordinateur de libérer de la mémoire lorsqu’une variable n’est plus nécessaire.
+    Notez que `gainsOrLosses` est créé **à l’intérieur** des accolades de la boucle. Il est **scopé** dans le bloc de code délimité par les `{}`, ce qui signifie qu’il n’existe qu’à l’intérieur de ce bloc. Si vous essayez de l’afficher à la ligne 19, vous obtiendrez une erreur. Le **scoping** est une fonctionnalité importante qui aide à éviter les conflits de variables, mais qui permet également à l’ordinateur de libérer de la mémoire lorsqu’une variable n’est plus nécessaire.
 </Callout>
 
 ![Une capture d'écran montrant VS Code avec un calculateur de compte épargne de base.](/assets/saving-account-calculator/basics.png)
@@ -242,7 +242,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
 
 À moins d’être extraordinairement chanceux, vous n’aurez pas les mêmes nombres que moi d'affichés dans le terminal. La seule certitude est que nous aurons tous les deux des nombres compris entre `0` et `1`.
 
-Pour randomiser notre taux d’intérêt (qui est actuellement `2`), nous aimerions avoir quelque chose de **moins** ou **plus** que 2, de manière aléatoire. Cette fluctuation pourrait être **positive** ou **négative**.
+Pour randomiser notre taux d’intérêt (qui est actuellement `2`), nous aimerions avoir quelque chose d'**inférieur** ou **supérieur** à 2, de manière aléatoire. Cette fluctuation pourrait être **positive** ou **négative**.
 
 Pour obtenir un nombre aléatoire positif ou négatif, nous pouvons simplement soustraire `0.5` à nos nombres aléatoires.
 
@@ -307,9 +307,9 @@ for (let year = startingYear; year < startingYear + years; year++) {
 
 Nous pouvons maintenant ajouter cette fluctuation à notre `interestRate`. Comme `interestRate` est défini à 2 % dans mon code, cela me donne un taux d’intérêt de **2 % ± 10 %** pour une année donnée. Cela signifie que le taux d’intérêt tombera aléatoirement entre **-8 %** (une très mauvaise année) et **12 %** (une performance incroyable) !
 
-Mettons à jour notre code et réactivons notre tableau. Maintenant, à chaque fois que vous sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC), vous verrez des résultats différents !
+Mettons à jour notre code et affichons de nouveau notre tableau. Par souci de simplicité, nous pouvons également arrondir notre `randomInterestRate`. Maintenant, à chaque fois que vous sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC), vous verrez des résultats différents !
 
-```ts showLineNumbers filename="main.ts" {14, 22, 28}
+```ts showLineNumbers filename="main.ts" {14, 16, 22, 28}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -400,7 +400,7 @@ console.table(results);
 
 Ce serait une bonne chose d’ajouter plus de détails, comme les gains ou pertes réalisés, à la fois en chiffres absolus et en pourcentage.
 
-```ts showLineNumbers filename="main.ts" {28-32, 35-40, 42-47}
+```ts showLineNumbers filename="main.ts" {30-32, 35-40, 42-47}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;

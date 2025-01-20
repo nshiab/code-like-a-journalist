@@ -1,11 +1,11 @@
 ---
-title: Saving account calculator 💸
-description: Learn how to code a saving account calculator with TypeScript in this tutorial.
+title: Savings account calculator 💸
+description: Learn how to code a savings account calculator with TypeScript in this tutorial.
 ---
 
 import { Callout } from "nextra/components";
 
-# Saving account calculator 💸
+# Savings account calculator 💸
 
 Welcome to your first coding project! Note that I expect you to have completed the lessons in the *First steps* section. If you haven’t, [start here](/first-steps/setup).
 
@@ -161,10 +161,10 @@ console.table(results);
 ```
 
 <Callout type="info" emoji="💡">
-    Note that `gainsOrLosses` is created **inside** the loop curly brackets. It's **scoped** inside the code block delimited by the `{}`, which means it only exists within it. If you try to log it on line 17, you'll get an error. **Scoping** is an important feature that helps avoid variable conflicts, but it also allows the computer to free up memory when something is no longer needed.
+    Note that `gainsOrLosses` is created **inside** the loop curly brackets. It's **scoped** inside the code block delimited by the `{}`, which means it only exists within it. If you try to log it on line 19, you'll get an error. **Scoping** is an important feature that helps avoid variable conflicts, but it also allows the computer to free up memory when something is no longer needed.
 </Callout>
 
-![A screenshot showing VS Code with a basic saving account calculator.](/assets/saving-account-calculator/basics.png)
+![A screenshot showing VS Code with a basic savings account calculator.](/assets/saving-account-calculator/basics.png)
 
 It works! You already have a basic savings account calculator! Do you see the compounding interest making your money grow? 💵
 
@@ -199,7 +199,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
 console.table(results);
 ```
 
-![A screenshot showing VS Code logging rounded values of a saving account calculator.](/assets/saving-account-calculator/round.png)
+![A screenshot showing VS Code logging rounded values of a savings account calculator.](/assets/saving-account-calculator/round.png)
 
 ## Randomizing interest rates
 
@@ -307,9 +307,9 @@ for (let year = startingYear; year < startingYear + years; year++) {
 
 We can now add this fluctuation to our `interestRate`. Since `interestRate` is set at 2% in my code, this gives me an interest rate of **2% ± 10%** for a given year. This means the interest rate will randomly fall between **-8%** (a very bad year) and **12%** (an amazing performance)!
 
-Let's update our code and bring back our table. Now, every time you save (`CMD` + `S` on Mac or `CTRL` + `S` on PC), you'll see different results!
+Let's update our code and bring back our table. For the sake of simplicity, we can also round our `randomInterestRate`. Now, every time you save (`CMD` + `S` on Mac or `CTRL` + `S` on PC), you'll see different results!
 
-```ts showLineNumbers filename="main.ts" {14, 22, 28}
+```ts showLineNumbers filename="main.ts" {14, 16, 22, 28}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -400,7 +400,7 @@ console.table(results);
 
 It would be great to add more details, like the gains or losses made, both in absolute numbers and as a percentage.
 
-```ts showLineNumbers filename="main.ts" {28-32, 35-40, 42-47}
+```ts showLineNumbers filename="main.ts" {30-32, 35-40, 42-47}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -459,7 +459,7 @@ console.table(results);
    The lines added here (35-40, 42-47) are using **template literals**. When you write strings with backticks (`` ` ``), you can create multiline text. You can also insert variables or code within the string by using `${}`. For example, `` `Two multiplied by two gives ${2 * 2}` `` will create the string `"Two multiplied by two gives 4"`. Template literals are very useful for creating dynamic text that changes based on your data and analysis results.
 </Callout>
 
-![A screenshot showing VS Code logging the results of a saving account calculator.](/assets/saving-account-calculator/results.png)
+![A screenshot showing VS Code logging the results of a savings account calculator.](/assets/saving-account-calculator/results.png)
 
 ## Congrats!
 
