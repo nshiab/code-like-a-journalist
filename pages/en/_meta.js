@@ -1,7 +1,8 @@
 export default {
     index: "Welcome!",
-    preamble: "Preamble",
-    "first-steps": "First steps",
+    preamble: "Why this course?",
+    "first-steps": "First steps 🧑‍🎓",
+    "saving-account-calculator": "Savings account calculator 💸",
     "more": "More to come...",
     contact: "Contact",
 };

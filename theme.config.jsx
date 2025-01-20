@@ -298,6 +298,9 @@ export default {
             return <span>{EDIT[locale]}</span>;
         },
     },
+    sidebar: {
+        defaultMenuCollapseLevel: 1,
+    },
     footer: {
         content: function useText() {
             const { locale } = useRouter();
