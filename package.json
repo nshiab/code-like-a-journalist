@@ -24,7 +24,7 @@
     "@nshiab/journalism": "npm:@jsr/nshiab__journalism@^1.21.9",
     "@vercel/analytics": "^1.4.1",
     "next": "^15.1.2",
-    "nextra": "^3.3.1",
+    "nextra": "^4.0.4",
     "nextra-theme-docs": "^3.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
