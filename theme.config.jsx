@@ -187,6 +187,9 @@ export default {
 
         return (
             <>
+                <title>
+                    {`${frontMatter.title} - ${TITLE[locale]}` || TITLE[locale]}
+                </title>
                 <meta property="og:url" content={url} />
                 <meta
                     property="og:site_name"
