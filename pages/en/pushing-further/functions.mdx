@@ -16,8 +16,7 @@ Make a new folder somewhere on your computer, open it with VS Code, and create t
 - `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
 - `deno.json`, which lets VS Code know this is a Deno project and enables the Deno extension. You can tweak settings in this file, but we'll keep it empty for now.
 
-Open the terminal and run the following command:  
-`deno run --watch --check main.ts`
+Open the terminal and run the following command:  `deno run --watch --check main.ts`
 
 This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
 
@@ -220,7 +219,7 @@ Nothing will work for now, but that's okay. You can click on the image below to 
 ![A screenshot showing VS Code showing two TypeScript files.](/assets/pushing-further/functions/new-file.png)
 
 <Callout type="info" emoji="💡">
-    In VS Code, files are opened as tabs. By default, only one tab is shown. If you want to see multiple tabs side by side, right-click on a tab and then click `Split up`, `Split down`, `Split left`, or `Split right`. In the screenshot below, I chose `Split right`.
+    In VS Code, files are opened as tabs. By default, only one tab is shown. If you want to see multiple tabs side by side, right-click on a tab and then click `Split up`, `Split down`, `Split left`, or `Split right`. In the screenshot above, I chose `Split right`.
 </Callout>
 
 Now, the `convertDollarsToEuros` function is in a separate file, but it can't be used anywhere else yet. There's a yellow warning about it.
@@ -256,18 +255,21 @@ const euros = convertDollarsToEuros(dollars);
 console.log(`${dollars} Canadian dollars is ${euros} euros`);
 ```
 <Callout type="info" emoji="💡">
-    When you import a file, you need to tell your computer where to find it with a **path**. Here, `./helpers/convertDollarsToEuros.ts` is a **relative path** because it starts with `./`. The `.` tells the computer to start where it is. In this case, since we are running `main.ts`, it starts in the folder where `main.ts` is. Then `/helpers` tells the computer to go inside the `helpers` folder. Finally, `/convertDollarsToEuros.ts` tells it to import the content of this file. On PC with Windows, the path uses `\` instead of `/`.
+    When you import a file, you need to tell your computer where to find it with a **path**. Here, `./helpers/convertDollarsToEuros.ts` is a **relative path** because it starts with `./`. The `.` tells the computer to start where the current file is. In this case, since we are updating `main.ts`, it starts in the folder where `main.ts` is. Then `/helpers` tells the computer to go inside the `helpers` folder. Finally, `/convertDollarsToEuros.ts` tells it to import the content of this file. On PC with Windows, the path might use `\` instead of `/`.
 </Callout>
 
 And now, everything works! If we had multiple files where `convertDollarsToEuros` was needed, we could easily import the function and reuse it in multiple places!
 
-![A screenshot showing VS Code importing and using a TypeScript function.](/assets/pushing-further/functions/intellisense.png)
+![A screenshot showing VS Code importing and using a TypeScript function.](/assets/pushing-further/functions/working.png)
 
 Also, since we are watching `main.ts` by running `deno run --watch --check`, we are automatically watching all of `main.ts` dependencies. This means that if you update `convertDollarsToEuros.ts` and save it, the terminal will be cleared, and the script will be rerun too. So useful!
 
 Change `0.67` to `0.65` to see it in action. Notice on the first line in the terminal which file change the `Watcher` detected.
 
 ![A screenshot showing Deno detecting a file change.](/assets/pushing-further/functions/file-change.png)
+<Callout type="info" emoji="💡">
+    You might think that creating multiple files makes it more difficult to navigate your code. But if you press `CMD` on Mac or `CTRL` on PC and click on a function in your code, VS Code will automatically take you to the function’s file by opening a new tab.
+</Callout>
 
 ## Documentation
 
@@ -289,13 +291,13 @@ export default function convertDollarsToEuros(dollars: number) {
 }
 ```
 
-The reason why JSDoc is so handy is because VS Code understands it. If you hover over the function in `main.ts` now, you'll see not only the types but also your documentation popping up!
+The reason why JSDoc is so handy is because VS Code (and many other tools) understands it. If you hover over the function in `main.ts` now, you'll see not only the types but also your documentation popping up!
 
 ![A screenshot showing VS Code displaying JSDoc for a function.](/assets/pushing-further/functions/documentation.png)
 
 We can improve our documentation by adding an example.
 
-To ensure that VS Code (and other JSDoc parsers) recognize the example as code, we use a **fenced code block** with three backticks `` ``` ``. When opening the block, we also specify `ts` so VS Code knows it's TypeScript code and applies the relevant syntax highlighting.
+To ensure that VS Code recognize the example as code, we use a **fenced code block** with three backticks `` ``` ``. When opening the block, we also specify `ts` so VS Code knows it's TypeScript code and applies the relevant syntax highlighting.
 
 ```ts showLineNumbers filename="convertDollarsToEuros.ts" {4-9}
 /**
@@ -378,4 +380,4 @@ With the regular function, you had to explicitly type `num: number` because your
 
 Functions are a fundamental part of programming. They help you organize your code, make it reusable, and keep it clean.
 
-Now, let's put that into practice with the next lesson: Refactoring. I know it sounds scary, but don't worry—I am with you! 🕺
+If you want to dig deeper into functions, check out the [Refactoring lesson](/ninja-moves/refactoring) in the *Ninja moves* 🥷 section.
