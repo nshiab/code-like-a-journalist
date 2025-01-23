@@ -1,1 +1,383 @@
-Salut
+---
+title: Les fonctions en TypeScript
+description: Apprenez à créer et utiliser des fonctions en TypeScript.
+---
+
+import { Callout } from 'nextra/components'
+
+# Les fonctions
+
+En encapsulant du code dans des fonctions, vous pouvez réutiliser ce même code encore et encore. Les fonctions aident également à diviser de longs scripts en morceaux modulaires, ce qui les rend plus faciles à gérer et à déboguer.
+
+Préparons notre environnement de travail pour cette leçon.
+
+Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
+
+- `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
+- `deno.json`, qui permet à VS Code de savoir qu'il s'agit d'un projet Deno et active l'extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+
+Ouvrez le terminal et exécutez la commande suivante :  
+`deno run --watch --check main.ts`
+
+Cette commande efface le terminal et réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+
+Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
+
+![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/pushing-further/functions/setup.png)
+
+## Fonction de base
+
+Pour créer une fonction, vous devez la déclarer en utilisant le mot-clé `function`, suivi de son nom avec des parenthèses `()` et des accolades `{}`.
+
+Créons une fonction appelée `sayHello` qui affiche `"Hello!"`. Le code que vous voulez que la fonction exécute doit être placé entre les `{}`. (Nous parlerons de ce qui se place entre les `()` dans un instant.)
+
+Copiez et collez le code ci-dessous dans `main.ts`.
+
+```ts showLineNumbers filename="main.ts"
+function sayHello() {
+  console.log("Hello!");
+}
+```
+
+Si vous sauvegardez et exécutez ce code, rien ne sera affiché. Vous avez créé une fonction, mais vous ne l’avez pas encore **appelée**.
+
+Pour **appeler une fonction**, vous devez utiliser son nom suivi de `()`, comme montré à la ligne 5 ci-dessous.
+
+```ts showLineNumbers filename="main.ts"
+function sayHello() {
+  console.log("Hello!");
+}
+
+sayHello()
+```
+<Callout type="info" emoji="💡">
+    Donner des noms clairs et compréhensibles aux fonctions est essentiel pour maintenir une base de code propre, facile à déboguer et réutilisable. Comme les fonctions sont censées faire quelque chose, il est souvent judicieux d'utiliser un verbe pour les nommer.
+</Callout>
+
+![Une capture d'écran montrant VS Code affichant Hello!.](/assets/pushing-further/functions/hello.png)
+
+Maintenant, vous pouvez la réutiliser autant de fois que vous le souhaitez !
+
+```ts showLineNumbers filename="main.ts"
+function sayHello() {
+  console.log("Hello!");
+}
+
+sayHello()
+sayHello()
+sayHello()
+sayHello()
+sayHello()
+```
+
+![Une capture d'écran montrant VS Code affichant plusieurs fois Hello!.](/assets/pushing-further/functions/hellos.png)
+
+## Paramètres
+
+Notre fonction est assez basique. Ce serait plus intéressant si nous pouvions **passer** un `name` (nom) pour une salutation personnalisée, comme `"Hello, Nael!"`.
+
+Pour ce faire, nous devons ajouter un **paramètre** à notre fonction—quelque chose qu'elle peut utiliser.
+
+Les paramètres sont définis entre les `()` lors de la déclaration de la fonction, et ils sont typés.
+
+Dans le code ci-dessous, nous ajoutons un paramètre `name` à la fonction `sayHello` et spécifions que `name` doit être de type `string`.
+
+```ts showLineNumbers filename="main.ts"
+function sayHello(name: string) {
+  console.log(`Hello, ${name}!`);
+}
+
+sayHello();
+```
+<Callout type="info" emoji="💡">
+    À la ligne 1, la syntaxe `name: string` est appelée un **type explicite**. Cela signifie que `name` doit être une `string`. La plupart du temps, les types dans votre code sont inférés. Mais dans certains cas, vous devez spécifier explicitement les types souhaités. La définition des paramètres de fonction est l’un de ces cas.
+</Callout>
+
+Si vous copiez, collez et sauvegardez ce code, vous rencontrerez une erreur. Cela se produit parce que votre fonction attend maintenant un paramètre `name`, et vous ne le fournissez pas lorsque vous appelez la fonction à la ligne 5.
+
+![Une capture d'écran montrant VS Code affichant une erreur à cause d’un argument manquant.](/assets/pushing-further/functions/missing-name.png)
+
+Passons l’**argument** `"Nael"` à la fonction à la ligne 5. Maintenant, elle affiche `"Hello, Nael!"`.
+
+
+```ts showLineNumbers filename="main.ts"
+function sayHello(name: string) {
+  console.log(`Hello, ${name}!`);
+}
+
+sayHello("Nael");
+```
+
+![Une capture d'écran montrant VS Code affichant "Hello Nael".](/assets/pushing-further/functions/hello-nael.png)
+
+Et maintenant, nous pouvons appeler la même fonction avec des noms différents.
+
+```ts showLineNumbers filename="main.ts"
+function sayHello(name: string) {
+  console.log(`Hello, ${name}!`);
+}
+
+sayHello("Nael");
+sayHello("Emily");
+sayHello("Diana");
+sayHello("John");
+sayHello("Jane");
+```
+
+![Une capture d'écran montrant VS Code affichant plusieurs "Hello" avec différents noms.](/assets/pushing-further/functions/hello-names.png)
+
+Rappelez-vous que les paramètres des fonctions sont typés. Si vous essayez de passer un nombre au lieu d’un texte comme `name`, vous obtiendrez une erreur.
+
+Encore une fois, les types travaillent pour vous. La vérification des types sur les paramètres des fonctions vous évitera de nombreuses séances de débogage. 🐞
+
+![Une capture d'écran montrant VS Code affichant une erreur de type.](/assets/pushing-further/functions/type-error.png)
+
+Tout peut être un paramètre de fonction : texte, nombres, booléens, objets, ou même d'autres fonctions !
+
+Vous pouvez également avoir plusieurs paramètres entre les `()` de la fonction, séparés par une virgule.
+
+Par exemple, ici, nous ajoutons un nouveau paramètre `isTired`, qui doit être un booléen. Lorsque `isTired` est `true`, nous ajoutons `"You look tired..."`. S’il est `false`, nous ajoutons `"You look great!"`.
+
+```ts showLineNumbers filename="main.ts"
+function sayHello(name: string, isTired: boolean) {
+  if (isTired) {
+    console.log(`Hello, ${name}! You look tired...`);
+  } else {
+    console.log(`Hello, ${name}! You look great!`);
+  }
+}
+
+sayHello("Nael", true);
+sayHello("Emily", false);
+```
+![Une capture d'écran montrant VS Code affichant une fonction avec plusieurs paramètres.](/assets/pushing-further/functions/multiple-parameters.png)
+
+## Retourner une valeur
+
+Si vous survolez la fonction (ou commencez à la taper), vous verrez la **signature de la fonction**, qui indique les types de ses paramètres et ce qu’elle retourne.
+
+Elle affiche `function sayHello(name: string, isTired: boolean): void`. Le `: void` à la fin indique que la fonction ne retourne rien, ce qui est logique car, pour l’instant, nous nous contentons d’afficher des informations dans le terminal.
+
+![Une capture d'écran montrant VS Code affichant une signature de fonction.](/assets/pushing-further/functions/function-signature.png)
+
+Cependant, dans de nombreux cas, vous voudrez qu'une fonction retourne quelque chose.
+
+Par exemple, disons que vous êtes Canadien et que vous voulez visiter la Tour Eiffel. Vous pourriez créer une fonction pour convertir les dollars canadiens en euros. Au moment d'écrire ces lignes (2025-01-22), le taux de conversion est de 0,67.
+
+```ts showLineNumbers filename="main.ts"
+function convertDollarsToEuros(dollars: number) {
+  return dollars * 0.67;
+}
+
+convertDollarsToEuros(100);
+```
+
+Ici, la fonction utilise le mot-clé `return`. Si vous survolez la fonction, vous verrez `: number` à la fin, ce qui signifie que cette fonction retourne un nombre.
+
+![Une capture d'écran montrant VS Code affichant une fonction retournant un nombre.](/assets/pushing-further/functions/return-number.png)
+
+Mais si vous exécutez le code, il semble que rien ne se passe !
+
+En réalité, les calculs sont effectués et retournés, mais retournés dans le vide ! Vous devez stocker le résultat quelque part ou l’afficher directement.
+
+Créons une variable `euros` pour stocker la valeur retournée de `convertDollarsToEuros(dollars)` et affichons un message approprié.
+
+```ts showLineNumbers filename="main.ts"
+function convertDollarsToEuros(dollars: number) {
+  return dollars * 0.67;
+}
+
+const dollars = 100;
+const euros = convertDollarsToEuros(dollars);
+
+console.log(`${dollars} Canadian dollars is ${euros} euros`);
+```
+
+![Une capture d'écran montrant VS Code affichant combien de dollars valent en euros.](/assets/pushing-further/functions/proper-message.png)
+
+Comme pour les paramètres, les valeurs retournées peuvent être de n’importe quel type : chaînes de caractères, nombres, booléens, objets ou même fonctions.
+
+Parce que les fonctions sont typées, les variables qui stockent leurs valeurs retournées sont automatiquement typées également.
+
+Si vous survolez `euros`, vous verrez que son type est `number` parce que la valeur retournée par `convertDollarsToEuros` est un `number`. Lorsque vous travaillez sur des algorithmes plus complexes avec de nombreuses fonctions, cette inférence de type semble magique et vous aide à garder le cap.
+
+![Une capture d'écran montrant VS Code affichant le type d’une variable.](/assets/pushing-further/functions/euros-type.png)
+
+## Exporter et importer
+
+Puisque `main.ts` est notre point d'entrée principal pour le code, nous essayons de le garder simple. L’encombrer avec des déclarations de fonctions n’est pas optimal.
+
+En général, nous mettons les fonctions dans leurs propres fichiers. Cela rend le débogage plus facile et rend également les fonctions réutilisables, car vous pouvez les `importer` dans d’autres fichiers.
+
+Nous regroupons souvent ces fonctions dans un dossier appelé `helpers`.
+
+Dans votre dépôt actuel :
+  1) Créez un nouveau dossier nommé `helpers`.
+  2) Créez un nouveau fichier nommé `convertDollarsToEuros.ts` dans `helpers`.
+  3) Coupez et collez la déclaration de la fonction `convertDollarsToEuros` dans ce fichier.
+
+Rien ne fonctionnera pour le moment. C'est normal. Vous pouvez cliquer sur l’image ci-dessous pour l’agrandir si nécessaire.
+
+![Une capture d'écran montrant VS Code affichant deux fichiers TypeScript.](/assets/pushing-further/functions/new-file.png)
+
+<Callout type="info" emoji="💡">
+    Dans VS Code, les fichiers s’ouvrent sous forme d’onglets. Par défaut, un seul onglet est affiché. Si vous voulez voir plusieurs onglets côte à côte, faites un clic droit sur un onglet, puis cliquez sur `Split up`, `Split down`, `Split left` ou `Split right`. Dans la capture d’écran ci-dessous, j’ai choisi `Split right`.
+</Callout>
+
+Maintenant, la fonction `convertDollarsToEuros` est dans un fichier séparé, mais elle ne peut pas encore être utilisée ailleurs. Il y a un avertissement jaune à ce sujet.
+
+Nous devons la rendre disponible en l’**exportant**.
+
+Mettez à jour votre code dans `convertDollarsToEuros.ts` en ajoutant les mots-clés `export default` à la ligne 1.
+
+```ts showLineNumbers filename="convertDollarsToEuros.ts" /export default/
+export default function convertDollarsToEuros(dollars: number) {
+  return dollars * 0.67;
+}
+```
+
+Maintenant que `convertDollarsToEuros` est exportée, nous pouvons l'importer où nous voulons !
+
+Dans notre cas, nous voulons l’utiliser dans `main.ts`. Pour ce faire, ajoutez la ligne suivante au début du fichier :  
+`import convertDollarsToEuros from "./helpers/convertDollarsToEuros.ts";`.
+
+IntelliSense reconnaît que la fonction est disponible. Si vous commencez à taper, il vous la suggérera. Sympa, non ? Appuyez sur `Enter` pour accepter la suggestion.
+
+Si vous êtes sur un PC sous Windows, vous pourriez voir `\` au lieu de `/` dans le chemin du fichier.
+
+![Une capture d'écran montrant la suggestion d'importation dans VS Code.](/assets/pushing-further/functions/intellisense.png)
+
+Voici le code que vous devriez avoir dans `main.ts` :
+
+```ts showLineNumbers filename="main.ts"
+import convertDollarsToEuros from "./helpers/convertDollarsToEuros.ts";
+
+const dollars = 100;
+const euros = convertDollarsToEuros(dollars);
+
+console.log(`${dollars} Canadian dollars is ${euros} euros`);
+```
+<Callout type="info" emoji="💡">
+    Lorsque vous importez un fichier, vous devez indiquer à votre ordinateur où le trouver avec un **chemin**. Ici, `./helpers/convertDollarsToEuros.ts` est un **chemin relatif** car il commence par `./`. Le `.` indique à l’ordinateur de commencer là où il se trouve. Dans ce cas, puisque nous exécutons `main.ts`, il commence dans le dossier où se trouve `main.ts`. Ensuite, `/helpers` indique à l’ordinateur d’aller dans le dossier `helpers`. Enfin, `/convertDollarsToEuros.ts` lui indique d’importer le contenu de ce fichier. Sur un PC sous Windows, le chemin utilise `\` au lieu de `/`.
+</Callout>
+
+Et maintenant, tout fonctionne ! Si nous avions plusieurs fichiers où `convertDollarsToEuros` était nécessaire, nous pourrions facilement importer la fonction et la réutiliser à plusieurs endroits !
+
+![Une capture d'écran montrant VS Code important et utilisant une fonction TypeScript.](/assets/pushing-further/functions/intellisense.png)
+
+De plus, comme nous surveillons `main.ts` avec la commande `deno run --watch --check`, nous surveillons automatiquement toutes les dépendances de `main.ts`. Cela signifie que si vous mettez à jour `convertDollarsToEuros.ts` et le sauvegardez, le terminal sera nettoyé et le script sera réexécuté. Tellement pratique !
+
+Changez `0.67` en `0.65` pour voir cela en action. Notez sur la première ligne du terminal quel fichier modifié a été détecté par le `Watcher`.
+
+![Une capture d'écran montrant Deno détectant un changement de fichier.](/assets/pushing-further/functions/file-change.png)
+
+## Documentation
+
+Documenter vos fonctions est essentiel si vous voulez les réutiliser à l’avenir. Les commentaires peuvent faire un bon travail, mais il existe quelque chose d’encore plus pratique : **JSDoc**.
+
+Pour créer une documentation avec la syntaxe JSDoc, vous devez utiliser `/**` au début de la documentation et `*/` à la fin. Chaque ligne doit commencer par un `*`. Et voilà !
+
+Voici une documentation de base ajoutée au début de `convertDollarsToEuros.ts`. Nous avons une description simple au départ, suivie d’une description du paramètre `dollars`, et enfin d’une description de la valeur retournée.
+
+```ts showLineNumbers filename="convertDollarsToEuros.ts" {1-6}
+/**
+ * Converts an amount in Canadian dollars to euros.
+ *
+ * @param dollars - The amount in dollars to be converted.
+ * @returns The equivalent amount in euros.
+ */
+export default function convertDollarsToEuros(dollars: number) {
+  return dollars * 0.65;
+}
+```
+
+The reason why JSDoc is so handy is because VS Code understands it. If you hover over the function in `main.ts` now, you'll see not only the types but also your documentation popping up!
+
+![A screenshot showing VS Code displaying JSDoc for a function.](/assets/pushing-further/functions/documentation.png)
+
+We can improve our documentation by adding an example.
+
+To ensure that VS Code (and other JSDoc parsers) recognize the example as code, we use a **fenced code block** with three backticks `` ``` ``. When opening the block, we also specify `ts` so VS Code knows it's TypeScript code and applies the relevant syntax highlighting.
+
+```ts showLineNumbers filename="convertDollarsToEuros.ts" {4-9}
+/**
+ * Converts an amount in Canadian dollars to euros.
+ *
+ * @example
+ * ```ts
+ * const dollars = 100;
+ * const euros = convertDollarsToEuros(dollars);
+ * console.log(euros); // 65
+ * ```
+ *
+ * @param dollars - The amount in dollars to be converted.
+ * @returns The equivalent amount in euros.
+ */
+export default function convertDollarsToEuros(dollars: number): number {
+  return dollars * 0.65;
+}
+```
+
+![Une capture d'écran montrant VS Code affichant JSDoc avec un exemple pour une fonction.](/assets/pushing-further/functions/documentation-example.png)
+
+## Fonctions fléchées
+
+Parfois, vous avez juste besoin d’une fonction simple, surtout lorsque vous passez des fonctions en tant que paramètres dans des méthodes comme celles pour les listes.
+
+Les fonctions fléchées (*arrow functions*) offrent une manière plus courte d’écrire des fonctions.
+
+Par exemple, voici une fonction classique qui affiche du texte dans le terminal.
+
+```ts showLineNumbers
+function sayHello(name: string) {
+  console.log(`Hello, ${name}!`);
+}
+
+sayHello("Nael") // "Hello, Nael!"
+```
+
+Elle pourrait être réécrite comme une fonction fléchée comme ceci. Elle est appelée fonction fléchée parce que le `=>` ressemble à une flèche.
+
+```ts showLineNumbers
+const sayHello = (name: string) => console.log(`Hello, ${name}!`);
+
+sayHello("Nael") // "Hello, Nael!"
+```
+
+Dans l'exemple ci-dessus, il n'y a pas de bénéfice significatif à utiliser une fonction fléchée. Cependant, lorsque vous travaillez avec des méthodes de tableau, les fonctions fléchées peuvent simplifier et rendre votre code plus lisible.
+
+Dans le code ci-dessous, nous avons un tableau de nombres que nous voulons filtrer, en gardant uniquement les nombres positifs. La méthode `.filter()` nécessite une fonction en tant que paramètre, nous déclarons donc la fonction `isPositive` et la passons à `.filter()`.
+
+Voici à quoi cela ressemble avec une fonction classique.
+
+```ts showLineNumbers
+const numbers = [-2, -1, 0, 1, 2];
+
+function isPositive(num: number) {
+  return num > 0;
+}
+
+const positiveNumbers = numbers.filter(isPositive);
+
+console.log(positiveNumbers); // [1, 2]
+```
+
+Mais nous pourrions simplifier tout cela en utilisant une fonction fléchée directement à l'intérieur des parenthèses de `.filter()`.
+
+```ts showLineNumbers /(num) => num > 0/
+const numbers = [-2, -1, 0, 1, 2];
+
+const positiveNumbers = numbers.filter((num) => num > 0);
+
+console.log(positiveNumbers); // [1, 2]
+```
+
+Comme le type de `numbers` est inféré comme un `number[]`, votre ordinateur en déduit que le paramètre de la fonction fléchée `num` ne peut être qu’un `number`. C’est très pratique.
+
+Avec la fonction classique, vous deviez taper explicitement `num: number` car votre ordinateur n’avait aucun moyen de savoir avec certitude ce que `num` était censé être.
+
+## Conclusion
+
+Les fonctions sont une partie fondamentale de la programmation. Elles vous aident à organiser votre code, à le rendre réutilisable et à le garder propre.
+
+Passons maintenant à la pratique avec la prochaine leçon : le refactoring. Je sais, cela peut sembler intimidant, mais ne vous inquiétez pas—je suis avec vous ! 🕺
