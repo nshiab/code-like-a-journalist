@@ -7,7 +7,7 @@ import { Callout } from 'nextra/components'
 
 # Functions
 
-By encapsulating code within functions, you can reuse the same code over and over. It also helps break up long scripts into modular chuncks, which are easier to manage and debug.
+By encapsulating code within functions, you can reuse the same code over and over. It also helps break up long scripts into modular chunks, which are easier to manage and debug.
 
 Let's set things up for this lesson.
 
@@ -28,7 +28,7 @@ You can use this setup to test the code provided in this lesson.
 
 To create a function, you need to declare it by using the `function` keyword followed by its name with parenthesis `()` and curly brackets `{}`.
 
-Let's create a function named `sayHello` logging `"Hello!"`. What you want the function to do must be between the `{}`. (We'll talk about what goes between the `()` in a minute).
+Let's create a function named `sayHello` that logs `"Hello!"`. What you want the function to do must be between the `{}`. (We'll talk about what goes between the `()` in a minute).
 
 Copy and paste the code below into `main.ts`.
 
@@ -50,7 +50,7 @@ function sayHello() {
 sayHello()
 ```
 <Callout type="info" emoji="💡">
-    Giving functions clear and understandable names is key to keep a clean codebase easy to debug and reuse. Since functions are supposed to do something, it's usually a good idea to use a verb as a naming convention.
+    Giving functions clear and understandable names is key to keeping a clean codebase easy to debug and reuse. Since functions are supposed to do something, it's usually a good idea to use a verb as a naming convention.
 </Callout>
 
 ![A screenshot showing VS Code logging Hello!.](/assets/pushing-further/functions/hello.png)
@@ -134,7 +134,7 @@ Anything can be a function parameter: strings, numbers, booleans, objects or eve
 
 And you can also have multiple parameters between the function `()`, separated by a comma.
 
-For example, here, we add a new parameter `isTired` which expected to be a boolean. When `isTired` is true, we add `"You look tired..."`. If it's false, we add `"You look great!"`.
+For example, here, we add a new parameter `isTired` which is expected to be a boolean. When `isTired` is true, we add `"You look tired..."`. If it's false, we add `"You look great!"`.
 
 ```ts showLineNumbers filename="main.ts"
 function sayHello(name: string, isTired: boolean) {
@@ -160,7 +160,7 @@ It shows `function sayHello(name: string, isTired: boolean): void`. The `: void`
 
 But in many cases, you want to return something.
 
-Let's say that you are Canadian and want to go see the Eiffel tower. You create a function to convert Canadian dollars to Euros. As time of writing this (2025-01-22), the convertion rate is 0.67.
+Let's say that you are Canadian and want to go see the Eiffel Tower. You create a function to convert Canadian dollars to Euros. As of the time of writing this (2025-01-22), the conversion rate is 0.67.
 
 ```ts showLineNumbers filename="main.ts"
 function convertDollarsToEuros(dollars: number) {
@@ -176,7 +176,7 @@ Here, the function has the keyword `return`. If you hover over the function, you
 
 But if you run the code, it looks like nothing happens!
 
-Actually, the calculations are done and returned. But returned... nowhere! You need to store the result somewhere, or to log it directly.
+Actually, the calculations are done and returned. But returned... nowhere! You need to store the result somewhere, or log it directly.
 
 Let's create a variable `euros` to store the returned value of `convertDollarsToEuros(dollars)` and log a proper message.
 
@@ -197,7 +197,7 @@ As with parameters, returned values can be anything: strings, numbers, booleans,
 
 Because the functions are typed, the variables storing the return values of a function are automatically typed too.
 
-If you hover over `euros`, you'll see that its type is `number` because the returned value of `convertDollarsToEuros` is `number`. When you start working on more complex algorithms with many functions, this type inferrence feels magical and helps you keeping everything on track.
+If you hover over `euros`, you'll see that its type is `number` because the returned value of `convertDollarsToEuros` is `number`. When you start working on more complex algorithms with many functions, this type inference feels magical and helps you keep everything on track.
 
 ![A screenshot showing VS Code showing the type of a variable.](/assets/pushing-further/functions/euros-type.png)
 
@@ -205,7 +205,7 @@ If you hover over `euros`, you'll see that its type is `number` because the retu
 
 Since `main.ts` is our primary code entry point, we try to keep it lean. Cluttering it with function declarations is not optimal.
 
-Also, we usually keep functions in their own files. It's easier to debug but it also makes them easier to reuse because you can then `import them`.
+Also, we usually keep functions in their own files. It's easier to debug but it also makes them easier to reuse because you can then `import` them.
 
 We often regroup functions in a folder called `helpers`.
 
@@ -245,7 +245,7 @@ If you are on PC with Windows, you might have `\` instead of `/`.
 
 Here's the code you should have in `main.ts`.
 
-```ts showLineNumbers filename="convertDollarsToEuros.ts"
+```ts showLineNumbers filename="main.ts"
 import convertDollarsToEuros from "./helpers/convertDollarsToEuros.ts";
 
 const dollars = 100;
@@ -257,11 +257,11 @@ console.log(`${dollars} Canadian dollars is ${euros} euros`);
     When you import a file, you need to tell your computer where to find it with a **path**. Here, `./helpers/convertDollarsToEuros.ts` is a **relative path** because it starts with `./`. The `.` tells the computer to start where it is. In this case, since we are running `main.ts`, it starts in the folder where `main.ts` is. Then `/helpers` tells the computer to go inside the `helpers` folder. Finally, `/convertDollarsToEuros.ts` tells it to import the content of this file. On PC with Windows, the path uses `\` instead of `/`.
 </Callout>
 
-An now, everything works! If we had multiple files where `convertDollarsToEuros` was needed, we could easily import the function and reuse it in multiple places!
+And now, everything works! If we had multiple files where `convertDollarsToEuros` was needed, we could easily import the function and reuse it in multiple places!
 
 ![A screenshot showing VS Code importing and using a TypeScript function.](/assets/pushing-further/functions/intellisense.png)
 
-Also, since we are watching `main.ts` by running `deno run --watch --check`, we are automatically watching all of `main.ts` dependencies. This means that if you update `convertDollarsToEuros.ts` and save it, the terminal will be cleaned and the script will be rerun too. So useful!
+Also, since we are watching `main.ts` by running `deno run --watch --check`, we are automatically watching all of `main.ts` dependencies. This means that if you update `convertDollarsToEuros.ts` and save it, the terminal will be cleared and the script will be rerun too. So useful!
 
 Change `0.67` to `0.65` to see it in action. Notice on the first line in the terminal which file change the `Watcher` detected.
 
@@ -271,7 +271,7 @@ Change `0.67` to `0.65` to see it in action. Notice on the first line in the ter
 
 Documenting your functions is crucial if you want to reuse them in the future. Comments can do a pretty good job but there is something more handy: **JSDoc**.
 
-To create a documentation with a JSDoc syntax, you need to use `/**` at the beginning of the documentation and `*/` at the end. Each line should start with a `*`. And that's it!
+To create documentation with JSDoc syntax, you need to use `/**` at the beginning of the documentation and `*/` at the end. Each line should start with a `*`. And that's it!
 
 Here's a basic documentation added at the beginning of `convertDollarsToEuros.ts`. We have a simple description at first then a description of the parameter `dollars` and finally a description of the returned value.
 
@@ -318,12 +318,62 @@ export default function convertDollarsToEuros(dollars: number): number {
 
 ## Arrow functions
 
-Concise. Convenient to shorten syntax, especially when passed as simple parameters, like in array methods.
+Sometimes, you just want a simple function, especially when passed as simple parameters like in array methods.
 
+Arrow functions are a shorter way to write functions.
+
+For example, this is a regular function logging a string.
+
+```ts showLineNumbers
+function sayHello(name: string) {
+  console.log(`Hello, ${name}!`);
+}
+
+sayHello("Nael") // "Hello, Nael!"
 ```
-const sayHello = (name: string) => console.log(name);
+
+It could be rewritten as an arrow function like this. We call it arrow because the `=>` looks like an arrow.
+
+```ts showLineNumbers
+const sayHello = (name: string) => console.log(`Hello, ${name}!`);
+
+sayHello("Nael") // "Hello, Nael!"
 ```
+
+In the example above, there is no big benefit to using an arrow function, but when you use array methods, arrow functions can make your code simpler and more readable.
+
+In the code below, we have an array of numbers that we want to filter by keeping only positive numbers. The `.filter()` methods needs a function as a parameter so we declare the `isPositive` function and pass it to `.filter()`.
+
+Here's how it looks like with a regular function.
+
+```ts showLineNumbers
+const numbers = [-2, -1, 0, 1, 2];
+
+function isPositive(num: number) {
+  return num > 0;
+}
+
+const positiveNumbers = numbers.filter(isPositive);
+
+console.log(positiveNumbers); // [1, 2]
+```
+
+But we could simplify all of this by using an arrow function directly between `.filter()` parenthesis.
+
+```ts showLineNumbers /(num) => num > 0/
+const numbers = [-2, -1, 0, 1, 2];
+
+const positiveNumbers = numbers.filter((num) => num > 0);
+
+console.log(positiveNumbers); // [1, 2]
+```
+
+Because `numbers` type is inferred as a `number[]`, your computer infers that the arrow function parameter `num` can only be a `number`. It's very convenient.
+
+With the regular function, you had to explicitly type `num: number` because your computer had no way to know for sure what `num` was supposed to be.
 
 ## Conclusion
 
-Something something something.
+Functions are a fundamental part of programming in general. They help you organize your code, make it reusable, and keep it clean.
+
+Now, let's put that into practice with the next lesson: Refactoring. I know, it sounds scary. But don't worry, I am with you! 🕺
