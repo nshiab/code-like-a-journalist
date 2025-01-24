@@ -1,13 +1,15 @@
 ---
-title: 
-description: 
+title: Fetching Data with Deno
+description: Learn how to fetch and save data using Deno, including JSON, CSV, and HTML files.
 ---
+
+import { Callout } from 'nextra/components'
 
 # Fetching data
 
-The Web is ubiquous and an extraordinary source of data. In this lesson, we'll see how to fetch/download data.
+The Web is ubiquitous and an extraordinary source of data. In this lesson, we'll explore how to fetch and download data.
 
-# Setup
+## Setup
 
 Let's set things up for this lesson.
 
@@ -26,10 +28,122 @@ You can use this setup to test the code provided in this lesson.
 
 ## Fetching a JSON file
 
-Let's fetch the `employee.json` file located [here](https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/employees.json).
+Let's fetch this [temp.json](https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json) file. It contains the daily temperatures in Montreal from 2000 to 2020. I uploaded it to GitHub specifically for this lesson.
 
-It's a file that I keep on GitHub to test my TypeScript library [simple-data-analysis](https://github.com/nshiab/simple-data-analysis/), which I'll show you how to use in another lesson.
+If you open it, you'll notice it's an array of objects, with each object storing a date string and a temperature.
 
-It's an array of objects, with each object storing information about an employee in a fictious company.
+![A screenshot showing VS Code running and watching a TypeScript file.](/assets/pushing-further/fetch/json-file.png)
 
-![A screenshot showing VS Code running and watching a TypeScript file.](/assets/pushing-further/fetch/setup.png)
+To fetch it, you can use the `fetch()` function. It's globally available, so you can call it directly in your code. It requires the relevant URL as a string.
+
+```ts showLineNumbers filename="main.ts"
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
+);
+
+console.log(response);
+```
+<Callout type="info" emoji="💡">
+    `fetch()` is an **asynchronous** function, so we need `await` in front of it to ensure our computer fetches the resources before executing the next lines. For more information, check the *About await* section in the [Writing and reading files](/pushing-further/files) lesson.
+</Callout>
+
+We have a security warning! Deno warns us that some code is trying to connect to the internet. ⚠️
+
+By default, Deno blocks any script from connecting to the web, which is a great feature. Imagine running code sent by someone that steals your information!
+
+![A screenshot showing Deno warning about a network connection.](/assets/pushing-further/fetch/allow-net.png)
+
+To allow your code to connect to the internet, you need to pass the `--allow-net` flag in the terminal command.
+
+So instead of running your script with `deno run --watch --check main.ts` as instructed at the beginning of this lesson, you must use `deno run --watch --check --allow-net main.ts`.
+
+However, since we’ll also write data to our computer later, let’s use the `-A` flag instead, which allows our script to do anything it needs.
+
+Click on your terminal and press `CTRL + C` to stop the script from running (this works on both Mac and PC). Then run: `deno run --watch --check -A main.ts`
+
+Now it works!
+
+![A screenshot showing a fetch response logged in the terminal.](/assets/pushing-further/fetch/response.png)
+
+Wow... There is a lot of stuff in this response, and that’s normal. Your computer and the server hosting the file exchange a lot of information to ensure the connection works properly.
+
+In our case, we know it’s a JSON file, so we can call the `.json()` asynchronous method to parse the response data as JSON.
+
+```ts showLineNumbers filename="main.ts"
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
+);
+
+const data = await response.json();
+
+console.log(data);
+```
+
+![A screenshot showing a fetched JSON file logged in the terminal.](/assets/pushing-further/fetch/json-data.png)
+
+Here we go! We’ve fetched the data, and now we can work with it!
+
+Instead of fetching it every time, we could write the data to a file for future use.
+
+```ts showLineNumbers filename="main.ts"
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
+);
+
+const data = await response.json();
+
+await Deno.writeTextFile("./temp.json", JSON.stringify(data));
+```
+
+![A screenshot showing a fetched JSON file written in a file.](/assets/pushing-further/fetch/json-write.png)
+
+Congrats! You now know how to fetch and save JSON files. That was easy, wasn’t it? 😄
+
+## Fetching a text/CSV file
+
+Instead of JSON, you might want to fetch and save a CSV file, which is plain text.
+
+It’s pretty straightforward: instead of calling `.json()` to parse the response, use `.text()`.
+
+I uploaded [temp.csv](https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv) on GitHub for this lesson.
+
+Here’s the updated code to fetch and write it. We’ll explore how to crunch CSV file data in another lesson.
+
+```ts showLineNumbers filename="main.ts"
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
+);
+
+const data = await response.text();
+
+await Deno.writeTextFile("./temp.csv", data);
+```
+<Callout type="info" emoji="💡">
+    To write the JSON data, we had to use `JSON.stringify()` because `writeTextFile` can only write strings, and the JSON data was an array of objects. However, the CSV data is already text, so we can pass it directly to `writeTextFile`.
+</Callout>
+
+![A screenshot showing a fetched CSV file written in a file.](/assets/pushing-further/fetch/csv-write.png)
+
+## Fetching a webpage HTML
+
+You can also fetch the source code of a webpage. For example, here’s how to retrieve the HTML from the Code Like a Journalist homepage.
+
+We’ll explore how to extract data from webpages (a technique known as *web scraping*) in another lesson.
+
+```ts showLineNumbers filename="main.ts"
+const response = await fetch(
+  "https://www.code-like-a-journalist.com/en",
+);
+
+const html = await response.text();
+
+console.log(html);
+```
+
+![A screenshot showing a fetched webpage HTML being logged in the terminal.](/assets/pushing-further/fetch/html.png)
+
+## Conclusion
+
+You now know how to fetch and save data with Deno.
+
+But there’s something else that is extremely useful and published on the Web: TypeScript libraries. Go check out the next lesson to discover what they are! 👀
