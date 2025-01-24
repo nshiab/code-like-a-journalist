@@ -1,1 +1,35 @@
-To do.
+---
+title: 
+description: 
+---
+
+# Fetching data
+
+The Web is ubiquous and an extraordinary source of data. In this lesson, we'll see how to fetch/download data.
+
+# Setup
+
+Let's set things up for this lesson.
+
+Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+
+- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
+- `deno.json`, which lets VS Code know this is a Deno project and enables the Deno extension. You can tweak settings in this file, but we'll keep it empty for now.
+
+Open the terminal and run the following command: `deno run --watch --check main.ts`
+
+This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+
+You can use this setup to test the code provided in this lesson.
+
+![A screenshot showing VS Code running and watching a TypeScript file.](/assets/pushing-further/fetch/setup.png)
+
+## Fetching a JSON file
+
+Let's fetch the `employee.json` file located [here](https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/employees.json).
+
+It's a file that I keep on GitHub to test my TypeScript library [simple-data-analysis](https://github.com/nshiab/simple-data-analysis/), which I'll show you how to use in another lesson.
+
+It's an array of objects, with each object storing information about an employee in a fictious company.
+
+![A screenshot showing VS Code running and watching a TypeScript file.](/assets/pushing-further/fetch/setup.png)
