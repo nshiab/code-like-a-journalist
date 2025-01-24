@@ -1,1 +1,149 @@
-To do.
+---
+title: Récupérer des données avec Deno
+description: Apprenez à récupérer et sauvegarder des données avec Deno, y compris les fichiers JSON, CSV et HTML.
+---
+
+import { Callout } from 'nextra/components'
+
+# Récupérer des données
+
+Le Web est omniprésent et une source extraordinaire de données. Dans cette leçon, nous explorerons comment récupérer et télécharger des données.
+
+## Configuration
+
+Préparons notre environnement de travail pour cette leçon.
+
+Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
+
+- `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
+- `deno.json`, qui permet à VS Code de savoir qu'il s'agit d'un projet Deno et active l'extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+
+Ouvrez le terminal et exécutez la commande suivante : `deno run --watch --check main.ts`
+
+Cette commande efface le terminal et réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+
+Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
+
+![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/pushing-further/fetch/setup.png)
+
+## Récupérer un fichier JSON
+
+Récupérons ce fichier [temp.json](https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json). Il contient les températures quotidiennes à Montréal de 2000 à 2020. Je l’ai téléversé sur GitHub spécifiquement pour cette leçon.
+
+Si vous l'ouvrez, vous remarquerez qu'il s'agit d'une liste d'objets, chaque objet stockant une date et une température.
+
+![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/pushing-further/fetch/json-file.png)
+
+Pour le récupérer, vous pouvez utiliser la fonction `fetch()`. Elle est disponible globalement, donc vous pouvez l'appeler directement dans votre code. Elle nécessite l'URL correspondante en tant que texte.
+
+```ts showLineNumbers filename="main.ts"
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
+);
+
+console.log(response);
+```
+<Callout type="info" emoji="💡">
+    `fetch()` est une fonction **asynchrone**, nous devons donc ajouter `await` devant pour nous assurer que notre ordinateur récupère les ressources avant d'exécuter les lignes suivantes. Pour plus d'informations, consultez la section *À propos de await* dans la leçon [Écrire et lire des fichiers](/pushing-further/files).
+</Callout>
+
+Nous avons un avertissement de sécurité ! Deno nous avertit qu'un script essaie de se connecter à Internet. ⚠️
+
+Par défaut, Deno bloque tout script qui tente de se connecter au Web, ce qui est une excellente fonctionnalité. Imaginez exécuter un code envoyé par quelqu’un qui volerait vos informations !
+
+![Une capture d'écran montrant Deno avertissant d'une connexion réseau.](/assets/pushing-further/fetch/allow-net.png)
+
+Pour permettre à votre code de se connecter à Internet, vous devez ajouter l'option `--allow-net` dans la commande du terminal.
+
+Ainsi, au lieu d’exécuter votre script avec `deno run --watch --check main.ts` comme indiqué au début de cette leçon, vous devez utiliser `deno run --watch --check --allow-net main.ts`.
+
+Cependant, comme nous allons également écrire des données sur notre ordinateur plus tard, utilisons plutôt l'option `-A`, qui permet à notre script de faire tout ce dont il a besoin.
+
+Cliquez sur votre terminal et appuyez sur `CTRL + C` pour arrêter l'exécution du script (cela fonctionne sur Mac et PC). Ensuite, exécutez : `deno run --watch --check -A main.ts`
+
+Et maintenant, ça fonctionne !
+
+![Une capture d'écran montrant une réponse fetch affichée dans le terminal.](/assets/pushing-further/fetch/response.png)
+
+Wow... Il y a beaucoup d'informations dans cette réponse, et c'est normal. Votre ordinateur et le serveur hébergeant le fichier échangent beaucoup d'informations pour s'assurer que la connexion fonctionne correctement.
+
+Dans notre cas, nous savons que c'est un fichier JSON, nous pouvons donc appeler la méthode asynchrone `.json()` pour convertir les données de la réponse en JSON.
+
+```ts showLineNumbers filename="main.ts"
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
+);
+
+const data = await response.json();
+
+console.log(data);
+```
+
+![Une capture d'écran montrant un fichier JSON récupéré affiché dans le terminal.](/assets/pushing-further/fetch/json-data.png)
+
+Et voilà ! Nous avons récupéré les données, et nous pouvons maintenant travailler avec elles !
+
+Au lieu de les récupérer à chaque fois, nous pourrions écrire les données dans un fichier pour une utilisation future.
+
+```ts showLineNumbers filename="main.ts"
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
+);
+
+const data = await response.json();
+
+await Deno.writeTextFile("./temp.json", JSON.stringify(data));
+```
+
+![Une capture d'écran montrant un fichier JSON récupéré écrit dans un fichier.](/assets/pushing-further/fetch/json-write.png)
+
+Félicitations ! Vous savez maintenant comment récupérer et enregistrer des fichiers JSON. C'était facile, n'est-ce pas ? 😄
+
+## Récupérer un fichier texte/CSV
+
+Au lieu d’un fichier JSON, vous pourriez vouloir récupérer et enregistrer un fichier CSV, qui est un fichier texte brut.
+
+C’est assez simple : au lieu d’appeler `.json()` pour convertir la réponse, utilisez `.text()`.
+
+J’ai téléversé [temp.csv](https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv) sur GitHub pour cette leçon.
+
+Voici le code mis à jour pour le récupérer et le sauvegarder. Nous explorerons comment analyser les données des fichiers CSV dans une autre leçon.
+
+```ts showLineNumbers filename="main.ts"
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
+);
+
+const data = await response.text();
+
+await Deno.writeTextFile("./temp.csv", data);
+```
+<Callout type="info" emoji="💡">
+    Pour écrire les données JSON, nous avons dû utiliser `JSON.stringify()` car `writeTextFile` ne peut écrire que du texte, et les données JSON étaient une liste d'objets. Cependant, les données CSV sont déjà du texte, donc nous pouvons les passer directement à `writeTextFile`.
+</Callout>
+
+![Une capture d'écran montrant un fichier CSV récupéré écrit dans un fichier.](/assets/pushing-further/fetch/csv-write.png)
+
+## Récupérer le HTML d'une page web
+
+Vous pouvez également récupérer le code source d'une page web. Par exemple, voici comment récupérer le HTML de la page d'accueil de Codez comme un journaliste.
+
+Nous explorerons comment extraire des données des pages web (une technique appelée *web scraping*) dans une autre leçon.
+
+```ts showLineNumbers filename="main.ts"
+const response = await fetch(
+  "https://www.code-like-a-journalist.com/en",
+);
+
+const html = await response.text();
+
+console.log(html);
+```
+
+![Une capture d'écran montrant le HTML d'une page web récupéré et affiché dans le terminal.](/assets/pushing-further/fetch/html.png)
+
+## Conclusion
+
+Vous savez maintenant comment récupérer et sauvegarder des données avec Deno.
+
+Mais il y a autre chose d'extrêmement utile et publié sur le Web : les bibliothèques TypeScript. Consultez la prochaine leçon pour découvrir ce qu'elles sont ! 👀
