@@ -1,0 +1,177 @@
+---
+title: Writing and Reading Files with Deno
+description: Learn how to write and read files using Deno, including handling JSON data and understanding asynchronous operations.
+---
+
+import { Callout } from 'nextra/components'
+
+# Writing and reading files
+
+When you run your code, everything is kept in your computer’s RAM (Random Access Memory). This type of memory is very fast, but if you stop your script or shut down your computer, everything is lost. 😱
+
+If you want to keep some data around, you need to write it to a file, which will be stored in your computer’s permanent storage (hard drive). And to retrieve the data from a file, you need to read it.
+
+## Setup
+
+Let's set things up for this lesson.
+
+Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+
+- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
+- `deno.json`, which lets VS Code know this is a Deno project and enables the Deno extension. You can tweak settings in this file, but we'll keep it empty for now.
+
+Open the terminal and run the following command: `deno run --watch --check main.ts`
+
+This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+
+You can use this setup to test the code provided in this lesson.
+
+![A screenshot showing VS Code running and watching a TypeScript file.](/assets/pushing-further/files/setup.png)
+
+## Writing
+
+With Deno, writing files is very easy. You can use the `Deno` global object, which is always available while coding, and call the `.writeTextFile()` method.
+
+The method requires a path as the first parameter and a string as the second parameter. In the code below, we want to create a file named `hello.txt` containing `"Hello!"`.
+
+Copy, paste, and save this code in `main.ts`. We’ll talk about the `await` keyword in a minute.
+
+```ts showLineNumbers filename="main.ts"
+await Deno.writeTextFile("./hello.txt", "Hello!");
+```
+
+Oh! Something popped up in the terminal. 🧐
+
+![A screenshot showing VS Code showing a Deno write warning in the terminal.](/assets/pushing-further/files/allow-write.png)
+
+Deno is very strict when it comes to security. By default, it doesn’t allow a script to write files on your computer. Imagine running code from an unknown source that writes dangerous files to your system—that would be terrible! 💣
+
+To allow the script to write a file, you need to explicitly grant permission by adding the `--allow-write` flag to the terminal command.
+
+At the beginning of this lesson, we ran the script with: `deno run --watch --check main.ts`
+
+Stop it by clicking in your terminal and pressing `CTRL + C` (this works on both Mac and PC).
+
+Then rerun it with: `deno run --watch --check --allow-write main.ts`
+
+Now it works! A new text file has been created with text content in it. You now know how to permanently store data on your computer!
+
+By the way, be careful: by default, `writeTextFile` overwrites files if they already exist.
+
+![A screenshot showing VS Code writing a text file with Deno.](/assets/pushing-further/files/write-working.png)
+
+## Reading
+
+To read files, you can use `Deno.readTextFile()`. The method expects a file path.
+
+Let’s update `main.ts` to read the file we wrote earlier.
+
+```ts showLineNumbers filename="main.ts"
+const data = await Deno.readTextFile("./hello.txt");
+console.log(data);
+```
+
+Oh! The warning again! 🚨
+
+By default, Deno doesn’t allow a script to read files on your computer. Again, this is a great security feature. Imagine running an unknown script that reads private files with confidential data! 🕵️
+
+![A screenshot showing VS Code showing a Deno read warning in the terminal.](/assets/pushing-further/files/allow-read.png)
+
+To allow the script to read a file, you need to explicitly grant permission by adding the `--allow-read` flag to the terminal command.
+
+Stop running your script by clicking in your terminal and pressing `CTRL + C` (this works on both Mac and PC).
+
+Then rerun it with: `deno run --watch --check --allow-read main.ts`
+
+Now it works. You’ve successfully retrieved the text content from the `hello.txt` file!
+
+![A screenshot showing VS Code reading a text file with Deno.](/assets/pushing-further/files/read-working.png)
+
+## All permissions granted 👮
+
+While Deno’s explicit permissions are a great security feature when running unknown code, it’s not very convenient during development.
+
+If you trust the code you are running (and all its dependencies!), you can use the flag `-A` to allow the script to do anything it wants.
+
+Here, it’s fine since we are just running our own code.
+
+Click on your terminal, press `CTRL + C` to stop it, and run: `deno run --watch --check -A main.ts`
+
+Now your script can write, read, and more! We will use this command for the rest of this lesson, as well as for the upcoming lessons.
+
+## JSON
+
+Writing data as text is pretty standard. For example, CSV files are just text files with commas representing columns.
+
+However, when working in TypeScript, especially for the Web, you’ll often write your data as **JSON files**. JSON stands for *JavaScript Object Notation*, and since TypeScript is based on JavaScript, it’s a natural choice.
+
+This text file format can store arrays, objects, text, numbers, and booleans, instead of just raw text.
+
+For example, in the script below, we write the array of objects `data` to the file `data.json`.
+
+
+```ts showLineNumbers filename="main.ts"
+const data = [
+  { name: "Nael", age: 25 },
+  { name: "John", age: 30 },
+];
+
+await Deno.writeTextFile(
+  "data.json",
+  JSON.stringify(data),
+);
+```
+<Callout type="info" emoji="💡">
+    On line 8, we used the `JSON` global object, which is always available while you code, and its `stringify()` method. `writeTextFile` expects a `string`, but `data` is an array of objects. So we **stringify** it to transform `data` into a JSON string. The complementary method is `JSON.parse()`, which can convert stringified arrays, objects, and values back to their original form.
+</Callout>
+
+![A screenshot showing VS Code writing a JSON file with Deno.](/assets/pushing-further/files/json-write.png)
+
+Because it has the `.json` extension, the file is understood by VS Code and Deno. Its content is displayed with the proper data types. In the screenshot above, the names are highlighted as strings and the ages as numbers. If we wrote everything into a `.txt` file, everything would appear as plain text.
+
+Additionally, because it’s a JSON file, you can import it like a `.ts` file by adding the `with { type: "json" }` assertion.
+
+```ts showLineNumbers filename="main.ts"
+import data from "./data.json" with { type: "json" };
+
+console.log(data);
+```
+![A screenshot showing VS Code reading a JSON file with Deno.](/assets/pushing-further/files/json-read.png)
+
+Because it’s JSON, the type checking works out of the box, which is wonderful.
+
+If you add a `.` after `data`, VS Code will suggest array methods because it knows the data stored in `data.json` is an array.
+
+![A screenshot showing VS Code suggesting array methods.](/assets/pushing-further/files/json-array-methods.png)
+
+If you select the first object of `data` with `[0]` and type a `.` to access a key, VS Code will suggest the keys that are in the object. Since it’s a JSON file, it can infer the types.
+
+![A screenshot showing VS Code reading a JSON file with Deno.](/assets/pushing-further/files/json-object-methods.png)
+
+And if you try to access keys that don’t exist in the objects, you’ll get an error. Isn’t that amazing? 😍
+
+![A screenshot showing VS Code reading a JSON file with Deno.](/assets/pushing-further/files/json-object-error.png)
+
+## About `await`
+
+There are two types of functions and methods: **synchronous** and **asynchronous**.
+
+In the [Functions lesson](/pushing-further/functions), we wrote synchronous functions. You didn’t need to add `await` in front of them.
+
+When your computer encounters a **synchronous** function, method, or statement, it **waits** to finish everything required before moving to the next one. It behaves as you’d expect: line 1 of your code gets completed, then line 2, then line 3, and so on.
+
+However, when your computer encounters an **asynchronous** function or method, it starts executing it *in the background* but **doesn’t wait** for it to finish. While the task is running *in the background*, it immediately jumps to the next instruction. The *background* is an oversimplification, but you get the idea.
+
+Since `writeTextFile` and `readTextFile` are asynchronous, it means you can write or read multiple files **concurrently**, significantly speeding up your script’s processing time (if used correctly 🧑‍🔬).
+
+This feature is also powerful for web development. For instance, a website with multiple images can fetch all images concurrently instead of one by one, enhancing speed and user experience.
+
+In our context, it’s easier to add the `await` keyword so the computer processes the code in the intended order.
+
+To identify an asynchronous function or method, hover over it. Asynchronous functions return a `Promise`. Don’t worry—type checking will alert you if `await` is required somewhere.
+
+![A screenshot showing VS Code reading a JSON file with Deno.](/assets/pushing-further/files/promise.png)
+
+## Conclusion
+
+With these new skills, you can now handle file operations in your Deno projects efficiently and securely. Happy coding! 🥳
