@@ -1,0 +1,175 @@
+---
+title: Utiliser des bibliothèques
+description: Apprenez à installer et utiliser des bibliothèques avec Deno.
+---
+
+import { Callout } from 'nextra/components'
+
+# Utiliser des bibliothèques
+
+Des millions de personnes à travers le monde travaillent avec JavaScript et TypeScript. L'une des raisons de leur popularité est l'immense écosystème de bibliothèques. De nombreux développeurs partagent leur code publiquement, ce qui permet à tout le monde de l'utiliser gratuitement.
+
+D'abord, un peu de vocabulaire : les *bibliothèques* sont aussi souvent appelées *libraries*, *packages* ou *modules*.
+
+Préparons maintenant notre environnement de travail avant de plonger dans cette leçon.
+
+Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code et créez deux fichiers :
+
+- `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
+- `deno.json`, qui permet à VS Code de savoir qu'il s'agit d'un projet Deno et active l'extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+
+Ouvrez le terminal et exécutez la commande suivante : `deno run --watch --check main.ts`
+
+Cette commande efface le terminal et réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD + S` sur Mac ou `CTRL + S` sur PC).
+
+Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
+
+![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/pushing-further/libraries/setup.png)
+
+## Registres
+
+Les bibliothèques sont publiées sur des registres publics. Les deux principaux registres sont **NPM** et **JSR**.
+
+Certaines bibliothèques sont disponibles sur les deux, tandis que d'autres existent uniquement sur NPM ou JSR.
+
+### NPM
+
+NPM a été créé en 2014 et a été acquis par GitHub (une filiale de Microsoft) en 2020.
+
+Au moment d'écrire ces lignes (2025-01-29), NPM héberge plus de **3,4 millions** de bibliothèques téléchargées environ **8 milliards de fois par jour** ! Vous pouvez publier des bibliothèques en code ouvert gratuitement, tandis que les bibliothèques privées nécessitent un abonnement payant.
+
+Prenons un exemple et recherchons `d3`, une bibliothèque bien connue pour la visualisation de données que nous utiliserons fréquemment.
+
+Allez sur [npmjs.com](https://www.npmjs.com/) et recherchez `d3`.
+
+![Une capture d'écran montrant les résultats de NPM pour d3.](/assets/pushing-further/libraries/d3-npm.png)
+
+Sélectionnez le premier résultat : `d3` avec la description **"Data-Driven Documents"** par Mike Bostock.
+
+Voici [le lien direct](https://www.npmjs.com/package/d3), au cas où.
+
+![Une capture d'écran montrant la description de d3 sur NPM.](/assets/pushing-further/libraries/d3-description.png)
+
+Cette page fournit de nombreuses informations utiles :
+- Dans la section principale, on voit une courte description et des liens vers la documentation, des exemples, et plus encore.
+- Sur la droite, il y a un lien vers la page GitHub et le site officiel de la bibliothèque.
+- On peut voir le nombre de téléchargements hebdomadaires, indiquant la popularité de la bibliothèque.
+- La liste des contributeurs inclut **Mike Bostock** et **Philippe Rivière**, deux experts bien connus en visualisation de données.
+
+Ces détails (ainsi que ceux sur la page GitHub) nous aident à déterminer si une bibliothèque est fiable. Soyez toujours prudent avant d'exécuter du code inconnu ! 🦠
+
+Installer `d3` dans un projet Deno est très simple. Cliquez sur votre terminal, arrêtez `main.ts` (`CTRL` + `C`), puis exécutez la commande suivante : `deno add npm:d3`
+
+Si vous ouvrez votre `deno.json`, vous verrez quelque chose de nouveau : **imports** ! Ces imports indiquent à Deno quelles bibliothèques (et quelles versions) vous souhaitez utiliser dans ce projet.
+
+![Une capture d'écran montrant les imports dans deno.json.](/assets/pushing-further/libraries/d3-add.png)
+<Callout type="info" emoji="💡">
+    Comme vous avez tapé `npm:`, Deno va chercher la dernière version de `d3` sur le registre NPM. Il la téléchargera ensuite et la stockera en cache sur votre disque dur. Puisqu'elle est mise en cache, si vous avez besoin de `d3` dans un autre projet et que sa dernière version n'a pas changé, Deno l'utilisera depuis le cache plutôt que de la télécharger à nouveau. Cela accélère les installations futures et évite d'avoir plusieurs versions de la même bibliothèque sur votre ordinateur.
+</Callout>
+
+Utiliser `d3` est maintenant très simple. Dans vos imports, `"d3": "npm:d3@^7.9.0"` signifie que vous pouvez utiliser le raccourci `d3` pour appeler la bibliothèque.
+
+Reprenons le [fichier CSV des températures de Montréal](https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv) de la leçon [Récupérer des données](/pushing-further/fetch).
+
+Si vous récupérez ces données, vous remarquerez que c'est juste du texte. CSV signifie **Comma-Separated Values** (valeurs séparées par des virgules) et vous ne pouvez pas travailler avec directement. Il serait bien mieux de le convertir en une liste d'objets.
+
+Copiez-collez le code ci-dessous dans `main.ts`, puis exécutez la commande suivante : `deno run --watch --check -A main.ts`
+
+N'oubliez pas `-A`, sinon votre code ne sera pas autorisé à récupérer des données !
+
+```ts showLineNumbers filename="main.ts"
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
+);
+
+const data = await response.text();
+
+console.log(data);
+```
+
+![Une capture d'écran montrant des données CSV dans le terminal.](/assets/pushing-further/libraries/d3-text.png)
+
+C'est notre jour de chance : la fonction `csvParse` de `d3` convertit les données CSV en une liste d'objets !
+
+Mettons à jour notre code pour l'utiliser.
+
+```ts showLineNumbers filename="main.ts" {1, 8, 10}
+import { csvParse } from "d3";
+
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
+);
+
+const data = await response.text();
+const arrayOfObjects = csvParse(data);
+
+console.log(arrayOfObjects);
+```
+![Une capture d'écran montrant des données CSV converties en une liste d'objets dans le terminal.](/assets/pushing-further/libraries/d3-parse.png)
+
+<Callout type="info" emoji="💡">
+    Dans la [leçon sur les fonctions](/pushing-further/functions), nous avons vu que nous pouvons importer des fonctions avec la syntaxe `import myFunction from "./myFunction"`. Ici, c'est un peu différent, car `d3` exporte plusieurs fonctions, et nous choisissons uniquement celle(s) que nous voulons. Pour cela, nous utilisons des accolades avec cette syntaxe : `import { myFunctionA, myFunctionB } from "./allMyFunctions"`.
+</Callout>
+
+Félicitations ! Vous venez d’installer `d3` depuis NPM et d’utiliser l’une de ses fonctions ! 💃🕺
+
+### JSR
+
+JSR a été lancé en 2024. C’est le petit nouveau et il est maintenu par l’équipe de Deno.
+
+Il se concentre sur des bibliothèques modernes, conçues avant tout pour TypeScript. Installer une bibliothèque depuis JSR est identique à une installation depuis NPM. Cependant, publier une bibliothèque est beaucoup plus simple sur JSR (mais nous verrons cela dans une autre leçon).
+
+Recherchons une bibliothèque pour convertir notre fichier CSV. Rendez-vous sur [jsr.io](https://jsr.io/) et recherchez `csv`.
+
+![Une capture d'écran montrant les résultats de JSR.](/assets/pushing-further/libraries/jsr-csv.png)
+
+Parmi les résultats, vous verrez une bibliothèque commençant par `@std`. Cela signifie qu’elle fait partie de la **bibliothèque standard** et qu’elle est maintenue par l’équipe de Deno, ce qui garantit des bibliothèques de haute qualité et bien testées pour des cas d’usage courants.
+
+Utilisons-la ! [Cliquez ici](https://jsr.io/@std/csv).
+
+![Une capture d'écran montrant la bibliothèque standard JSR.](/assets/pushing-further/libraries/jsr-std.png)
+
+Vous trouverez de nombreuses informations utiles sur cette page :
+- Un lien vers la page GitHub.
+- La documentation et des exemples.
+- La date de publication de la dernière version.
+
+Au moment d'écrire ces lignes, une différence par rapport à NPM est l’absence du nombre de téléchargements. Cette fonctionnalité a été demandée et devrait être ajoutée prochainement. Cependant, vous pouvez toujours consulter le nombre d'étoiles sur la page GitHub de la bibliothèque afin d’avoir une idée de sa popularité. La [bibliothèque standard de Deno](https://github.com/denoland/std) a plus de 3 000 étoiles, ce qui est considérable. 🌟
+
+Pour installer la bibliothèque, arrêtez l’exécution de `main.ts` (`CTRL` + `C`) et exécutez la commande suivante : `deno add jsr:@std/csv`
+
+Vous verrez `@std/csv` être ajoutée à votre `deno.json`.
+
+Comme vous l’avez peut-être remarqué, nous avons utilisé `jsr:` au lieu de `npm:` pour que Deno cherche la bibliothèque sur JSR au lieu de NPM.
+
+![Une capture d'écran montrant un module JSR ajouté.](/assets/pushing-further/libraries/jsr-add.png)
+
+<Callout type="info" emoji="💡">
+    Tout comme les modules NPM, les modules JSR sont mis en cache. Si vous devez vider votre cache, exécutez `deno clean`. Et pour installer toutes les bibliothèques listées dans un fichier `deno.json`, vous pouvez exécuter `deno install`.
+</Callout>
+
+Mettons maintenant à jour notre code dans `main.ts` pour utiliser `@std` au lieu de `d3`. Une différence clé est que nous devons définir l'option `skipFirstRow` sur `true` pour ignorer la première ligne qui contient les en-têtes des colonnes CSV.
+
+```ts showLineNumbers filename="main.ts" {1, 8}
+import { parse } from "@std/csv";
+
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
+);
+
+const data = await response.text();
+const arrayOfObjects = parse(data, { skipFirstRow: true });
+
+console.log(arrayOfObjects);
+```
+![Une capture d'écran montrant un fichier CSV converti en liste d'objets avec la bibliothèque standard.](/assets/pushing-further/libraries/jsr-done.png)
+
+Et... voilà ! Vous avez installé et utilisé une bibliothèque depuis JSR ! 💃🕺
+
+## Conclusion
+
+Vous vous demandez sûrement comment découvrir de nouvelles bibliothèques...
+
+Eh bien, face à un problème, une recherche Google pour des tutoriels et articles de blog peut être très utile. Demander à votre chatbot préféré peut aussi vous aider.
+
+Et bien sûr, il existe d'excellents cours (comme celui-ci 😏) qui vous feront découvrir les bibliothèques incontournables !
