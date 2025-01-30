@@ -5,6 +5,7 @@ export default {
     "saving-account-calculator": "Savings account calculator 💸",
     "pushing-further": "Pushing further 🚀",
     "ninja-moves": "Ninja moves 🥷",
+    others: "Smart people & reads 📚",
     "more": "More to come...",
     contact: "Contact",
 };
