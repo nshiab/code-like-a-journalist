@@ -5,6 +5,7 @@ export default {
     "saving-account-calculator": "Calculateur d'épargne 💸",
     "pushing-further": "Aller plus loin 🚀",
     "ninja-moves": "Techniques de ninja 🥷",
+    others: "Personnes & lectures inspirantes 📚",
     "more": "Prochaines leçons...",
     contact: "Contact",
 };
