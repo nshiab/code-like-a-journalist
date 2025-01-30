@@ -4,12 +4,15 @@ description: Learn how to write and read files using Deno, including handling JS
 ---
 
 import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Writing and reading files
 
 When you run your code, everything is kept in your computer’s RAM (Random Access Memory). This type of memory is very fast, but if you stop your script or shut down your computer, everything is lost. 😱
 
 If you want to keep some data around, you need to write it to a file, which will be stored in your computer’s permanent storage (hard drive). And to retrieve the data from a file, you need to read it.
+
+<NoticeIntro />
 
 ## Setup
 
@@ -175,3 +178,5 @@ To identify an asynchronous function or method, hover over it. Asynchronous func
 ## Conclusion
 
 With these new skills, you can now handle file operations in your Deno projects efficiently and securely. Happy coding! 🥳
+
+<NoticeEnd />
