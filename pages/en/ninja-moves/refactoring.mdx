@@ -4,6 +4,7 @@ description: Learn how to refactor TypeScript code by breaking it down into modu
 ---
 
 import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Refactoring
 
@@ -16,6 +17,8 @@ This is why **refactoring** is an important step. It means restructuring your co
 A key aspect of refactoring is breaking down long scripts into modular functions.
 
 In this lesson, we will take the final code from the [Savings account calculator 💸](/saving-account-calculator) and refactor it. If you haven’t done this project, do it first! I also expect that you have completed all of the lessons in the **First steps** 🧑‍🎓 section.
+
+<NoticeIntro />
 
 ## Setup
 
@@ -265,3 +268,5 @@ for (let i = 1; i <= 1000; i++) {
 ## Conclusion
 
 You don’t always have the luxury of time to refactor your code. But if you plan on reusing, sharing, or maintaining your code for a long time, it’s a well-worth investment—especially if you add tests (but tests will be another lesson).
+
+<NoticeEnd />
