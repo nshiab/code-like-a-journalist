@@ -73,19 +73,26 @@ const FOOTER = {
             }}
         >
             <div>
-                Code Like a Journalist © {new Date().getFullYear()} by{" "}
-                <a
-                    href="https://www.naelshiab.com/"
-                    style={{ textDecoration: "underline" }}
-                >
-                    Nael Shiab
-                </a>{" "}
+                Code Like a Journalist © {new Date().getFullYear()}{" "}
                 is licensed under{" "}
                 <a
                     href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
                     style={{ textDecoration: "underline" }}
                 >
-                    Creative Commons Attribution 4.0 International
+                    CC BY 4.0
+                </a>. You have to give credit to{" "}
+                <a
+                    href="https://www.naelshiab.com/"
+                    style={{ textDecoration: "underline" }}
+                >
+                    Nael Shiab
+                </a>{"  "}
+                with a link to the{" "}
+                <a
+                    href="https://www.code-like-a-journalist.com/"
+                    style={{ textDecoration: "underline" }}
+                >
+                    website
                 </a>. This project was funded by the{" "}
                 <a
                     href="https://www.michenerawards.ca/media-release/michener-awards-foundation-announces-its-2024-fellowships-winners/"
@@ -127,19 +134,26 @@ const FOOTER = {
             }}
         >
             <div>
-                Codez comme un journaliste © {new Date().getFullYear()} par{" "}
-                <a
-                    href="https://www.naelshiab.com/"
-                    style={{ textDecoration: "underline" }}
-                >
-                    Nael Shiab
-                </a>{" "}
+                Codez comme un journaliste © {new Date().getFullYear()}{"  "}
                 est publié sous la licence{" "}
                 <a
                     href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
                     style={{ textDecoration: "underline" }}
                 >
-                    Creative Commons Attribution 4.0 International
+                    CC BY 4.0
+                </a>. Vous devez donner le crédit à{"  "}
+                <a
+                    href="https://www.naelshiab.com/"
+                    style={{ textDecoration: "underline" }}
+                >
+                    Nael Shiab
+                </a>{"  "}
+                avec un lien vers le{"   "}
+                <a
+                    href="https://www.code-like-a-journalist.com/fr"
+                    style={{ textDecoration: "underline" }}
+                >
+                    site web
                 </a>. Ce project a été financé par la{" "}
                 <a
                     href="https://www.prixmichener.ca/media-release/la-fondation-des-prix-michener-devoile-les-laureat-e-s-de-ses-bourses-pour-lannee-2024/"
