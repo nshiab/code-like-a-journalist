@@ -6,7 +6,7 @@ export default {
     "pushing-further": "Pushing further 🚀",
     "stock-market-simulator": "Stock market simulator 📈",
     "ninja-moves": "Ninja moves 🥷",
-    others: "Inspiring people & reads 📚",
+    inspirations: "Inspiring people & content 📚",
     "more": "More to come...",
     contact: "Contact",
 };
