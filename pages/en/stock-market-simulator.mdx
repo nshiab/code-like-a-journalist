@@ -50,6 +50,8 @@ And then run `deno run -A --watch --check main.ts`.
 
 To run our simulator, we need historical stock market prices. One of the most common sources for financial data is [Yahoo Finance](https://finance.yahoo.com/).
 
+The use of a small amount of data is tolerated for educational or public interest purposes, but if you want to collect and reuse a large volume of this data, with or without a commercial purpose, contact the team behind the site or purchase a premium subscription.
+
 On the [home page](https://finance.yahoo.com/), you can search for a publicly traded company. For example, search for Apple and click on the relevant result.
 
 ![A screenshot showing the Yahoo Finance website.](/assets/stock-market-simulator/search-apple.png)
@@ -327,7 +329,7 @@ If you rerun `main.ts` by saving it again, you'll see that the logged message is
 
 ![A screenshot showing the Apple stock market data being cached.](/assets/stock-market-simulator/data-cached-aapl.png)
 
-The beauty of this technique is that you can keep cached data for multiple companies. For example, replace `AAPL` in the `symbol` variable with `GOOG` to get the historical stock prices of Alphabet (formerly Google) and run the code.
+You can keep cached data for multiple companies. For example, replace `AAPL` in the `symbol` variable with `GOOG` to get the historical stock prices of Alphabet (formerly Google) and run the code.
 
 You'll see another file, `GOOG.json`, being created in `data`.
 
@@ -454,8 +456,6 @@ export default async function getData(symbol: string) {
 You can now see the timestamps converted to dates. The first one is December 12, 1980, which is when Apple started being traded on the stock market.
 
 ![A screenshot showing timestamps converted to dates.](/assets/stock-market-simulator/to-dates.png)
-
-<NoticeEnd />
 
 ## Restructuring the data
 
@@ -723,7 +723,7 @@ const finalAmount = getFinalAmount(amount, startDate, dailyStockData);
 logResult(amount, symbol, startDate, finalAmount);
 ```
 <Callout type="info" emoji="💡">
-    Throwing errors is very useful to stop running your script and provide a message to the user (or yourself). Always aim for clear messages that will help you debug easily or will help the user act accordingly to avoid problems.
+    Throwing errors is very useful to stop running your script and provide a message to the user (or yourself). Always aim for clear messages that will help you debug easily or will help the user to act accordingly.
 </Callout>
 
 That's better. We won't return impossible results now! You can safely play with different `startDate` values.
@@ -742,3 +742,5 @@ Or tweak the code to add more functionalities. Here are some ideas:
 - Buy and sell shares at different dates
 
 Have fun! 💃🕺
+
+<NoticeEnd />
