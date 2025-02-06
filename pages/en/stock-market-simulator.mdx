@@ -1,6 +1,6 @@
 ---
 title: Stock market simulator 📈
-description: Learn how to code a stock market simulator with TypeScript in this tutorial.
+description: Learn how to fetch stock market data and code a returns simulator with TypeScript.
 ---
 
 import { Callout } from "nextra/components";
@@ -25,7 +25,7 @@ It's always important to clearly identify the question we want to answer before 
 So, today, our question is:
 - How much would have gain or lost by investing in a given publicly traded company at a specific date?
 
-The answer will be the difference between the initial amount and the final amount.
+To answer this, we need to calculate the difference between the initial amount and the final amount.
 
 We can also identify three variables that will impact the result:
 - The choosen company
@@ -64,11 +64,15 @@ The columns that really interest us are the **Date** and the **Adj close** price
 
 ![A screenshot showing the Yahoo Finance website.](/assets/stock-market-simulator/all-data.png)
 
-That was easy! But how can get this data in our script? 🤔
+That was easy! But how can we get this data in our script? 🤔
 
 ### Finding the data
 
 This data doesn't come from nowhere. It probably comes from from an API providing the data to the page. Let's look behind the curtains to figure this out. 🧐 
+
+<Callout type="info" emoji="💡">
+    API stands for *Application Programming Interface*. On the web, APIs are often used as a way to transfer data. When you call an API endpoint (with an URL and sometimes parameters), the API sends you back the relevant data. APIs are very useful for websites displaying live data, among other things. Instead of rebuilding and republishing the website with new data, which can be slow and costly, you can just need to update your API endpoints. The APIs answers are often in JSON, but could also be in CSV, XML, and more.
+</Callout>
 
 Note that I will be using Google Chrome for the following steps, but you can do the same things with Firefox or Safari.
 
@@ -80,7 +84,7 @@ This tab shows all requests made by the page. When the page loads, it needs all 
 
 In our case, we are interested in the Apple stock market data that is displayed as a table on the webpage.
 
-Refresh the page then select the **Max** option one more time to retrieve all of the available data. Then search for the request containing `AAPL`, which the symbol used for Apple. It's also the symbol used in the page URL, so it's a good guess.
+Refresh the page then select the **Max** option one more time to retrieve all of the available data. Then search for the request containing `AAPL`, which the symbol used for Apple on stock markets. It's also the symbol used in the page URL, so it's a good guess.
 
 You'll notice one or more fetch requests starting with `AAPL`. This is very promising!
 
@@ -88,7 +92,7 @@ You'll notice one or more fetch requests starting with `AAPL`. This is very prom
 
 Do a right click on one of them and open it in a new tab. Wow! Do you recognize this syntax? It's JSON! And it looks like a look of data. 😏
 
-And if you look closer at the url, you'll notice that they are parameters like `symbol`, `interval`, `period1` and `period2`.
+And if you look closer at the url, you'll notice that they are parameters like `symbol`, `interval`, `period1` and `period2`. There are also `region` and `lang` parameters that might be different for you, depending on your location.
 
 `https://query1.finance.yahoo.com/v8/finance/chart/AAPL?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=AAPL&userYfid=true&lang=en-CA&region=CA`
 
@@ -98,7 +102,7 @@ Let's explore it more with code.
 
 ### Fetching the data
 
-Let's fetch the data coming from the URL we just discovered. To do that, we can write a simple script like below.
+Let's fetch the data coming from the API endpoint we just discovered. To do that, we can write a simple script like below.
 
 ```ts showLineNumbers filename="main.ts"
 const response = await fetch(
@@ -124,6 +128,12 @@ To access the timestamps, we have to:
 - then retrieve the first item of the array, which is an object
 - in this object, we get the `timestamp` array.
 
+It looks like this.
+
+```ts
+const timestamps = data.chart.result[0].timestamp;
+```
+
 To access the adjusted close prices, we have to:
 - get the `chart` object
 - then get the `result` array
@@ -132,6 +142,12 @@ To access the adjusted close prices, we have to:
 - then we get the `adjclose` array
 - we get the first item of the array, which is an object
 - in this object, we retrieve the `adjclose` values
+
+It looks like this.
+
+```ts
+const values = data.chart.result[0].indicators.adjclose[0].adjclose;
+```
 
 Don't worry. JSON are not always this complicated on the Web. And after a few projects, the JSON structure will be crystal clear for you! 💎
 
@@ -160,7 +176,7 @@ Let's check the last elements to be sure.
 
 Timestamps represent the duration since January 1st 1970. Here's it looks like its in seconds. But in JavaScript, it's in milliseconds. We can easily account for that.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="main.ts" {8, 11, 13}
 const response = await fetch(
   "https://query1.finance.yahoo.com/v8/finance/chart/AAPL?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=AAPL&userYfid=true&lang=en-CA&region=CA",
 );
@@ -168,40 +184,91 @@ const response = await fetch(
 const data = await response.json();
 
 const timestamps = data.chart.result[0].timestamp;
+const firstTimestamp = new Date(timestamps[0] * 1000);
 const lastTimestamp = new Date(timestamps[timestamps.length - 1] * 1000);
 
 const values = data.chart.result[0].indicators.adjclose[0].adjclose;
+const firstValue = values[0];
 const lastValue = values[values.length - 1];
 
-console.log({ lastTimestamp, lastValue });
+console.log({ firstTimestamp, lastTimestamp, firstValue, lastValue });
 ```
 
 This code logs these values.
 
 ```json
 {
-  lastTimestamp: 2025-02-05T18:48:30.000Z,
-  lastValue: 230.0799932861328
+  firstTimestamp: 1980-12-12T14:30:00.000Z,
+  lastTimestamp: 2025-02-05T14:30:00.000Z,
+  firstValue: 0.09883447736501694,
+  lastValue: 232.47000122070312
 }
 ```
 
-Which corresponds to what I am seeing on Yahoo's website as of February 5, 2025! We got our data! 🥳
+Apple indeed went public on December 12, 1980 with a share price of $0.10 according to [its website](https://investor.apple.com/faq/default.aspx#:~:text=When%20was%20Apple%E2%80%99s,was%20%24.10.) and the latest value correspond with what I am seeing on Yahoo's website as of February 5, 2025! We got our data! 🥳
 
-By the way, this technique is called *web scraping*. We'll do a full lesson about it later.
+
 
 ![A screenshot showing the Apple stock market value on Yahoo's website.](/assets/stock-market-simulator/latest-yahoo.png)
+
+The current URL has parameters for Apple, but we will want our code to work with any company. So let's extract some parameters values as variables.
+
+By using backticks, we can insert variables into the URL string. So instead of this:
+
+`https://query1.finance.yahoo.com/v8/finance/chart/AAPL?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=AAPL&userYfid=true&lang=en-CA&region=CA`
+
+We can make the call to the API general with `${symbol}`, `${period1}` and `${period2}`:
+
+`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=${period1}&period2=${period2}&symbol=${symbol}&userYfid=true&lang=en-CA&region=CA`
+
+For `period1`, we could set it to `0`, which means January 1st, 1970, because timestamps are the duration since January 1st, 1970. And for `period2`, we can use `Date.now()` which returns the number of milliseconds since January 1st, 1970, which should give us the latest data available.
+
+```ts showLineNumbers filename="main.ts" {1-7}
+const symbol = "AAPL";
+const period1 = 0;
+const period2 = Date.now();
+
+const response = await fetch(
+  `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=${period1}&period2=${period2}&symbol=${symbol}&userYfid=true&lang=en-CA&region=CA`,
+);
+
+const data = await response.json();
+
+const timestamps = data.chart.result[0].timestamp;
+const firstTimestamp = new Date(timestamps[0] * 1000);
+const lastTimestamp = new Date(timestamps[timestamps.length - 1] * 1000);
+
+const values = data.chart.result[0].indicators.adjclose[0].adjclose;
+const firstValue = values[0];
+const lastValue = values[values.length - 1];
+
+console.log({ firstTimestamp, lastTimestamp, firstValue, lastValue });
+```
+
+This code still logs this data, which means the API accepts our more general parameters!
+
+```json
+{
+  firstTimestamp: 1980-12-12T14:30:00.000Z,
+  lastTimestamp: 2025-02-05T14:30:00.000Z,
+  firstValue: 0.09883449226617813,
+  lastValue: 232.47000122070312
+}
+```
+
+By the way, this data gathering technique is called *web scraping*. The web is an amazing source of data and we'll do a full lesson about it later.
 
 ## Caching
 
 Currently, everytime we update `main.ts` and save it, the code is bein rerun and the data is being refetched.
 
-We don't want to submerge the Yahoo servers with our requests and get blacklisted... So let's cache the data.
+We don't want to submerge the Yahoo servers with our requests. We must respect their infrastructure. Also, we don't want to get blacklisted... 🫣 So let's cache the data.
 
 Caching can mean different things in different context, but here it would just involve writing the data to a local file and use the local file instead of fetching the data all the time.
 
 Basically, if the local file exists, we should use it. Otherwise, we should fetch the data.
 
-To check whether the file already exists on our machine, we can use the `exist` function from the Deno's standard library [@std/fs](https://jsr.io/@std/fs/doc/~/exists).
+To check whether the file already exists on our machine, we can use the `exists` function from the Deno's standard library [@std/fs](https://jsr.io/@std/fs/doc/~/exists) (*fs* stands for *file system*).
 
 Stop your terminal and install it by running `deno add jsr:@std/fs`, then rewatch `main.ts` by running `deno -A --watch --check main.ts`.
 
@@ -209,16 +276,18 @@ Create a new folder `data` where we will cache the data.
 
 The code below does the caching. Here's what's happening when you run it:
 - On line 1, we import the `exists` function from the standard library
-- On line 3, we create a variable for the company symbol.
-- On line 4, we use the `symbol` to create a path for the cached data
-- On line 6, we create a `let` variable for the data.
-- On line 7, we check if there is already a file for this company. If it's the case, we read the data from this file and put it inside the `data` variable (line 9).
-- If the file doesn't exist, the data is not cached. We fetch it (line 12-14), parse it as JSON and put it inside the `data` variable (line 15). Then we cache it by writing a JSON file with the company `path`.
+- On line 6, we use the `symbol` to create a path for the cached data
+- On line 8, we create a `let` variable for the data.
+- On line 9, we check if there is already a file for this company. If it's the case, we read the data from this file and put it inside the `data` variable (line 11).
+- If the file doesn't exist, the data is not cached. We fetch it (line 14-18), parse it as JSON and put it inside the `data` variable (line 15). Then we cache it by writing a JSON file with the company `path`.
+- By 21 and 22, the `data` variable contains data that has been read locally or fetched, so we can retrieve the timesamps and the values!
 
 ```ts showLineNumbers filename="main.ts"
 import { exists } from "@std/fs";
 
 const symbol = "AAPL";
+const period1 = 0;
+const period2 = Date.now();
 const path = `data/${symbol}.json`;
 
 let data;
@@ -228,41 +297,43 @@ if (await exists(path)) {
 } else {
   console.log("=> Fetching data...");
   const response = await fetch(
-    `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=${symbol}&userYfid=true&lang=en-CA&region=CA`,
+    `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=${period1}&period2=${period2}&symbol=${symbol}&userYfid=true&lang=en-CA&region=CA`,
   );
   data = await response.json();
   await Deno.writeTextFile(path, JSON.stringify(data));
 }
 
-// const timestamps = data.chart.result[0].timestamp;
-// const values = data.chart.result[0].indicators.adjclose[0].adjclose;
+const timestamps = data.chart.result[0].timestamp;
+const values = data.chart.result[0].indicators.adjclose[0].adjclose;
 ```
 
-The first time you'll run this code, you'll see the message from line 11 being logged in the terminal and you'll notice a new file `AAPL.json` being created in `data`.
+The first time you'll run this code, you'll see the message from line 13 being logged in the terminal and you'll notice a new file `AAPL.json` being created in `data`.
 
-The data is fetched and written to a file for next uses.
+The data has been fetched and written to a file for next uses. You can check what's in `AAPL.json` if you are curious!
 
 ![A screenshot showing the Apple stock market data being fetched.](/assets/stock-market-simulator/data-fetched-aapl.png)
 
-If you rerun `main.ts` by saving it again, you'll see the message logged is the one from line 8. You are now using the cached data! The data is not fetched anymore. It's retrieved from the local file!
+If you rerun `main.ts` by saving it again, you'll see the message logged is the one from line 10. You are now using the cached data! The data is not fetched anymore. It's retrieved from the local file!
 
 ![A screenshot showing the Apple stock market data being cached.](/assets/stock-market-simulator/data-cached-aapl.png)
 
-The beauty of this technique is that you can keep data cached for multiple companies. For example, replace `AAPL` with `GOOG` to get the historical stock prices of Alphabet (formely Google) and run the code.
+The beauty of this technique is that you can keep data cached for multiple companies. For example, replace `AAPL` in the `symbol` variable with `GOOG` to get the historical stock prices of Alphabet (formely Google) and run the code.
 
 You'll see another file `GOO.json` being created in data.
 
 If you switch back to `AAPL`, the data is still there! Still no need to fetch it.
 
-And if you want more up-to-date prices, just delete the files in `data`. Easy!
+And if you want more up-to-date prices, just delete the files in `data`, and rerun your code. Easy!
 
-Here, we are using the cache to avoid pinging Yahoo's servers too many times. But caching is also very often used to speed up things. For example, reading a local file is much faster than fetching data over the Internet.
+<Callout type="info" emoji="💡">
+    Here, we are using the cache to avoid pinging Yahoo's servers too many times. But caching is also very often used to speed up things. For example, reading a local file is much faster than fetching data over the Internet.
+</Callout>
 
 ## Cleaning
 
-The values are numbers and don't need any cleaning. But the timesamps are not very convenient to work with. Let's clean them!
+The values are numbers and don't need any cleaning. But the timesamps are not very convenient to work with. It would be better to convert them to dates.
 
-Before doing so, let's clean up our code first by putting everything we did so far in a `getData` function.
+Before doing so, let's clean up our code first by putting everything we did so far in a `getData` function. It will help keeping `main.ts` organized and make our code easier to understand and debug.
 
 Create a new folder `helpers` and make a new file `getData.ts` in it with the code below.
 
@@ -276,6 +347,8 @@ And the function returns the `timestamps` and `values` in an object.
 import { exists } from "@std/fs";
 
 export default async function getData(symbol: string) {
+  const period1 = 0;
+  const period2 = Date.now();
   const path = `data/${symbol}.json`;
 
   let data;
@@ -285,7 +358,7 @@ export default async function getData(symbol: string) {
   } else {
     console.log("=> Fetching data...");
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=${symbol}&userYfid=true&lang=en-CA&region=CA`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=${period1}&period2=${period2}&symbol=${symbol}&userYfid=true&lang=en-CA&region=CA`,
     );
     data = await response.json();
     await Deno.writeTextFile(path, JSON.stringify(data));
@@ -313,11 +386,11 @@ console.log(timestamps, values);
     You might be wondering what is going on with `const { timestamps, values }`. When you have an object, you can **destructure it** by extracting keys and putting them in variables of the same name directly. So here, since `getData` returns an object with the keys `timestamps` and `values`, we can destructure it to directly create the variables `timestamps` and `values` variables with the relevant data.
 </Callout>
 
-Here's how eveything you look now. You can click on the image to make it bigger.
+Here's how eveything should look now. You can click on the image to make it bigger.
 
 ![A screenshot showing main.ts and getData.ts.](/assets/stock-market-simulator/refactor.png)
 
-To clean up our timesamps, let's create another function `cleanTimestamps` in `helpers`.
+Now, to clean up our timesamps, let's create another function `cleanTimestamps` in `helpers`.
 
 This function expects a parameter `timestamps` that should be an array of numbers, as indicated by the type `number[]`.
 
@@ -339,11 +412,13 @@ export default function cleanTimestamps(
 
 We can import this function in `getData.ts` and pass the raw timestamps to it.
 
-```ts showLineNumbers filename="getData.ts" {2, 20}
+```ts showLineNumbers filename="getData.ts" {2, 22}
 import { exists } from "@std/fs";
 import cleanTimestamps from "./cleanTimestamps.ts";
 
 export default async function getData(symbol: string) {
+  const period1 = 0;
+  const period2 = Date.now();
   const path = `data/${symbol}.json`;
 
   let data;
@@ -353,7 +428,7 @@ export default async function getData(symbol: string) {
   } else {
     console.log("=> Fetching data...");
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=${symbol}&userYfid=true&lang=en-CA&region=CA`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=${period1}&period2=${period2}&symbol=${symbol}&userYfid=true&lang=en-CA&region=CA`,
     );
     data = await response.json();
     await Deno.writeTextFile(path, JSON.stringify(data));
@@ -495,7 +570,7 @@ Let's create another function `getFinalAmount` in `helpers`. This function will 
 - The `startDate` which is the `Date` of the investment
 - The `dailyStockData`, which is an array of objects with:
   - a key `percChange` with a value of type `number`
-  - a key `date` with a value of type `Date``
+  - a key `date` with a value of type `Date`
 
 Note that there are other keys in the `dailyStockData` objects, but we don't need them here, so there is no need to specify them.
 
@@ -533,7 +608,7 @@ In `main.ts`, we can create a variable `amount` and `startDate` to store the ini
 
 We store the result of the function `getFinalAmount` into a new variable `finalAmount`.
 
-```ts showLineNumbers filename="main.ts" {2, 13-15}
+```ts showLineNumbers filename="main.ts" {2, 6-7, 13-15}
 import getData from "./helpers/getData.ts";
 import getFinalAmount from "./helpers/getFinalAmount.ts";
 import restructureData from "./helpers/restructureData.ts";
@@ -551,7 +626,7 @@ const finalAmount = getFinalAmount(amount, startDate, dailyStockData);
 console.log(finalAmount);
 ```
 
-And here's the result! It works! You would have $3,245 today (as of Feb. 2025) if you had invested $1,000 in Apple in January 2020.
+And here's the result! It works! You would have $3,266 today (as of Feb. 2025) if you had invested $1,000 in Apple in January 2020.
 
 ![A screenshot showing the final amount invested.](/assets/stock-market-simulator/final-amount.png)
 
@@ -561,7 +636,7 @@ Let's create a function to better log the results.
 
 In `helpers`, create the function `logResult`.
 
-For the `startDate`, we can convert it to text by using `toISOString`. To keep only the date, we split the text on "T" and keep only the first part, which is just the date without time.
+For the `startDate`, we can convert it to text by using `toISOString`, which returns the investment date in this format: `"2020-01-01T00:00:00.000Z"`. To keep only the date, we split the text on "T". The `split` method returns an array with `["2020-01-01", "00:00:00.000Z"]`. Since we just want the date, we use the index `[0]`.
 
 ```ts showLineNumbers filename="logResult.ts"
 export default function logResult(
@@ -601,15 +676,17 @@ logResult(amount, symbol, startDate, finalAmount);
 
 Beautiful, isn't it? 😍
 
+![A VS Code screenshot showing a script simulating the stock market](/assets/stock-market-simulator/final-result.png)
+
 ## Wait a minute...
 
 Everything works fine with a `startDate` of January 2020... But what would happen if the start date was in 1970, before Apple was publicly traded?
 
 It's impossible! Our code should warn our user!
 
-Update `startDate` with `"1950-01-01"` to test things out. It's returning an amount, but should be throwing an error.
+Update `startDate` with `"1950-01-01"` to test things out... It's returning an amount, but should be throwing an error.
 
-We can update `main.ts` to compare the `startDate` with the first date in `timestamps`.
+We can update `main.ts` to compare the `startDate` with the first date in `timestamps`. If the `startDate` is earlier than the first `timestamp`, we throw an error with a message.
 
 ```ts showLineNumbers filename="main.ts" {8, 12-16}
 import getData from "./helpers/getData.ts";
@@ -635,6 +712,9 @@ const finalAmount = getFinalAmount(amount, startDate, dailyStockData);
 
 logResult(amount, symbol, startDate, finalAmount);
 ```
+<Callout type="info" emoji="💡">
+    Throwing errors is very useful to stop running your script and provide a message to the user (or yourself). Always aim for clear messages that will help you debug easily or will help the user act accordingly to avoid problems.
+</Callout>
 
 That's better. We won't return impossible results now! You can safely play with different `startDate`.
 
@@ -642,4 +722,13 @@ That's better. We won't return impossible results now! You can safely play with 
 
 ## Conclusion
 
-Test with different companies and different dates!
+Congratulations! You've learnt many things in this project. We dig into Yahoo's website to find their API and then fetch it. We then processed this data to calculate returns based on a invested amount on a specific date. It's a lot!
+
+Now, you can play more with this script. Search for other companies on Yahoo's website and copy-paste the symbols. Test different amounts and investment date!
+
+Or tweak the code to add more functionnalities. Here are some ideas:
+- Compare the returns for multiple companies
+- Invest in multiple companies at once
+- Buy and sell shares at different dates
+
+Have fun! 💃🕺
