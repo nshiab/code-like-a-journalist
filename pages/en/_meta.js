@@ -4,6 +4,7 @@ export default {
     "first-steps": "First steps 🧑‍🎓",
     "saving-account-calculator": "Savings account calculator 💸",
     "pushing-further": "Pushing further 🚀",
+    "stock-market-simulator": "Stock market simulator 📈",
     "ninja-moves": "Ninja moves 🥷",
     others: "Inspiring people & reads 📚",
     "more": "More to come...",
