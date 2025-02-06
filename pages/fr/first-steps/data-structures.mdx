@@ -197,6 +197,20 @@ console.log(names);
 // => [ "James", "John", "Patricia", "Jennifer", "Nael" ]
 ```
 
+#### `.slice()`
+
+La méthode `.slice()` crée une copie de la liste. Vous pouvez spécifier un index de début et un index de fin pour copier seulement une partie de la liste.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+// Commence à l'index 0 et s'arrête à l'index 2, non inclus
+const namesSubset = names.slice(0, 2);
+
+console.log(namesSubset);
+// Logs => [ "James", "John" ]
+```
+
 #### `.sort()`
 
 La méthode `.sort()` trie la liste par ordre croissant par défaut.

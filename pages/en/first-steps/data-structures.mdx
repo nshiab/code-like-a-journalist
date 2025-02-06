@@ -198,6 +198,20 @@ console.log(names);
 // Logs => [ "James", "John", "Patricia", "Jennifer", "Nael" ]
 ```
 
+#### `.slice()`
+
+The `.slice()` method creates a copy of the array. You can specify a starting index and a stopping index to copy just a portion of the array.
+
+```ts showLineNumbers filename="main.ts"
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+// Start at index 0 and end at index 2, not included
+const namesSubset = names.slice(0, 2);
+
+console.log(namesSubset);
+// Logs => [ "James", "John" ]
+```
+
 #### `.sort()`
 
 The `.sort()` method sorts arrays containing strings in ascending order by default.
