@@ -242,7 +242,7 @@ To explore the data, we can use the `.summarize()` method. It aggregates the dat
 
 Let's start with `time`. We specify the `categories` as being the values in the column `city` to have the details for each city.
 
-```ts showLineNumbers filename="main.ts" {22-24}
+```ts showLineNumbers filename="main.ts" {22-25}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
@@ -266,6 +266,7 @@ await temperatures.cache(async () => {
 
 await temperatures.summarize({
   values: "time",
+  categories: "city"
 });
 await temperatures.logTable();
 
@@ -277,6 +278,10 @@ The `min` and `max` show that we have over a hundred years worth of daily temper
 But there is a problem... The `count` columns has different values for each city. In theory, we should have around 44,195 days in 121 years. We see less than that here. It means we will have to deal with missing data...
 
 ![A screenshot showing the time values aggregated.](/assets/simple-data-analysis/tabular-data/time.png)
+<Callout type="info" emoji="💡">
+    If the table layout is displayed weirdly, it's because the width of the table is bigger than the width of your terminal. Do a right click on the terminal and look for `Toggle size with content width`.
+</Callout>
+
 
 Let's now check what we have in `t`, which stands for *temperature*. Just replace `"time"` with `"t"` on line 23.
 
@@ -284,9 +289,11 @@ Hmm... Not only we have missing rows in our data, as we saw just above, we also 
 
 ![A screenshot showing the temperature values aggregated.](/assets/simple-data-analysis/tabular-data/t.png)
 
-Let's take of this right away, but using the method `.removeMissing()`. It removes any rows with a `null` value. You can also specify specific columns if you want, but it's not necessary here.
+Let's take care of this right away by using the method `.removeMissing()`. It removes any rows with a `null` value. You can also specify specific columns if you want, but it's not necessary here.
 
-```ts showLineNumbers filename="main.ts" {22}
+Let's put that in the cache, while we are at it.
+
+```ts showLineNumbers filename="main.ts" {21}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
@@ -306,10 +313,13 @@ await temperatures.cache(async () => {
   // await cities.logTable();
 
   await temperatures.join(cities);
+
+  await temperatures.removeMissing();
 });
 
 await temperatures.summarize({
   values: "time",
+  categories: "city",
 });
 await temperatures.logTable();
 
@@ -317,6 +327,8 @@ await sdb.done();
 ```
 
 Here we go! No more null temperatures.
+
+Since we changed the code in the `.cache()` method, you'll notice that the message in the terminal indicates that the code is being run again. Pretty clever, huh? 😉
 
 ![A screenshot showing the removeMissing method.](/assets/simple-data-analysis/tabular-data/remove-missing.png)
 
