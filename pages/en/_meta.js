@@ -5,6 +5,7 @@ export default {
     "saving-account-calculator": "Savings account calculator 💸",
     "pushing-further": "Pushing further 🚀",
     "stock-market-simulator": "Stock market simulator 📈",
+    "simple-data-analysis": "The SDA library 🤓",
     "ninja-moves": "Ninja moves 🥷",
     inspirations: "Inspiring people & content 📚",
     "more": "More to come...",
