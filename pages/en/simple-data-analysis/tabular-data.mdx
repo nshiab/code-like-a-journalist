@@ -42,7 +42,7 @@ After running the command, your terminal will display a description of the creat
 - `sda/helpers`: An empty folder for now, but you can use it to store your functions.
 - `sda/data`: An empty folder for now, but this is where we will store our data for analysis.
 - `sda/output`: An empty folder for now. This is where we will write our results into files.
-- `README.md`: A text file with some information about the project.
+- `README.md`: A text file containing some information about the project. You can modify it as you wish.
 
 ### Libraries installed
 
@@ -285,7 +285,7 @@ But there is a problem... The `count` column has different values for each city.
 ![A screenshot showing the time values aggregated.](/assets/simple-data-analysis/tabular-data/time.png)
 
 <Callout type="info" emoji="💡">
-    If the table layout is displayed weirdly, it's because the width of the table is bigger than the width of your terminal. Right-click on the terminal and look for `Toggle size with content width`. There is also a handy shortcut that I use all the time to do that: `OPTION` + `Z` on Mac and `ALT` + `Z` on PC.
+    If the table layout is displayed weirdly in your terminal, it's because the width of the table is bigger than the width of your terminal. Right-click on the terminal and look for `Toggle size with content width`. There is also a handy shortcut that I use all the time to do that: `OPTION` + `Z` on Mac and `ALT` + `Z` on PC.
 </Callout>
 
 Let's now check what we have in `t`, which stands for *temperature*. Just replace `"time"` with `"t"` on line 23.
@@ -482,7 +482,7 @@ await sdb.done();
 
 This is looking very good. Thanks to the `count`, we can clearly see where data is missing.
 
-Of course, the `"[2020-2049]"` bins are incomplete, but so is the `[1990-2019]` bin for `MONTREAL`. In theory, the 30-year bins should have 10,957 days.
+Of course, the `[2020-2049]` bins are incomplete, but so is the `[1990-2019]` bin for `MONTREAL`. In theory, the 30-year bins should have around 10,957 days.
 
 ![A screenshot showing the summary method.](/assets/simple-data-analysis/tabular-data/summary.png)
 
