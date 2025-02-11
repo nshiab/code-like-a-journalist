@@ -1,4 +1,4 @@
-const YouTubeEmbed = ({ videoId, lang = "en" }) => {
+const YouTube = ({ videoId, lang = "en" }) => {
     return (
         <>
             {lang === "fr" && (
@@ -49,4 +49,4 @@ const YouTubeEmbed = ({ videoId, lang = "en" }) => {
     );
 };
 
-export default YouTubeEmbed;
+export default YouTube;
