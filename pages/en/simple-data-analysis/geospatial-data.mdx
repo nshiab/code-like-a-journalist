@@ -1,0 +1,36 @@
+---
+title: How to analyze geospatial data with the simple-data-analysis library
+description: In this lesson, we learn how open, process, join and visualize geospatial data.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Geospatial analysis with the Simple Data Analysis library
+
+In this lesson, we will learn how to use the open-source library I created: [simple-data-analysis](https://github.com/nshiab/simple-data-analysis). We will analyze wildfires in Canadian provinces. The question we will answer is:
+
+- How much have wildfires burnt in each Canadian province in 2023?
+
+To do that, we will convert a CSV file with the latitude and longitude of wildfires to point geometries, open a geojson file containing the provinces boundaries, and do a spatial join to check which fire is in which province.
+
+If you have a minute, please add a ⭐ to the library's [GitHub repository](https://github.com/nshiab/simple-data-analysis). It's always nice to know your open-source work is appreciated. 😊
+
+Note that I expect you to have at least completed the **First steps 🧑‍🎓** and **Pushing further 🚀** sections, as the previous lesson about [Tabular data lesson](/simple-data-analysis/tabular-data) from the current section.
+
+<NoticeIntro />
+
+## Setup
+
+As we did in the previous lesson, create a new folder on your computer and run command: `deno -A jsr:@nshiab/setup-sda`
+
+After running the command, your terminal will display a description of the created files and installed libraries.
+
+Run the suggested task to run and watch our code: `deno task sda`
+
+
+## Conclusion
+
+Something something
+
+<NoticeEnd />
