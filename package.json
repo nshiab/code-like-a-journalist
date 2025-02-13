@@ -1,6 +1,6 @@
 {
   "name": "code-like-a-journalist",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "description": "A free and open-source online course for anyone interested in data analysis and data visualization with JavaScript/TypeScript",
   "scripts": {
     "dev": "next dev",
