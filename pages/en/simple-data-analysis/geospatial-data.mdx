@@ -561,6 +561,8 @@ Click on the image to make it bigger.
 
 ## Exporting the data
 
+### Tabular data
+
 If you want to save a table, you can use the `writeData` method. You can write CSV, JSON and Parquet files.
 
 ```ts showLineNumbers filename="main.ts" {38}
@@ -606,6 +608,8 @@ await firesInsideProvinces.writeData("./sda/output/firesInsideProvinces.csv");
 await sdb.done();
 ```
 ![A screenshot showing a CSV file.](/assets/simple-data-analysis/geospatial-data/write.png)
+
+### Geospatial data
 
 If we want, we can also write our original tables with the geometries with `writeGeoData`. You can write them as GeoJSON or GeoParquet files.
 
