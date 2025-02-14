@@ -5,8 +5,11 @@ description: Learn how to fetch stock market data and code a returns simulator w
 
 import { Callout } from "nextra/components";
 import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+import YouTube from "../../components/YouTube.jsx"
 
 # Stock market simulator 📈
+
+<YouTube videoId="XVVQJFS4sZs"/>
 
 Welcome to this new project! We are going to fetch historical stock market data and use it to estimate how much we would have gained or lost by investing in publicly traded companies.
 
@@ -182,7 +185,7 @@ Let's check the first and last elements to be sure.
 
 Timestamps represent the duration since January 1, 1970. Here, they appear to be in seconds. However, in JavaScript, timestamps are in milliseconds. We can easily account for that.
 
-```ts showLineNumbers filename="main.ts" {8, 11, 13}
+```ts showLineNumbers filename="main.ts" {8-9, 12-13, 15}
 const response = await fetch(
   "https://query1.finance.yahoo.com/v8/finance/chart/AAPL?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=AAPL&userYfid=true&lang=en-CA&region=CA",
 );
