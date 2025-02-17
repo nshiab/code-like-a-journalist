@@ -1,42 +1,43 @@
 ---
-title: How to analyze geospatial data with the simple-data-analysis library
-description: In this lesson, we learn how to open, process, join, and visualize geospatial data.
+title: Comment analyser des données géospatiales avec la bibliothèque simple-data-analysis
+description: Dans cette leçon, nous apprenons à ouvrir, traiter, joindre et visualiser des données géospatiales.
 ---
 
 import { Callout } from 'nextra/components'
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
-# Geospatial analysis with the simple-data-analysis library
+# Analyse géospatiale avec la bibliothèque simple-data-analysis
 
-In this lesson, we will learn how to use the open-source library I created: [simple-data-analysis](https://github.com/nshiab/simple-data-analysis). This library allows you to work with both tabular and geospatial data. Here, we will analyze wildfires in Canadian provinces to answer the following question:
+Dans cette leçon, nous allons apprendre à utiliser la bibliothèque en code ouvert que j’ai créée : [simple-data-analysis](https://github.com/nshiab/simple-data-analysis). Cette bibliothèque permet de travailler à la fois avec des données tabulaires et géospatiales. Ici, nous allons analyser des feux de forêt au Canada afin de répondre à la question suivante :
 
-- How much land have wildfires burned in each Canadian province in 2023?
+- Quelle superficie les feux de forêt ont-ils brûlée dans chaque province canadienne en 2023 ?
 
-To do that, we will convert a CSV file containing the latitude and longitude of wildfires into point geometries, open a GeoJSON file with provincial boundaries, and perform a spatial join to determine which fire occurred in which province.
+Pour cela, nous allons convertir un fichier CSV contenant la latitude et la longitude des feux en géométries, ouvrir un fichier GeoJSON contenant les frontières provinciales et effectuer une jointure spatiale pour déterminer dans quelle province chaque feu s'est produit.
 
-If you have a moment, please consider adding a ⭐ to the library's [GitHub repository](https://github.com/nshiab/simple-data-analysis). It's always nice to know your open-source work is appreciated. 😊
+Si vous avez un moment, n’hésitez pas à ajouter un ⭐ à la [page GitHub](https://github.com/nshiab/simple-data-analysis) de la bibliothèque. C’est toujours agréable de savoir que son travail en code ouvert est apprécié. 😊
 
-Note that you should have already completed the **First steps 🧑‍🎓** and **Pushing further 🚀** sections, as well as the previous lesson on **[Tabular data](/simple-data-analysis/tabular-data)** from this section.
+Notez que vous devriez déjà avoir complété les sections **Premiers pas 🧑‍🎓** et **Aller plus loin 🚀**, ainsi que la leçon précédente sur **[Les données tabulaires](/simple-data-analysis/tabular-data)** de cette section.
 
-<NoticeIntro />
+<NoticeIntro lang="fr" />
 
-## Setup
+## Configuration
 
-As we did in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `deno -A jsr:@nshiab/setup-sda`
+Comme dans la leçon précédente, créez un nouveau dossier sur votre ordinateur, ouvrez-le avec VS Code et exécutez la commande suivante dans le terminal : `deno -A jsr:@nshiab/setup-sda`
 
-After running this command, your terminal will display a description of the created files and installed libraries.
+Après avoir exécuté cette commande, votre terminal affichera une description des fichiers créés et des bibliothèques installées.
 
-Next, run the suggested task to start and watch `sda/main.ts`: `deno task sda`
+Ensuite, exécutez la tâche suggérée pour lancer et surveiller `sda/main.ts` : `deno task sda`
 
-![A screenshot showing VS Code after running setup-sda.](/assets/simple-data-analysis/geospatial-data/setup.png)
+![Une capture d'écran montrant VS Code après l'exécution de setup-sda.](/assets/simple-data-analysis/geospatial-data/setup.png)
 
-## Loading and caching data
+## Téléchargement et mise en cache des données
 
-### Wildfires
+### Feux de forêt
 
-Let's start by fetching the 2023 Canadian wildfire data. 🔥 I uploaded the dataset to [GitHub](https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv). This CSV file comes from Natural Resources Canada.
+Commençons par récupérer les données des feux de forêt canadiens de 2023. 🔥 J’ai téléversé l’ensemble des données sur [GitHub](https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv). Ce fichier CSV provient de Ressources naturelles Canada.
 
-First, we create a new table and use the `loadData` method to load the data. Then, we use `logTable` to display it in the terminal.
+Tout d’abord, nous créons une nouvelle table et utilisons la méthode `loadData` pour charger les données. Ensuite, nous utilisons `logTable` pour les afficher dans le terminal.
+
 
 ```ts showLineNumbers filename="main.ts" {5-9}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -51,11 +52,11 @@ await fires.logTable();
 
 await sdb.done();
 ```
-![A screenshot showing the 2023 Canadian wildfires data in VS Code terminal.](/assets/simple-data-analysis/geospatial-data/log-fires.png)
+![Une capture d'écran montrant les données des feux de forêt canadiens de 2023 dans le terminal VS Code.](/assets/simple-data-analysis/geospatial-data/log-fires.png)
 
-As we can see, we have around 7,000 wildfires. The latitude and longitude values are stored in two separate columns. To convert these into geometries that allow us to use geospatial methods, we can use the `points` method.
+Comme nous pouvons le voir, il y a environ 7 000 feux de forêt. Les valeurs de latitude et de longitude sont stockées dans deux colonnes distinctes. Pour les convertir en géométries nous permettant d’utiliser des méthodes géospatiales, nous pouvons utiliser la méthode `points`.
 
-This method requires three arguments: the name of the column storing latitude, the name of the column storing longitude, and the name of the new column where the point geometries will be stored, which I usually name `geom`.
+Cette méthode requiert trois arguments : le nom de la colonne contenant la latitude, le nom de la colonne contenant la longitude et le nom de la nouvelle colonne où seront stockées les géométries, que j’appelle généralement `geom`.
 
 
 ```ts showLineNumbers filename="main.ts" {9}
@@ -72,13 +73,13 @@ await fires.logTable();
 
 await sdb.done();
 ```
-![A screenshot showing the 2023 Canadian wildfires as point geometries.](/assets/simple-data-analysis/geospatial-data/log-fires-points.png)
+![Une capture d'écran montrant les feux de forêt canadiens de 2023 sous forme de géométries ponctuelles.](/assets/simple-data-analysis/geospatial-data/log-fires-points.png)
 
-This looks good. We can cache the data for now instead of fetching it every time. This will also speed up our code execution.
+Les données semblent bonnes. Nous pouvons mettre les données en cache pour éviter de les récupérer à chaque exécution. Cela accélérera également le tout.
 
-The `cacheVerbose` option will tell SDA to log extra information in the terminal regarding the cache, such as the time saved by using it.
+L’option `cacheVerbose` permet à SDA d’afficher des informations supplémentaires dans le terminal concernant la mise en cache, notamment le temps économisé grâce à son utilisation.
 
-The first time you run this code, the data will be fetched and stored in a new folder called `.sda-cache` in your project. On subsequent runs, SDA will use the cached data instead of refetching it, saving resources and making data retrieval faster!
+La première fois que vous exécutez ce code, les données seront récupérées et stockées dans un nouveau dossier appelé `.sda-cache` dans votre projet. Lors des exécutions suivantes, SDA utilisera les données mises en cache au lieu de les récupérer à nouveau, ce qui permet d’économiser des ressources et d’accélérer l’accès aux données !
 
 ```ts showLineNumbers filename="main.ts" {6, 11} /{ cacheVerbose: true }/
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -100,13 +101,13 @@ await sdb.done();
 
 ### Provinces
 
-We can now focus on retrieving the Canadian province boundaries. I uploaded a GeoJSON file on [GitHub](https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json).
+Nous allons maintenant nous concentrer sur la récupération des frontières des provinces canadiennes. J’ai téléversé un fichier GeoJSON sur [GitHub](https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json).
 
-GeoJSON is a widely used format for geospatial data. It typically consists of an object that stores an array of `features`. Each feature has a geometry (which contains latitude and longitude coordinates or equivalent) and properties (which store metadata).
+GeoJSON est un format largement utilisé pour les données géospatiales. Il est pratique car il s'agit simplement d'un fichier JSON (facile à utiliser en TypeScript) structuré d’une manière spécifique. Il consiste généralement en un objet contenant un tableau de `features`. Chaque entité possède une géométrie (qui contient des coordonnées en latitude et longitude ou équivalentes) et des propriétés (qui stockent des métadonnées).
 
-For example, the Canadian provinces GeoJSON is structured as shown below, with each province represented as a `feature` object. The `geometry` field contains the province's borders as `coordinates`, and the `properties` field includes metadata such as the province's name in both French and English (since Canada is bilingual 🇨🇦).
+Par exemple, le fichier GeoJSON des provinces canadiennes est structuré comme ci-dessous, chaque province étant représentée par un objet `feature`. Le champ `geometry` contient les frontières de la province sous forme de `coordinates`, et le champ `properties` inclut des métadonnées telles que le nom de la province en français et en anglais (puisque le Canada est bilingue 🇨🇦).
 
-There are different types of geometries in GeoJSON, such as `Point`, `Polygon`, and `MultiPolygon`, as seen in this dataset.
+Il existe différents types de géométries en GeoJSON, comme `Point`, `Polygon` et `MultiPolygon`, comme on peut le voir dans cet ensemble de données.
 
 ```json
 {
@@ -136,9 +137,9 @@ There are different types of geometries in GeoJSON, such as `Point`, `Polygon`, 
 }
 ```
 
-Luckily, we don't have to deal with nested objects. SDA will convert all of this into an easy-to-wrangle data table! 😅
+Heureusement, nous n'avons pas à manipuler ce genre d'objects avec SDA. La bibliothèque va convertir tout cela en une table de données facile à exploiter ! 😅
 
-To fetch the wildfires CSV file, we used `loadData`, but since the provinces data is in a geospatial format, we will use `loadGeoData` instead. BTW, this method can load all kinds of geospatial formats, not just GeoJSON. 🤓
+Pour récupérer le fichier CSV des feux de forêt, nous avons utilisé `loadData`, mais comme les données des provinces sont dans un format géospatial, nous allons utiliser `loadGeoData` à la place. D’ailleurs, cette méthode peut charger tous types de formats géospatiaux, pas seulement les GeoJSON. 🤓
 
 ```ts showLineNumbers filename="main.ts" {14-18}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -162,11 +163,11 @@ await provinces.logTable();
 
 await sdb.done();
 ```
-![A screenshot showing the Canadian provinces data in VS Code terminal.](/assets/simple-data-analysis/geospatial-data/log-provinces.png)
+![Une capture d'écran montrant les données des provinces canadiennes dans le terminal VS Code.](/assets/simple-data-analysis/geospatial-data/log-provinces.png)
 
-As we can see in the screenshot above, each GeoJSON feature has been transformed into a row in the table. The `geometry` coordinates are stored in the `geom` column by default, and all the properties have been restructured as columns. Very handy!
+Comme on peut le voir dans la capture d’écran ci-dessus, chaque entité GeoJSON a été transformée en une ligne dans la table. Les coordonnées des `geometry` sont stockées par défaut dans la colonne `geom`, et toutes les propriétés ont été restructurées sous forme de colonnes. Très pratique !
 
-The data doesn't need to be transformed, so let's cache it too!
+Les données n’ont pas besoin d’être transformées, donc mettons-les en cache aussi !
 
 
 ```ts showLineNumbers filename="main.ts" {15, 19}
@@ -194,20 +195,20 @@ await provinces.logTable();
 await sdb.done();
 ```
 
-Using the cache makes the code run 11 times faster on my machine! And I'm sure it's speeding things up on your end too. 😁
+L'utilisation du cache rend le code 11 fois plus rapide sur ma machine ! Et je suis sûr que cela accélère aussi les choses de votre côté. 😁
 
-![A screenshot showing the result of caching the Canadian provinces boundaries.](/assets/simple-data-analysis/geospatial-data/provinces-cache.png)
+![Une capture d'écran montrant le résultat de la mise en cache des limites des provinces canadiennes.](/assets/simple-data-analysis/geospatial-data/provinces-cache.png)
 
-## Spatial join
+## Jointure spatiale
 
-Now that we have our fires and provinces, we can perform a **spatial join**. We’ll use the `joinGeo` method to match each fire with the province it occurred in.
+Maintenant que nous avons nos feux et nos provinces, nous pouvons effectuer une **jointure spatiale**. Nous allons utiliser la méthode `joinGeo` pour associer chaque feu à la province où il s'est produit.
 
-On lines 22-24, we call the `joinGeo` method on the `fires` table. As arguments, we pass:
-- the `provinces` table, so each fire attempts to match with a province,
-- the `"inside"` condition (also called a predicate), meaning each fire will be matched with the province it falls within,
-- the `outputTable` option to return the result of the join as a new table, which we store in the variable `firesInsideProvinces`.
+Aux lignes 22-24, nous appelons la méthode `joinGeo` sur la table `fires`. Nous lui passons les arguments suivants :
+- la table `provinces`, afin que chaque feu tente de correspondre à une province,
+- la condition `"inside"` (aussi appelée prédicat), pour que chaque feu soit associé à la province dans laquelle il se trouve,
+- l’option `outputTable`, qui permet de stocker le résultat de la jointure dans une nouvelle table, que nous enregistrons dans la variable `firesInsideProvinces`.
 
-Finally, we log the new table `firesInsideProvinces` on line 25.
+Enfin, nous affichons la nouvelle table `firesInsideProvinces` à la ligne 25.
 
 
 ```ts showLineNumbers filename="main.ts" {22-25}
@@ -239,27 +240,28 @@ await firesInsideProvinces.logTable();
 
 await sdb.done();
 ```
-![A screenshot showing the result joining fires and provinces.](/assets/simple-data-analysis/geospatial-data/join.png)
+![Une capture d'écran montrant le résultat de la jointure entre les feux et les provinces.](/assets/simple-data-analysis/geospatial-data/join.png)
 
 <Callout type="info" emoji="💡">
-    If the table layout appears distorted in your terminal, it's likely because the table's width exceeds the terminal's width. Right-click on the terminal and look for `Toggle size with content width`. There's also a handy shortcut I use all the time: `OPTION` + `Z` on Mac and `ALT` + `Z` on PC.
+    Si la mise en page de la table semble déformée dans votre terminal, c'est probablement parce que sa largeur dépasse celle de votre terminal. Faites un clic droit sur le terminal et recherchez l'option `Toggle size with content width`. Il existe aussi un raccourci pratique que j’utilise tout le temps : `OPTION` + `Z` sur Mac et `ALT` + `Z` sur PC.
 </Callout>
 
-As you can see, each fire is now matched with a province! Thanks to the spatial join, we now know in which province each fire occurred.
+Comme vous pouvez le voir, chaque feu est maintenant associé à une province ! Grâce à la jointure spatiale, nous savons dans quelle province chaque feu s'est produit.
 
-## Summarizing
+## Agrégation des données
 
-Now, it's very easy to answer our question:
+Nous pouvons maintenant répondre très facilement à notre question :
 
-- How much land did wildfires burn in each Canadian province in 2023?
+- Quelle superficie les feux de forêt ont-ils brûlée dans chaque province canadienne en 2023 ?
 
-We can use the `summarize` method on the `firesInsideProvinces` table.
+Nous utilisons la méthode `summarize` sur la table `firesInsideProvinces`.
 
-We pass the following parameters to the method:
-- The `hectares` column as the values,
-- The `nameEnglish` column as categories, so we get results for each province,
-- The `count` and `sum` functions for the `hectares` values,
-- The `decimals: 0` option to round the values.
+Nous passons les paramètres suivants à la méthode :
+- La colonne `hectares` en tant que valeurs,
+- La colonne `nameEnglish` comme catégorie, afin d’obtenir des résultats pour chaque province,
+- Les fonctions `count` et `sum` pour les valeurs de `hectares`,
+- L’option `decimals: 0` pour arrondir les valeurs.
+
 
 
 ```ts showLineNumbers filename="main.ts" {25-30}
@@ -297,13 +299,13 @@ await firesInsideProvinces.logTable();
 
 await sdb.done();
 ```
-![A screenshot showing the number of fires in each Canadian province.](/assets/simple-data-analysis/geospatial-data/summary.png)
+![Une capture d'écran montrant le nombre de feux dans chaque province canadienne.](/assets/simple-data-analysis/geospatial-data/summary.png)
 
-We now have the number of fires and the total area burned in each province. Of course, this is an approximation—some fires may have crossed provincial borders, which we haven’t accounted for here.
+Nous avons maintenant le nombre de feux et la superficie totale brûlée dans chaque province. Bien sûr, il s’agit d’une approximation—certains feux ont peut-être traversé les frontières provinciales, ce que nous n’avons pas pris en compte ici.
 
-If we had the fire perimeters as polygons, we could achieve a more precise analysis using the [`intersection`](https://jsr.io/@nshiab/simple-data-analysis/doc/web/~/SimpleWebTable.prototype.intersection) method to compute the overlap between each fire and each province. Maybe we'll cover that in another lesson later!
+Si nous avions les périmètres des feux sous forme de polygones, nous pourrions réaliser une analyse plus précise en utilisant la méthode [`intersection`](https://jsr.io/@nshiab/simple-data-analysis/doc/web/~/SimpleWebTable.prototype.intersection) pour calculer le chevauchement entre chaque feu et chaque province. Peut-être que nous aborderons cela dans une autre leçon plus tard !
 
-For now, let's make our data more presentable by renaming the columns and sorting the rows.
+Pour l’instant, rendons nos données plus lisibles en renommant les colonnes et en triant les lignes.
 
 
 ```ts showLineNumbers filename="main.ts" {31-35}
@@ -346,13 +348,14 @@ await firesInsideProvinces.logTable();
 
 await sdb.done();
 ```
-![A screenshot showing new column names.](/assets/simple-data-analysis/geospatial-data/renamed.png)
+![Une capture d'écran montrant les nouveaux noms de colonnes.](/assets/simple-data-analysis/geospatial-data/renamed.png)
 
-## Visualizing the data
+## Visualisation des données
 
-### In the terminal
+### Dans le terminal
 
-We can represent our final table as a bar chart directly in the terminal using the `logBarChart` method.
+Nous pouvons représenter notre table finale sous forme de diagramme à barres directement dans le terminal en utilisant la méthode `logBarChart`.
+
 
 ```ts showLineNumbers filename="main.ts" {38}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -396,14 +399,13 @@ await firesInsideProvinces.logBarChart("nameEnglish", "burntArea");
 
 await sdb.done();
 ```
-![A screenshot showing a bar chart in the terminal.](/assets/simple-data-analysis/geospatial-data/bar-chart.png)
+![Une capture d'écran montrant un diagramme à barres dans le terminal.](/assets/simple-data-analysis/geospatial-data/bar-chart.png)
 
-### Saving a chart
+### Enregistrement d'un graphique
 
-We can also save a chart using [Plot](https://github.com/observablehq/plot), which has been pre-installed as part of the `setup-sda` setup.
+Nous pouvons également enregistrer un graphique en utilisant [Plot](https://github.com/observablehq/plot), qui a été préinstallé lors de la configuration avec `setup-sda`.
 
-Don't worry about the syntax for now—we'll cover Plot in detail in a future lesson.
-
+Ne vous inquiétez pas pour la syntaxe pour l’instant. Nous aborderons Plot en détail dans une leçon future.
 
 ```ts showLineNumbers filename="main.ts" {2, 39-55}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -465,19 +467,19 @@ await firesInsideProvinces.writeChart(chart, "./sda/output/chart.png");
 await sdb.done();
 ```
 
-You can click on the screenshot below to zoom in.
+Vous pouvez cliquer sur la capture d'écran ci-dessous pour zoomer.
 
-![A screenshot showing a Plot bar chart.](/assets/simple-data-analysis/geospatial-data/plot-chart.png)
+![Une capture d'écran montrant un diagramme à barres avec Plot.](/assets/simple-data-analysis/geospatial-data/plot-chart.png)
 
-### Saving a map
+### Enregistrement d'une carte
 
-Since this is geospatial data, you might want to create a map. You can do that with Plot as well.
+Puisqu'il s'agit de données géospatiales, créons une carte, encore une fois avec Plot.
 
-The code below creates a map with the province boundaries and the wildfires. The size of the fire markers depends on the area burned, and their color corresponds to their cause.
+Le code ci-dessous génère une carte affichant les limites des provinces ainsi que les feux de forêt. La taille des marqueurs de feu dépend de la superficie brûlée, et leur couleur correspond à leur cause.
 
-One useful trick is to put all the geospatial data we want to map into the same table, which is done on line 42 below.
+Une astuce utile consiste à regrouper toutes les données géospatiales que nous souhaitons cartographier dans une seule table, ce qui est fait à la ligne 42 ci-dessous.
 
-Again, don't worry about the syntax—we’ll go over it in a dedicated lesson on Plot.
+Encore une fois, ne vous inquiétez pas pour la syntaxe. Nous l’expliquerons en détail dans une leçon dédiée à Plot.
 
 
 ```ts showLineNumbers filename="main.ts" {2, 39-84}
@@ -569,20 +571,20 @@ await provincesAndFires.writeMap(makeMap, "./sda/output/map.png", {
 await sdb.done();
 ```
 
-You can click on the screenshot below to zoom in.
+Vous pouvez cliquer sur la capture d'écran ci-dessous pour zoomer.
 
-![A screenshot showing a Plot bar chart.](/assets/simple-data-analysis/geospatial-data/make-map.png)
+![Une capture d'écran montrant une carte générée avec Plot.](/assets/simple-data-analysis/geospatial-data/make-map.png)
 
-Here's the map we created above. Quite beautiful. 😍
+Voici la carte que nous avons créée ci-dessus. Plutôt magnifique. 😍
 
-![A map created with simple-data-analysis and Plot.](/assets/simple-data-analysis/geospatial-data/fires-map.png)
+![Une carte créée avec simple-data-analysis et Plot.](/assets/simple-data-analysis/geospatial-data/fires-map.png)
 
+## Exportation des données
 
-## Exporting the data
+### Données tabulaires
 
-### Tabular data
+Si vous souhaitez enregistrer une table, vous pouvez utiliser la méthode `writeData`. Cela vous permet d'exporter les données au format CSV, JSON ou Parquet.
 
-If you want to save a table, you can use the `writeData` method. This allows you to export data in CSV, JSON, or Parquet format.
 
 ```ts showLineNumbers filename="main.ts" {38}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -626,11 +628,11 @@ await firesInsideProvinces.writeData("./sda/output/firesInsideProvinces.csv");
 
 await sdb.done();
 ```
-![A screenshot showing a CSV file.](/assets/simple-data-analysis/geospatial-data/write.png)
+![Une capture d'écran montrant un fichier CSV.](/assets/simple-data-analysis/geospatial-data/write.png)
 
-### Geospatial data
+### Données géospatiales
 
-If needed, we can also export our tables containing geometries using `writeGeoData`. This allows us to save them as GeoJSON or GeoParquet files.
+Si nécessaire, nous pouvons également exporter nos tables contenant des géométries en utilisant `writeGeoData`. Cela nous permet de les enregistrer au format GeoJSON ou GeoParquet.
 
 ```ts showLineNumbers filename="main.ts" {38-39}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -676,18 +678,18 @@ await provinces.writeGeoData("./sda/output/provinces.geojson");
 await sdb.done();
 ```
 
-If you saved them as GeoJSON files, you can visualize them directly in VS Code after installing the [Geo Data Viewer extension](https://marketplace.visualstudio.com/items?itemName=RandomFractalsInc.geo-data-viewer).
+Si vous les avez enregistrés au format GeoJSON, vous pouvez les visualiser directement dans VS Code après avoir installé l'[extension Geo Data Viewer](https://marketplace.visualstudio.com/items?itemName=RandomFractalsInc.geo-data-viewer).
 
-Right-click on the GeoJSON files and select the `View map` option.
+Faites un clic droit sur les fichiers GeoJSON et sélectionnez l’option `View map`.
 
-![A screenshot showing GeoJSON files as interactive maps in VS Code.](/assets/simple-data-analysis/geospatial-data/map-viewer.png)
+![Une capture d'écran montrant des fichiers GeoJSON sous forme de cartes interactives dans VS Code.](/assets/simple-data-analysis/geospatial-data/map-viewer.png)
 
 ## Conclusion
 
-I hope you noticed how easy it was to wrangle geospatial data with SDA. One of the library's goals is to simplify complex data operations and make geospatial analysis accessible to everyone. 🌍
+J'espère que vous avez constaté à quel point il est facile de manipuler des données géospatiales avec SDA. L’un des objectifs de la bibliothèque est de simplifier les opérations complexes sur les données et de rendre l’analyse géospatiale accessible à tout le monde. 🌍
 
-Whether you're working with tabular or geospatial data, SDA provides consistent and intuitive methods to help you get your work done efficiently.
+Que vous travailliez avec des données tabulaires ou géospatiales, SDA propose des méthodes cohérentes et intuitives pour vous aider à accomplir vos tâches efficacement.
 
-Since SDA is integrated with Plot, you can also create stunning data visualizations. And that's the topic of the next lesson. See you there! 📈
+Puisque SDA est intégré avec Plot, vous pouvez également créer d'impressionantes visualisations de données. Et c’est justement le sujet de la prochaine leçon. À bientôt ! 📈
 
-<NoticeEnd />
+<NoticeEnd lang="fr" />

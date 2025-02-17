@@ -102,7 +102,7 @@ await sdb.done();
 
 We can now focus on retrieving the Canadian province boundaries. I uploaded a GeoJSON file on [GitHub](https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json).
 
-GeoJSON is a widely used format for geospatial data. It typically consists of an object that stores an array of `features`. Each feature has a geometry (which contains latitude and longitude coordinates or equivalent) and properties (which store metadata).
+GeoJSON is a widely used format for geospatial data. It's convenient because it's just a JSON file (easy to use in TypeScript) structured in a specific way. It typically consists of an object that stores an array of `features`. Each feature has a geometry (which contains latitude and longitude coordinates or equivalent) and properties (which store metadata).
 
 For example, the Canadian provinces GeoJSON is structured as shown below, with each province represented as a `feature` object. The `geometry` field contains the province's borders as `coordinates`, and the `properties` field includes metadata such as the province's name in both French and English (since Canada is bilingual 🇨🇦).
 
