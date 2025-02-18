@@ -1,0 +1,284 @@
+---
+title: How to visualize data with TypeScript
+description: In this lesson, we learn how to visualize tabular and geospatial data with the simple-data-analysis and Plot libraries.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Visualizing data with Simple Data Analysis and Plot
+
+Data visualizations help you understand your data and communicate your findings. In this lesson, we'll learn how to visualize SDA tables, from the simple chart in your terminal to the customized data visualization with the amazing Plot library.
+
+I'll assume you already completed the [Tabular data](/simple-data-analysis/tabular-data) and [Geospatial data](/simple-data-analysis/geospatial) lessons.
+
+<NoticeIntro />
+
+## Setup
+
+As we did in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `deno -A jsr:@nshiab/setup-sda`
+
+After running this command, your terminal will display a description of the created files and installed libraries.
+
+Next, run the suggested task to start and watch `sda/main.ts`: `deno task sda`
+
+![A screenshot showing VS Code after running setup-sda.](/assets/simple-data-analysis/dataviz/setup.png)
+
+Let's fetch and cache the 2023 Canadian wildfires. The data we are using here is a slightly modified version of the one we used in the previous version. Here, we have dates and only fires with a `hectares` burnt value greater than 0.
+
+```ts showLineNumbers filename="main.ts" {5-11}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const fires = sdb.newTable("fires");
+await fires.cache(async () => {
+  await fires.loadData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+  );
+});
+await fires.logTable();
+
+await sdb.done();
+```
+![A screenshot showing VS Code with a data table in the terminal.](/assets/simple-data-analysis/dataviz/fetch-fires.png)
+
+Let's say that we would like to visualize how much wildfires have burnt through the year, for each province. We need the cumulative sum of the area burnt.
+
+First, let's sum up our fires per date and province.
+
+```ts showLineNumbers filename="main.ts" {12-17}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const fires = sdb.newTable("fires");
+await fires.cache(async () => {
+  await fires.loadData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+  );
+});
+
+await fires.summarize({
+  values: "hectares",
+  categories: ["province", "startdate"],
+  summaries: "sum",
+  decimals: 1,
+});
+await fires.logTable();
+
+await sdb.done();
+```
+![A screenshot showing VS Code logging data tables.](/assets/simple-data-analysis/dataviz/summary.png)
+
+Now, we can compute the cumulative sum per province with the method `accumulate`. We can also round the values with the `round` method to avoid floating point errors. And let's format the date as labels for easier use later on.
+
+```ts showLineNumbers filename="main.ts" {18-22}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const fires = sdb.newTable("fires");
+await fires.cache(async () => {
+  await fires.loadData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+  );
+});
+
+await fires.summarize({
+  values: "hectares",
+  categories: ["province", "startdate"],
+  summaries: "sum",
+  decimals: 1,
+});
+await fires.accumulate("sum", "cumulativeHectares", {
+  categories: "province",
+});
+await fires.round("cumulativeHectares", { decimals: 1 });
+await fires.convert({ startdate: "string" }, { datetimeFormat: "%x" });
+await fires.logTable();
+
+await sdb.done();
+```
+![A screenshot showing a new column cumulativeHectares in a data table.](/assets/simple-data-analysis/dataviz/cumulative.png)
+
+Let's visualize this data now!
+
+## In the terminal
+
+SDA has a some methods to easily log charts in your terminal. It's very nice to quickly have a look at your data.
+
+In the example below, we use the `logDotChart` method with `startdate` column for the x values and the `cumulativeHectares` for the y values. I also added a few options:
+- We use the `province` values to create small multiples (one chart per province).
+- We make all the charts scales the same, which is conveninent to compare provinces visually
+- We format the y labels with the `formatNumber` function from the [journalism](https://github.com/nshiab/journalism) library, which I created and provides general helper functions. It's automatically installed when setuping with `setup-sda`.
+
+```ts showLineNumbers filename="main.ts" {2, 26-33}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { formatNumber } from "@nshiab/journalism/web";
+
+const sdb = new SimpleDB();
+
+const fires = sdb.newTable("fires");
+await fires.cache(async () => {
+  await fires.loadData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+  );
+});
+
+await fires.summarize({
+  values: "hectares",
+  categories: ["province", "startdate"],
+  summaries: "sum",
+  decimals: 1,
+});
+await fires.accumulate("sum", "cumulativeHectares", {
+  categories: "province",
+});
+await fires.round("cumulativeHectares", { decimals: 1 });
+await fires.convert({ startdate: "string" }, { datetimeFormat: "%x" });
+
+await fires.logTable();
+await fires.logLineChart(
+  "startdate",
+  "cumulativeHectares",
+  {
+    smallMultiples: "province",
+    fixedScales: true,
+    formatY: (d) => formatNumber(d as number, { decimals: 0, suffix: " ha" }),
+});
+
+await sdb.done();
+```
+![A screenshot showing dot charts in the terminal.](/assets/simple-data-analysis/dataviz/dot-charts.png)
+
+You are not limited to dot charts. You can also use the methods `logLineChart`, `logBarChart` and `logHistogram`.
+
+However, these methods, while very handy, are quite limited.
+
+## With Plot
+
+[Plot](https://github.com/observablehq/plot) is a fantastic library to create charts. It's based of the very famous [d3](https://github.com/d3/d3) library (and built by the same team, including [Mike Bostock](https://github.com/mbostock) and [Philippe Rivière](https://github.com/Fil)). However, it's much easier to use because many things that should be handled manually with d3 (scales, axis, etc.) are done automatically with Plot.
+
+SDA integrates Plot seamlessly and when you set up your project with `setup-sda`, it's automatically installed.
+
+To create a chart and save it to a file (`.jpeg`, `.png`, or `.svg` if you want to rework it in Illustrator), you can use the method `writeChart`.
+
+The `writeChart` method needs to arguments: 
+- A function that draws a Plot chart
+- A path for the image file that will be saved
+
+Let's create a simple line chart of the area burnet through 2023 per province. Note that I removed the line converting `startdate` to strings, because Plot understands dates and wrangle them.
+
+```ts showLineNumbers filename="main.ts" {2, 25-35}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { line, plot } from "@observablehq/plot";
+
+const sdb = new SimpleDB();
+
+const fires = sdb.newTable("fires");
+await fires.cache(async () => {
+  await fires.loadData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+  );
+});
+
+await fires.summarize({
+  values: "hectares",
+  categories: ["province", "startdate"],
+  summaries: "sum",
+  decimals: 1,
+});
+await fires.accumulate("sum", "cumulativeHectares", {
+  categories: "province",
+});
+await fires.round("cumulativeHectares", { decimals: 1 });
+await fires.logTable();
+
+const drawChart = (data: unknown[]) =>
+  plot({
+    marks: [
+      line(data, {
+        x: "startdate",
+        y: "cumulativeHectares",
+        stroke: "province",
+      }),
+    ],
+  });
+await fires.writeChart(drawChart, "./sda/output/chart.png");
+
+await sdb.done();
+```
+![A screenshot showing a line chart saved as png.](/assets/simple-data-analysis/dataviz/draw-chart.png)
+<Callout type="info" emoji="💡">
+   To open two tabs one on top of the other, do a right click on the tab you want at the bottom and click on `Split down`. In the screenshot above, I toggled the terminal, but even if it's not displayed, it's still running and watching `main.ts`. So anytime I update the chart code, `main.ts` is rerun and the chart updated.
+</Callout>
+
+Let me explain what's going on above:
+- On line 25-34, I create an arrow function `drawChart`. The function expects an array of `unknown` values, because it doesn't know what's in our table.
+- On line 26, I call the function `plot` from Plot. This functions will create a chart. It needs an object with some options.
+- On line 27, I add a `marks` key, with an array. It's the most important option. Marks are the shapes you want to show on your chart, based on your data.
+- On line 28-32, inside the `marks` array, I call the function `line` to create lines based on our `data`. For the `line` options, I specify the `x` values (`startdate`), the `y` values (`cumulativeHectares`), and the `stroke` color (based on the values in `province`).
+- Finally, on line 35, I call the method `writeChart` on the `fires` table. The first argument is our function `drawChart`, which will be automatically fed with the `fires` data. The second argument is where we want the chart to be written, in the `output` folder.
+
+Our chart is quite basic for now and there is some problems, like the y axis. Let's fix it!
+
+```ts showLineNumbers filename="main.ts" {27-33}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { line, plot } from "@observablehq/plot";
+
+const sdb = new SimpleDB();
+
+const fires = sdb.newTable("fires");
+await fires.cache(async () => {
+  await fires.loadData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+  );
+});
+
+await fires.summarize({
+  values: "hectares",
+  categories: ["province", "startdate"],
+  summaries: "sum",
+  decimals: 1,
+});
+await fires.accumulate("sum", "cumulativeHectares", {
+  categories: "province",
+});
+await fires.round("cumulativeHectares", { decimals: 1 });
+await fires.logTable();
+
+const drawChart = (data: unknown[]) =>
+  plot({
+    inset: 10,
+    y: {
+      grid: true,
+      label: "Area burned (hectares)",
+      ticks: 5,
+      tickFormat: (d) => `${d / 1_000_000}M`,
+    },
+    marks: [
+      line(data, {
+        x: "startdate",
+        y: "cumulativeHectares",
+        stroke: "province",
+      }),
+    ],
+  });
+await fires.writeChart(drawChart, "./sda/output/chart.png");
+
+await sdb.done();
+```
+![A screenshot showing a chart with a better y axis.](/assets/simple-data-analysis/dataviz/y-axis.png)
+
+This is better! To update the y-axis, you can pass options to a `y` option. Here's what we are doing here:
+- We add grids, to make the chart more readable.
+- We change the label to something more understandable with the unit
+- We limit the axis to around 5 ticks
+- We format the ticks labels to show millions hectares instead of just hectares.
+
+I also added an `inset` of `10` to give a little bit more space to the top label.
+
+## Conclusion
+
+<NoticeEnd />
