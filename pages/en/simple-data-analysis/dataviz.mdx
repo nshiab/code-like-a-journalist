@@ -158,6 +158,8 @@ However, these methods, while very handy, are quite limited.
 
 ## With Plot
 
+### Cumulative hectares
+
 [Plot](https://github.com/observablehq/plot) is a fantastic library to create charts. It's based of the very famous [d3](https://github.com/d3/d3) library (and built by the same team, including [Mike Bostock](https://github.com/mbostock) and [Philippe Rivière](https://github.com/Fil)). However, it's much easier to use because many things that should be handled manually with d3 (scales, axis, etc.) are done automatically with Plot.
 
 SDA integrates Plot seamlessly and when you set up your project with `setup-sda`, it's automatically installed.
@@ -215,7 +217,7 @@ await sdb.done();
 </Callout>
 
 Let me explain what's going on above:
-- On line 25-34, I create an arrow function `drawChart`. The function expects an array of `unknown` values, because it doesn't know what's in our table.
+- On line 25-34, I create an arrow function `drawChart`. The function expects an array of `unknown` values, because it doesn't know what's in our table. Actually, our data will be an array of objects, as usual.
 - On line 26, I call the function `plot` from Plot. This functions will create a chart. It needs an object with some options.
 - On line 27, I add a `marks` key, with an array. It's the most important option. Marks are the shapes you want to show on your chart, based on your data.
 - On line 28-32, inside the `marks` array, I call the function `line` to create lines based on our `data`. For the `line` options, I specify the `x` values (`startdate`), the `y` values (`cumulativeHectares`), and the `stroke` color (based on the values in `province`).
@@ -271,13 +273,392 @@ await sdb.done();
 ```
 ![A screenshot showing a chart with a better y axis.](/assets/simple-data-analysis/dataviz/y-axis.png)
 
-This is better! To update the y-axis, you can pass options to a `y` option. Here's what we are doing here:
+This is better! To update the y-axis, you can pass options to a `y` as an object. Here's what we are doing in the code above:
 - We add grids, to make the chart more readable.
 - We change the label to something more understandable with the unit
-- We limit the axis to around 5 ticks
+- We limit the axis ticks to 5
 - We format the ticks labels to show millions hectares instead of just hectares.
 
 I also added an `inset` of `10` to give a little bit more space to the top label.
+
+Now, let's update the `x` label. There is no need for us to update the x tick labels because Plot wrangles dates very well and displays years, months, days and even time depending on the scale values.
+
+We can tweak the colors too by using a different scheme and by adding a legend.
+
+```ts showLineNumbers filename="main.ts" {34-40}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { line, plot } from "@observablehq/plot";
+
+const sdb = new SimpleDB();
+
+const fires = sdb.newTable("fires");
+await fires.cache(async () => {
+  await fires.loadData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+  );
+});
+
+await fires.summarize({
+  values: "hectares",
+  categories: ["province", "startdate"],
+  summaries: "sum",
+  decimals: 1,
+});
+await fires.accumulate("sum", "cumulativeHectares", {
+  categories: "province",
+});
+await fires.round("cumulativeHectares", { decimals: 1 });
+await fires.logTable();
+
+const drawChart = (data: unknown[]) =>
+  plot({
+    inset: 10,
+    y: {
+      grid: true,
+      label: "Area burned (hectares)",
+      ticks: 5,
+      tickFormat: (d) => `${d / 1_000_000}M`,
+    },
+    x: {
+      label: "Date",
+    },
+    color: {
+      legend: true,
+      scheme: "Accent",
+    },
+    marks: [
+      line(data, {
+        x: "startdate",
+        y: "cumulativeHectares",
+        stroke: "province",
+      }),
+    ],
+  });
+await fires.writeChart(drawChart, "./sda/output/chart.png");
+
+await sdb.done();
+```
+![A screenshot showing a chart with a color legend.](/assets/simple-data-analysis/dataviz/x-colors.png)
+
+Hmmmm... The color legend doesn't work very well with so many categories. We need to change our strategy. Instead of a color legend, maybe we could add a dot and a text label at the end of each line.
+
+Let's remove the color legend and add a first `dot` mark. Since we want to add it at the end of the line, we use the `selectLast` transform. It will select just the last data point.
+
+Note that the order in the `marks` array is important. The marks are drawn in order. So if you want a shape to be on top of another, but it after in the array.
+
+```ts showLineNumbers filename="main.ts" {2, 46-53}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { dot, line, plot, selectLast } from "@observablehq/plot";
+
+const sdb = new SimpleDB();
+
+const fires = sdb.newTable("fires");
+await fires.cache(async () => {
+  await fires.loadData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+  );
+});
+
+await fires.summarize({
+  values: "hectares",
+  categories: ["province", "startdate"],
+  summaries: "sum",
+  decimals: 1,
+});
+await fires.accumulate("sum", "cumulativeHectares", {
+  categories: "province",
+});
+await fires.round("cumulativeHectares", { decimals: 1 });
+await fires.logTable();
+
+const drawChart = (data: unknown[]) =>
+  plot({
+    inset: 10,
+    y: {
+      grid: true,
+      label: "Area burned (hectares)",
+      ticks: 5,
+      tickFormat: (d) => `${d / 1_000_000}M`,
+    },
+    x: {
+      label: "Date",
+    },
+    color: {
+      scheme: "Accent",
+    },
+    marks: [
+      line(data, {
+        x: "startdate",
+        y: "cumulativeHectares",
+        stroke: "province",
+      }),
+      dot(
+        data,
+        selectLast({
+          x: "startdate",
+          y: "cumulativeHectares",
+          fill: "province",
+        }),
+      ),
+    ],
+  });
+await fires.writeChart(drawChart, "./sda/output/chart.png");
+
+await sdb.done();
+```
+![A screenshot showing a line chart with dots at the end.](/assets/simple-data-analysis/dataviz/dots.png)
+
+And now let's add the text labels. We use `selectLast` again and some more specific options:
+- On top of `x` and `y`, we also use `z` to let Plot know that we want a text label for each province.
+- We use the values in the `province` column for the text.
+- We use a black `fill`, but with a white `stroke` to make the text more readeable when overlapping other chart elements.
+- We set the `textAnchor` to start, so the text is aligned with the `dot`, but we shift it by 5 pixels with `dx` so it's not touching the dot.
+
+```ts showLineNumbers filename="main.ts" {2, 54-66}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { dot, line, plot, selectLast, text } from "@observablehq/plot";
+
+const sdb = new SimpleDB();
+
+const fires = sdb.newTable("fires");
+await fires.cache(async () => {
+  await fires.loadData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+  );
+});
+
+await fires.summarize({
+  values: "hectares",
+  categories: ["province", "startdate"],
+  summaries: "sum",
+  decimals: 1,
+});
+await fires.accumulate("sum", "cumulativeHectares", {
+  categories: "province",
+});
+await fires.round("cumulativeHectares", { decimals: 1 });
+await fires.logTable();
+
+const drawChart = (data: unknown[]) =>
+  plot({
+    inset: 10,
+    y: {
+      grid: true,
+      label: "Area burned (hectares)",
+      ticks: 5,
+      tickFormat: (d) => `${d / 1_000_000}M`,
+    },
+    x: {
+      label: "Date",
+    },
+    color: {
+      scheme: "Accent",
+    },
+    marks: [
+      line(data, {
+        x: "startdate",
+        y: "cumulativeHectares",
+        stroke: "province",
+      }),
+      dot(
+        data,
+        selectLast({
+          x: "startdate",
+          y: "cumulativeHectares",
+          fill: "province",
+        }),
+      ),
+      text(
+        data,
+        selectLast({
+          x: "startdate",
+          y: "cumulativeHectares",
+          z: "province",
+          text: "province",
+          textAnchor: "start",
+          fill: "black",
+          stroke: "white",
+          dx: 5,
+        }),
+      ),
+    ],
+  });
+await fires.writeChart(drawChart, "./sda/output/chart.png");
+
+await sdb.done();
+```
+![A screenshot showing a line chart with dots and text labels at the end.](/assets/simple-data-analysis/dataviz/text-labels.png)
+
+This is much better! But our chart need new adjustements now. The margin on the right should be wider. To avoid overlapping labels, we could label only last points that have a `cumulativeHectares` value of 100,000 or more.
+
+```ts showLineNumbers filename="main.ts" {28, 61}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { dot, line, plot, selectLast, text } from "@observablehq/plot";
+
+const sdb = new SimpleDB();
+
+const fires = sdb.newTable("fires");
+await fires.cache(async () => {
+  await fires.loadData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+  );
+});
+
+await fires.summarize({
+  values: "hectares",
+  categories: ["province", "startdate"],
+  summaries: "sum",
+  decimals: 1,
+});
+await fires.accumulate("sum", "cumulativeHectares", {
+  categories: "province",
+});
+await fires.round("cumulativeHectares", { decimals: 1 });
+await fires.logTable();
+
+const drawChart = (data: unknown[]) =>
+  plot({
+    inset: 10,
+    marginRight: 70,
+    y: {
+      grid: true,
+      label: "Area burned (hectares)",
+      ticks: 5,
+      tickFormat: (d) => `${d / 1_000_000}M`,
+    },
+    x: {
+      label: "Date",
+    },
+    color: {
+      scheme: "Accent",
+    },
+    marks: [
+      line(data, {
+        x: "startdate",
+        y: "cumulativeHectares",
+        stroke: "province",
+      }),
+      dot(
+        data,
+        selectLast({
+          x: "startdate",
+          y: "cumulativeHectares",
+          fill: "province",
+        }),
+      ),
+      text(
+        data,
+        selectLast({
+          x: "startdate",
+          y: "cumulativeHectares",
+          z: "province",
+          filter: (d) => d.cumulativeHectares > 100_000,
+          text: "province",
+          textAnchor: "start",
+          fill: "black",
+          stroke: "white",
+          dx: 5,
+        }),
+      ),
+    ],
+  });
+await fires.writeChart(drawChart, "./sda/output/chart.png");
+
+await sdb.done();
+```
+![A screenshot showing a line chart with a wider margin.](/assets/simple-data-analysis/dataviz/margin-right.png)
+
+We are getting there!
+
+One last thing: it looks like not much is happening before mid-April and after October. We could filter our table to keep only what's in between, and then tweak some options.
+
+```ts showLineNumbers filename="main.ts {23, 29, 40, 62}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { dot, line, plot, selectLast, text } from "@observablehq/plot";
+
+const sdb = new SimpleDB();
+
+const fires = sdb.newTable("fires");
+await fires.cache(async () => {
+  await fires.loadData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+  );
+});
+
+await fires.summarize({
+  values: "hectares",
+  categories: ["province", "startdate"],
+  summaries: "sum",
+  decimals: 1,
+});
+await fires.accumulate("sum", "cumulativeHectares", {
+  categories: "province",
+});
+await fires.round("cumulativeHectares", { decimals: 1 });
+await fires.filter(`startDate >= '2023-04-15' && startDate <= '2023-10-01'`);
+await fires.logTable();
+
+const drawChart = (data: unknown[]) =>
+  plot({
+    inset: 10,
+    marginRight: 110,
+    y: {
+      grid: true,
+      label: "Area burned (hectares)",
+      ticks: 5,
+      tickFormat: (d) => `${d / 1_000_000}M`,
+    },
+    x: {
+      label: "Date",
+    },
+    color: {
+      scheme: "tableau10",
+    },
+    marks: [
+      line(data, {
+        x: "startdate",
+        y: "cumulativeHectares",
+        stroke: "province",
+      }),
+      dot(
+        data,
+        selectLast({
+          x: "startdate",
+          y: "cumulativeHectares",
+          fill: "province",
+        }),
+      ),
+      text(
+        data,
+        selectLast({
+          x: "startdate",
+          y: "cumulativeHectares",
+          z: "province",
+          filter: (d) => d.cumulativeHectares > 400_000,
+          text: "province",
+          textAnchor: "start",
+          fill: "black",
+          stroke: "white",
+          dx: 5,
+        }),
+      ),
+    ],
+  });
+await fires.writeChart(drawChart, "./sda/output/chart.png");
+
+await sdb.done();
+```
+![A screenshot showing a line chart with a focus on April to October.](/assets/simple-data-analysis/dataviz/final-fires-lines.png)
+
+This is very nice!
+
+Of course, it could be improved. For example, one problem is that we summarized the data on the fires start date. So we have some gaps in our dates. This is why we are seeing some dots stopping before the end of the x-axis.
+
+But for this lesson, I think it's good enough! The goal was to show you the different options, step by step. 😊
+
+### Fires beeswarm chart
+
+### Fires map
 
 ## Conclusion
 
