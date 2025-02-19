@@ -1,39 +1,38 @@
 ---
-title: How to visualize data with TypeScript
-description: In this lesson, we learn how to visualize tabular and geospatial data with Simple Data Analysis and Plot.
+title: Comment visualiser des données avec TypeScript
+description: Dans cette leçon, nous apprenons à visualiser des données tabulaires et géospatiales avec Simple Data Analysis et Plot.
 ---
 
 import { Callout } from 'nextra/components'
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
-# Visualizing data with Simple Data Analysis and Plot
+# Visualiser des données avec Simple Data Analysis et Plot
 
-Data visualizations help you understand your data and communicate your findings. In this lesson, we'll learn how to visualize SDA tables, from simple terminal charts to customized visualizations with the powerful Plot library.
+Les visualisations de données vous aident à mieux comprendre vos données et à communiquer vos conclusions. Dans cette leçon, nous allons apprendre à visualiser des tables SDA, que ce soit avec des graphiques simples dans le terminal ou des visualisations plus poussées avec la librairie Plot.
 
-We'll use data on the 2023 Canadian wildfires and explore different visualization techniques, including line charts, beeswarm charts, and maps! 🌎
+Nous utiliserons des données sur les feux de forêt au Canada en 2023 et explorerons différentes techniques de visualisation, y compris des graphiques en ligne, des diagrammes en essaim et des cartes ! 🌎
 
-This lesson assumes you've already completed the [Tabular data](/simple-data-analysis/tabular-data) and [Geospatial data](/simple-data-analysis/geospatial) lessons.
+Cette leçon suppose que vous avez déjà complété les leçons sur les [Données tabulaires](/simple-data-analysis/tabular-data) et les [Données géospatiales](/simple-data-analysis/geospatial).
 
 <NoticeIntro lang="fr" />
 
-## Setup
+## Configuration
 
-As in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `deno -A jsr:@nshiab/setup-sda`
+Comme dans la leçon précédente, créez un nouveau dossier sur votre ordinateur, ouvrez-le avec VS Code et exécutez la commande suivante dans le terminal : `deno -A jsr:@nshiab/setup-sda`
 
-After running this command, your terminal will display a description of the created files and installed libraries.
+Après l'exécution de cette commande, votre terminal affichera une description des fichiers créés et des librairies installées.
 
-Next, run the suggested task to start and watch `sda/main.ts`: `deno task sda`
+Ensuite, exécutez la tâche suggérée pour démarrer et surveiller `sda/main.ts` : `deno task sda`
 
-![A screenshot showing VS Code after running setup-sda.](/assets/simple-data-analysis/dataviz/setup.png)
+![Une capture d'écran montrant VS Code après l'exécution de setup-sda.](/assets/simple-data-analysis/dataviz/setup.png)
 
-To keep our code organized, let's create two functions:
-- `crunchData`, where we'll fetch and clean the wildfire data.
-- `visualizeData`, where we'll generate charts and maps.
+Pour organiser notre code de manière claire, nous allons créer deux fonctions :
+- `crunchData`, où nous allons récupérer et nettoyer les données sur les feux de forêt.
+- `visualizeData`, où nous allons générer nos graphiques et nos cartes.
 
-Let's start with `crunchData`. Create a `crunchData.ts` file in `./sda/helpers/`. This `async` function expects a `fires` parameter of type `SimpleTable`, which is an SDA table. The function doesn't need to return anything.
+Commençons par `crunchData`. Créez un fichier `crunchData.ts` dans `./sda/helpers/`. Cette fonction `async` attend un paramètre `fires` de type `SimpleTable`, qui est une table SDA. La fonction n'a pas besoin de renvoyer de valeur.
 
-Inside, we'll fetch and cache the wildfire data. This dataset is a slightly modified version of the one used in the previous lesson. It includes dates and only fires with a `hectares` burnt value greater than zero.
-
+À l'intérieur, nous allons récupérer et mettre en cache les données sur les feux de forêt. Cet ensemble de données est une version légèrement modifiée de celui utilisé dans la leçon précédente. Il inclut des dates et uniquement les feux ayant une superficie brûlée (`hectares`) supérieure à zéro.
 
 ```ts showLineNumbers filename="crunchData.ts"
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -47,7 +46,7 @@ export default async function crunchData(fires: SimpleTable) {
 }
 ````
 
-Now, we can take care of `visualizeData`. Create a `visualizeData.ts` file in `./sda/helpers/`. It's also an `async` function that takes a `fires` parameter of type `SimpleTable`. For now, let's just log the table.
+Nous pouvons maintenant nous occuper de `visualizeData`. Créez un fichier `visualizeData.ts` dans `./sda/helpers/`. C'est également une fonction `async` qui prend un paramètre `fires` de type `SimpleTable`. Pour l'instant, contentons-nous d'afficher la table dans la console.
 
 ```ts showLineNumbers filename="visualizeData.ts"
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -57,7 +56,7 @@ export default async function visualizeData(fires: SimpleTable) {
 }
 ```
 
-Let's update `main.ts` to create the `fires` table and pass it to our new functions.
+Mettons à jour `main.ts` pour créer la table `fires` et la passer à nos nouvelles fonctions.
 
 ```ts  showLineNumbers filename="main.ts"
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -72,13 +71,13 @@ await visualizeData(fires);
 
 await sdb.done();
 ```
-![A screenshot showing VS Code after running helper functions.](/assets/simple-data-analysis/dataviz/helpers.png)
+![Une capture d'écran montrant VS Code après l'exécution des fonctions d'aide.](/assets/simple-data-analysis/dataviz/helpers.png)
 
-## Prepping the data
+## Préparation des données
 
-We have around 5,000 wildfires. Let's say that we would like to visualize how much wildfires have burnt through the year, for each province. We need the cumulative sum of the area burnt.
+Nous avons environ 5 000 feux de forêt. Disons que nous aimerions visualiser la superficie brûlée au fil de l'année pour chaque province. Nous devons calculer la somme cumulative de la superficie brûlée.
 
-In `crunchData.ts`, let's sum up our fires per date and province.
+Dans `crunchData.ts`, additionnons les superficies brûlées par date et par province.
 
 ```ts showLineNumbers filename="crunchData.ts" {10-15}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -98,9 +97,9 @@ export default async function crunchData(fires: SimpleTable) {
   });
 }
 ```
-![A screenshot showing VS Code logging data tables.](/assets/simple-data-analysis/dataviz/summary.png)
+![Une capture d'écran montrant VS Code affichant des tables de données.](/assets/simple-data-analysis/dataviz/summary.png)
 
-Now, we can compute the cumulative sum per province with the method `accumulate`. We can also round the values with the `round` method to avoid floating point errors.
+Nous pouvons maintenant calculer la somme cumulative par province avec la méthode `accumulate`. Nous pouvons également arrondir les valeurs avec la méthode `round` pour éviter les erreurs d'arrondi liées aux nombres à virgule flottante.
 
 ```ts showLineNumbers filename="crunchData.ts" {16-19}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -124,18 +123,22 @@ export default async function crunchData(fires: SimpleTable) {
   await fires.round("cumulativeHectares", { decimals: 1 });
 }
 ```
-![A screenshot showing a new column cumulativeHectares in a data table.](/assets/simple-data-analysis/dataviz/cumulative.png)
+![Une capture d'écran montrant une nouvelle colonne cumulativeHectares dans une table de données.](/assets/simple-data-analysis/dataviz/cumulative.png)
 
-Let's visualize this data now!
+Visualisons maintenant ces données !
 
-## In the terminal
+## Dans le terminal
 
-SDA has some methods to easily log charts in your terminal. It's a great way to quickly inspect your data. Let's work in `visualizeData.ts`.
+SDA propose des méthodes pour afficher facilement des graphiques dans votre terminal. C'est un excellent moyen d'inspecter rapidement vos données. Travaillons dans `visualizeData.ts`.
 
-In the example below, we use the `logDotChart` method with the `startdate` column for the x values and `cumulativeHectares` for the y values. I also added a few options:
-- We use the `province` values to create small multiples (one chart per province).
-- We make all the charts share the same scales, which is convenient for comparing provinces visually.
-- We format the y-axis labels with the `formatNumber` function from the [journalism](https://github.com/nshiab/journalism) library. I created this library to provide general helper functions. It's automatically installed when setting up with `setup-sda`.
+Dans l'exemple ci-dessous, nous utilisons la méthode `logDotChart` avec :
+- La colonne `startdate` pour les valeurs en abscisse (x).
+- La colonne `cumulativeHectares` pour les valeurs en ordonnée (y).
+
+J'ai également ajouté quelques options :
+- Nous utilisons la valeur `province` pour créer des graphiques multiples (un graphique par province).
+- Nous appliquons la même échelle à tous les graphiques, ce qui facilite la comparaison entre les provinces.
+- Nous formatons les libellés de l'axe des y avec la fonction `formatNumber` de la librairie [journalism](https://github.com/nshiab/journalism). J'ai créé cette librairie pour fournir des fonctions utilitaires générales. Elle est automatiquement installée avec `setup-sda`.
 
 ```ts showLineNumbers filename="visualizeData.ts" {6-14}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -154,27 +157,28 @@ export default async function visualizeData(fires: SimpleTable) {
   );
 }
 ```
-![A screenshot showing dot charts in the terminal.](/assets/simple-data-analysis/dataviz/dot-charts.png)
+![Une capture d'écran montrant des graphiques en points dans le terminal.](/assets/simple-data-analysis/dataviz/dot-charts.png)
 
-You are not limited to dot charts. You can also use the methods `logLineChart`, `logBarChart`, and `logHistogram`.
+Vous n'êtes pas limité aux graphiques en points. Vous pouvez également utiliser les méthodes `logLineChart`, `logBarChart` et `logHistogram`.
 
-However, while these methods are very handy, they are quite limited.
+Cependant, bien que ces méthodes soient très pratiques, elles restent assez limitées.
 
-## With Plot
+## Avec Plot
 
-### Cumulative hectares burnt per province
+### Hectares brûlés cumulés par province
 
-[Plot](https://github.com/observablehq/plot) is a fantastic library for creating charts. It's based on the very famous [d3](https://github.com/d3/d3) library (and built by the same team, including [Mike Bostock](https://github.com/mbostock) and [Philippe Rivière](https://github.com/Fil)). However, it's much easier to use because many things that need to be handled manually in d3 (scales, axes, etc.) are done automatically with Plot.
+[Plot](https://github.com/observablehq/plot) est une librairie fantastique pour créer des graphiques. Elle est basée sur la célèbre librairie [d3](https://github.com/d3/d3) (développée par la même équipe, dont [Mike Bostock](https://github.com/mbostock) et [Philippe Rivière](https://github.com/Fil)). Cependant, elle est bien plus facile à utiliser, car de nombreux éléments qui doivent être gérés manuellement avec d3 (échelles, axes, etc.) sont pris en charge automatiquement par Plot.
 
-SDA integrates Plot seamlessly, and when you set up your project with `setup-sda`, it is automatically installed.
+SDA intègre Plot de manière transparente et l'installe automatiquement lorsque vous configurez votre projet avec `setup-sda`.
 
-To create a chart and save it as a file (`.jpeg`, `.png`, or `.svg` if you want to rework it in Illustrator), you can use the `writeChart` method.
+Pour créer un graphique et l'enregistrer sous forme de fichier (`.jpeg`, `.png` ou `.svg` si vous souhaitez le retravailler dans Illustrator), vous pouvez utiliser la méthode `writeChart`.
 
-The `writeChart` method requires two arguments:
-- A function that draws a Plot chart.
-- A path for the image file that will be saved.
+La méthode `writeChart` nécessite deux arguments :
+- Une fonction qui génère un graphique Plot.
+- Un chemin d'accès pour enregistrer le fichier image.
 
-In `visualizeData.ts`, let's create a simple line chart showing the area burnt throughout 2023 for each province.
+Dans `visualizeData.ts`, créons un graphique en ligne simple représentant la superficie brûlée au fil de l'année 2023 pour chaque province.
+
 
 ```ts showLineNumbers filename="visualizeData.ts" {2, 6-16}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -195,20 +199,20 @@ export default async function visualizeData(fires: SimpleTable) {
   await fires.writeChart(drawChart, "./sda/output/chart.png");
 }
 ```
-![A screenshot showing a line chart saved as png.](/assets/simple-data-analysis/dataviz/draw-chart.png)
+![Une capture d'écran montrant un graphique en ligne enregistré au format png.](/assets/simple-data-analysis/dataviz/draw-chart.png)
 
 <Callout type="info" emoji="💡">
-   To open two tabs one on top of the other, right-click on the tab you want at the bottom and click on `Split down`. In the screenshot above, I toggled the terminal, but even if it's not displayed, it's still running and watching `main.ts`. So anytime I update the chart code, `main.ts` is rerun and the chart updates.
+   Pour ouvrir deux onglets l'un au-dessus de l'autre, faites un clic droit sur l'onglet que vous souhaitez placer en bas et cliquez sur `Split down`. Dans la capture d'écran ci-dessus, j'ai masqué le terminal, mais même s'il n'est pas affiché, il continue de s'exécuter et surveille `main.ts`. Ainsi, à chaque mise à jour du code du graphique, `main.ts` est relancé et le graphique est mis à jour.
 </Callout>
 
-Let me explain what's going on above:
-- On lines 6-15, I create an arrow function `drawChart`. The function expects an array of `unknown` values because it doesn't know what's in our table. In reality, our data will be an array of objects, as usual.
-- On line 7, I call the `plot` function from Plot. This function creates a chart and requires an object with some options.
-- On line 8, I add a `marks` key with an array. This is the most important option. `marks` define the shapes that represent our data.
-- On lines 9-13, inside the `marks` array, I call the `line` function to create lines based on our `data`. For the `line` options, I specify the `x` values (`startdate`), the `y` values (`cumulativeHectares`), and the `stroke` color (based on `province` values).
-- Finally, on line 16, I call the `writeChart` method on the `fires` table. The first argument is our `drawChart` function, which will automatically receive the `fires` data. The second argument specifies where we want the chart to be saved, which is in the `output` folder.
+Laissez-moi vous expliquer le code ci-dessus: 
+- Aux lignes 6-15, je crée une fonction `drawChart`. Cette fonction attend une liste de valeurs `unknown`, car elle ne sait pas à l'avance ce que contient notre table. En réalité, nos données seront sous forme d'une liste d'objets, comme d'habitude.
+- À la ligne 7, j'appelle la fonction `plot` de Plot. Cette fonction crée un graphique et nécessite un objet avec certaines options.
+- À la ligne 8, j'ajoute une clé `marks` contenant une liste. C'est l'option la plus importante. `marks` définit les formes qui représentent nos données.
+- Aux lignes 9-13, à l'intérieur de la liste `marks`, j'appelle la fonction `line` pour tracer des lignes basées sur nos `data`. Pour les options de `line`, je spécifie les valeurs `x` (`startdate`), les valeurs `y` (`cumulativeHectares`), et la couleur de `stroke` (basée sur les valeurs de `province`).
+- Enfin, à la ligne 16, j'appelle la méthode `writeChart` sur la table `fires`. Le premier argument est notre fonction `drawChart`, qui recevra automatiquement les données `fires`. Le deuxième argument spécifie l'emplacement où enregistrer le graphique, dans le dossier `output`.
 
-Our chart is quite basic for now, and there are some issues, like the y-axis. Let's fix it!
+Notre graphique est encore assez basique, et il y a quelques problèmes, comme l'axe des y. Corrigeons cela !
 
 ```ts showLineNumbers filename="visualizeData.ts" {8-14}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -236,19 +240,19 @@ export default async function visualizeData(fires: SimpleTable) {
   await fires.writeChart(drawChart, "./sda/output/chart.png");
 }
 ```
-![A screenshot showing a chart with a better y axis.](/assets/simple-data-analysis/dataviz/y-axis.png)
+![Une capture d'écran montrant un graphique avec un meilleur axe des y.](/assets/simple-data-analysis/dataviz/y-axis.png)
 
-This is better! To update the y-axis, you can pass options to `y` as an object. Here's what we are doing in the code above:
-- We add grids to make the chart more readable.
-- We format the top axis label to be more understandable with the unit.
-- We limit the axis ticks to 5.
-- We format the tick labels to show millions of hectares instead of just hectares.
+C'est mieux ! Pour mettre à jour l'axe des y, vous pouvez passer des options à `y` sous forme d'objet. Voici ce que nous faisons dans le code ci-dessus :
+- Nous ajoutons des grilles pour rendre le graphique plus lisible.
+- Nous formatons le libellé de l'axe supérieur pour le rendre plus compréhensible avec l'unité.
+- Nous limitons le nombre de graduations de l'axe à 5.
+- Nous formatons les libellés des graduations pour afficher des millions d'hectares au lieu d'hectares simples.
 
-I also added an `inset` of `10` to give a little more space to the top label.
+J'ai également ajouté un `inset` de `10` pour laisser un peu plus d'espace au libellé du haut.
 
-Now, let's update the `x` label. There's no need to modify the x tick labels because Plot handles dates well, automatically displaying years, months, days, or even time based on the scale values and axis width.
+Passons maintenant au libellé de l'axe des x. Il n'est pas nécessaire de modifier les libellés des graduations pour l'axe des x, car Plot gère très bien les dates et affiche automatiquement les années, mois, jours, voire l'heure, en fonction des valeurs de l'échelle et de la largeur de l'axe.
 
-The colors are currently assigned automatically. We can choose a different scheme and maybe add a legend.
+Les couleurs sont actuellement attribuées automatiquement. Nous pourrions choisir un autre jeu de couleurs et peut-être ajouter une légende.
 
 ```ts showLineNumbers filename="visualizeData.ts" {15-21}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -283,13 +287,14 @@ export default async function visualizeData(fires: SimpleTable) {
   await fires.writeChart(drawChart, "./sda/output/chart.png");
 }
 ```
-![A screenshot showing a chart with a color legend.](/assets/simple-data-analysis/dataviz/x-colors.png)
+![Une capture d'écran montrant un graphique avec une légende de couleurs.](/assets/simple-data-analysis/dataviz/x-colors.png)
 
-Hmmmm... The color legend doesn't work very well with so many categories. We need to change our strategy. Instead of a color legend, maybe we could add a dot and a text label at the end of each line.
+Hmmmm... La légende des couleurs ne fonctionne pas très bien avec autant de catégories. Il faut changer de stratégie. Plutôt qu'une légende, nous pourrions ajouter un point et un libellé à la fin de chaque ligne.
 
-Let's remove the color legend and add a `dot` mark. Since we want to add dots at the end of each line, we use the `selectLast` transform. This will select only the last data point.
+Supprimons la légende des couleurs et ajoutons une `mark` `dot`. Comme nous voulons placer les points à la fin de chaque ligne, nous utilisons la transformation `selectLast`, qui sélectionnera uniquement le dernier point de données.
 
-Note that the order in the `marks` array is important. Marks are drawn in sequence, so if you want a shape to appear on top of another, add it later in the array.
+Notez que l'ordre des éléments dans la liste `marks` est important. Les `marks` sont dessinées dans l'ordre d'ajout. Si vous souhaitez qu'une forme apparaisse au-dessus d'une autre, ajoutez-la plus tard dans la liste.
+
 
 ```ts showLineNumbers filename="visualizeData.ts" {2, 27-34}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -331,13 +336,13 @@ export default async function visualizeData(fires: SimpleTable) {
   await fires.writeChart(drawChart, "./sda/output/chart.png");
 }
 ```
-![A screenshot showing a line chart with dots at the end.](/assets/simple-data-analysis/dataviz/dots.png)
+![Une capture d'écran montrant un graphique en ligne avec des points à la fin.](/assets/simple-data-analysis/dataviz/dots.png)
 
-And now let's add the text labels. We use `selectLast` again with some additional options:
-- In addition to `x` and `y`, we also use `z` to let Plot know that we want a text label for each province. If we had used `fill` or `stroke` with `province` values, this would have been automatic, as the text would match the line colors. However, I prefer black text for labels.
-- We use the values in the `province` column for the `text`.
-- We apply a black `fill` with a white `stroke` to improve readability, ensuring the text remains visible even when overlapping other chart elements.
-- We set `textAnchor` to `start` so the text aligns with the `dot`, but we shift it by 5 pixels with `dx` to prevent it from touching the dot.
+Ajoutons maintenant les libellés. Nous utilisons à nouveau `selectLast` avec quelques options supplémentaires :
+- En plus de `x` et `y`, nous utilisons `z` pour indiquer à Plot que nous voulons un texte pour chaque province. Si nous avions utilisé `fill` ou `stroke` avec les valeurs de `province`, cela aurait été automatique, car le texte aurait pris la même couleur que les lignes. Cependant, je préfère un texte noir pour plus de lisibilité.
+- Nous utilisons les valeurs de la colonne `province` pour le `text`.
+- Nous appliquons un `fill` noir avec un `stroke` blanc afin d'améliorer la lisibilité, garantissant que le texte reste visible même lorsqu'il chevauche d'autres éléments du graphique.
+- Nous définissons `textAnchor` sur `start` afin que le texte s'aligne avec le `dot`, mais nous le décalons de 5 pixels avec `dx` pour éviter qu'il ne touche le point.
 
 ```ts showLineNumbers filename="visualizeData.ts" {2, 35-47}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -392,17 +397,17 @@ export default async function visualizeData(fires: SimpleTable) {
   await fires.writeChart(drawChart, "./sda/output/chart.png");
 }
 ```
-![A screenshot showing a line chart with dots and text labels at the end.](/assets/simple-data-analysis/dataviz/text-labels.png)
+![Une capture d'écran montrant un graphique en ligne avec des points et des étiquettes de texte à la fin.](/assets/simple-data-analysis/dataviz/text-labels.png)
 
-This is much better! But our chart needs some obvious adjustments now.
+C'est bien mieux ! Mais notre graphique nécessite encore quelques ajustements évidents.
 
-For example, we can see that the dots and labels at the end of the lines are not aligned... Since we summarized data based on the fires' `startDate`, some provinces have gaps in their dates.
+Par exemple, les points et les libellés à la fin des lignes ne sont pas alignés... Comme nous avons agrégé les données en fonction de la date de début des feux (`startDate`), certaines provinces ont des trous dans leurs dates.
 
-We also notice that not much is happening before mid-April and after October 1st.
+Nous constatons également qu'il ne se passe pas grand-chose avant la mi-avril et après le 1er octobre.
 
-Let's go back to `crunchData.ts` to fix that:
-- On line 10, we filter the fires to keep only those with a `startDate` between April 15, 2023, and October 1st, 2023.
-- On lines 21-30, we retrieve the maximum `cumulativeHectares` for each province and store the results in a new table, `maxValuesPerProvince`. Then, we remove and rename columns to match those in the `fires` table. We also add a new column with the final date for our data (October 1st, 2023). Finally, we insert the rows from this new table into our `fires` table.
+Revenons à `crunchData.ts` pour corriger cela :
+- À la ligne 10, nous filtrons les feux pour ne conserver que ceux ayant un `startDate` entre le 15 avril 2023 et le 1er octobre 2023.
+- Aux lignes 21-30, nous récupérons la valeur maximale de `cumulativeHectares` pour chaque province et stockons les résultats dans une nouvelle table, `maxValuesPerProvince`. Ensuite, nous supprimons et renommons certaines colonnes pour correspondre à celles de la table `fires`. Nous ajoutons également une nouvelle colonne avec la date finale de nos données (1er octobre 2023). Enfin, nous insérons les lignes de cette nouvelle table dans `fires`.
 
 
 ```ts showLineNumbers filename="crunchData.ts" {10, 21-30}
@@ -438,11 +443,11 @@ export default async function crunchData(fires: SimpleTable) {
   await fires.insertTables(maxValuesPerProvince);
 }
 ```
-![A screenshot showing a line chart with aligned labels.](/assets/simple-data-analysis/dataviz/labels-aligned.png)
+![Une capture d'écran montrant un graphique en ligne avec des étiquettes alignées.](/assets/simple-data-analysis/dataviz/labels-aligned.png)
 
-And now, our labels are properly aligned!
+Et maintenant, nos libellés sont correctement alignés !
 
-Let's go back to `visualizeData.ts` to fix the right margin. We can also filter out some labels to prevent overlapping text.
+Retournons dans `visualizeData.ts` pour corriger la marge de droite. Nous pouvons également filtrer certaines étiquettes afin d'éviter le chevauchement du texte.
 
 ```ts showLineNumbers filename="visualizeData.ts" {8, 46}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -499,22 +504,21 @@ export default async function visualizeData(fires: SimpleTable) {
 }
 ```
 
-And here's our chart! Pretty nice, isn't it? 😊
+Et voici notre graphique ! Plutôt sympa, non ? 😊
 
-![The final line chart.](/assets/simple-data-analysis/dataviz/line-chart-final.png)
+![Le graphique final en ligne.](/assets/simple-data-analysis/dataviz/line-chart-final.png)
 
-Of course, there's much more you can do with Plot. Be sure to check the [documentation](https://observablehq.com/plot/getting-started) and the [examples](https://observablehq.com/@observablehq/plot-gallery).
+Bien sûr, vous pouvez faire bien plus avec Plot. N'hésitez pas à consulter la [documentation](https://observablehq.com/plot/getting-started) et les [exemples](https://observablehq.com/@observablehq/plot-gallery).
 
-And if you want to create charts that can be modified in software like Illustrator, just save them as `.svg` instead of `.png`.
+Et si vous souhaitez créer des graphiques modifiables dans des logiciels comme Illustrator, enregistrez-les simplement au format `.svg` au lieu de `.png`.
 
-### Wildfires beeswarm chart
+### Diagramme en essaim des feux de forêt
 
-Our previous chart was quite traditional, but you can also create more unconventional visualizations that push the boundaries of data storytelling.
+Notre graphique précédent était assez classique, mais vous pouvez également créer des visualisations plus originales.
 
-For example, let's create a beeswarm of our fires.
+Par exemple, créons un diagramme en essaim des feux de forêt.
 
-We can update `crunchData.ts` to return to our raw data. However, let's keep only fires greater than 1 hectare. That leaves us with around 2,400 fires. This is quite a lot, considering we want to visualize each fire individually!
-
+Nous pouvons mettre à jour `crunchData.ts` pour revenir à nos données brutes. Cependant, limitons-nous aux feux de plus de 1 hectare. Cela nous laisse environ 2 400 feux, ce qui est déjà assez conséquent puisque nous voulons les visualiser individuellement !
 
 ```ts showLineNumbers filename="crunchData.ts"
 import { SimpleTable } from "@nshiab/simple-data-analysis";
