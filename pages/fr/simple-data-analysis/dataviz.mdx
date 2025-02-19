@@ -1,0 +1,1134 @@
+---
+title: Comment visualiser des données avec TypeScript
+description: Dans cette leçon, nous apprenons à visualiser des données tabulaires et géospatiales avec Simple Data Analysis et Plot.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Visualiser des données avec Simple Data Analysis et Plot
+
+Les visualisations de données vous aident à mieux comprendre vos données et à communiquer vos conclusions. Dans cette leçon, nous allons apprendre à visualiser des tables SDA, que ce soit avec des graphiques simples dans le terminal ou des visualisations plus poussées avec la librairie Plot.
+
+Nous utiliserons des données sur les feux de forêt au Canada en 2023 et explorerons différentes techniques de visualisation, y compris des graphiques en ligne, des diagrammes en essaim et des cartes ! 🌎
+
+Cette leçon suppose que vous avez déjà complété les leçons sur les [Données tabulaires](/simple-data-analysis/tabular-data) et les [Données géospatiales](/simple-data-analysis/geospatial).
+
+<NoticeIntro lang="fr" />
+
+## Configuration
+
+Comme dans la leçon précédente, créez un nouveau dossier sur votre ordinateur, ouvrez-le avec VS Code et exécutez la commande suivante dans le terminal : `deno -A jsr:@nshiab/setup-sda`
+
+Après l'exécution de cette commande, votre terminal affichera une description des fichiers créés et des librairies installées.
+
+Ensuite, exécutez la tâche suggérée pour démarrer et surveiller `sda/main.ts` : `deno task sda`
+
+![Une capture d'écran montrant VS Code après l'exécution de setup-sda.](/assets/simple-data-analysis/dataviz/setup.png)
+
+Pour organiser notre code de manière claire, nous allons créer deux fonctions :
+- `crunchData`, où nous allons récupérer et nettoyer les données sur les feux de forêt.
+- `visualizeData`, où nous allons générer nos graphiques et nos cartes.
+
+Commençons par `crunchData`. Créez un fichier `crunchData.ts` dans `./sda/helpers/`. Cette fonction `async` attend un paramètre `fires` de type `SimpleTable`, qui est une table SDA. La fonction n'a pas besoin de renvoyer de valeur.
+
+À l'intérieur, nous allons récupérer et mettre en cache les données sur les feux de forêt. Cet ensemble de données est une version légèrement modifiée de celui utilisé dans la leçon précédente. Il inclut des dates et uniquement les feux ayant une superficie brûlée (`hectares`) supérieure à zéro.
+
+```ts showLineNumbers filename="crunchData.ts"
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(fires: SimpleTable) {
+  await fires.cache(async () => {
+    await fires.loadData(
+      "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+    );
+  });
+}
+````
+
+Nous pouvons maintenant nous occuper de `visualizeData`. Créez un fichier `visualizeData.ts` dans `./sda/helpers/`. C'est également une fonction `async` qui prend un paramètre `fires` de type `SimpleTable`. Pour l'instant, contentons-nous d'afficher la table dans la console.
+
+```ts showLineNumbers filename="visualizeData.ts"
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+}
+```
+
+Mettons à jour `main.ts` pour créer la table `fires` et la passer à nos nouvelles fonctions.
+
+```ts  showLineNumbers filename="main.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import crunchData from "./helpers/crunchData.ts";
+import visualizeData from "./helpers/visualizeData.ts";
+
+const sdb = new SimpleDB();
+const fires = sdb.newTable("fires");
+
+await crunchData(fires);
+await visualizeData(fires);
+
+await sdb.done();
+```
+![Une capture d'écran montrant VS Code après l'exécution des fonctions d'aide.](/assets/simple-data-analysis/dataviz/helpers.png)
+
+## Préparation des données
+
+Nous avons environ 5 000 feux de forêt. Disons que nous aimerions visualiser la superficie brûlée au fil de l'année pour chaque province. Nous devons calculer la somme cumulative de la superficie brûlée.
+
+Dans `crunchData.ts`, additionnons les superficies brûlées par date et par province.
+
+```ts showLineNumbers filename="crunchData.ts" {10-15}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(fires: SimpleTable) {
+  await fires.cache(async () => {
+    await fires.loadData(
+      "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+    );
+  });
+
+  await fires.summarize({
+    values: "hectares",
+    categories: ["province", "startdate"],
+    summaries: "sum",
+    decimals: 1,
+  });
+}
+```
+![Une capture d'écran montrant VS Code affichant des tables de données.](/assets/simple-data-analysis/dataviz/summary.png)
+
+Nous pouvons maintenant calculer la somme cumulative par province avec la méthode `accumulate`. Nous pouvons également arrondir les valeurs avec la méthode `round` pour éviter les erreurs d'arrondi liées aux nombres à virgule flottante.
+
+```ts showLineNumbers filename="crunchData.ts" {16-19}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(fires: SimpleTable) {
+  await fires.cache(async () => {
+    await fires.loadData(
+      "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+    );
+  });
+
+  await fires.summarize({
+    values: "hectares",
+    categories: ["province", "startdate"],
+    summaries: "sum",
+    decimals: 1,
+  });
+  await fires.accumulate("sum", "cumulativeHectares", {
+    categories: "province",
+  });
+  await fires.round("cumulativeHectares", { decimals: 1 });
+}
+```
+![Une capture d'écran montrant une nouvelle colonne cumulativeHectares dans une table de données.](/assets/simple-data-analysis/dataviz/cumulative.png)
+
+Visualisons maintenant ces données !
+
+## Dans le terminal
+
+SDA propose des méthodes pour afficher facilement des graphiques dans votre terminal. C'est un excellent moyen d'inspecter rapidement vos données. Travaillons dans `visualizeData.ts`.
+
+Dans l'exemple ci-dessous, nous utilisons la méthode `logDotChart` avec :
+- La colonne `startdate` pour les valeurs en abscisse (x).
+- La colonne `cumulativeHectares` pour les valeurs en ordonnée (y).
+
+J'ai également ajouté quelques options :
+- Nous utilisons la valeur `province` pour créer des graphiques multiples (un graphique par province).
+- Nous appliquons la même échelle à tous les graphiques, ce qui facilite la comparaison entre les provinces.
+- Nous formatons les libellés de l'axe des y avec la fonction `formatNumber` de la librairie [journalism](https://github.com/nshiab/journalism). J'ai créé cette librairie pour fournir des fonctions utilitaires générales. Elle est automatiquement installée avec `setup-sda`.
+
+```ts showLineNumbers filename="visualizeData.ts" {6-14}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { formatNumber } from "@nshiab/journalism/web";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  await fires.logDotChart(
+    "startdate",
+    "cumulativeHectares",
+    {
+      smallMultiples: "province",
+      fixedScales: true,
+      formatY: (d) => formatNumber(d as number, { decimals: 0, suffix: " ha" }),
+    },
+  );
+}
+```
+![Une capture d'écran montrant des graphiques en points dans le terminal.](/assets/simple-data-analysis/dataviz/dot-charts.png)
+
+Vous n'êtes pas limité aux graphiques en points. Vous pouvez également utiliser les méthodes `logLineChart`, `logBarChart` et `logHistogram`.
+
+Cependant, bien que ces méthodes soient très pratiques, elles restent assez limitées.
+
+## Avec Plot
+
+### Hectares brûlés cumulés par province
+
+[Plot](https://github.com/observablehq/plot) est une librairie fantastique pour créer des graphiques. Elle est basée sur la célèbre librairie [d3](https://github.com/d3/d3) (développée par la même équipe, dont [Mike Bostock](https://github.com/mbostock) et [Philippe Rivière](https://github.com/Fil)). Cependant, elle est bien plus facile à utiliser, car de nombreux éléments qui doivent être gérés manuellement avec d3 (échelles, axes, etc.) sont pris en charge automatiquement par Plot.
+
+SDA intègre Plot de manière transparente et l'installe automatiquement lorsque vous configurez votre projet avec `setup-sda`.
+
+Pour créer un graphique et l'enregistrer sous forme de fichier (`.jpeg`, `.png` ou `.svg` si vous souhaitez le retravailler dans Illustrator), vous pouvez utiliser la méthode `writeChart`.
+
+La méthode `writeChart` nécessite deux arguments :
+- Une fonction qui génère un graphique Plot.
+- Un chemin d'accès pour enregistrer le fichier image.
+
+Dans `visualizeData.ts`, créons un graphique en ligne simple représentant la superficie brûlée au fil de l'année 2023 pour chaque province.
+
+
+```ts showLineNumbers filename="visualizeData.ts" {2, 6-16}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { line, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      marks: [
+        line(data, {
+          x: "startdate",
+          y: "cumulativeHectares",
+          stroke: "province",
+        }),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+![Une capture d'écran montrant un graphique en ligne enregistré au format png.](/assets/simple-data-analysis/dataviz/draw-chart.png)
+
+<Callout type="info" emoji="💡">
+   Pour ouvrir deux onglets l'un au-dessus de l'autre, faites un clic droit sur l'onglet que vous souhaitez placer en bas et cliquez sur `Split down`. Dans la capture d'écran ci-dessus, j'ai masqué le terminal, mais même s'il n'est pas affiché, il continue de s'exécuter et surveille `main.ts`. Ainsi, à chaque mise à jour du code du graphique, `main.ts` est relancé et le graphique est mis à jour.
+</Callout>
+
+Laissez-moi vous expliquer le code ci-dessus: 
+- Aux lignes 6-15, je crée une fonction `drawChart`. Cette fonction attend une liste de valeurs `unknown`, car elle ne sait pas à l'avance ce que contient notre table. En réalité, nos données seront sous forme d'une liste d'objets, comme d'habitude.
+- À la ligne 7, j'appelle la fonction `plot` de Plot. Cette fonction crée un graphique et nécessite un objet avec certaines options.
+- À la ligne 8, j'ajoute une clé `marks` contenant une liste. C'est l'option la plus importante. `marks` définit les formes qui représentent nos données.
+- Aux lignes 9-13, à l'intérieur de la liste `marks`, j'appelle la fonction `line` pour tracer des lignes basées sur nos `data`. Pour les options de `line`, je spécifie les valeurs `x` (`startdate`), les valeurs `y` (`cumulativeHectares`), et la couleur de `stroke` (basée sur les valeurs de `province`).
+- Enfin, à la ligne 16, j'appelle la méthode `writeChart` sur la table `fires`. Le premier argument est notre fonction `drawChart`, qui recevra automatiquement les données `fires`. Le deuxième argument spécifie l'emplacement où enregistrer le graphique, dans le dossier `output`.
+
+Notre graphique est encore assez basique, et il y a quelques problèmes, comme l'axe des y. Corrigeons cela !
+
+```ts showLineNumbers filename="visualizeData.ts" {8-14}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { line, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      inset: 10,
+      y: {
+        grid: true,
+        label: "Area burned (hectares)",
+        ticks: 5,
+        tickFormat: (d) => `${d / 1_000_000}M`,
+      },
+      marks: [
+        line(data, {
+          x: "startdate",
+          y: "cumulativeHectares",
+          stroke: "province",
+        }),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+![Une capture d'écran montrant un graphique avec un meilleur axe des y.](/assets/simple-data-analysis/dataviz/y-axis.png)
+
+C'est mieux ! Pour mettre à jour l'axe des y, vous pouvez passer des options à `y` sous forme d'objet. Voici ce que nous faisons dans le code ci-dessus :
+- Nous ajoutons des grilles pour rendre le graphique plus lisible.
+- Nous formatons le libellé de l'axe supérieur pour le rendre plus compréhensible avec l'unité.
+- Nous limitons le nombre de graduations de l'axe à 5.
+- Nous formatons les libellés des graduations pour afficher des millions d'hectares au lieu d'hectares simples.
+
+J'ai également ajouté un `inset` de `10` pour laisser un peu plus d'espace au libellé du haut.
+
+Passons maintenant au libellé de l'axe des x. Il n'est pas nécessaire de modifier les libellés des graduations pour l'axe des x, car Plot gère très bien les dates et affiche automatiquement les années, mois, jours, voire l'heure, en fonction des valeurs de l'échelle et de la largeur de l'axe.
+
+Les couleurs sont actuellement attribuées automatiquement. Nous pourrions choisir un autre jeu de couleurs et peut-être ajouter une légende.
+
+```ts showLineNumbers filename="visualizeData.ts" {15-21}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { line, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      inset: 10,
+      y: {
+        grid: true,
+        label: "Area burned (hectares)",
+        ticks: 5,
+        tickFormat: (d) => `${d / 1_000_000}M`,
+      },
+      x: {
+        label: "Date",
+      },
+      color: {
+        legend: true,
+        scheme: "tableau10",
+      },
+      marks: [
+        line(data, {
+          x: "startdate",
+          y: "cumulativeHectares",
+          stroke: "province",
+        }),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+![Une capture d'écran montrant un graphique avec une légende de couleurs.](/assets/simple-data-analysis/dataviz/x-colors.png)
+
+Hmmmm... La légende des couleurs ne fonctionne pas très bien avec autant de catégories. Il faut changer de stratégie. Plutôt qu'une légende, nous pourrions ajouter un point et un libellé à la fin de chaque ligne.
+
+Supprimons la légende des couleurs et ajoutons une `mark` `dot`. Comme nous voulons placer les points à la fin de chaque ligne, nous utilisons la transformation `selectLast`, qui sélectionnera uniquement le dernier point de données.
+
+Notez que l'ordre des éléments dans la liste `marks` est important. Les `marks` sont dessinées dans l'ordre d'ajout. Si vous souhaitez qu'une forme apparaisse au-dessus d'une autre, ajoutez-la plus tard dans la liste.
+
+
+```ts showLineNumbers filename="visualizeData.ts" {2, 27-34}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { dot, line, plot, selectLast } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      inset: 10,
+      y: {
+        grid: true,
+        label: "Area burned (hectares)",
+        ticks: 5,
+        tickFormat: (d) => `${d / 1_000_000}M`,
+      },
+      x: {
+        label: "Date",
+      },
+      color: {
+        scheme: "tableau10",
+      },
+      marks: [
+        line(data, {
+          x: "startdate",
+          y: "cumulativeHectares",
+          stroke: "province",
+        }),
+        dot(
+          data,
+          selectLast({
+            x: "startdate",
+            y: "cumulativeHectares",
+            fill: "province",
+          }),
+        ),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+![Une capture d'écran montrant un graphique en ligne avec des points à la fin.](/assets/simple-data-analysis/dataviz/dots.png)
+
+Ajoutons maintenant les libellés. Nous utilisons à nouveau `selectLast` avec quelques options supplémentaires :
+- En plus de `x` et `y`, nous utilisons `z` pour indiquer à Plot que nous voulons un texte pour chaque province. Si nous avions utilisé `fill` ou `stroke` avec les valeurs de `province`, cela aurait été automatique, car le texte aurait pris la même couleur que les lignes. Cependant, je préfère un texte noir pour plus de lisibilité.
+- Nous utilisons les valeurs de la colonne `province` pour le `text`.
+- Nous appliquons un `fill` noir avec un `stroke` blanc afin d'améliorer la lisibilité, garantissant que le texte reste visible même lorsqu'il chevauche d'autres éléments du graphique.
+- Nous définissons `textAnchor` sur `start` afin que le texte s'aligne avec le `dot`, mais nous le décalons de 5 pixels avec `dx` pour éviter qu'il ne touche le point.
+
+```ts showLineNumbers filename="visualizeData.ts" {2, 35-47}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { dot, line, plot, selectLast, text } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      inset: 10,
+      y: {
+        grid: true,
+        label: "Area burned (hectares)",
+        ticks: 5,
+        tickFormat: (d) => `${d / 1_000_000}M`,
+      },
+      x: {
+        label: "Date",
+      },
+      color: {
+        scheme: "tableau10",
+      },
+      marks: [
+        line(data, {
+          x: "startdate",
+          y: "cumulativeHectares",
+          stroke: "province",
+        }),
+        dot(
+          data,
+          selectLast({
+            x: "startdate",
+            y: "cumulativeHectares",
+            fill: "province",
+          }),
+        ),
+        text(
+          data,
+          selectLast({
+            x: "startdate",
+            y: "cumulativeHectares",
+            z: "province",
+            text: "province",
+            fill: "black",
+            stroke: "white",
+            textAnchor: "start",
+            dx: 5,
+          }),
+        ),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+![Une capture d'écran montrant un graphique en ligne avec des points et des étiquettes de texte à la fin.](/assets/simple-data-analysis/dataviz/text-labels.png)
+
+C'est bien mieux ! Mais notre graphique nécessite encore quelques ajustements évidents.
+
+Par exemple, les points et les libellés à la fin des lignes ne sont pas alignés... Comme nous avons agrégé les données en fonction de la date de début des feux (`startDate`), certaines provinces ont des trous dans leurs dates.
+
+Nous constatons également qu'il ne se passe pas grand-chose avant la mi-avril et après le 1er octobre.
+
+Revenons à `crunchData.ts` pour corriger cela :
+- À la ligne 10, nous filtrons les feux pour ne conserver que ceux ayant un `startDate` entre le 15 avril 2023 et le 1er octobre 2023.
+- Aux lignes 21-30, nous récupérons la valeur maximale de `cumulativeHectares` pour chaque province et stockons les résultats dans une nouvelle table, `maxValuesPerProvince`. Ensuite, nous supprimons et renommons certaines colonnes pour correspondre à celles de la table `fires`. Nous ajoutons également une nouvelle colonne avec la date finale de nos données (1er octobre 2023). Enfin, nous insérons les lignes de cette nouvelle table dans `fires`.
+
+
+```ts showLineNumbers filename="crunchData.ts" {10, 21-30}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(fires: SimpleTable) {
+  await fires.cache(async () => {
+    await fires.loadData(
+      "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+    );
+  });
+
+  await fires.filter(`startdate >= '2023-04-15' && startdate <= '2023-10-01'`);
+  await fires.summarize({
+    values: "hectares",
+    categories: ["province", "startdate"],
+    summaries: "sum",
+    decimals: 1,
+  });
+  await fires.accumulate("sum", "cumulativeHectares", {
+    categories: "province",
+  });
+  await fires.round("cumulativeHectares", { decimals: 1 });
+  const maxValuesPerProvince = await fires.summarize({
+    values: "cumulativeHectares",
+    categories: "province",
+    summaries: "max",
+    outputTable: "maxValuesPerProvince",
+  });
+  await maxValuesPerProvince.removeColumns("value");
+  await maxValuesPerProvince.renameColumns({ max: "cumulativeHectares" });
+  await maxValuesPerProvince.addColumn("startdate", "date", `'2023-10-01'`);
+  await fires.insertTables(maxValuesPerProvince);
+}
+```
+![Une capture d'écran montrant un graphique en ligne avec des étiquettes alignées.](/assets/simple-data-analysis/dataviz/labels-aligned.png)
+
+Et maintenant, nos libellés sont correctement alignés !
+
+Retournons dans `visualizeData.ts` pour corriger la marge de droite. Nous pouvons également filtrer certaines étiquettes afin d'éviter le chevauchement du texte.
+
+```ts showLineNumbers filename="visualizeData.ts" {8, 46}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { dot, line, plot, selectLast, text } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  const drawChart = (data: unknown[]) =>
+    plot({
+      inset: 10,
+      marginRight: 110,
+      y: {
+        grid: true,
+        label: "Area burned (hectares)",
+        ticks: 5,
+        tickFormat: (d) => `${d / 1_000_000}M`,
+      },
+      x: {
+        label: "Date",
+      },
+      color: {
+        scheme: "tableau10",
+      },
+      marks: [
+        line(data, {
+          x: "startdate",
+          y: "cumulativeHectares",
+          stroke: "province",
+        }),
+        dot(
+          data,
+          selectLast({
+            x: "startdate",
+            y: "cumulativeHectares",
+            fill: "province",
+          }),
+        ),
+        text(
+          data,
+          selectLast({
+            x: "startdate",
+            y: "cumulativeHectares",
+            z: "province",
+            text: "province",
+            fill: "black",
+            stroke: "white",
+            textAnchor: "start",
+            dx: 5,
+            filter: (d) => d.cumulativeHectares >= 400_000,
+          }),
+        ),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+
+Et voici notre graphique ! Plutôt sympa, non ? 😊
+
+![Le graphique final en ligne.](/assets/simple-data-analysis/dataviz/line-chart-final.png)
+
+Bien sûr, vous pouvez faire bien plus avec Plot. N'hésitez pas à consulter la [documentation](https://observablehq.com/plot/getting-started) et les [exemples](https://observablehq.com/@observablehq/plot-gallery).
+
+Et si vous souhaitez créer des graphiques modifiables dans des logiciels comme Illustrator, enregistrez-les simplement au format `.svg` au lieu de `.png`.
+
+### Diagramme en essaim des feux de forêt
+
+Notre graphique précédent était assez classique, mais vous pouvez également créer des visualisations plus originales.
+
+Par exemple, créons un diagramme en essaim des feux de forêt.
+
+Nous pouvons mettre à jour `crunchData.ts` pour revenir à nos données brutes. Cependant, limitons-nous aux feux de plus de 1 hectare. Cela nous laisse environ 2 400 feux, ce qui est déjà assez conséquent puisque nous voulons les visualiser individuellement !
+
+```ts showLineNumbers filename="crunchData.ts"
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(fires: SimpleTable) {
+  await fires.cache(async () => {
+    await fires.loadData(
+      "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+    );
+  });
+  await fires.filter(`hectares > 1`);
+}
+```
+
+Commençons par dessiner nos feux sous forme de points simples sur un axe des y.
+
+```ts showLineNumbers filename="visualizeData.ts"
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { dot, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      marks: [
+        dot(data, { y: "hectares" }),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+![Les feux représentés sous forme de points simples.](/assets/simple-data-analysis/dataviz/fires-dots.png)
+
+Pour le moment, nos feux se chevauchent. L'objectif d'un diagramme en essaim est d'empiler les points de données de manière à ce que chacun reste visible.
+
+Pour créer un diagramme en essaim, nous pouvons utiliser la transformation `dodge` avec l'option `middle`. Mettons à jour notre code.
+
+Le rendu de ce graphique peut prendre quelques secondes en fonction de la puissance de votre ordinateur.
+
+```ts showLineNumbers filename="visualizeData.ts" {2, 9}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { dodgeX, dot, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      marks: [
+        dot(data, dodgeX("middle", { y: "hectares" })),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+![Notre premier diagramme en essaim.](/assets/simple-data-analysis/dataviz/fires-dodge.png)
+
+On dirait que nous avons énoooormément de petits feux de forêt et quelques très gros.
+
+Une échelle logarithmique pourrait nous aider à mieux visualiser cela ! Changeons le `type` de l'échelle `y` en `log`.
+
+```ts showLineNumbers filename="visualizeData.ts" {8-10}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { dodgeX, dot, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      y: {
+        type: "log",
+      },
+      marks: [
+        dot(data, dodgeX("middle", { y: "hectares" })),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+![Le diagramme en essaim avec une échelle logarithmique.](/assets/simple-data-analysis/dataviz/log-scale.png)
+
+C'est déjà bien mieux. Une autre amélioration consisterait à ajuster le rayon des points en fonction de la taille des feux.
+
+Nous pouvons mettre à jour les options de la fonction `dot` et ajuster l'échelle `r` pour garantir un rayon minimum de 1 pixel et un maximum de 20 pixels.
+
+```ts showLineNumbers filename="visualizeData.ts" {11-13, 15}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { dodgeX, dot, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      y: {
+        type: "log",
+      },
+      r: {
+        range: [1, 20],
+      },
+      marks: [
+        dot(data, dodgeX("middle", { y: "hectares", r: "hectares" })),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+![Le diagramme en essaim avec le rayon des points en fonction des hectares brûlés.](/assets/simple-data-analysis/dataviz/radiuses.png)
+
+On y arrive.
+
+Colorons maintenant les cercles en fonction de la cause des feux et ajoutons une légende.
+
+```ts showLineNumbers filename="visualizeData.ts" {14-16, 20}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { dodgeX, dot, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      y: {
+        type: "log",
+      },
+      r: {
+        range: [1, 20],
+      },
+      color: {
+        legend: true,
+      },
+      marks: [
+        dot(
+          data,
+          dodgeX("middle", { y: "hectares", r: "hectares", fill: "cause" }),
+        ),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+![Le diagramme en essaim avec des couleurs selon la cause des feux.](/assets/simple-data-analysis/dataviz/fires-color.png)
+
+Pour faciliter la comparaison des causes, nous pourrions utiliser des facettes. Faisons cela pour créer trois petits graphiques au lieu d'un grand.
+
+Pour ce faire, nous utilisons l'option `fx` pour créer des facettes horizontales. Augmentons également la largeur du graphique pour une meilleure lisibilité.
+
+```ts showLineNumbers filename="visualizeData.ts" {8, 25}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { dodgeX, dot, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      width: 800,
+      y: {
+        type: "log",
+      },
+      r: {
+        range: [1, 20],
+      },
+      color: {
+        legend: true,
+      },
+      marks: [
+        dot(
+          data,
+          dodgeX("middle", {
+            y: "hectares",
+            r: "hectares",
+            fill: "cause",
+            fx: "cause",
+          }),
+        ),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+![Le diagramme en essaim avec des facettes selon la cause des feux.](/assets/simple-data-analysis/dataviz/facets.png)
+
+Ça commence à avoir fière allure. Nous n'avons probablement plus besoin de la légende des couleurs.
+
+Ajustons les libellés et les axes. Et voilà!
+
+```ts showLineNumbers filename="visualizeData.ts" {8-9, 12-14, 19-21}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { dodgeX, dot, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawChart = (data: unknown[]) =>
+    plot({
+      width: 800,
+      marginTop: 40,
+      y: {
+        type: "log",
+        label: "Hectares",
+        ticks: 5,
+        grid: true,
+      },
+      r: {
+        range: [1, 20],
+      },
+      fx: {
+        label: null,
+      },
+      marks: [
+        dot(
+          data,
+          dodgeX("middle", {
+            y: "hectares",
+            r: "hectares",
+            fill: "cause",
+            fx: "cause",
+          }),
+        ),
+      ],
+    });
+  await fires.writeChart(drawChart, "./sda/output/chart.png");
+}
+```
+
+C'est plutôt sympa, non ? En jouant avec les `marks` et les `transforms`, vous pouvez créer des visualisations de données époustouflantes avec SDA et Plot.
+
+Encore une fois, je vous encourage à consulter la [documentation](https://observablehq.com/plot/getting-started) de Plot ainsi que les [exemples](https://observablehq.com/@observablehq/plot-gallery). Vous allez vous amuser avec cette librairie ! 💃🕺
+
+![Le diagramme en essaim.](/assets/simple-data-analysis/dataviz/beeswarm.png)
+
+### Carte des feux de forêt
+
+Avec SDA, vous pouvez travailler à la fois avec des données tabulaires et des données géospatiales. Et lorsque vous manipulez des données géospatiales, vous souhaitez souvent créer des cartes !
+
+Cartographions nos feux en y ajoutant les limites des provinces canadiennes.
+
+Tout d'abord, nous devons stocker les géométries des feux dans la même table que les limites des provinces.
+
+Réutilisons ce que nous avons fait dans la leçon précédente et mettons à jour `crunchData.ts`. Nous allons le modifier pour qu'il prenne un deuxième paramètre, `provinces`. Nous récupérons et mettons en cache les limites des provinces, puis nous les insérons dans la table `fires`. Avant de les insérer, nous ajoutons une colonne `isFire` à la table `fires` pour pouvoir les différencier facilement par la suite.
+
+```ts showLineNumbers filename="crunchData.ts"
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(
+  fires: SimpleTable,
+  provinces: SimpleTable,
+) {
+  await fires.cache(async () => {
+    await fires.loadData(
+      "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+    );
+    await fires.points("lat", "lon", "geom");
+    await fires.addColumn("isFire", "boolean", `TRUE`);
+  });
+
+  await provinces.cache(async () => {
+    await provinces.loadGeoData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
+    );
+  });
+
+  await fires.insertTables(provinces, { unifyColumns: true });
+}
+```
+
+Retirons tout sauf le `logTable` dans `visualizeData.ts` pour le moment.
+
+```ts showLineNumbers filename="visualizeData.ts"
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+}
+```
+
+Mettons à jour `main.ts` pour créer une nouvelle table `provinces` et la passer à `crunchData`.
+
+```ts showLineNumbers filename="main.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import crunchData from "./helpers/crunchData.ts";
+import visualizeData from "./helpers/visualizeData.ts";
+
+const sdb = new SimpleDB();
+const fires = sdb.newTable("fires");
+const provinces = sdb.newTable("provinces");
+
+await crunchData(fires, provinces);
+await visualizeData(fires);
+
+await sdb.done();
+```
+
+Voici ce que vous devriez voir pour partir du bon pied.
+
+![VS Code en cours d'exécution et surveillant main.ts.](/assets/simple-data-analysis/dataviz/map-start.png)
+
+Passons maintenant à notre carte dans `visualizeData`. Au lieu d'utiliser `writeChart`, nous devons utiliser `writeMap`.
+
+Étant donné que nous travaillons avec des données géospatiales, `writeMap` passe les données au format GeoJSON à la fonction qui dessine la carte. C'est pourquoi `drawMap` attend des données avec le type `{ features: { properties: { [key: string]: unknown } }[] }`. Cela signifie essentiellement que nos données de table sont maintenant stockées dans les `properties` de chaque `feature`.
+
+Pour travailler facilement avec les feux et les provinces, nous les isolons d'abord aux lignes 9-14. Ensuite, dans la fonction `plot`, nous utilisons la `mark` `geo`, qui gère automatiquement les coordonnées géospatiales des `features`.
+
+```ts showLineNumbers filename="visualizeData.ts" {2, 6-23}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { geo, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawMap = (
+    data: { features: { properties: { [key: string]: unknown } }[] },
+  ) => {
+    const firesPoints = data.features.filter(
+      (feature) => feature.properties.isFire,
+    );
+    const provincesPolygons = data.features.filter(
+      (feature) => !feature.properties.isFire,
+    );
+
+    return plot({
+      marks: [
+        geo(provincesPolygons),
+        geo(firesPoints),
+      ],
+    });
+  };
+  await fires.writeMap(drawMap, "./sda/output/map.png");
+}
+```
+![VS Code affichant une carte de base.](/assets/simple-data-analysis/dataviz/basic-map.png)
+
+Comme vous pouvez le voir sur la capture d'écran ci-dessus, la marque `geo` a automatiquement détecté les coordonnées sous forme de points de nos feux et les coordonnées des polygones représentant les frontières des provinces canadiennes. Plutôt malin, non ? 🤓
+
+Actuellement, la projection est en Mercator. Heureusement, Plot prend en charge des projections plus adaptées. Mettons à jour l'option `projection` :
+- Définissez le `type` sur `conic-conformal`.
+- Utilisez l'option `rotate` pour s'assurer que la carte n'est pas inclinée avec cette projection.
+- Utilisez l'option `domain` pour aider Plot à faire en sorte que nos données géospatiales occupent le plus d'espace possible sur la carte.
+
+```ts showLineNumbers filename="visualizeData.ts" {17-21}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { geo, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawMap = (
+    data: { features: { properties: { [key: string]: unknown } }[] },
+  ) => {
+    const firesPoints = data.features.filter(
+      (feature) => feature.properties.isFire,
+    );
+    const provincesPolygons = data.features.filter(
+      (feature) => !feature.properties.isFire,
+    );
+
+    return plot({
+      projection: {
+        type: "conic-conformal",
+        rotate: [100, -60],
+        domain: data,
+      },
+      marks: [
+        geo(provincesPolygons),
+        geo(firesPoints),
+      ],
+    });
+  };
+  await fires.writeMap(drawMap, "./sda/output/map.png");
+}
+```
+![VS Code affichant une projection conique conforme.](/assets/simple-data-analysis/dataviz/projection.png)
+
+C'est mieux. Stylisons les frontières des provinces pour créer un joli fond.
+
+```ts showLineNumbers filename="visualizeData.ts" {23-26}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { geo, plot } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawMap = (
+    data: { features: { properties: { [key: string]: unknown } }[] },
+  ) => {
+    const firesPoints = data.features.filter(
+      (feature) => feature.properties.isFire,
+    );
+    const provincesPolygons = data.features.filter(
+      (feature) => !feature.properties.isFire,
+    );
+
+    return plot({
+      projection: {
+        type: "conic-conformal",
+        rotate: [100, -60],
+        domain: data,
+      },
+      marks: [
+        geo(provincesPolygons, {
+          stroke: "lightgray",
+          fill: "whitesmoke",
+        }),
+        geo(firesPoints),
+      ],
+    });
+  };
+  await fires.writeMap(drawMap, "./sda/output/map.png");
+}
+```
+![VS Code affichant les frontières des provinces en gris clair.](/assets/simple-data-analysis/dataviz/boundaries.png)
+
+Passons maintenant aux feux. Étant donné que ce sont des points géospatiaux, Plot les affiche automatiquement sous forme de points en utilisant la marque `geo`.
+
+Mais rien ne nous empêche d'utiliser une autre marque ! Créons plutôt une carte en `spike`.
+
+Comme les feux sont une collection de `features` GeoJSON, nous devons utiliser des fonctions pour indiquer à Plot où trouver les bonnes valeurs pour les options de `spike`.
+
+```ts showLineNumbers filename="visualizeData.ts" {2, 22-24, 30-34}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { geo, plot, spike } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawMap = (
+    data: { features: { properties: { [key: string]: unknown } }[] },
+  ) => {
+    const firesPoints = data.features.filter(
+      (feature) => feature.properties.isFire,
+    );
+    const provincesPolygons = data.features.filter(
+      (feature) => !feature.properties.isFire,
+    );
+
+    return plot({
+      projection: {
+        type: "conic-conformal",
+        rotate: [100, -60],
+        domain: data,
+      },
+      length: {
+        range: [1, 100],
+      },
+      marks: [
+        geo(provincesPolygons, {
+          stroke: "lightgray",
+          fill: "whitesmoke",
+        }),
+        spike(firesPoints, {
+          x: (d) => d.properties.lon,
+          y: (d) => d.properties.lat,
+          length: (d) => d.properties.hectares,
+        }),
+      ],
+    });
+  };
+  await fires.writeMap(drawMap, "./sda/output/map.png");
+}
+```
+![VS Code affichant une carte en spikes basique.](/assets/simple-data-analysis/dataviz/basic-spike-map.png)
+
+C'est assez intéressant ! Maintenant, ajoutons un code couleur aux pics en fonction de la cause des feux de forêt.
+
+```ts showLineNumbers filename="visualizeData.ts" {25-27, 37}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { geo, plot, spike } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawMap = (
+    data: { features: { properties: { [key: string]: unknown } }[] },
+  ) => {
+    const firesPoints = data.features.filter(
+      (feature) => feature.properties.isFire,
+    );
+    const provincesPolygons = data.features.filter(
+      (feature) => !feature.properties.isFire,
+    );
+
+    return plot({
+      projection: {
+        type: "conic-conformal",
+        rotate: [100, -60],
+        domain: data,
+      },
+      length: {
+        range: [1, 100],
+      },
+      color: {
+        legend: true,
+      },
+      marks: [
+        geo(provincesPolygons, {
+          stroke: "lightgray",
+          fill: "whitesmoke",
+        }),
+        spike(firesPoints, {
+          x: (d) => d.properties.lon,
+          y: (d) => d.properties.lat,
+          length: (d) => d.properties.hectares,
+          stroke: (d) => d.properties.cause,
+        }),
+      ],
+    });
+  };
+  await fires.writeMap(drawMap, "./sda/output/map.png");
+}
+```
+![VS Code affichant une carte en spikes colorée.](/assets/simple-data-analysis/dataviz/spikes-color.png)
+
+Nous avons beaucoup de pics qui se chevauchent. Par défaut, Plot dessine les pics dans l'ordre dans lequel ils apparaissent dans les données.
+
+Mettons à jour `crunchData` pour trier les feux par ordre croissant de `hectares`, afin que les feux les plus importants soient dessinés en dernier et apparaissent au-dessus des autres.
+
+```ts showLineNumbers filename="crunchData.ts" {13}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(
+  fires: SimpleTable,
+  provinces: SimpleTable,
+) {
+  await fires.cache(async () => {
+    await fires.loadData(
+      "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+    );
+    await fires.points("lat", "lon", "geom");
+    await fires.addColumn("isFire", "boolean", `TRUE`);
+    await fires.sort({ hectares: "asc" });
+  });
+
+  await provinces.cache(async () => {
+    await provinces.loadGeoData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
+    );
+  });
+
+  await fires.insertTables(provinces, { unifyColumns: true });
+}
+```
+
+De plus, par défaut, Plot attribue une opacité de 0.3 à la couleur de remplissage des pics. Nous pouvons plutôt utiliser des couleurs plus claires qui correspondent à la légende des couleurs. En supprimant la transparence, nous réduirons la confusion visuelle sur la carte.
+
+En outre, nous pouvons augmenter la hauteur maximale des pics pour une meilleure visibilité.
+
+```ts showLineNumbers filename="visualizeData.ts" {23, 38-47}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { geo, plot, spike } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawMap = (
+    data: { features: { properties: { [key: string]: unknown } }[] },
+  ) => {
+    const firesPoints = data.features.filter(
+      (feature) => feature.properties.isFire,
+    );
+    const provincesPolygons = data.features.filter(
+      (feature) => !feature.properties.isFire,
+    );
+
+    return plot({
+      projection: {
+        type: "conic-conformal",
+        rotate: [100, -60],
+        domain: data,
+      },
+      length: {
+        range: [1, 200],
+      },
+      color: {
+        legend: true,
+      },
+      marks: [
+        geo(provincesPolygons, {
+          stroke: "lightgray",
+          fill: "whitesmoke",
+        }),
+        spike(firesPoints, {
+          x: (d) => d.properties.lon,
+          y: (d) => d.properties.lat,
+          length: (d) => d.properties.hectares,
+          stroke: (d) => d.properties.cause,
+          fillOpacity: 1,
+          fill: (d) => {
+            if (d.properties.cause === "Human") {
+              return "#b5caff";
+            } else if (d.properties.cause === "Natural") {
+              return "#ffe6a8";
+            } else {
+              return "#ffb9ad";
+            }
+          },
+        }),
+      ],
+    });
+  };
+  await fires.writeMap(drawMap, "./sda/output/map.png");
+}
+```
+<Callout type="info" emoji="💡">
+   Il existe de nombreuses façons de représenter les couleurs. Ici, j'utilise des valeurs de couleur en HEX. Consultez [cet article](https://www.w3schools.com/html/html_colors_hex.asp) pour en savoir plus.
+</Callout>
+
+Ça a fière allure ! Pour en savoir plus sur les cartes, consultez la [documentation de la marque `geo`](https://observablehq.com/plot/marks/geo) ainsi que la [documentation sur les projections](https://observablehq.com/plot/features/projections).
+
+![Notre carte finale en spikes.](/assets/simple-data-analysis/dataviz/final-spike-map.png)
+
+## Conclusion
+
+Félicitations ! Vous savez maintenant comment créer des visualisations de données avec SDA et Plot !
+
+J'espère que les exemples étape par étape vous ont aidé à comprendre comment construire des graphiques simples tout comme des visualisations plus poussées, en utilisant à la fois des données tabulaires et géospatiales.
+
+Bien sûr, ces visualisations sont statiques. Il n'y a pas d'interaction utilisateur possible puisqu'elles sont enregistrées sous forme d'images. Il n'y a pas d'animations non plus.
+
+Mais ne vous inquiétez pas ! Nous réutiliserons tout ce que nous avons appris ici pour créer des visualisations de données interactives et animées sur le web dans une prochaine leçon ! 😁
+
+À bientôt !
+
+<NoticeEnd lang="fr"/>
