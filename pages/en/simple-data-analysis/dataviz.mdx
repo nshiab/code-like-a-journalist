@@ -1024,10 +1024,11 @@ export default async function visualizeData(fires: SimpleTable) {
 ```
 ![VS Code showing a colored spike map.](/assets/simple-data-analysis/dataviz/spikes-color.png)
 
-We have a lot of overlapping spikes. By default, Plot draws the spikes in the order they appear in the data.
+We have a lot of overlapping spikes. By default, Plot draws the spikes in the order they appear in the data. Let's change that to create a nice 3D effect.
 
-Let's update `crunchData` to sort the fires in ascending order by their `hectares` values so that the larger fires are drawn last and appear on top of the others.
+Let's update `crunchData` to sort the fires in descending order by their latitude (`lat`) values. This way, the fires with a greater latitude (further north) will be drawn first and will be overlapped by the ones with a smaller latitude (further south). This approach adds some perspective to the map. 
 
+Thank you to [Philippe Rivière](https://github.com/Fil) for the suggestion! 😊
 
 ```ts showLineNumbers filename="crunchData.ts" {13}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -1042,7 +1043,7 @@ export default async function crunchData(
     );
     await fires.points("lat", "lon", "geom");
     await fires.addColumn("isFire", "boolean", `TRUE`);
-    await fires.sort({ hectares: "asc" });
+    await fires.sort({ lat: "desc" });
   });
 
   await provinces.cache(async () => {
