@@ -1025,9 +1025,11 @@ export default async function visualizeData(fires: SimpleTable) {
 ```
 ![VS Code affichant une carte en spikes colorée.](/assets/simple-data-analysis/dataviz/spikes-color.png)
 
-Nous avons beaucoup de pics qui se chevauchent. Par défaut, Plot dessine les pics dans l'ordre dans lequel ils apparaissent dans les données.
+Nous avons beaucoup de pics qui se chevauchent. Par défaut, Plot dessine les pics dans l'ordre dans lequel ils apparaissent dans les données. Changeons cela pour créer un effet 3D.
 
-Mettons à jour `crunchData` pour trier les feux par ordre croissant de `hectares`, afin que les feux les plus importants soient dessinés en dernier et apparaissent au-dessus des autres.
+Mettons à jour `crunchData` pour trier les incendies par ordre décroissant de leur latitude (`lat`). De cette façon, les incendies avec une latitude plus élevée (plus au nord) seront dessinés en premier et seront recouverts par ceux avec une latitude plus basse (plus au sud). Cette approche ajoute une perspective à la carte. 
+
+Merci à [Philippe Rivière](https://github.com/Fil) pour la suggestion ! 😊
 
 ```ts showLineNumbers filename="crunchData.ts" {13}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -1042,7 +1044,7 @@ export default async function crunchData(
     );
     await fires.points("lat", "lon", "geom");
     await fires.addColumn("isFire", "boolean", `TRUE`);
-    await fires.sort({ hectares: "asc" });
+    await fires.sort({ lat: "asc" });
   });
 
   await provinces.cache(async () => {
