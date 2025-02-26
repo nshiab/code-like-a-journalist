@@ -1,0 +1,359 @@
+---
+title: Wrangling Statistics Canada Census data 🇨🇦
+description: Learn how to crunch massive datasets from Statistics Canada with the Simple Data Analysis library and TypeScript.
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+
+# Wrangling Census data 🇨🇦
+
+Welcome to this new exciting project in which we are going to top tap into the trove of information that is the Canadian census from Statistics Canada.
+
+For each metropolitan area, we are going to find the median total income of households and use it to create a map showing the areas with a lower or greater income. The map below is an example of the final output we'll get together.
+
+![A map of Montreal.](/assets/stats-can-census/map-Montréal.png)
+
+In this real use case project, I am going to show you advanced techniques that I use to crunch big datasets. The 2021 Census data is around 30 GB of data, but you will actually need around 60 GB of free space on your hard drive for this project. Time to do some cleaning! 🧹
+
+Also, I'll assume you have completed all the lessons about the Simple Data Analysis library, which we will use here:
+- [Tabular data](/simple-data-analysis/tabular-data)
+- [Geospatial data](/simple-data-analysis/geospatial-data)
+- [Visualizing data](/simple-data-analysis/dataviz)
+
+Now, let's get started!
+
+<NoticeIntro />
+
+## What's the question?
+
+To be perfectly clear, let's define the question we're trying to answer:
+- For each Canadian metropolitan area, which dissemination areas have household incomes above or below the median?
+
+The metropolitan areas are defined as follow in the Census.
+
+> A census metropolitan area (CMA) is formed by one or more adjacent municipalities centred on a population centre (known as the core). A CMA must have a total population of at least 100,000, of which 50,000 or more must live in the core.
+
+And here's the dissemination areas definition.
+
+> A dissemination area (DA) is a small, relatively stable geographic unit with an average population of 400 to 700 persons. It is the smallest standard geographic area for which all census data are disseminated. DAs cover all the territory of Canada.
+
+Let's code!
+
+## Setup
+
+To setup everything we need, let's use [setup-sda](https://jsr.io/@nshiab/setup-sda) like in previous lessons.
+
+Create a new folder, open it with VS Code and run: `deno -A jsr:@nshiab/setup-sda`
+
+Then run `deno task sda` to watch `main.ts` and its dependencies.
+
+![A screenshot of VS Code after running setup-sda.](/assets/stats-can-census/setup.png)
+<Callout type="info" emoji="💡">
+ For SDA to work properly, it's best to have at least version 2.1.9 of Deno. To check your version, you can run `deno --version` in your terminal. To upgrade it, simply run `deno upgrade`.
+</Callout>
+
+## Downloading the data
+
+To download the Census data with the most granularity, click on this [Statistics Canada page](https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/download-telecharger.cfm?Lang=E).
+
+Click on the first drawer *Comprehensive download file* and then on the *CSV* button for *Canada, provinces, territories, census divisions (CDs), census subdivisions (CSDs) and dissemination areas (DAs)*.
+
+In case you can't find it, here's the [direct link](https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/download-telecharger/comp/GetFile.cfm?Lang=E&FILETYPE=CSV&GEONO=006). This will download a 2.25 GB zip file.
+
+![A screenshot of Statistics Canada webpage to download Census data.](/assets/stats-can-census/stats-can-census-download.png)
+
+Because we want to work on the metropolitan areas, it would be great to have the metropolitan area names for each dissemination area.
+
+The file storing this information can be found [here](https://www12.statcan.gc.ca/census-recensement/alternative_alternatif.cfm?l=eng&dispext=zip&teng=2021_92-151_X.zip&k=%20%20%20%20%209602&loc=/census-recensement/2021/geo/aip-pia/attribute-attribs/files-fichiers/2021_92-151_X.zip). Download it as well. It's another zip file weighting 9.8 MB.
+
+![A screenshot of Statistics Canada webpage to download Census data names.](/assets/stats-can-census/stats-can-names-download.png)
+
+And finally, since we want to create a map, we need the geospatial boundaries of the dissemination areas. You'll find them [here](https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/index2021-eng.cfm?year=21).
+
+Click on the drawer *Statistical boundaries* and select *Dissemination areas*. In the *Format* section, select *Shapefile*, then hit *Continue* at the bottom of the page.
+
+In case you can't find it, here's the [direct link](https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/files-fichiers/lda_000b21a_e.zip) to download the file. It's around 197 MB.
+
+![A screenshot of Statistics Canada webpage to download dissemination areas boundaries.](/assets/stats-can-census/stats-can-boundaries-download.png)
+
+Now, move all of this inside the `data` folder in your project, and unzip everything!
+
+To unzip, check your folder outside of VS Code, like in Finder or File Explorer. You might need a software like Winzip or 7-zip. Once unzipped, remove to the three `.zip` files and don't forget to empty your trash! 🗑️
+
+Surprise! You now have over 27 GB of data waiting to be processed. 😅
+
+![A screenshot of VS Code with the data unzipped.](/assets/stats-can-census/unzipped.png)
+
+## The Census data
+
+### First try
+
+When we unzipped the census data, we got a folder with multiple files in it. The data is in the file with the `_data_` substring.
+
+Let's try to open the first one for the Atlantic provinces.
+
+```ts showLineNumbers filename="main.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const census = sdb.newTable("census");
+await census.loadData(
+  "sda/data/98-401-X2021006_eng_CSV/98-401-X2021006_English_CSV_data_Atlantic.csv",
+);
+
+await sdb.done();
+```
+
+Hmmm... We have a problem. This error means that the data is not using the `UTF-8` encoding, which is kind of the data standard nowadays and needed by SDA.
+
+![A screenshot of VS Code showing an Invalid unicode error.](/assets/stats-can-census/encoding-error.png)
+
+A few years ago, I asked Statistics Canada about that and they told me they use the `Windows-1252` encoding. This means our first step is to re-encode the data...
+
+Yes, real worl data project are always this fun! 😬
+
+### Re-encoding the data
+
+To re-encode the data, let's create a new file `toUTF8.ts` file in the `helpers` folder and use the code below.
+
+Don't worry if you don't understand all of the code below. Just know that you can reuse it easily in your future projects.
+
+Here's what the `async` function `toUTF8` is doing, step by step:
+- First, we create a `TextDecoder` for the `windows-1252` encoding and a `TextEncoder` to re-encode to `utf-8`, which is the default (lines 4-5).
+- Because the files are very big, we can't load them directly in memory. We need to break them down in smaller pieces, 1MB chuncks, so we create the `bufferSize` variable to use it later (line 6).
+- We create an array with the `regions` matching the data files (lines 8-15). We loop over them (lines 17-50).
+- Because re-encoding such big CSV files can take quite some time, we don't want to re-encode them everything we run our code. So we check if the re-encoded file already exists (lines 18-21). If it doesn't exist, it means we must re-encode (lines 22-50).
+- To re-encode, we start by opening our files (lines 27-33) and creating a buffer (line 35).
+- Then we loop over the chuncks of data, re-encode them and write them to our output file (lines 39-43).
+- Once done, we close all the files (lines 45-46).
+
+```ts showLineNumbers filename="toUTF8.ts"
+import { exists } from "@std/fs";
+
+export default async function toUTF8() {
+  const decoder = new TextDecoder("windows-1252");
+  const encoder = new TextEncoder();
+  const bufferSize = 1024 * 1024;
+
+  const regions = [
+    "Atlantic",
+    "BritishColumbia",
+    "Ontario",
+    "Prairies",
+    "Quebec",
+    "Territories",
+  ];
+
+  for (const r of regions) {
+    const newFile =
+      `sda/data/98-401-X2021006_eng_CSV/98-401-X2021006_English_CSV_data_${r}_utf8.csv`;
+    if (await exists(newFile)) {
+      continue;
+    } else {
+      const originalFile =
+        `sda/data/98-401-X2021006_eng_CSV/98-401-X2021006_English_CSV_data_${r}.csv`;
+
+      console.log(`\nReading => ${r}`);
+      const inputFile = await Deno.open(originalFile, { read: true });
+
+      const outputFile = await Deno.open(newFile, {
+        write: true,
+        create: true,
+        truncate: true,
+      });
+
+      const buffer = new Uint8Array(bufferSize);
+      let bytesRead;
+
+      console.log(`Processing in chunks => ${r}`);
+      while ((bytesRead = await inputFile.read(buffer)) !== null) {
+        const text = decoder.decode(buffer.subarray(0, bytesRead));
+        const utf8Data = encoder.encode(text);
+        await outputFile.write(utf8Data);
+      }
+
+      inputFile.close();
+      outputFile.close();
+
+      console.log(`Done => ${r}`);
+    }
+  }
+}
+```
+
+Stop watching `main.ts` (CTRL + C in your terminal) to install the now needed `@std/fs` library by running `deno add jsr:@std/fs` in your terminal (don't worry about the warnings, it's fine).
+
+Now let's update `main.ts` to use our new function `toUTF8`. We can comment the previous code for now.
+
+```ts showLineNumbers filename="main.ts"
+// import { SimpleDB } from "@nshiab/simple-data-analysis";
+import toUTF8 from "./helpers/toUTF8.ts";
+
+await toUTF8();
+
+// const sdb = new SimpleDB();
+
+// const census = sdb.newTable("census");
+// await census.loadData(
+//   "sda/data/98-401-X2021006_eng_CSV/98-401-X2021006_English_CSV_data_Atlantic.csv",
+// );
+
+// await sdb.done();
+```
+
+And we can run our new code with `deno task sda`.
+
+It will take a few seconds to have all the files re-encoded. But here what you'll see once done.
+
+New files have appeared with `_utf8` in their names! And now your `data` folder weights... 53 GB. 🤭
+
+If you are tight on storage space, delete the original files, keep only the ones ending with `_utf8`, and comment `await toUTF8()` for the rest of the project.
+
+Otherwise, rerun the code (CMD + S on Mac or CTRL + S on PC). You'll see that the data is not re-encoded since the files already exist in the `data` folder. Life is too short to run the same computation twice!
+
+By the way, you can click on images (like the screenshot below) to make them bigger.
+
+![A screenshot of VS Code showing re-encoded data.](/assets/stats-can-census/re-encoding.png)
+
+### Trying again
+
+Let's try to load and log the re-encoded `data` for the Atlantic provinces now.
+
+```ts showLineNumbers filename="main.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+// import toUTF8 from "./helpers/toUTF8.ts";
+
+// await toUTF8();
+
+const sdb = new SimpleDB();
+
+const census = sdb.newTable("census");
+await census.loadData(
+  "sda/data/98-401-X2021006_eng_CSV/98-401-X2021006_English_CSV_data_Atlantic_utf8.csv",
+);
+await census.logTable();
+
+await sdb.done();
+```
+![A screenshot of VS Code showing the Atlantic provinces data.](/assets/stats-can-census/atlantic-data.png)
+<Callout type="info" emoji="💡">
+    If the table layout is displayed weirdly in your terminal, it's because the width of the table is bigger than the width of your terminal. Right-click on the terminal and look for `Toggle size with content width`. There is also a handy shortcut that I use all the time to do that: `OPTION` + `Z` on Mac and `ALT` + `Z` on PC.
+</Callout>
+
+Amazing! It works! 🥳
+
+Let's try another one: the Prairies, which cover Alberta, Saskatchewan, and Manitoba provinces.
+
+```ts showLineNumbers filename="main.ts" {10}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+// import toUTF8 from "./helpers/toUTF8.ts";
+
+// await toUTF8();
+
+const sdb = new SimpleDB();
+
+const census = sdb.newTable("census");
+await census.loadData(
+  "sda/data/98-401-X2021006_eng_CSV/98-401-X2021006_English_CSV_data_Prairies_utf8.csv",
+);
+await census.logTable();
+
+await sdb.done();
+```
+![A screenshot of VS Code showing an error due to a badly formatted CSV.](/assets/stats-can-census/prairies-error.png)
+
+Oh no! Another error... It looks like this CSV file might be badly formatted...
+
+We can tweak the options to make the CSV parsing less strict and see if it works.
+
+```ts showLineNumbers filename="main.ts" {10}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+// import toUTF8 from "./helpers/toUTF8.ts";
+
+// await toUTF8();
+
+const sdb = new SimpleDB();
+
+const census = sdb.newTable("census");
+await census.loadData(
+  "sda/data/98-401-X2021006_eng_CSV/98-401-X2021006_English_CSV_data_Prairies_utf8.csv",
+  { strict: false },
+);
+await census.logTable();
+
+await sdb.done();
+```
+
+Beautiful! Now everything works!
+
+![A screenshot of VS Code showing the Prairies data.](/assets/stats-can-census/prairies-working.png)
+
+### Loading all the data
+
+So far, we loaded the data one file at the time. But you can also load all of the CSV files into one table easily.
+
+Let's create a new `crunchData.ts` file to do that. This `async` function will have one parameter `sdb` and it will return a `census` table.
+
+When you have files with names following the same pattern, you can use wildcards `*`. In our case, we want to load all CSV files ending with `_utf8.csv`, so we load all of the files by using `*_utf8.csv`, as shown on line 7 below.
+
+We also use the `cache` method to speed things up going forward.
+
+```ts showLineNumbers filename="crunchData.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(sdb: SimpleDB) {
+  const census = sdb.newTable("census");
+
+  await census.cache(async () => {
+    await census.loadData("sda/data/98-401-X2021006_eng_CSV/*_utf8.csv", {
+      strict: false,
+    });
+  });
+
+  await census.logTable();
+
+  return census;
+}
+```
+
+Let's update `main.ts` to use this new function. We also set the `cacheVerbose` to `true` when creating our `SimpleDB`.
+
+```ts showLineNumbers filename="crunchData.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+// import toUTF8 from "./helpers/toUTF8.ts";
+import crunchData from "./helpers/crunchData.ts";
+
+// await toUTF8();
+
+const sdb = new SimpleDB();
+
+const census = await crunchData(sdb);
+
+await sdb.done();
+```
+
+The first time, you'll run this code, two things will happen:
+- Depending on the RAM available on your computer, you might see a `.tmp` folder appearing. If the data is bigger than your RAM, this folder will be use to process all of it by putting processed chuncks in it. Spoiler: it's bigger than the 16 GB I have on my M1 Macbook Pro!
+- Since we are using the `cache` method, a `.sda-cache` is created. The result of everything between the `cache` method will be stored in it. So, if the code doesn't change and you rerun your code, SDA will load the data from the cache (only one 2.7 GB parquet file) instead of loading again all of the 23 GB CSV files.
+
+<Callout type="info" emoji="💡">
+    If you want to clean your cache, run `deno task clean`. This will remove `.tmp` and `.sda-cache`. You can also delete them manually, but don't forget to to empty your trash.
+</Callout>
+
+We finally can have a look at the data. With 166 million rows and 23 columns, we have around 3 billion data points. 🙃
+
+And loading all of this took around 2 minutes on my computer. Not bad!
+
+![A screenshot of VS Code showing all the data loaded.](/assets/stats-can-census/loading-all.png)
+
+On the second run, thanks to the cache, it took only 25 seconds!
+
+![A screenshot of VS Code showing all the data loaded.](/assets/stats-can-census/loading-all-cache.png)
+
+## Conclusion
+
+
+
+<NoticeEnd />
