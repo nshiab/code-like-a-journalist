@@ -6,6 +6,7 @@ export default {
     "pushing-further": "2. Aller plus loin 🚀",
     "stock-market-simulator": "Simulateur boursier 📈",
     "simple-data-analysis": "3. La librairie SDA 🤓",
+    "stats-can-census": "Exploiter le recensement 🇨🇦",
     "ninja-moves": "Techniques de ninja 🥷",
     inspirations: "Personnes & contenus inspirants 📚",
     "more": "Prochaines leçons...",
