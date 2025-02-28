@@ -79,7 +79,7 @@ In case you can't find it, here's the [direct link](https://www12.statcan.gc.ca/
 
 Now, move all of this inside the `data` folder in your project, and unzip everything except the geospatial boundaries in the file `lda_000b21a_e.zip`! It's unzipped in my screenshots, but it was a mistake 🥲.
 
-To unzip, check your folder outside of VS Code, like in Finder or File Explorer. You might need a software like Winzip or 7-zip. Once unzipped, remove to the three `.zip` files in your project and download folder, and don't forget to empty your trash! 🗑️
+To unzip, check your folder outside of VS Code, like in Finder or File Explorer. You might need a software like Winzip or 7-zip. Once unzipped, remove to the two original `.zip` files from your project and download folder, and don't forget to empty your trash! 🗑️ Disk storage is precious when you work with big datasets.
 
 Surprise! You now have over 27 GB of data waiting to be processed. 😅
 
@@ -117,9 +117,9 @@ Yes, real worl data project are always this fun! 😬
 
 ### Re-encoding the data
 
-Since re-encoding data often happens, I created the function [`reencode`](https://jsr.io/@nshiab/journalism/doc/~/reencode) and published it in the `journalism` library. When you setup your project with `setup-sda`, `journalism` is automatically installed. So this step will be very easy!
+Since re-encoding data often happens, I created the function [`reencode`](https://jsr.io/@nshiab/journalism/doc/~/reencode) and published it in the *[journalism](https://github.com/nshiab/journalism)* library. When you setup your project with `setup-sda`, *journalism* is automatically installed. So this step will be very easy!
 
-Let's create a new file `toUTF8.ts` in `helpers` with the following code. Since we need to reecode the data just once, we are not exporting a function. It's just a regular script.
+Let's create a new file `toUTF8.ts` in `helpers` with the code below. Since we need to reecode the data just once, we are not exporting a function. It's just a regular script.
 
 If you have a look at the file names, you'll notice they all share the same structure, except for the region. So by creating an array with the regions, we can easily loop over all the files.
 
@@ -167,7 +167,7 @@ To run this script, we could create a new task `toUTF8` in our `deno.json`. Don'
   "nodeModulesDir": "auto",
   "imports": {
     "@nshiab/journalism": "jsr:@nshiab/journalism@^1.22.0",
-    "@nshiab/simple-data-analysis": "jsr:@nshiab/simple-data-analysis@^4.1.14",
+    "@nshiab/simple-data-analysis": "jsr:@nshiab/simple-data-analysis@^4.2.0",
     "@observablehq/plot": "npm:@observablehq/plot@^0.6.17"
   }
 }
@@ -185,7 +185,7 @@ If you are tight on storage space, delete the original data files. We will work 
 
 ### Trying again
 
-Let's try to load and log the re-encoded CSV file for the Atlantic provinces now. Update `main.ts` and run `deno task sda`.
+Let's try to load and log the re-encoded CSV file for the Atlantic provinces now. Update `main.ts` and run `deno task sda` in your terminal.
 
 ```ts showLineNumbers filename="main.ts" {7}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -255,13 +255,14 @@ Let's create a new `crunchData.ts` file to do that. This `async` function will h
 
 When you have files with names following the same pattern, you can use wildcards `*`. In our case, we want to load all CSV files ending with `_utf8.csv`, so we load all of the files by using `*_utf8.csv`, as shown on line 6 below.
 
-```ts showLineNumbers filename="crunchData.ts"
+```ts showLineNumbers filename="crunchData.ts" {6}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(sdb: SimpleDB) {
   const census = sdb.newTable("census");
 
-  await census.loadData("sda/data/98-401-X2021006_eng_CSV/*_utf8.csv", {
+  await census.loadData("sda/data/98-401-X2021006_eng_CSV/*_utf8.csv",
+  {
     strict: false,
   });
 
@@ -319,7 +320,7 @@ export default async function crunchData(sdb: SimpleDB) {
 ```
 ![A screenshot of VS Code showing the first million rows loaded.](/assets/stats-can-census/limit.png)
 
-We can also use the `cache` method. Anything wrapped by the method will be run once and the result will be stored in the `.sda-cache` folder. If the code doesn't change, the data will be loaded from the cache instead of rerunning the computations.
+We can also use the `cache` method. Anything wrapped by the method will be run once and the result will be stored in the `.sda-cache` folder. If the code doesn't change in the `cache` method, the data will be loaded from the cache instead of rerunning the computations.
 
 On the first run, it takes a little bit longer to run because it writes data to the cache.
 
@@ -341,9 +342,7 @@ export default async function crunchData(sdb: SimpleDB) {
 ```
 ![A screenshot of VS Code showing the cache being written.](/assets/stats-can-census/first-run-cache.png)
 
-But on the subsequent runs, it's loading data from the cache, which is way faster. On my macbook pro, it's speeding things up 10 times.
-
-We can now work on the first million rows in under a second! 😱
+But on the subsequent runs, it's loading data from the cache, which is way faster. On my macbook pro, it's speeding things up 10 times! 😱
 
 ![A screenshot of VS Code showing the cache being written.](/assets/stats-can-census/using-cache.png)
 
@@ -369,7 +368,7 @@ Finally, we just need three columns:
 
 Let's update crunchData to keep only what we need.
 
-```ts showLineNumbers filename="crunchData.ts"
+```ts showLineNumbers filename="crunchData.ts" {11-20}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(sdb: SimpleDB) {
@@ -403,7 +402,7 @@ This is looking much better! We can now focus on adding the metropolitan area na
 
 ### First try
 
-Let's try to load the names which are in the `2021_92-151_X.csv` file. We can update `crunchData.ts` in the `cache` method. We can keep working in the `cache` method.
+Let's try to load the names which are in the `2021_92-151_X.csv` file. We can update `crunchData.ts`. We can keep working in the `cache` method.
 
 ```ts showLineNumbers filename="crunchData.ts" {22-24}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -636,7 +635,7 @@ Click on the `Export` button in the top right corner, keep the file format as th
 
 You can now rename this file `lda_000b21a_e_simplified.shp.zip` (notice I added `.shp.zip` for the file extension to help SDA understand it's a shapefile) and move it to your `data` folder.
 
-Instead of 197 MB, our geospatial data now weights just 27 MB, which will help speed up our computations!
+Instead of 197 MB, our geospatial data now weights just 27 MB, which will help speed up our computations and maps drawing!
 
 ![A screenshot of mapshaper showing how to export simplified layers.](/assets/stats-can-census/mapshaper-export.png)
 
@@ -646,7 +645,7 @@ To load the geometries, we can use the `loadGeoData` method. Don't forget to mod
 
 When you load new geospatial data, it's always important to check the projection. Below, we use the `logProjections` method for that.
 
-```ts showLineNumbers filename="crunchData.ts" {35-39}
+```ts showLineNumbers filename="crunchData.ts" {35-40}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(sdb: SimpleDB) {
@@ -696,11 +695,11 @@ export default async function crunchData(sdb: SimpleDB) {
 
 We have no problem loading the geospatial data. We can see the 57,932 dissemination areas as rows with their properties and geometries.
 
-But the projection `proj=lcc` with its `units=m` is problematic. Statistcs Canada uses the Lambert conic conformal projection with coordinates in meters. For many SDA methods to work properly, we need the coordinates with the WGS84 projection using latitude and longitude.
+But the projection `proj=lcc` with its `units=m` is problematic. Statistics Canada uses the Lambert conic conformal projection with coordinates in meters. For many SDA methods to work properly, we need the coordinates with the WGS84 projection using latitude and longitude.
 
-But don't worry, SDA got you covered. You just need to pass the option `{ toWGS84: true }` to convert your geospatial data.
+But don't worry, SDA got you covered. You just need to pass the option `{ toWGS84: true }` to convert your geospatial data in the right format.
 
-While at it, let's select only the columns we are instered in:
+While at it, let's select only the columns we are interested in:
 - `DGUID`, which is the unique id for dissemination areas. We will use it to join the geometries to the census data.
 - `geom`, which stores the geometries.
 
@@ -757,9 +756,69 @@ export default async function crunchData(sdb: SimpleDB) {
 
 Our data is finally complete! We have our dissemination areas with their median total household income, the name of their metropolitan area and their boundaries!
 
-And since all of this code in in the `cache method`, it will run just once and let us work quickly on the next steps! As shown above, on the first pass, the code took 4 seconds to run. But on the second, it took only 70 ms.
+We can remove the limit and select just the three columns that we will use going forward. We can also remove rows with missing values.
 
-Structuring, formatting, filtering and cleaning the data is often the longest step in data analysis and visualization. 🫠
+Let's run everything now!
+
+```ts showLineNumbers filename="crunchData.ts" {41-42}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(sdb: SimpleDB) {
+  const census = sdb.newTable("census");
+
+  await census.cache(async () => {
+    await census.loadData("sda/data/98-401-X2021006_eng_CSV/*_utf8.csv", {
+      strict: false,
+    });
+    await census.keep({
+      GEO_LEVEL: "Dissemination area",
+      CHARACTERISTIC_ID: [243], // Median total income of household in 2020 ($)
+    });
+    await census.selectColumns([
+      "DGUID",
+      "GEO_NAME",
+      "C1_COUNT_TOTAL",
+    ]);
+    await census.renameColumns({ C1_COUNT_TOTAL: "medianIncome" });
+
+    const names = sdb.newTable("names");
+    await names.loadData("sda/data/2021_92-151_X_utf8.csv", { strict: false });
+    await names.keep({
+      CMATYPE_RMRGENRE: "B",
+    });
+    await names.selectColumns(["DADGUID_ADIDUGD", "CMANAME_RMRNOM"]);
+    await names.removeDuplicates();
+    await names.renameColumns({
+      DADGUID_ADIDUGD: "DGUID",
+      CMANAME_RMRNOM: "CMA",
+    });
+    await census.join(names);
+
+    const disseminationAreas = sdb.newTable("disseminationAreas");
+    await disseminationAreas.loadGeoData(
+      "sda/data/lda_000b21a_e_simplified.shp.zip",
+      { toWGS84: true },
+    );
+    await disseminationAreas.selectColumns(["DGUID", "geom"]);
+    await census.join(disseminationAreas);
+    await census.selectColumns(["medianIncome", "CMA", "geom"]);
+    await census.removeMissing();
+  });
+
+  return census;
+}
+```
+![A screenshot of VS Code showing complete dissemination area data.](/assets/stats-can-census/run-all-cleaning.png)
+
+We now have our data for around 37 thousand dissemination areas located in metropolitan areas.
+
+And since all of this code is within the `cache` method, it will run just once and let us work quickly on the next steps! As shown above, on the first pass, the code took 1 min 31 seconds to run on my computer. But on the second, it took only 97 ms. 😏
+
+![A screenshot of VS Code showing complete dissemination area data loaded from the cache.](/assets/stats-can-census/run-all-cleaning-cache.png)
+
+Structuring, formatting, filtering and cleaning the data is often the longest step in data analysis and visualization. 🫠 But it's also extremely important to do it properly to avoid errors in your analysis and visualizations.
+
+Always take the time to read the data documentation. It will sometimes feel like a waste of time at the beginning, but it will actually save you a lot of time down the road. I've been there. Trust me. 🫣
 
 ## Answering the question
 
@@ -770,8 +829,400 @@ The question we want to answer is:
 
 So we need to find the median household total income for each metropolitan area. This is easy to with the method `summarize`.
 
+Note that we can work outside the cache method now. With the data cleaned up and filtered, this is an easy lift.
+
+```ts showLineNumbers filename="crunchData.ts" {45-51}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(sdb: SimpleDB) {
+  const census = sdb.newTable("census");
+
+  await census.cache(async () => {
+    await census.loadData("sda/data/98-401-X2021006_eng_CSV/*_utf8.csv", {
+      strict: false,
+    });
+    await census.keep({
+      GEO_LEVEL: "Dissemination area",
+      CHARACTERISTIC_ID: [243], // Median total income of household in 2020 ($)
+    });
+    await census.selectColumns([
+      "DGUID",
+      "GEO_NAME",
+      "C1_COUNT_TOTAL",
+    ]);
+    await census.renameColumns({ C1_COUNT_TOTAL: "medianIncome" });
+
+    const names = sdb.newTable("names");
+    await names.loadData("sda/data/2021_92-151_X_utf8.csv", { strict: false });
+    await names.keep({
+      CMATYPE_RMRGENRE: "B",
+    });
+    await names.selectColumns(["DADGUID_ADIDUGD", "CMANAME_RMRNOM"]);
+    await names.removeDuplicates();
+    await names.renameColumns({
+      DADGUID_ADIDUGD: "DGUID",
+      CMANAME_RMRNOM: "CMA",
+    });
+    await census.join(names);
+
+    const disseminationAreas = sdb.newTable("disseminationAreas");
+    await disseminationAreas.loadGeoData(
+      "sda/data/lda_000b21a_e_simplified.shp.zip",
+      { toWGS84: true },
+    );
+    await disseminationAreas.selectColumns(["DGUID", "geom"]);
+    await census.join(disseminationAreas);
+    await census.selectColumns(["medianIncome", "CMA", "geom"]);
+    await census.removeMissing();
+  });
+
+  const medians = await census.summarize({
+    values: "medianIncome",
+    categories: "CMA",
+    summaries: "median",
+    outputTable: "medians",
+  });
+  await medians.logTable();
+
+  return census;
+}
+```
+![A screenshot of VS Code showing the median household total income.](/assets/stats-can-census/summarize.png)
+
+Now that we have the median for each CMA in the `medians` table, we can join the `medians` table to the `census` table. Since both have the `CMA` column, SDA will be able to easily match the rows. For convenience, we can remove the `value` column from `medians` before doing the join.
+
+We can now add a new column `varPerc` with the percentage variation from the median for each dissemination area. We can round the values too. This is what we will use to color our maps.
+
+```ts showLineNumbers filename="crunchData.ts" {51-59}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(sdb: SimpleDB) {
+  const census = sdb.newTable("census");
+
+  await census.cache(async () => {
+    await census.loadData("sda/data/98-401-X2021006_eng_CSV/*_utf8.csv", {
+      strict: false,
+    });
+    await census.keep({
+      GEO_LEVEL: "Dissemination area",
+      CHARACTERISTIC_ID: [243], // Median total income of household in 2020 ($)
+    });
+    await census.selectColumns([
+      "DGUID",
+      "GEO_NAME",
+      "C1_COUNT_TOTAL",
+    ]);
+    await census.renameColumns({ C1_COUNT_TOTAL: "medianIncome" });
+
+    const names = sdb.newTable("names");
+    await names.loadData("sda/data/2021_92-151_X_utf8.csv", { strict: false });
+    await names.keep({
+      CMATYPE_RMRGENRE: "B",
+    });
+    await names.selectColumns(["DADGUID_ADIDUGD", "CMANAME_RMRNOM"]);
+    await names.removeDuplicates();
+    await names.renameColumns({
+      DADGUID_ADIDUGD: "DGUID",
+      CMANAME_RMRNOM: "CMA",
+    });
+    await census.join(names);
+
+    const disseminationAreas = sdb.newTable("disseminationAreas");
+    await disseminationAreas.loadGeoData(
+      "sda/data/lda_000b21a_e_simplified.shp.zip",
+      { toWGS84: true },
+    );
+    await disseminationAreas.selectColumns(["DGUID", "geom"]);
+    await census.join(disseminationAreas);
+    await census.selectColumns(["medianIncome", "CMA", "geom"]);
+    await census.removeMissing();
+  });
+
+  const medians = await census.summarize({
+    values: "medianIncome",
+    categories: "CMA",
+    summaries: "median",
+    outputTable: "medians",
+  });
+  await medians.removeColumns("value");
+
+  await census.join(medians);
+  await census.addColumn(
+    "varPerc",
+    "number",
+    `(medianIncome - median) / median * 100`,
+  );
+  await census.round("varPerc");
+
+  return census;
+}
+```
+![A screenshot of VS Code showing the variation from the median income in each metropolitan area.](/assets/stats-can-census/variation.png)
+
+We now have the answer to our question: the variation from the median in each metropolitan area.
+
+Time to visualize this!
+
+### Making maps
+
+To keep our code organized and to stay mentally sane, let's create a new file `visualizeData.ts` in `helpers`.
+
+The new function will need the `census` table and will just log it for now.
+
+```ts showLineNumbers filename="visualizeData.ts"
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function visualizeData(census: SimpleTable) {
+  await census.logTable();
+}
+```
+
+And let's update `main.ts` to call this new function.
+
+```ts showLineNumbers filename="main.ts" {8}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import crunchData from "./helpers/crunchData.ts";
+import visualizeData from "./helpers/visualizeData.ts";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const census = await crunchData(sdb);
+await visualizeData(census);
+
+await sdb.done();
+```
+
+We want to draw a map for each metropolitan area, so first, let's retrieve all unique metropolitan areas in our data.
+
+Then, we can loop over them, clone the `census` table, and keep only the rows with the right `CMA`.
+
+As you see in the screenshhot below the new code, when you don't specify a name for tables, SDA automatically name them `table0`, `table1`, etc. Here, we can see that the last table is `table42`, meaning we are looping over 43 metropolitan areas.
+
+To know the number of metropolitan areas, you could also check the `.length` of `allCMAs`, since `getUniques` return all unique values in a column as an array.
+
+```ts showLineNumbers filename="visualizeData.ts" {4-10}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function visualizeData(census: SimpleTable) {
+  const allCMAs = await census.getUniques("CMA");
+
+  for (const CMA of allCMAs) {
+    const tableCMA = await census.cloneTable();
+    await tableCMA.keep({ CMA });
+    await tableCMA.logTable();
+  }
+}
+```
+![A screenshot of VS Code after running setup-sda.](/assets/stats-can-census/clone.png)
+<Callout type="info" emoji="💡">
+ Because the `census` table has a column `CMA` and the loop is using the `CMA` variable too, we can write `{ CMA }` as a shortcut for `{ CMA: CMA }`.
+</Callout>
+
+We can now create a function to draw our maps. When we setup everything with `setup-sda`, we automatically installed [Plot](https://github.com/observablehq/plot). This very powerful datavisualization library works very well with SDA and this is what we are going to use to draw our map.
+
+Since it's the same function to draw all of the maps, we can create it outside of the loop. This function will expect the data as a GeoJSON, with an array of features with properties. To start, let's draw the dissemination area polygons with the `geo` mark and let's color the `fill` and `stroke` with the values we computed in the `varPerc` column.
+
+In the loop, we can pass it to the method `writeMap`, which will pass the data from the table as GeoJSON data to our drawing function. We also need to specify where we want the map to be saved and we use the metropolitan area name to create unique files in the `output` folder.
+
+Since we are still in our exploration phase to make the maps, let's break the loop to work just on the first metropolitan area at first. We will be able to iterate faster to improve our dataviz.
+
+```ts showLineNumbers filename="visualizeData.ts" {2, 7-15, 20-21} 
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { geo, plot } from "@observablehq/plot";
+
+export default async function visualizeData(census: SimpleTable) {
+  const allCMAs = await census.getUniques("CMA");
+
+  function drawMap(
+    data: { features: { properties: { [key: string]: unknown } }[] },
+  ) {
+    return plot({
+      marks: [
+        geo(data, { fill: "varPerc", stroke: "varPearc" }),
+      ],
+    });
+  }
+
+  for (const CMA of allCMAs) {
+    const tableCMA = await census.cloneTable();
+    await tableCMA.keep({ CMA });
+    await tableCMA.writeMap(drawMap, `./sda/output/${CMA}.png`);
+    break;
+  }
+}
+```
+![A screenshot of VS Code showing a first iteration of the map.](/assets/stats-can-census/first-map.png)
+
+It's ugly, but it works!
+
+We can now add a title, subtitle, and caption. We can also use a diverging scale for the colors and restrict the domain to -100% to +100%. We can also tweak the projection. If you want to know more about these customizations, check the [Visualizing data](/simple-data-analysis/dataviz) lesson.
+
+One thing that you are maybe wondering is why do we have `data.features[0].properties.CMA` for the title?
+
+When this function will be run, it won't know about the `CMA` variable. So we need to grab the metropolitan name from the data directly. Since we are using `writeMap`, SDA is passing the data as a GeoJSON to this function. In GeoJSON features, the data is stored in the `properties` object. So we retrieve the name of the metropolitan area by grabbing the first feature and finding the CMA name in its properties.
+
+```ts showLineNumbers filename="visualizeData.ts" {11-32}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { geo, plot } from "@observablehq/plot";
+
+export default async function visualizeData(census: SimpleTable) {
+  const allCMAs = await census.getUniques("CMA");
+
+  function drawMap(
+    data: { features: { properties: { [key: string]: unknown } }[] },
+  ) {
+    return plot({
+      title: data.features[0].properties.CMA,
+      subtitle:
+        "Variation from the median household total income at the dissemination area level.",
+      caption: "2021 Census, Statistics Canada",
+      inset: 10,
+      projection: {
+        type: "mercator",
+        domain: data,
+      },
+      color: {
+        legend: true,
+        type: "diverging",
+        domain: [-100, 100],
+        label: null,
+        tickFormat: (d) => {
+          if (d > 0) {
+            return `+${d}%`;
+          } else {
+            return `${d}%`;
+          }
+        },
+      },
+      marks: [
+        geo(data, { fill: "varPerc", stroke: "varPerc" }),
+      ],
+    });
+  }
+
+  for (const CMA of allCMAs) {
+    const tableCMA = await census.cloneTable();
+    await tableCMA.keep({ CMA });
+    await tableCMA.writeMap(drawMap, `./sda/output/${CMA}.png`);
+    break;
+  }
+}
+```
+![A screenshot of VS Code showing a styled map.](/assets/stats-can-census/styled-map.png)
+
+This is looking much better.
+
+One last thing that I like to do in my maps usually is to add an outline.
+
+Inside the loop, we can clone the `tableCMA` and merge all the dissemination areas geometries by running the `aggregateGeo` method. Since this can be quite computationally expensive when there are a lot of dissemination areas, we cache the result.
+
+We can then insert this newly created geometry to the `tableCMA`.
+
+In the `drawMap` function, we can add a new `geo` mark to draw the outline. But we need to filter on the `varPerc` to make sure that we only draw the outline and not all the disseminationAreas again.
+
+```ts showLineNumbers filename="visualizeData.ts" {35, 38-41, 50-54}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { geo, plot } from "@observablehq/plot";
+
+export default async function visualizeData(census: SimpleTable) {
+  const allCMAs = await census.getUniques("CMA");
+
+  function drawMap(
+    data: { features: { properties: { [key: string]: unknown } }[] },
+  ) {
+    return plot({
+      title: data.features[0].properties.CMA,
+      subtitle:
+        "Variation from the median household total income at the dissemination area level.",
+      caption: "2021 Census, Statistics Canada",
+      inset: 10,
+      projection: {
+        type: "mercator",
+        domain: data,
+      },
+      color: {
+        legend: true,
+        type: "diverging",
+        domain: [-100, 100],
+        label: null,
+        tickFormat: (d) => {
+          if (d > 0) {
+            return `+${d}%`;
+          } else {
+            return `${d}%`;
+          }
+        },
+      },
+      marks: [
+        geo(
+          data.features.filter((d) => typeof d.properties.varPerc === "number"),
+          { fill: "varPerc", stroke: "varPerc" },
+        ),
+        geo(data.features.filter((d) => d.properties.varPerc === null), {
+          stroke: "black",
+          opacity: 0.5,
+        }),
+      ],
+    });
+  }
+
+  for (const CMA of allCMAs) {
+    const tableCMA = await census.cloneTable();
+    await tableCMA.keep({ CMA });
+
+    const outline = await tableCMA.cloneTable();
+    await outline.cache(async () => {
+      await outline.aggregateGeo("union");
+    });
+    await tableCMA.insertTables(outline);
+
+    await tableCMA.writeMap(drawMap, `./sda/output/${CMA}.png`);
+    break;
+  }
+}
+```
+![A screenshot of VS Code showing a styled map with an outline.](/assets/stats-can-census/outline.png)
+
+The difference is subtle, but I think it important to see the holes in the metropolitan area geometry.
+
+Now that we are happy with our map look, it's time to remove the `break` statement on line 57! Let's create 43 maps!
+
+If you are done running your code and inspect the maps, you'll notice a few problems.
+
+![A screenshot of problematic maps.](/assets/stats-can-census/maps-problems.png)
+
+First, you can see that some folders have been created for some metropolitan areas. It's because some names have `/` in them! We need to replace this character by something else before passing it to `writeMap`.
+
+We can update `visualizeData.ts` to fix that.
+
+```ts showLineNumbers filename="visualizeData.ts"
+```
+
+We can also see that the outline for some cities is not right and the map for Montréal is just one gigantic polygon. This usually happens when some geometries are invalid. Simplification often creates invalid geometries. Luckily, we can call the `fixGeo` method to the rescue!
+
+We can update `crunchData.ts`, within the `cache` method, to fix the geometries after loading the geospatial data.
+
+```ts showLineNumbers filename="crunchData.ts"
+```
+
+Now, stop watching `main.ts` (`CTRL` + `C` in your terminal) and delete `.temp` and `.sda-cache` manually or by running `deno task clean`. Remove everything in the `output` folder as well.
+
+And let's rerun everything from scratch!
+
+![A screenshot of problematic maps.](/assets/stats-can-census/last-run.png)
+
+Amazing! It runs smoothly and all of our problems dissapeared. 😁
+
+On my computer, our code was able to crunch all of the data and draw all of the maps in 2 minutes 46 seconds. But thanks to our clever caching, if I need to tweak the look of the maps, it's taking just 32 seconds to rewrite all of the 43 maps.
+
+By the way, here, we are saving our maps as images, but if you want vectors to edit them in Illustrator or else, just replace `.png` by `.svg` in `writeMap`.
+
 ## Conclusion
 
+What a journey! Crunching big datasets with multiple tables storing tabular and geospatial data is not an easy taks.
 
+But I hope this real life example showed you how you can cut through GB of data like if it was butter with SDA. 🧈
+
+Have fun with your next data project and feel free to [reach out](/contact) if you want to share what you are makin with SDA or if you have any questions! 😊
 
 <NoticeEnd />
