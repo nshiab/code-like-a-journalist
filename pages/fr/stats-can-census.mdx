@@ -1,99 +1,91 @@
 ---
-title: Wrangling Statistics Canada Census data 🇨🇦
-description: Learn how to crunch and visualize massive datasets from Statistics Canada with the Simple Data Analysis library and TypeScript.
+title: Exploiter les données du recensement de Statistique Canada 🇨🇦
+description: Apprenez à traiter et à visualiser des ensembles de données massifs de Statistique Canada avec la librairie Simple Data Analysis et TypeScript.
 ---
 
 import { Callout } from "nextra/components";
 import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
 
-# Wrangling census data 🇨🇦
+# Exploiter les données du recensement 🇨🇦
 
-Welcome to this new exciting project! We will tap into the vast trove of information from the Canadian Census provided by Statistics Canada! To crunch the data, we will use the Simple Data Analysis library (SDA), which I created ([give it a ⭐](https://github.com/nshiab/simple-data-analysis)).
+Bienvenue dans ce nouveau projet ! Nous allons explorer l'immense quantité d'informations provenant du recensement canadien fourni par Statistique Canada ! Pour traiter les données, nous utiliserons la librairie Simple Data Analysis (SDA), que j'ai créée ([donnez-lui une étoile ⭐](https://github.com/nshiab/simple-data-analysis)).
 
-For each metropolitan area, we will create a map showing areas with lower or higher income levels. The Montréal map below is an example of the final output we'll achieve together.
+Pour chaque région métropolitaine, nous créerons une carte montrant les zones où les revenus des ménages sont inférieurs ou supérieurs à la médiane. La carte de Montréal ci-dessous est un exemple du résultat final que nous allons obtenir ensemble.
 
-![A map of Montreal.](/assets/stats-can-census/map-Montréal.png)
+![Une carte de Montréal.](/assets/stats-can-census/map-Montréal.png)
 
-In this real-world project, I will show you advanced techniques for crunching large datasets with TypeScript. The 2021 Census data is approximately 30 GB, but you will actually need about 70 GB of free space on your hard drive for this project. Time to do some cleaning! 🧹
+Dans ce projet, je vais vous montrer des techniques avancées pour traiter de grands ensembles de données avec TypeScript. Les données du recensement de 2021 pèsent environ 30 GB, mais vous aurez besoin d'environ 70 GB d'espace libre sur votre disque dur pour ce projet. Il est temps de faire un peu de ménage ! 🧹
 
-If you are stuck at any point in this project, it may be beneficial to review the previous lessons explaining the basics of SDA:
-- [Tabular data](/simple-data-analysis/tabular-data)
-- [Geospatial data](/simple-data-analysis/geospatial-data)
-- [Visualizing data](/simple-data-analysis/dataviz)
+Si vous êtes bloqué à un moment donné, il peut être utile de revoir les leçons précédentes expliquant les bases de SDA :
+- [Données tabulaires](/simple-data-analysis/tabular-data)
+- [Données géospatiales](/simple-data-analysis/geospatial-data)
+- [Visualiser des données](/simple-data-analysis/dataviz)
 
-We will use Deno and VS Code. Check the [Setup](/first-steps/setup) lesson if needed.
+Nous utiliserons Deno et VS Code. Consultez la leçon [Installation](/first-steps/setup) si nécessaire.
 
-Let's get started!
+C'est parti !
 
-<NoticeIntro />
+<NoticeIntro lang="fr" />
 
-## What's the question?
+## Quelle est la question ?
 
-To avoid getting lost, let's define the question we're trying to answer:
-- For each Canadian metropolitan area, which dissemination areas have household incomes above or below the median?
+Pour ne pas perdre le fil, définissons la question à laquelle nous essayons de répondre :
+- Pour chaque région métropolitaine canadienne, quelles sont les aires de diffusion dont le revenu des ménages est supérieur ou inférieur à la médiane ?
 
-The metropolitan areas are defined as follows in the Census:
+Les régions métropolitaines sont définies ainsi dans le recensement :
 
-> A census metropolitan area (CMA) is formed by one or more adjacent municipalities centred on a population centre (known as the core). A CMA must have a total population of at least 100,000, of which 50,000 or more must live in the core.
+> Une région métropolitaine de recensement (RMR) est formée d'une ou de plusieurs municipalités adjacentes centrées sur une région urbaine (appelée le noyau). Une RMR doit avoir une population totale d'au moins 100 000 habitants, dont au moins 50 000 vivent dans le noyau.
 
-And here's the definition of dissemination areas:
+Voici la définition des aires de diffusion :
 
-> A dissemination area (DA) is a small, relatively stable geographic unit with an average population of 400 to 700 persons. It is the smallest standard geographic area for which all census data are disseminated. DAs cover all the territory of Canada.
+> Une aire de diffusion (AD) est une petite unité géographique relativement stable avec une population moyenne de 400 à 700 personnes. C'est la plus petite unité géographique pour laquelle toutes les données de recensement sont diffusées. Les AD couvrent tout le territoire canadien.
 
-Let's code!
+C'est parti pour le code !
 
-## Setup
+## Configuration
 
-To set up everything we need, let's use [setup-sda](https://jsr.io/@nshiab/setup-sda) like in previous lessons.
+Pour tout configurer, utilisons [setup-sda](https://jsr.io/@nshiab/setup-sda) comme dans les leçons précédentes.
 
-Create a new folder, open it with VS Code, and run: `deno -A jsr:@nshiab/setup-sda`
+Créez un nouveau dossier, ouvrez-le avec VS Code, et exécutez : `deno -A jsr:@nshiab/setup-sda`
 
-Then run `deno task sda` to watch `main.ts` and its dependencies.
+Ensuite, exécutez `deno task sda` pour surveiller `main.ts` et ses dépendances.
 
-![A screenshot of VS Code after running setup-sda.](/assets/stats-can-census/setup.png)
+![Capture d'écran de VS Code après avoir exécuté setup-sda.](/assets/stats-can-census/setup.png)
 <Callout type="info" emoji="💡">
- For SDA to work properly, it's best to have at least version 2.1.9 of Deno. To check your version, you can run `deno --version` in your terminal. To upgrade it, simply run `deno upgrade`.
+ Pour que SDA fonctionne correctement, il est recommandé d'avoir au moins la version 2.1.9 de Deno. Pour vérifier votre version, exécutez `deno --version` dans votre terminal. Pour la mettre à jour, exécutez simplement `deno upgrade`.
 </Callout>
 
-## Downloading the data
+## Téléchargement des données
 
-To download the Census data with the most granularity, click on this [Statistics Canada page](https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/download-telecharger.cfm?Lang=E).
+Pour télécharger les données du recensement avec le plus de granularité possible, cliquez sur cette [page de Statistique Canada](https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/download-telecharger.cfm?Lang=F).
 
-Click on the first drawer *Comprehensive download file* and then on the *CSV* button for *Canada, provinces, territories, census divisions (CDs), census subdivisions (CSDs), and dissemination areas (DAs)*.
+Cliquez sur le premier volet *Fichier de téléchargement complet* puis sur le bouton *CSV* pour *Canada, provinces, territoires, divisions de recensement (DR), subdivisions de recensement (SDR) et aires de diffusion (AD)*.
 
-In case you can't find it, here's the [direct link](https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/download-telecharger/comp/GetFile.cfm?Lang=E&FILETYPE=CSV&GEONO=006). This will download a 2.25 GB zip file.
+Si vous ne le trouvez pas, voici le [lien direct](https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/download-telecharger/comp/GetFile.cfm?Lang=F&FILETYPE=CSV&GEONO=006). Cela téléchargera un fichier zip de 2,25 GB.
 
-![A screenshot of Statistics Canada webpage to download Census data.](/assets/stats-can-census/stats-can-census-download.png)
+![Capture d'écran du site de Statistique Canada pour télécharger les données du recensement.](/assets/stats-can-census/stats-can-census-download.png)
 
-Because we want to work on the metropolitan areas, it would be great to have the metropolitan area names for each dissemination area.
+Parce que nous voulons travailler sur les régions métropolitaines, il serait utile d'avoir les noms des régions pour chaque aire de diffusion.
 
-The file storing this information can be found [here](https://www12.statcan.gc.ca/census-recensement/alternative_alternatif.cfm?l=eng&dispext=zip&teng=2021_92-151_X.zip&k=%20%20%20%20%209602&loc=/census-recensement/2021/geo/aip-pia/attribute-attribs/files-fichiers/2021_92-151_X.zip). Download it as well. It's another zip file weighing 9.8 MB.
+Le fichier contenant ces informations se trouve [ici](https://www12.statcan.gc.ca/census-recensement/alternative_alternatif.cfm?l=fra&dispext=zip&teng=2021_92-151_X.zip&k=%20%20%20%20%209602&loc=/census-recensement/2021/geo/aip-pia/attribute-attribs/files-fichiers/2021_92-151_X.zip). Téléchargez-le aussi. C'est un autre fichier zip de 9,8 MB.
 
-![A screenshot of Statistics Canada webpage to download Census data names.](/assets/stats-can-census/stats-can-names-download.png)
+![Capture d'écran du site de Statistique Canada pour télécharger les noms des régions.](/assets/stats-can-census/stats-can-names-download.png)
 
-And finally, since we want to create a map, we need the geospatial boundaries of the dissemination areas. You'll find them [here](https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/index2021-eng.cfm?year=21).
+Et enfin, comme nous voulons créer une carte, nous avons besoin des frontières géospatiales des aires de diffusion. Vous les trouverez [ici](https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/index2021-fra.cfm?year=21).
 
-Click on the drawer *Statistical boundaries* and select *Dissemination areas*. In the *Format* section, select *Shapefile*, then hit *Continue* at the bottom of the page.
+Déplacez tout cela dans le dossier `data` de votre projet et décompressez tout sauf les frontières géospatiales dans le fichier `lda_000b21a_e.zip` ! C'est décompressé dans mes captures d'écran, mais c'était une erreur 🥲.
 
-In case you can't find it, here's the [direct link](https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/files-fichiers/lda_000b21a_e.zip) to download the file. It's around 197 MB.
+Surprise ! Vous avez maintenant plus de 27 GB de données à traiter. 😅
 
-![A screenshot of Statistics Canada webpage to download dissemination areas boundaries.](/assets/stats-can-census/stats-can-boundaries-download.png)
+![Capture d'écran de VS Code avec les données décompressées.](/assets/stats-can-census/unzipped.png)
 
-Now, move all of this inside the `data` folder in your project and unzip everything except the geospatial boundaries in the file `lda_000b21a_e.zip`! It's unzipped in my screenshots, but it was a mistake 🥲.
+## Les données du recensement
 
-To unzip, check your folder outside of VS Code, like in Finder or File Explorer. You might need software like Winzip or 7-zip. Once unzipped, remove the two original `.zip` files from your project and download folder, and don't forget to empty your trash! 🗑️ Disk storage is precious when you work with big datasets.
+### Premier essai
 
-Surprise! You now have over 27 GB of data waiting to be processed. 😅
+En décompressant les données, nous avons obtenu un dossier contenant plusieurs fichiers. Les données se trouvent dans les fichiers dont le nom contient `_data_`.
 
-![A screenshot of VS Code with the data unzipped.](/assets/stats-can-census/unzipped.png)
-
-## The Census data
-
-### First try
-
-When we unzipped the census data, we got a folder with multiple files in it. The data is in the files with the `_data_` substring.
-
-Let's try to open the first one for the Atlantic provinces.
+Essayons d'ouvrir le premier pour les provinces de l'Atlantique.
 
 ```ts showLineNumbers filename="main.ts"
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -108,28 +100,27 @@ await census.logTable()
 
 await sdb.done();
 ```
+Hmmm... Nous avons un problème. Cette erreur signifie que les données n'utilisent pas l'encodage `UTF-8`, qui est pourtant la norme de nos jours et nécessaire pour SDA.
 
-Hmmm... We have a problem. This error means that the data is not using the `UTF-8` encoding, which is the standard nowadays and needed by SDA.
+![Capture d'écran de VS Code montrant une erreur de codage Unicode invalide.](/assets/stats-can-census/encoding-error.png)
 
-![A screenshot of VS Code showing an Invalid unicode error.](/assets/stats-can-census/encoding-error.png)
+J'ai contacté Statistique Canada à ce sujet, et ils m'ont dit qu'ils utilisaient l'encodage [`Windows-1252`](https://fr.wikipedia.org/wiki/Windows-1252). Cela signifie que notre première étape consiste à réencoder les données...
 
-I asked Statistics Canada about this, and they told me they use the [`Windows-1252`](https://en.wikipedia.org/wiki/Windows-1252) encoding. This means our first step is to re-encode the data...
+Et oui, les projets de données dans la vraie vie sont toujours aussi amusants ! 😬
 
-Yes, real-world data projects are always this fun! 😬
+### Réencodage des données
 
-### Re-encoding the data
+Comme le réencodage de données est une tâche courante, j'ai créé la fonction [`reencode`](https://jsr.io/@nshiab/journalism/doc/~/reencode) et je l'ai publiée dans la librairie *[journalism](https://github.com/nshiab/journalism)*. Lorsque vous configurez votre projet avec `setup-sda`, *journalism* est automatiquement installé. Cette étape sera donc très facile !
 
-Since re-encoding data is a common task, I created the function [`reencode`](https://jsr.io/@nshiab/journalism/doc/~/reencode) and published it in the *[journalism](https://github.com/nshiab/journalism)* library. When you set up your project with `setup-sda`, *journalism* is automatically installed. So this step will be very easy!
+Créons un nouveau fichier `toUTF8.ts` dans le dossier `helpers` avec le code ci-dessous. Comme nous n'avons besoin de réencoder les données qu'une seule fois, nous n'exportons pas de fonction. C'est simplement un script que nous allons exécuter une seule fois.
 
-Let's create a new file `toUTF8.ts` in `helpers` with the code below. Since we need to re-encode the data just once, we are not exporting a function. It's just a regular script we will run once.
+En regardant les noms des fichiers, vous remarquerez qu'ils ont tous la même structure, sauf pour la région. En créant une liste avec les régions, nous pouvons facilement parcourir tous les fichiers.
 
-If you look at the file names, you'll notice they all share the same structure, except for the region. So by creating an array with the regions, we can easily loop over all the files.
-
-The `reencode` function needs four arguments:
-- the input file
-- the output file, which here has the same name as the original file but with `_utf8` at the end
-- the original encoding
-- the new encoding
+La fonction `reencode` nécessite quatre arguments :
+- le fichier d'entrée
+- le fichier de sortie, qui ici a le même nom que le fichier original mais avec `_utf8` à la fin
+- l'encodage d'origine
+- le nouvel encodage
 
 
 ```ts showLineNumbers filename="toUTF8.ts"
@@ -158,7 +149,7 @@ for (const r of regions) {
 }
 ```
 
-To run this script, we could create a new task `toUTF8` in our `deno.json`. Don't worry if you don't have the same version as me in the imports. You're fine!
+Pour exécuter ce script, nous pouvons créer une nouvelle tâche `toUTF8` dans notre `deno.json`. Ne vous inquiétez pas si vous n'avez pas la même version que moi dans les *imports*. Tout va bien aller ! 
 
 ```ts showLineNumbers filename="deno.json" {5}
 {
@@ -176,19 +167,20 @@ To run this script, we could create a new task `toUTF8` in our `deno.json`. Don'
 }
 ```
 
-Now stop watching `main.ts` (`CTRL` + `C` in your terminal) and let's run our new script with our new task: `deno task toUTF8`
+Arrêtez de surveiller `main.ts` (`CTRL` + `C` dans votre terminal) et exécutons notre nouveau script avec notre nouvelle tâche : `deno task toUTF8`
 
-It will take a few minutes to have all the files re-encoded. But here's what you'll see once done.
+Cela prendra quelques minutes pour réencoder tous les fichiers. Voici ce que vous verrez une fois que ce sera terminé.
 
-![A screenshot of VS Code showing re-encoded data.](/assets/stats-can-census/re-encoding.png)
+![Capture d'écran de VS Code montrant les données réencodées.](/assets/stats-can-census/re-encoding.png)
 
-New files have appeared with `_utf8` in their names! And now your `data` folder weighs... 53 GB. 🤭
+De nouveaux fichiers sont apparus avec `_utf8` dans leurs noms ! Et maintenant, votre dossier `data` pèse... 53 GB. 🤭
 
-If you're tight on storage space, delete the original data files. We will work with the ones ending in `_utf8.csv` from now on. Also, keep the other files around, especially `98-401-X2021006_English_meta.txt`!
+Si vous manquez d'espace de stockage, supprimez les fichiers de données d'origine. Nous travaillerons désormais avec ceux qui se terminent par `_utf8.csv`. Gardez également les autres fichiers, en particulier `98-401-X2021006_English_meta.txt` !
 
-### Trying again
+### Réessayons
 
-Let's try to load and log the re-encoded CSV file for the Atlantic provinces now. Update `main.ts` and run `deno task sda` in your terminal.
+Essayons maintenant de charger et d'afficher le fichier CSV réencodé pour les provinces de l'Atlantique. Mettez à jour `main.ts` et exécutez `deno task sda` dans votre terminal.
+
 
 ```ts showLineNumbers filename="main.ts" {7}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -203,14 +195,14 @@ await census.logTable();
 
 await sdb.done();
 ```
-![A screenshot of VS Code showing the Atlantic provinces data.](/assets/stats-can-census/atlantic-data.png)
+![Capture d'écran de VS Code montrant les données des provinces de l'Atlantique.](/assets/stats-can-census/atlantic-data.png)
 <Callout type="info" emoji="💡">
-    If the table layout is displayed weirdly in your terminal, it's because the width of the table is bigger than the width of your terminal. Right-click on the terminal and look for `Toggle size with content width`. There is also a handy shortcut that I use all the time to do that: `OPTION` + `Z` on Mac and `ALT` + `Z` on PC.
+    Si la disposition du tableau s'affiche de manière étrange dans votre terminal, c'est parce que la largeur du tableau est supérieure à celle de votre terminal. Faites un clic droit sur le terminal et cherchez `Toggle size with content width`. Il y a aussi un raccourci pratique que j'utilise tout le temps pour cela : `OPTION` + `Z` sur Mac et `ALT` + `Z` sur PC.
 </Callout>
 
-Amazing! It works! 🥳
+Ça fonctionne ! 🥳
 
-Let's try another one: the Prairies, which cover Alberta, Saskatchewan, and Manitoba provinces.
+Essayons un autre fichier : celui des Prairies, qui couvre les provinces de l'Alberta, de la Saskatchewan et du Manitoba.
 
 ```ts showLineNumbers filename="main.ts" {7}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -225,11 +217,11 @@ await census.logTable();
 
 await sdb.done();
 ```
-![A screenshot of VS Code showing an error due to a badly formatted CSV.](/assets/stats-can-census/prairies-error.png)
+![Capture d'écran de VS Code montrant une erreur due à un CSV mal formaté.](/assets/stats-can-census/prairies-error.png)
 
-Oh no! Another error... It looks like this CSV file might be badly formatted...
+Oh non ! Encore une erreur... Il semble que ce fichier CSV soit mal formaté...
 
-We can tweak the options to make the CSV parsing less strict and see if it works.
+Nous pouvons ajuster les options pour rendre le chargement du CSV moins stricte et voir si cela fonctionne.
 
 ```ts showLineNumbers filename="main.ts" {8}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -245,17 +237,18 @@ await census.logTable();
 
 await sdb.done();
 ```
-![A screenshot of VS Code showing the Prairies data.](/assets/stats-can-census/prairies-working.png)
+![Capture d'écran de VS Code montrant les données des Prairies.](/assets/stats-can-census/prairies-working.png)
 
-Beautiful! Now everything works!
+Magnifique ! Tout fonctionne maintenant !
 
-### Loading all the data
+### Charger toutes les données
 
-So far, we loaded the data one file at a time. But you can also load all of the CSV files into one table easily.
+Jusqu'à présent, nous avons chargé les données un fichier à la fois. Mais vous pouvez également charger tous les fichiers CSV dans une seule table facilement.
 
-Let's create a new `crunchData.ts` file to do that. This `async` function will have one parameter `sdb` and it will return a `census` table.
+Créons un nouveau fichier `crunchData.ts` pour cela. Cette fonction `async` aura un paramètre `sdb` et retournera une table `census`.
 
-When you have files with names following the same pattern, you can use wildcards `*`. In our case, we want to load all CSV files ending with `_utf8.csv`, so we load all of the files by using `*_utf8.csv`, as shown on line 6 below.
+Lorsque vous avez des fichiers dont les noms suivent le même modèle, vous pouvez utiliser des jokers `*`. Dans notre cas, nous voulons charger tous les fichiers CSV se terminant par `_utf8.csv`, donc nous les chargeons tous en utilisant `*_utf8.csv`, comme montré à la ligne 6 ci-dessous.
+
 
 ```ts showLineNumbers filename="crunchData.ts" {6}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -272,7 +265,7 @@ export default async function crunchData(sdb: SimpleDB) {
 }
 ```
 
-Let's update `main.ts` to use this new function. We also set the `cacheVerbose` to `true` when creating our `SimpleDB`. This will log the total duration and will be useful going forward when we use the cache.
+Mettons à jour `main.ts` pour utiliser cette nouvelle fonction. Nous réglons également `cacheVerbose` sur `true` lors de la création de notre `SimpleDB`. Cela enregistrera la durée totale et sera utile par la suite lorsque nous utiliserons le cache.
 
 ```ts showLineNumbers filename="main.ts" {4-7}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -286,25 +279,25 @@ await census.logTable();
 await sdb.done();
 ```
 
-Depending on the RAM available on your computer, you might see a `.tmp` folder appearing. If the data is bigger than your RAM, this folder will be used to process all of it by putting processed chunks in it.
+En fonction de la mémoire RAM disponible sur votre ordinateur, vous pourriez voir un dossier `.tmp` apparaître. Si les données sont plus volumineuses que votre RAM, ce dossier sera utilisé pour traiter toutes les données en y stockant des morceaux prétraités.
 
-This `.tmp` folder can become quite big. On my machine after the first run, it's around 16 GB.
+Ce dossier `.tmp` peut devenir assez volumineux. Sur ma machine, après la première exécution, il pèse environ 16 GB.
 
 <Callout type="info" emoji="💡">
-    If you want to clean your cache, run `deno task clean`. This will remove `.tmp` and `.sda-cache` (more about it later). You can also delete them manually, but don't forget to empty your trash.
+    Si vous souhaitez nettoyer votre cache, exécutez `deno task clean`. Cela supprimera `.tmp` et `.sda-cache` (nous en reparlerons plus tard). Vous pouvez également les supprimer manuellement, mais n'oubliez pas de vider votre corbeille.
 </Callout>
 
-We can finally have a look at the data. With 166 million rows and 23 columns, we have around 3.8 billion data points. 🙃
+Nous pouvons enfin jeter un œil aux données. Avec 166 millions de lignes et 23 colonnes, nous avons environ 3,8 milliards de points de données. 🙃
 
-And loading all of this took less than a minute on my computer. Not bad!
+Et charger tout cela a pris moins d'une minute sur mon ordinateur. Pas mal !
 
-![A screenshot of VS Code showing all the data loaded.](/assets/stats-can-census/loading-all.png)
+![Capture d'écran de VS Code montrant toutes les données chargées.](/assets/stats-can-census/loading-all.png)
 
-### Limit and cache
+### Limite et cache
 
-To start working on the data, we don't need all of it. We can use the option `limit` to load just the first million rows.
+Pour commencer à travailler sur les données, nous n'avons pas besoin de tout charger. Nous pouvons utiliser l'option `limit` pour ne charger que le premier million de lignes.
 
-Now, loading the data takes around a second.
+Maintenant, le chargement des données prend environ une seconde.
 
 ```ts showLineNumbers filename="crunchData.ts" {8}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -320,11 +313,11 @@ export default async function crunchData(sdb: SimpleDB) {
   return census;
 }
 ```
-![A screenshot of VS Code showing the first million rows loaded.](/assets/stats-can-census/limit.png)
+![Capture d'écran de VS Code montrant le premier million de lignes chargées.](/assets/stats-can-census/limit.png)
 
-We can also use the `cache` method. Anything wrapped by the method will be run once and the result will be stored in the `.sda-cache` folder. If the code doesn't change in the `cache` method, the data will be loaded from the cache instead of rerunning the computations.
+Nous pouvons également utiliser la méthode `cache`. Tout ce qui est enveloppé par cette méthode sera exécuté une seule fois et le résultat sera stocké dans le dossier `.sda-cache`. Si le code ne change pas dans la méthode `cache`, les données seront chargées depuis le cache au lieu de relancer les calculs.
 
-On the first run, it takes a little bit longer to run because it writes data to the cache.
+Lors de la première exécution, cela prend un peu plus de temps car les données sont écrites dans le cache.
 
 ```ts showLineNumbers filename="crunchData.ts"
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -342,33 +335,33 @@ export default async function crunchData(sdb: SimpleDB) {
   return census;
 }
 ```
-![A screenshot of VS Code showing the cache being written.](/assets/stats-can-census/first-run-cache.png)
+![Capture d'écran de VS Code montrant l'écriture dans le cache.](/assets/stats-can-census/first-run-cache.png)
 
-But on the subsequent runs, it's loading data from the cache, which is way faster. On my MacBook Pro, it's speeding things up 10 times! 😱
+Mais lors des exécutions suivantes, les données sont chargées depuis le cache, ce qui est beaucoup plus rapide. Sur mon MacBook Pro, c'est 10 fois plus rapide ! 😱
 
-![A screenshot of VS Code showing the cache being written.](/assets/stats-can-census/using-cache.png)
+![Capture d'écran de VS Code montrant le cache utilisé.](/assets/stats-can-census/using-cache.png)
 
-### Filtering
+### Filtrage
 
-One of the first things you want to do when working with big datasets is to filter them to keep only the data you are interested in.
+L'une des premières choses à faire lorsque l'on travaille avec de grands ensembles de données est de les filtrer pour ne conserver que les informations qui nous intéressent.
 
-Our question is:
-- For each Canadian metropolitan area, which dissemination areas have household incomes above or below the median?
+Notre question est :
+- Pour chaque région métropolitaine canadienne, quelles sont les aires de diffusion dont le revenu des ménages est supérieur ou inférieur à la médiane ?
 
-To find the household total income, you can check the `98-401-X2021006_English_meta.txt`. In it, there is the list of all the Census variables.
+Pour trouver le revenu total des ménages, vous pouvez consulter le fichier `98-401-X2021006_English_meta.txt`. Il contient la liste de toutes les variables du recensement.
 
-The `CHARACTERISTIC_ID` for the `Median total income of household in 2020 ($)` is `243`.
+Le `CHARACTERISTIC_ID` pour le `Median total income of household in 2020 ($)` est `243`.
 
-![A screenshot of VS Code showing the code for the total income variable.](/assets/stats-can-census/income-code.png)
+![Capture d'écran de VS Code montrant le code pour la variable du revenu total.](/assets/stats-can-census/income-code.png)
 
-Also, the Census data files we downloaded have different geographic levels, but we just need the dissemination areas.
+De plus, les fichiers de données du recensement que nous avons téléchargés contiennent différents niveaux géographiques, mais nous avons seulement besoin des aires de diffusion.
 
-Finally, we just need three columns:
-- `DGUID`, which contains the dissemination areas' unique geospatial ID. We will use it to find the right boundaries to make a map.
-- `GEO_NAME`, which contains the dissemination areas' unique naming ID. We will use it to retrieve the metropolitan area names. 
-- `C1_COUNT_TOTAL`, which contains the values of the variable. In our case, the median total income in each dissemination area. We can rename this column to have something more readable.
+Enfin, nous n'avons besoin que de trois colonnes :
+- `DGUID`, qui contient l'ID géospatial unique des aires de diffusion. Nous l'utiliserons pour trouver les bonnes frontières pour créer une carte.
+- `GEO_NAME`, qui contient l'ID de nommage unique des aires de diffusion. Nous l'utiliserons pour récupérer les noms des régions métropolitaines. 
+- `C1_COUNT_TOTAL`, qui contient les valeurs de la variable. Dans notre cas, il s'agit du revenu total médian dans chaque aire de diffusion. Nous pouvons renommer cette colonne pour avoir quelque chose de plus lisible.
 
-Let's update `crunchData` to keep only what we need.
+Mettons à jour `crunchData` pour ne conserver que ce dont nous avons besoin.
 
 
 ```ts showLineNumbers filename="crunchData.ts" {11-20}
@@ -397,15 +390,16 @@ export default async function crunchData(sdb: SimpleDB) {
   return census;
 }
 ```
-![A screenshot of VS Code showing the filtered data.](/assets/stats-can-census/cleaning-filtering.png)
+![Capture d'écran de VS Code montrant les données filtrées.](/assets/stats-can-census/cleaning-filtering.png)
 
-This is looking much better! We can now focus on adding the metropolitan area names.
+C'est beaucoup mieux ! Nous pouvons maintenant nous concentrer sur l'ajout des noms des régions métropolitaines.
 
-## The metropolitan areas
+## Les régions métropolitaines
 
-### First try
+### Premier essai
 
-Let's try to load the names which are in the `2021_92-151_X.csv` file. We can update `crunchData.ts`. We can keep working in the `cache` method.
+Essayons de charger les noms qui se trouvent dans le fichier `2021_92-151_X.csv`. Nous pouvons mettre à jour `crunchData.ts`. Nous continuons de travailler dans la méthode `cache`.
+
 
 ```ts showLineNumbers filename="crunchData.ts" {22-24}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -437,13 +431,13 @@ export default async function crunchData(sdb: SimpleDB) {
   return census;
 }
 ```
-![A screenshot of VS Code showing an encoding problem for the file containing the names.](/assets/stats-can-census/names-error.png)
+![Capture d'écran de VS Code montrant un problème d'encodage pour le fichier contenant les noms.](/assets/stats-can-census/names-error.png)
 
-We know this error! It's the encoding again!
+Nous connaissons cette erreur ! C'est encore un problème d'encodage !
 
-### Re-encoding again
+### Réencodage à nouveau
 
-Let's update `toUTF8.ts` to convert this CSV file too. We comment out the previous code because we don't need to reconvert the census files.
+Mettons à jour `toUTF8.ts` pour convertir également ce fichier CSV. Nous commentons le code précédent car nous n'avons pas besoin de reconvertir les fichiers du recensement.
 
 ```ts showLineNumbers filename="toUTF8.ts" {25-32}
 import { reencode } from "@nshiab/journalism";
@@ -480,9 +474,9 @@ await reencode(
 console.log("Done with names data");
 ```
 
-Stop watching `main.ts` in your terminal (`CTRL` + `C`) and run `deno task toUTF8`.
+Arrêtez de surveiller `main.ts` dans votre terminal (`CTRL` + `C`) et exécutez `deno task toUTF8`.
 
-Now, let's load our new file `sda/data/2021_92-151_X_utf8.csv` in `crunchData.ts`.
+Maintenant, chargeons notre nouveau fichier `sda/data/2021_92-151_X_utf8.csv` dans `crunchData.ts`.
 
 
 ```ts showLineNumbers filename="crunchData.ts" {23}
@@ -515,9 +509,9 @@ export default async function crunchData(sdb: SimpleDB) {
   return census;
 }
 ```
-![A screenshot of VS Code showing an encoding problem for the file containing the names.](/assets/stats-can-census/names-strict.png)
+![Capture d'écran de VS Code montrant un problème d'encodage pour le fichier contenant les noms.](/assets/stats-can-census/names-strict.png)
 
-Another error... Again, we have to set the `strict` option to `false`.
+Encore une erreur... Nous devons à nouveau définir l'option `strict` sur `false`.
 
 ```ts showLineNumbers filename="crunchData.ts" {23}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -550,15 +544,16 @@ export default async function crunchData(sdb: SimpleDB) {
 }
 ```
 
-And now it works! But this file has a whopping 63 columns. 😳
+Et maintenant, ça fonctionne ! Mais ce fichier contient un impressionnant total de 63 colonnes. 😳
 
-### Filtering
+### Filtrage
 
-If you read [the documentation](https://www150.statcan.gc.ca/n1/pub/92-151-g/2021001/tbl/tbl4_1-eng.htm) (and know your Census pretty well 🥸), you'll realize that you only need two columns, after filtering `CMATYPE_RMRGENRE` for the `B` type to keep only metropolitan areas.
+Si vous lisez [la documentation](https://www150.statcan.gc.ca/n1/pub/92-151-g/2021001/tbl/tbl4_1-fra.htm) (et que vous connaissez bien votre recensement 🥸), vous réaliserez que vous n'avez besoin que de deux colonnes, après avoir filtré `CMATYPE_RMRGENRE` pour le type `B` afin de ne conserver que les régions métropolitaines.
 
-Because the file contains data for different geographical levels, we remove duplicates created by selecting just two columns. And since the goal is to add the metropolitan names to our `census` table, we rename the column `DADGUID_ADIDUGD` to `DGUID` to easily join the two tables. We also rename `CMANAME_RMRNOM` to `CMA` for convenience.
+Comme le fichier contient des données pour différents niveaux géographiques, nous supprimons les doublons créés en sélectionnant seulement deux colonnes. Et puisque le but est d'ajouter les noms des régions métropolitaines à notre table `census`, nous renommons la colonne `DADGUID_ADIDUGD` en `DGUID` pour joindre facilement les deux tables. Nous renommons également `CMANAME_RMRNOM` en `CMA` par souci de commodité.
 
-Here's an updated version of `crunchData.ts`.
+Voici une version mise à jour de `crunchData.ts`.
+
 
 ```ts showLineNumbers filename="crunchData.ts" {24-33}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -599,56 +594,55 @@ export default async function crunchData(sdb: SimpleDB) {
   return census;
 }
 ```
-![A screenshot of VS Code showing the census table with the CMA names.](/assets/stats-can-census/names-joined.png)
+![Capture d'écran de VS Code montrant la table du recensement avec les noms des CMA.](/assets/stats-can-census/names-joined.png)
 
-Victory! We now have the metropolitan area name for each dissemination area! 🥳
+Victoire ! Nous avons maintenant le nom de la région métropolitaine pour chaque aire de diffusion ! 🥳
 
-## The dissemination areas boundaries
+## Les frontières des aires de diffusion
 
-### Simplifying
+### Simplification
 
-Since we want to make a map, we need the dissemination areas boundaries. We downloaded them earlier as the zipped file `lda_000b21a_e.zip` (and I told you not to unzip them 😬).
+Comme nous voulons créer une carte, nous avons besoin des frontières des aires de diffusion. Nous les avons téléchargées précédemment sous forme de fichier compressé `lda_000b21a_e.zip` (et je vous avais dit de ne pas le décompresser 😬).
 
-Statistics Canada provides very detailed geospatial data. But since we only want to draw maps, we don't need a very high level of detail. A simplified version would be enough and would make our code run faster.
+Statistique Canada fournit des données géospatiales très détaillées. Mais comme nous voulons seulement dessiner des cartes, nous n'avons pas besoin d'un niveau de détail aussi élevé. Une version simplifiée suffira et rendra notre code plus rapide.
 
-One of my favorite tools to simplify geospatial data is [mapshaper.org](https://mapshaper.org/). Go give them a ⭐ on [GitHub](https://github.com/mbloch/mapshaper) if you have an account!
+Un de mes outils préférés pour simplifier les données géospatiales est [mapshaper.org](https://mapshaper.org/). Allez leur donner une ⭐ sur [GitHub](https://github.com/mbloch/mapshaper) si vous avez un compte !
 
-Go on the website and drag-and-drop `lda_000b21a_e.zip` on the page. Note that you can't drag-and-drop from VS Code. Do it from your folder using your computer's Finder or File Explorer.
+Allez sur le site et faites glisser `lda_000b21a_e.zip` sur la page. Notez que vous ne pouvez pas faire glisser le fichier depuis VS Code. Faites-le depuis votre dossier à l'aide du Finder ou de l'Explorateur de fichiers de votre ordinateur.
 
-After a few seconds, you'll see all the dissemination areas.
+Après quelques secondes, vous verrez toutes les aires de diffusion.
 
-![A screenshot of mapshaper showing the dissemination areas.](/assets/stats-can-census/mapshaper.png)
+![Capture d'écran de mapshaper montrant les aires de diffusion.](/assets/stats-can-census/mapshaper.png)
 
-You can now click on `Simplify` on the top right corner and select the following options:
+Vous pouvez maintenant cliquer sur `Simplify` en haut à droite et sélectionner les options suivantes :
 - `prevent shape removal`
 - `Visvalingam / weighted area`
 
-Click on `Apply`!
+Cliquez sur `Apply` !
 
-![A screenshot of mapshaper showing the dissemination areas.](/assets/stats-can-census/mapshaper-simplify.png)
+![Capture d'écran de mapshaper montrant les aires de diffusion.](/assets/stats-can-census/mapshaper-simplify.png)
 
-For the next step, I usually zoom in on a high-density area, like Montreal. Then, using the top slider, I aim for a simplification threshold that doesn't alter the overall shapes.
+Pour l'étape suivante, je zoome généralement sur une zone à haute densité, comme Montréal. Ensuite, à l'aide du curseur en haut, je vise un seuil de simplification qui ne modifie pas les formes globales.
 
-Here, 10% works pretty well. Note that you can type in the percentage that you want directly too.
+Ici, 10% fonctionne plutôt bien. Notez que vous pouvez également saisir directement le pourcentage souhaité.
 
-![A screenshot of mapshaper showing the simplification options.](/assets/stats-can-census/mapshaper-threshold.png)
+![Capture d'écran de mapshaper montrant les options de simplification.](/assets/stats-can-census/mapshaper-threshold.png)
 
-And the next step is to export the simplified data!
+L'étape suivante consiste à exporter les données simplifiées !
 
-Click on the `Export` button in the top right corner, keep the file format as the original `Shapefile`, and hit `Export`.
+Cliquez sur le bouton `Export` en haut à droite, conservez le format de fichier original `Shapefile`, puis cliquez sur `Export`.
 
-![A screenshot of mapshaper showing how to export simplified layers.](/assets/stats-can-census/mapshaper-export.png)
+![Capture d'écran de mapshaper montrant comment exporter des calques simplifiés.](/assets/stats-can-census/mapshaper-export.png)
 
-You can now rename this file `lda_000b21a_e_simplified.shp.zip` (notice I added `.shp.zip` for the file extension to help SDA understand it's a shapefile) and move it to your `data` folder.
+Vous pouvez maintenant renommer ce fichier en `lda_000b21a_e_simplified.shp.zip` (remarquez que j'ai ajouté `.shp.zip` à l'extension pour aider SDA à comprendre qu'il s'agit d'un shapefile) et le déplacer dans votre dossier `data`.
 
-Instead of 197 MB, our geospatial data now weighs just 27 MB, which will help speed up our computations and map drawing!
+Au lieu de 197 MB, nos données géospatiales ne pèsent plus que 27 MB, ce qui accélérera nos calculs et le dessin des cartes !
 
+### Chargement des géométries
 
-### Loading the geometries
+Pour charger les géométries, nous pouvons utiliser la méthode `loadGeoData`. N'oubliez pas de modifier l'extension du fichier Shapefile simplifié en `.shp.zip`. Le `shp` est important pour SDA. Sans cela, SDA ne reconnaît pas le fichier en tant que Shapefile et ne peut pas le charger correctement.
 
-To load the geometries, we can use the `loadGeoData` method. Don't forget to modify the file extension of your simplified Shapefile to `.shp.zip`. The `shp` is important for SDA. Without it, SDA doesn't recognize the file as a Shapefile and can't load it correctly.
-
-When you load new geospatial data, it's always important to check the projection. Below, we use the `logProjections` method for that.
+Lorsque vous chargez de nouvelles données géospatiales, il est toujours important de vérifier la projection. Ci-dessous, nous utilisons la méthode `logProjections` pour cela.
 
 
 ```ts showLineNumbers filename="crunchData.ts" {35-40}
@@ -697,19 +691,19 @@ export default async function crunchData(sdb: SimpleDB) {
   return census;
 }
 ```
-![A screenshot of VS Code loading geospatial data.](/assets/stats-can-census/loadGeoData.png)
+![Capture d'écran de VS Code chargant des données géospatiales.](/assets/stats-can-census/loadGeoData.png)
 
-We have no problem loading the geospatial data. We can see the 57,932 dissemination areas as rows with their properties and geometries.
+Nous n'avons aucun problème à charger les données géospatiales. Nous pouvons voir les 57 932 aires de diffusion sous forme de lignes avec leurs propriétés et leurs géométries.
 
-But the projection `proj=lcc` with its `units=m` is problematic. Statistics Canada uses the Lambert conic conformal projection with coordinates in meters. For many SDA methods to work properly, we need the coordinates with the WGS84 projection using latitude and longitude.
+Mais la projection `proj=lcc` avec ses `units=m` pose problème. Statistique Canada utilise la projection conforme conique de Lambert avec des coordonnées en mètres. Pour que de nombreuses méthodes de SDA fonctionnent correctement, nous avons besoin des coordonnées avec la projection WGS84 utilisant la latitude et la longitude.
 
-But don't worry, SDA has you covered. You just need to pass the option `{ toWGS84: true }` to convert your geospatial data to the right format.
+Mais ne vous inquiétez pas, SDA gère cela pour vous. Il vous suffit de passer l'option `{ toWGS84: true }` pour convertir vos données géospatiales au bon format.
 
-While at it, let's select only the columns we are interested in:
-- `DGUID`, which is the unique ID for dissemination areas. We will use it to join the geometries to the census data.
-- `geom`, which stores the geometries.
+Pendant qu'on y est, sélectionnons uniquement les colonnes qui nous intéressent :
+- `DGUID`, qui est l'ID unique pour les aires de diffusion. Nous l'utiliserons pour joindre les géométries aux données du recensement.
+- `geom`, qui contient les géométries.
 
-And let's join the `disseminationAreas` table to the `census` table! Since we have a `DGUID` in each table, SDA will use it to match the dissemination areas' census data with the right boundaries.
+Et joignons la table `disseminationAreas` à la table `census` ! Comme nous avons un `DGUID` dans chaque table, SDA l'utilisera pour faire correspondre les données du recensement des aires de diffusion avec les bonnes frontières.
 
 
 ```ts showLineNumbers filename="crunchData.ts" {38, 40-41}
@@ -759,14 +753,13 @@ export default async function crunchData(sdb: SimpleDB) {
   return census;
 }
 ```
-![A screenshot of VS Code showing complete dissemination area data.](/assets/stats-can-census/all-data.png)
+![Capture d'écran de VS Code montrant les données complètes des aires de diffusion.](/assets/stats-can-census/all-data.png)
 
-Our data is finally complete! We have our dissemination areas with their median total household income, the name of their metropolitan area, and their boundaries!
+Nos données sont enfin complètes ! Nous avons nos aires de diffusion avec leur revenu total médian des ménages, le nom de leur région métropolitaine et leurs frontières !
 
-We can remove the `limit` option on line 9 and select just the three columns that we will use going forward. We can also remove rows with missing values.
+Nous pouvons supprimer l'option `limit` à la ligne 9 et sélectionner uniquement les trois colonnes que nous utiliserons par la suite. Nous pouvons également supprimer les lignes avec des valeurs manquantes.
 
-Let's run everything now!
-
+Traitons toutes les données maintenant !
 
 ```ts showLineNumbers filename="crunchData.ts" {41-42}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -816,28 +809,28 @@ export default async function crunchData(sdb: SimpleDB) {
   return census;
 }
 ```
-![A screenshot of VS Code showing complete dissemination area data.](/assets/stats-can-census/run-all-cleaning.png)
+![Capture d'écran de VS Code montrant les données complètes des aires de diffusion.](/assets/stats-can-census/run-all-cleaning.png)
 
-We now have our data for around 37 thousand dissemination areas located in metropolitan areas.
+Nous avons maintenant nos données pour environ 37 000 aires de diffusion situées dans des régions métropolitaines.
 
-And since all of this code is within the `cache` method, it will run just once and let us work quickly on the next steps! As shown above, on the first pass, the code took 1 min 31 seconds to run on my computer. But on the second, it took only 97 ms. 😏
+Et comme tout ce code est dans la méthode `cache`, il ne s'exécutera qu'une seule fois, ce qui nous permettra de travailler rapidement sur les prochaines étapes ! Comme indiqué ci-dessus, lors de la première exécution, le code a mis 1 min 31 s à s'exécuter sur mon ordinateur. Mais lors de la seconde, il n'a fallu que 97 ms. 😏
 
-![A screenshot of VS Code showing complete dissemination area data loaded from the cache.](/assets/stats-can-census/run-all-cleaning-cache.png)
+![Capture d'écran de VS Code montrant les données complètes chargées depuis le cache.](/assets/stats-can-census/run-all-cleaning-cache.png)
 
-Structuring, formatting, filtering, and cleaning the data is often the longest step in data analysis and visualization. 🫠 But it's also extremely important to do it properly to avoid errors in your analysis and visualizations.
+La structuration, le formatage, le filtrage et le nettoyage des données sont souvent les étapes les plus longues dans l'analyse et la visualisation de données. 🫠 Mais il est également extrêmement important de bien les faire pour éviter les erreurs dans votre analyse et vos visualisations.
 
-Always take the time to read the data documentation. It might feel like a waste of time at the beginning, but it will actually save you a lot of time down the road. I've been there. Trust me. 🫣
+Prenez toujours le temps de lire la documentation des données. Cela peut sembler une perte de temps au début, mais cela vous fera en réalité gagner beaucoup de temps par la suite. J'ai déjà vécu ça. Faites-moi confiance. 🫣
 
-## Answering the question
+## Répondre à la question
 
-### Variation from the median
+### Variation par rapport à la médiane
 
-The question we want to answer is:
-- For each Canadian metropolitan area, which dissemination areas have household incomes above or below the median?
+La question à laquelle nous voulons répondre est :
+- Pour chaque région métropolitaine canadienne, quelles sont les aires de diffusion dont le revenu des ménages est supérieur ou inférieur à la médiane ?
 
-So we need to find the median household total income for each metropolitan area. This is easy to do with the method `summarize`.
+Nous devons donc trouver le revenu total médian des ménages pour chaque région métropolitaine. C'est facile à faire avec la méthode `summarize`.
 
-Note that we can work outside the cache method now. With the data cleaned up and filtered, this is an easy lift.
+Notez que nous pouvons maintenant travailler en dehors de la méthode `cache`. Les données étant nettoyées et filtrées, cela devient beaucoup plus léger à traiter.
 
 
 ```ts showLineNumbers filename="crunchData.ts" {45-51}
@@ -896,11 +889,11 @@ export default async function crunchData(sdb: SimpleDB) {
   return census;
 }
 ```
-![A screenshot of VS Code showing the median household total income.](/assets/stats-can-census/summarize.png)
+![Capture d'écran de VS Code montrant le revenu total médian des ménages.](/assets/stats-can-census/summarize.png)
 
-Now that we have the median for each CMA in the `medians` table, we can join the `medians` table to the `census` table. Since both have the `CMA` column, SDA will be able to easily match the rows. For convenience, we can remove the `value` column from `medians` before doing the join.
+Maintenant que nous avons la médiane pour chaque CMA dans la table `medians`, nous pouvons joindre la table `medians` à la table `census`. Comme les deux tables ont la colonne `CMA`, SDA pourra facilement faire correspondre les lignes. Par commodité, nous pouvons supprimer la colonne `value` de `medians` avant de faire la jointure.
 
-We can now add a new column `varPerc` with the percentage variation from the median for each dissemination area. We can round the values too. This is what we will use to color our maps.
+Nous pouvons maintenant ajouter une nouvelle colonne `varPerc` avec la variation en pourcentage par rapport à la médiane pour chaque aire de diffusion. Nous pouvons également arrondir les valeurs. C'est ce que nous utiliserons pour colorer nos cartes.
 
 ```ts showLineNumbers filename="crunchData.ts" {51-59}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -966,17 +959,18 @@ export default async function crunchData(sdb: SimpleDB) {
   return census;
 }
 ```
-![A screenshot of VS Code showing the variation from the median income in each metropolitan area.](/assets/stats-can-census/variation.png)
+![Capture d'écran de VS Code montrant la variation par rapport au revenu médian dans chaque région métropolitaine.](/assets/stats-can-census/variation.png)
 
-We now have the answer to our question: the variation from the median in each dissemination area for all metropolitan areas.
+Nous avons maintenant la réponse à notre question : la variation par rapport à la médiane dans chaque aire de diffusion pour toutes les régions métropolitaines.
 
-Time to visualize this!
+Il est temps de visualiser tout ça !
 
-### Making maps
+### Création des cartes
 
-To keep our code organized and to stay mentally sane, let's create a new file `visualizeData.ts` in `helpers`.
+Pour garder notre code organisé et pour rester sain d'esprit, créons un nouveau fichier `visualizeData.ts` dans le dossier `helpers`.
 
-The new function will need the `census` table and will just log it for now.
+La nouvelle fonction aura besoin de la table `census` et, pour l'instant, elle se contentera de l'afficher dans la console.
+
 
 ```ts showLineNumbers filename="visualizeData.ts"
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -986,7 +980,7 @@ export default async function visualizeData(census: SimpleTable) {
 }
 ```
 
-And let's update `main.ts` to call this new function.
+Et mettons à jour `main.ts` pour appeler cette nouvelle fonction.
 
 ```ts showLineNumbers filename="main.ts" {8}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -1001,13 +995,14 @@ await visualizeData(census);
 await sdb.done();
 ```
 
-We want to draw a map for each metropolitan area, so first, let's retrieve all unique metropolitan areas in our data.
+Nous voulons dessiner une carte pour chaque région métropolitaine, alors commençons par récupérer toutes les régions métropolitaines uniques dans nos données.
 
-Then, we can loop over them, clone the `census` table, and keep only the rows with the right `CMA`.
+Ensuite, nous pouvons les parcourir dans une boucle, cloner la table `census` et ne garder que les lignes correspondant à la bonne `CMA`.
 
-As you can see in the screenshot below the new code, when you don't specify a name for tables, SDA automatically names them `table0`, `table1`, etc. Here, we can see that the last table is `table42`, meaning we are looping over 43 metropolitan areas.
+Comme vous pouvez le voir dans la capture d'écran ci-dessous, lorsque vous ne spécifiez pas de nom pour les tables, SDA les nomme automatiquement `table0`, `table1`, etc. Ici, nous voyons que la dernière table est `table42`, ce qui signifie que nous parcourons 43 régions métropolitaines.
 
-To know the number of metropolitan areas, you could also check the `.length` of `allCMAs`, since `getUniques` returns all unique values in a column as an array.
+Pour connaître le nombre de régions métropolitaines, vous pouvez également vérifier la propriété `.length` de `allCMAs`, puisque `getUniques` renvoie toutes les valeurs uniques d'une colonne sous forme de liste.
+
 
 ```ts showLineNumbers filename="visualizeData.ts" {4-10}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -1022,18 +1017,18 @@ export default async function visualizeData(census: SimpleTable) {
   }
 }
 ```
-![A screenshot of VS Code after running setup-sda.](/assets/stats-can-census/clone.png)
+![Capture d'écran de VS Code après avoir exécuté setup-sda.](/assets/stats-can-census/clone.png)
 <Callout type="info" emoji="💡">
- Because the `census` table has a column `CMA` and the loop is using the `CMA` variable too, we can write `{ CMA }` as a shortcut for `{ CMA: CMA }`.
+ Comme la table `census` possède une colonne `CMA` et que la boucle utilise également la variable `CMA`, nous pouvons écrire `{ CMA }` comme raccourci pour `{ CMA: CMA }`.
 </Callout>
 
-We can now create a function to draw our maps. When we set up everything with `setup-sda`, we automatically installed [Plot](https://github.com/observablehq/plot). This very powerful data visualization library works very well with SDA and this is what we are going to use to draw our map.
+Nous pouvons maintenant créer une fonction pour dessiner nos cartes. Lorsque nous avons tout configuré avec `setup-sda`, nous avons automatiquement installé [Plot](https://github.com/observablehq/plot). Cette puissante librairie de visualisation de données fonctionne très bien avec SDA et c'est ce que nous allons utiliser pour dessiner nos cartes.
 
-Since it's the same function to draw all of the maps, we can create it outside of the loop. This function will expect the data as a GeoJSON, with an array of features with properties. To start, let's draw the dissemination area polygons with the `geo` mark and let's color the `fill` and `stroke` with the values we computed in the `varPerc` column.
+Comme c'est la même fonction pour dessiner toutes les cartes, nous pouvons la créer en dehors de la boucle. Cette fonction attendra les données au format GeoJSON, avec une liste de *features* contenant des propriétés. Pour commencer, dessinons les polygones des aires de diffusion avec le marqueur `geo` et colorons le `fill` et le `stroke` avec les valeurs calculées dans la colonne `varPerc`.
 
-In the loop, we can pass this function to the method `writeMap`, which will pass the data from the table as GeoJSON data to our drawing function. We also need to specify where we want the map to be saved, and we use the metropolitan area name to create unique files in the `output` folder.
+Dans la boucle, nous pouvons passer cette fonction à la méthode `writeMap`, qui lui transmettra les données de la table au format GeoJSON. Nous devons également spécifier l'emplacement où nous voulons enregistrer la carte, et nous utilisons le nom de la région métropolitaine pour créer des fichiers uniques dans le dossier `output`.
 
-Since we are still in our exploration phase to make the maps, let's break the loop to work just on the first metropolitan area for now. This will allow us to iterate faster and improve our data visualization.
+Comme nous sommes encore en phase d'exploration pour la création des cartes, limitons la boucle pour ne travailler que sur la première région métropolitaine pour l'instant. Cela nous permettra d'itérer plus rapidement et d'améliorer notre visualisation des données.
 
 
 ```ts showLineNumbers filename="visualizeData.ts" {2, 7-15, 20-21} 
@@ -1061,15 +1056,15 @@ export default async function visualizeData(census: SimpleTable) {
   }
 }
 ```
-![A screenshot of VS Code showing a first iteration of the map.](/assets/stats-can-census/first-map.png)
+![Capture d'écran de VS Code montrant une première itération de la carte.](/assets/stats-can-census/first-map.png)
 
-It's ugly, but it works!
+C'est moche, mais ça fonctionne !
 
-We can now add a title, subtitle, and caption. We can also use a diverging scale for the colors and restrict the domain to -100% to +100%. We can also tweak the projection. If you want to know more about these customizations, check the [Visualizing data](/simple-data-analysis/dataviz) lesson.
+Nous pouvons maintenant ajouter un titre, un sous-titre et une légende. Nous pouvons également utiliser une échelle divergente pour les couleurs et restreindre le domaine de -100 % à +100 %. Nous pouvons aussi ajuster la projection. Si vous voulez en savoir plus sur ces personnalisations, consultez la leçon [Visualiser des données](/simple-data-analysis/dataviz).
 
-One thing you might be wondering is why we have `data.features[0].properties.CMA` for the title.
+Une chose que vous vous demandez peut-être est pourquoi nous utilisons `data.features[0].properties.CMA` pour le titre.
 
-When this function is run, it won't know about the `CMA` variable. So we need to grab the metropolitan name from the data directly. Since we are using `writeMap`, SDA passes the data as a GeoJSON to this function. In GeoJSON features, the data is stored in the `properties` object. So we retrieve the name of the metropolitan area by grabbing the first feature and finding the CMA name in its properties.
+Lorsque cette fonction sera exécutée, elle ne connaîtra pas la variable `CMA`. Nous devons donc récupérer le nom de la région métropolitaine directement à partir des données. Comme nous utilisons `writeMap`, SDA transmet les données sous forme de GeoJSON à cette fonction. Dans les *features* GeoJSON, les données sont stockées dans l'objet `properties`. Nous récupérons donc le nom de la région métropolitaine en prenant le premier *feature* et en trouvant le nom `CMA` dans ses propriétés.
 
 ```ts showLineNumbers filename="visualizeData.ts" {11-32}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -1118,17 +1113,18 @@ export default async function visualizeData(census: SimpleTable) {
   }
 }
 ```
-![A screenshot of VS Code showing a styled map.](/assets/stats-can-census/styled-map.png)
+![Capture d'écran de VS Code montrant une carte stylisée.](/assets/stats-can-census/styled-map.png)
 
-This is looking much better.
+Ça a bien meilleure allure.
 
-One last thing that I like to do in my maps is to add an outline.
+Une dernière chose que j'aime faire sur mes cartes est d'ajouter un contour.
 
-Inside the loop, we can clone the `tableCMA` and merge all the dissemination areas geometries by running the `aggregateGeo` method. Since this can be quite computationally expensive when there are a lot of dissemination areas, we cache the result.
+Dans la boucle, nous pouvons cloner la `tableCMA` et fusionner toutes les géométries des aires de diffusion en utilisant la méthode `aggregateGeo`. Comme cela peut être assez coûteux en termes de calcul lorsqu'il y a beaucoup d'aires de diffusion, nous mettons le résultat en cache.
 
-We can then insert this newly created geometry into the `tableCMA`.
+Nous pouvons ensuite insérer cette géométrie nouvellement créée dans la `tableCMA`.
 
-In the `drawMap` function, we can add a new `geo` mark to draw the outline. But we need to filter on the `varPerc` to make sure that we only draw the outline and not all the dissemination areas again.
+Dans la fonction `drawMap`, nous pouvons ajouter un nouveau marqueur `geo` pour dessiner le contour. Mais nous devons filtrer sur le `varPerc` pour nous assurer de ne dessiner que le contour et non toutes les aires de diffusion à nouveau.
+
 
 ```ts showLineNumbers filename="visualizeData.ts" {35, 38-41, 50-54}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -1191,19 +1187,19 @@ export default async function visualizeData(census: SimpleTable) {
   }
 }
 ```
-![A screenshot of VS Code showing a styled map with an outline.](/assets/stats-can-census/outline.png)
+![Capture d'écran de VS Code montrant une carte stylisée avec un contour.](/assets/stats-can-census/outline.png)
 
-The difference is subtle, but it's important to see the holes in the metropolitan area geometry.
+La différence est subtile, mais il est important de voir les trous dans la géométrie de la région métropolitaine.
 
-Now that we are happy with our map's look, it's time to remove the `break` statement on line 57! Let's create 43 maps! Run everything!
+Maintenant que nous sommes satisfaits de l'apparence de notre carte, il est temps de supprimer l'instruction `break` à la ligne 57 ! Créons 43 cartes ! Exécutez tout le code !
 
-If you inspect the maps after running your code, you'll notice a few problems.
+Si vous examinez les cartes après avoir exécuté votre code, vous remarquerez quelques problèmes.
 
-![A screenshot of problematic maps.](/assets/stats-can-census/maps-problems.png)
+![Capture d'écran montrant des cartes problématiques.](/assets/stats-can-census/maps-problems.png)
 
-First, you can see that some folders have been created for some metropolitan areas in the `output` folder. It's because some names have `/` in them! We need to replace this character with something else before passing it to `writeMap`.
+Tout d'abord, vous pouvez voir que certains dossiers ont été créés pour certaines régions métropolitaines dans le dossier `output`. C'est parce que certains noms contiennent le caractère `/` ! Nous devons remplacer ce caractère par autre chose avant de le transmettre à `writeMap`.
 
-We can update `visualizeData.ts` to fix that.
+Nous pouvons mettre à jour `visualizeData.ts` pour corriger cela.
 
 ```ts showLineNumbers filename="visualizeData.ts" {58}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -1269,9 +1265,10 @@ export default async function visualizeData(census: SimpleTable) {
 }
 ```
 
-We can also see that the outline for some cities is not right and the map for Montréal is just one gigantic polygon. This usually happens when some geometries are invalid. Simplification often creates invalid geometries. Luckily, we can call the `fixGeo` method to the rescue!
+Nous pouvons également constater que le contour de certaines villes n'est pas correct et que la carte de Montréal n'est qu'un énorme polygone. Cela se produit généralement lorsque certaines géométries sont invalides. La simplification crée souvent des géométries invalides. Heureusement, nous pouvons utiliser la méthode `fixGeo` pour résoudre ce problème !
 
-We can update `crunchData.ts`, within the `cache` method, to fix the geometries after loading the geospatial data.
+Nous pouvons mettre à jour `crunchData.ts`, dans la méthode `cache`, pour corriger les géométries après le chargement des données géospatiales.
+
 
 ```ts showLineNumbers filename="crunchData.ts" {39}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -1339,24 +1336,24 @@ export default async function crunchData(sdb: SimpleDB) {
 }
 ```
 
-Now, stop watching `main.ts` (`CTRL` + `C` in your terminal) and delete `.temp` and `.sda-cache` manually or by running `deno task clean`. Remove everything in the `output` folder as well.
+Arrêtez de surveiller `main.ts` (`CTRL` + `C` dans votre terminal) et supprimez `.temp` et `.sda-cache` manuellement ou en exécutant `deno task clean`. Supprimez également tout le contenu du dossier `output`.
 
-And let's rerun everything from scratch!
+Et relançons tout depuis le début !
 
-![A screenshot of problematic maps.](/assets/stats-can-census/last-run.png)
+![Capture d'écran montrant les cartes corrigées.](/assets/stats-can-census/last-run.png)
 
-Amazing! It runs smoothly and all of our problems disappeared. 😁
+Tout fonctionne parfaitement et tous nos problèmes ont disparu. 😁
 
-On my computer, our code was able to crunch all of the data and draw all of the maps in 2 minutes 46 seconds. But thanks to our clever caching, if I need to tweak the look of the maps, it takes just 32 seconds to rewrite all of the 43 maps.
+Sur mon ordinateur, notre code a pu traiter toutes les données et dessiner toutes les cartes en 2 minutes et 46 secondes. Mais grâce à notre système de mise en cache astucieux, si je veux ajuster l'apparence des cartes, cela prend seulement 32 secondes pour réécrire les 43 cartes.
 
-By the way, here, we are saving our maps as images, but if you want vectors to edit them in Illustrator or other design tools, just replace `.png` with `.svg` in `writeMap`.
+Au fait, ici, nous enregistrons nos cartes sous forme d'images, mais si vous voulez des vecteurs pour les modifier dans Illustrator ou d'autres outils de conception, il vous suffit de remplacer `.png` par `.svg` dans `writeMap`.
 
 ## Conclusion
 
-What a journey! Crunching big datasets with multiple tables storing tabular and geospatial data is not an easy task.
+Que de chemin parcouru ! Traiter de grands ensembles de données avec plusieurs tables stockant des données tabulaires et géospatiales n'est pas une tâche facile.
 
-But I hope this real-life example showed you how you can cut through GB of data like it was butter with SDA. 🧈
+Mais j'espère que cet exemple concret vous a montré comment vous pouvez couper au travers de gigaoctets de données comme dans du beurre avec SDA. 🧈
 
-Have fun with your next data project and feel free to [reach out](/contact) if you want to share what you are making with SDA or if you have any questions! 😊
+Amusez-vous bien avec votre prochain projet de données et n'hésitez pas à [me contacter](/contact) si vous souhaitez partager ce que vous créez avec SDA ou si vous avez des questions ! 😊
 
-<NoticeEnd />
+<NoticeEnd lang="fr"/>
