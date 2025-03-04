@@ -7,6 +7,7 @@ export default {
     "stock-market-simulator": "Stock market simulator 📈",
     "simple-data-analysis": "3. The SDA library 🤓",
     "stats-can-census": "Wrangling Census data 🇨🇦",
+    "one-billion-row-challenge": "One billion row challenge 😱",
     "ninja-moves": "Ninja moves 🥷",
     inspirations: "Inspiring people & content 📚",
     "more": "More to come...",
