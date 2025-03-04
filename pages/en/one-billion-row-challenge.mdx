@@ -44,9 +44,9 @@ Then run `deno task sda` to watch `main.ts` and its dependencies.
 
 In the original challenge, you have to fork a GitHub repo and run a script to generate a CSV file with 1 billion rows of data. But I did this for you and uploaded the compressed file to my Google Drive.
 
-Download the data [from here](https://drive.google.com/file/d/1A_OCjRyHnCCMZbgT0Z5KN70pJXMA8TYD/view?usp=drive_link). It might take a few minutes since it's around 4 GB.
+[Download the data from here](https://drive.google.com/file/d/1A_OCjRyHnCCMZbgT0Z5KN70pJXMA8TYD/view?usp=drive_link). It might take a few minutes since it's around 4 GB.
 
-Then put it in your `data` folder and unzip it. The uncompressed version of the CSV file is around 13 GB of data.
+Then put it in your `data` folder and unzip it. The uncompressed version of the CSV file is around 13 GB.
 
 To load the data, copy and paste this code into your `main.ts`. Depending on your computer, it might take a few seconds to a few minutes to run.
 
@@ -100,7 +100,7 @@ await sdb.done();
 ```
 ![A screenshot of VS Code after aggregating one billion rows of data.](/assets/one-billion-row-challenge/summarize.png)
 
-Aggregating the one billion values took less than 50 seconds on my machine with SDA! 🚀
+Loading and aggregating the one billion values took less than 50 seconds on my machine with SDA! 🚀
 
 ## Speeding things up
 
@@ -118,8 +118,7 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ logDuration: true });
 
-const result = await sdb.customQuery(
-  `
+const result = await sdb.customQuery(`
 SELECT city,
     MIN(temp) AS min_temp,
     ROUND(MEAN(temp), 1) AS mean_temp,
@@ -163,7 +162,7 @@ I also tested the geospatial computations, which are still under heavy developme
 
 ## Conclusion
 
-That's it! I hope this quick project convinced you of how performant the Simple Data Analysis library is.
+That's it! I hope this project convinced you of how performant the Simple Data Analysis library is.
 
 Nothing is stopping you from crunching massive datasets with TypeScript now! 💃🕺
 
