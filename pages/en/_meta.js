@@ -8,6 +8,7 @@ export default {
     "simple-data-analysis": "3. The SDA library 🤓",
     "stats-can-census": "Wrangling Census data 🇨🇦",
     "one-billion-row-challenge": "One billion row challenge 😱",
+    "web-basics": "4. Web basics 🌐",
     "ninja-moves": "Ninja moves 🥷",
     inspirations: "Inspiring people & content 📚",
     "more": "More to come...",

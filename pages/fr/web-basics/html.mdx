@@ -1,0 +1,124 @@
+---
+title: Comment utiliser le HTML pour structurer une page web
+description: Dans cette leçon, nous apprenons ce qu'est le HTML et comment l'utiliser.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Comment utiliser le HTML pour structurer une page web
+
+HTML signifie *HyperText Markup Language*. C'est la structure de base de toute page web. Sa syntaxe est simple et intuitive. Ce n'est pas un langage de programmation. Il n'y a ni conditions, ni boucles, ni fonctions en HTML. C'est simplement du texte structuré qui indique au navigateur ce qu'il doit afficher à l'utilisateur.
+
+Notez que je m'attends à ce que vous ayez complété les leçons précédentes, en particulier les sections **1. Premiers pas 🧑‍🎓** et **2. Aller plus loin 🚀**.
+
+<NoticeIntro lang="fr" />
+
+## Installation
+
+Vous n'avez rien à installer pour cette leçon. Il vous suffit d'ouvrir un dossier vide avec VS Code et d'y créer un fichier `index.html`. Laissez-le vide pour l'instant.
+
+Par convention, la page d'accueil de votre site web doit être nommée `index.html`.
+
+![Une capture d'écran montrant VS Code avec un fichier HTML vide.](/assets/web-basics/html/setup.png)
+
+## Syntaxe
+
+Le HTML est construit autour d'éléments définis par des balises ouvrantes et fermantes.
+
+Par exemple, le code ci-dessous indique au navigateur d'afficher un paragraphe (élément `p`) contenant le texte `Hello!`. La balise ouvrante est `<p>`, tandis que la balise fermante est `</p>` (notez le `/`).
+
+
+```html showLineNumbers filename="index.html"
+<p>Hello!</p>
+```
+
+Copiez ce code et collez-le dans votre fichier `index.html`. Ensuite, ouvrez le fichier avec votre navigateur web préféré (Firefox, Safari, Chrome, etc.).
+
+Vous verrez que votre navigateur comprend votre HTML et affiche un paragraphe de texte avec `Hello!`.
+
+![Une capture d'écran montrant VS Code avec un fichier HTML simple et Chrome l'affichant.](/assets/web-basics/html/hello.png)
+
+<Callout type="info" emoji="💡">
+ Pour ouvrir le fichier HTML, vous devrez probablement le localiser dans votre dossier à l'aide du Finder ou de l'Explorateur de fichiers, puis double-cliquer dessus.
+</Callout>
+
+## Structure de base
+
+Pour que tout fonctionne correctement, votre navigateur a besoin d'informations de base sur le contenu que vous souhaitez afficher.
+
+Copiez et collez le code ci-dessous dans votre fichier `index.html`, enregistrez-le, puis actualisez la page dans votre navigateur web.
+
+
+```html showLineNumbers filename="index.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First Page</title>
+</head>
+<body>
+    <p>Hello!</p>
+</body>
+</html>
+```
+![Une capture d'écran montrant VS Code avec une structure HTML simple et Chrome l'affichant.](/assets/web-basics/html/basic-structure.png)
+
+<Callout type="info" emoji="💡">
+ L'indentation ci-dessus est uniquement pour nous, les humains, afin de rendre le HTML plus lisible. Les navigateurs n'en ont pas besoin et se basent uniquement sur les balises ouvrantes et fermantes. De nombreux développeurs utilisent des bibliothèques pour *minifier* leur HTML, CSS et JavaScript en supprimant les espaces afin de créer des fichiers plus petits, qui se chargent plus rapidement et économisent de la bande passante. Nous verrons cela dans une autre leçon.
+</Callout>
+
+Le code ci-dessus affiche toujours un simple paragraphe de texte, mais cette fois, il contient bien plus d’informations, non seulement pour le navigateur, mais aussi pour les moteurs de recherche et d'autres logiciels qui analysent votre page.
+
+Voici une explication détaillée :
+- `<!DOCTYPE html>` indique au navigateur qu'il s'agit d'un fichier HTML5.
+- La balise ouvrante `<html lang="en">` définit le début du code HTML et spécifie la langue de la page (utilisez `fr` pour les pages en français). La balise fermante `</html>` à la fin du code marque la fin du document HTML.
+- L'élément `<head>` contient des informations utiles pour le navigateur, les moteurs de recherche et d'autres services similaires. Ce qui se trouve entre `<head>` et `</head>` ne sera pas affiché à l'utilisateur.
+- `<meta charset="UTF-8">` définit l'encodage des caractères du document. Comme nous l'avons vu dans la section *Analyse simple de données*, `UTF-8` est l'encodage standard aujourd'hui. Il prend en charge les accents et les caractères spéciaux de presque toutes les langues.
+- `<meta name="viewport" content="width=device-width, initial-scale=1.0">` permet d'afficher correctement la page sur les petits écrans, comme les téléphones. Sans cela, l'utilisateur devrait zoomer pour voir le contenu.
+- `<title>My First Page</title>` définit le titre de votre page, qui apparaît dans l'onglet du navigateur.
+- L'élément `<body>` contient tout ce qui doit être visible par l'utilisateur. Tout ce qui se trouve entre `<body>` et `</body>` sera affiché par le navigateur.
+
+## Éléments courants
+
+Créons une page web simple pour rendre hommage à mon alma mater : l'Université du Québec à Montréal, une université francophone.
+
+Téléchargez [cette image](https://drive.google.com/file/d/1-lQv2ZWOD4xzYqfZTYsOt_QXfyP0WyAr/view?usp=drive_link) depuis mon Google Drive et placez-la dans votre projet. Ensuite, copiez et collez le code ci-dessous dans votre fichier `index.html`.
+
+
+```html showLineNumbers filename="index.html" {6, 9-12}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Alma Mater</title>
+</head>
+<body>
+    <h1>My Alma Mater: UQAM</h1>
+    <p>I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
+    <p>The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+</body>
+</html>
+```
+![Une capture d'écran montrant VS Code et Chrome affichant une page web simple.](/assets/web-basics/html/alma-mater.png)
+
+<Callout type="info" emoji="💡">
+ Lorsque des éléments sont entourés par les balises ouvrantes et fermantes d'un autre élément, on les appelle des *children*. L'élément qui les entoure est appelé le *parent*. Par exemple, l'élément `a` ici est l'enfant de l'élément `p`, qui est lui-même l'enfant de l'élément `body`. Si l'on remonte dans l'autre sens, on peut également dire que `body` est le parent de `h1`, du premier `p`, de `img` et du dernier `p` (qui est aussi le parent de l'élément `a`).
+</Callout>
+
+Le code ci-dessus ajoute du contenu à l'élément `body` :
+- L'élément `h1` est le titre principal de la page. La lettre `h` signifie *headline* (titre), et le chiffre `1` indique qu'il s'agit du plus important. Si vous avez besoin de sous-titres, vous devez utiliser `h2`, `h3`, `h4`, etc., en respectant l'ordre hiérarchique.
+- Le premier `p` ajoute du texte à la page sous forme de paragraphe.
+- L'élément `img` affiche une image. Vous devez spécifier l'attribut `src` (qui signifie *source*) pour indiquer au navigateur où trouver l'image à afficher.
+- Le deuxième `p` ajoute du texte supplémentaire contenant un lien hypertexte. Pour créer un lien cliquable vers une autre page, vous devez utiliser un élément `a`. Ces éléments nécessitent un attribut `href` (*HyperText Reference*), qui spécifie l'URL vers laquelle le lien doit pointer. Les éléments `a` peuvent entourer n'importe quel contenu.
+
+## Conclusion
+
+C'est tout pour cette introduction au HTML. Il existe [de nombreux éléments](https://www.w3schools.com/tags/default.asp) que vous pouvez utiliser pour construire vos pages web. Même si vous ne les utiliserez pas tous, il est important de choisir les bons pour rendre votre page plus accessible, non seulement pour les humains, mais aussi pour les machines. Ne vous inquiétez pas, nous en découvrirons d'autres dans les prochaines leçons.
+
+Jusqu'à présent, nous avons appris à structurer une page web. Dans la prochaine leçon, je vous montrerai comment la styliser ! 💅
+
+<NoticeEnd lang="fr"/>
