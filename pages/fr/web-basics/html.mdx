@@ -1,0 +1,121 @@
+---
+title: How to use HTML to structure a web page
+description: In this lesson, we learn what HTML is and how to use it.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# How to use HTML to structure a web page
+
+HTML stands for *HyperText Markup Language*. It is the skeleton of any web page. Its syntax is simple and straightforward. It is not a programming language. There are no conditions, loops, or functions in HTML. It is just structured text that tells the browser what to display to the user.
+
+Note that I assume you have completed the previous lessons, especially the **1. First steps 🧑‍🎓** and **2. Pushing further 🚀** sections.
+
+<NoticeIntro />
+
+## Setup
+
+You don't have to install anything for this lesson. Just open an empty folder with VS Code to get started and create an `index.html` file in it. Keep it empty for now.
+
+By convention, the home page of your website must be named `index.html`.
+
+![A screenshot showing VS Code with an empty HTML file.](/assets/web-basics/html/setup.png)
+
+## Syntax
+
+HTML is built around elements specified by opening and closing tags.
+
+For example, the code below tells the browser to display a paragraph (`p` element) with the text `Hello!` in it. The opening tag is `<p>` while the closing tag is `</p>` (notice the `/`).
+
+```html showLineNumbers filename="index.html"
+<p>Hello!</p>
+```
+
+Copy this code and paste it into your `index.html` file. Then open the file with your favorite web browser (Firefox, Safari, Chrome, etc.).
+
+You'll see that your browser understands your HTML and renders a paragraph of text with `Hello!`.
+
+![A screenshot showing VS Code with a simple HTML file and Chrome rendering it.](/assets/web-basics/html/hello.png)
+
+<Callout type="info" emoji="💡">
+ To open the HTML file, you'll probably need to locate it in your folder using Finder or File Explorer, then double-click on it.
+</Callout>
+
+## Basic structure
+
+To ensure everything works properly, your browser needs some basic information about the content you want to display.
+
+Copy and paste the code below into your `index.html` file, save it, and refresh the page in your web browser.
+
+```html showLineNumbers filename="index.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First Page</title>
+</head>
+<body>
+    <p>Hello!</p>
+</body>
+</html>
+```
+![A screenshot showing VS Code with a simple HTML structure and Chrome rendering it.](/assets/web-basics/html/basic-structure.png)
+
+<Callout type="info" emoji="💡">
+ The indentation above is just for us, humans, to make the HTML more readable. Browsers don't need it and rely only on opening and closing tags. Many developers use libraries to *minify* their HTML, CSS, and JavaScript by removing spaces to create smaller files, which load faster and save bandwidth. We'll cover this in another lesson.
+</Callout>
+
+The code above still displays just a paragraph of text, but now there is much more information available, not only to the browser but also to search engines and other software analyzing your page.
+
+Here's a breakdown:
+- `<!DOCTYPE html>` tells the browser that this is an HTML5 file.
+- The opening `<html lang="en">` tag defines where the HTML starts and specifies the language of the page. The closing `</html>` tag at the end of the code marks where the HTML stops.
+- The `<head>` element contains useful information for the browser, search engines, and similar services. Anything inside `<head>` and `</head>` won't be displayed to the user.
+- `<meta charset="UTF-8">` defines the character encoding for the document. `UTF-8`, as we saw in the Simple Data Analysis section, is the standard encoding today. It supports accents and special characters from almost all languages.
+- `<meta name="viewport" content="width=device-width, initial-scale=1.0">` helps ensure the page is displayed correctly on small screens, such as smartphones. Without it, users would need to zoom in.
+- `<title>My First Page</title>` defines the title of your page, which appears in the browser tab.
+- The `<body>` element contains everything that should be visible to the user. Anything between `<body>` and `</body>` will be rendered.
+
+## Common elements
+
+Let's code a simple webpage to honor my alma mater: the Université du Québec à Montréal, a francophone university.
+
+Download [this picture](https://drive.google.com/file/d/1-lQv2ZWOD4xzYqfZTYsOt_QXfyP0WyAr/view?usp=drive_link) from my Google Drive and place it in your project. Then, copy and paste the code below into your `index.html`.
+
+```html showLineNumbers filename="index.html" {6, 9-12}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Alma Mater</title>
+</head>
+<body>
+    <h1>My Alma Mater: UQAM</h1>
+    <p>I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
+    <p>The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+</body>
+</html>
+```
+![A screenshot showing VS Code and Chrome displaying a simple web page.](/assets/web-basics/html/alma-mater.png)
+
+<Callout type="info" emoji="💡">
+ When elements are wrapped by the opening and closing tags of another element, we call them *children* elements. The element wrapping them is called the *parent*. For example, the `a` element here is the child of the `p` element, which is also the child of the `body` element. If we go in the opposite direction, we can say that `body` is the parent of `h1`, the first `p`, `img`, and the last `p` (which is also the parent of the `a` element).
+</Callout>
+
+The code above adds some content to the `body`:
+- The `h1` element is the main title of the page. The `h` stands for *headline*, and the `1` means it's the most important one. If you need subtitles on your page, you should use `h2`, `h3`, `h4`, and so on, in hierarchical order.
+- The first `p` adds some text inside a paragraph.
+- The `img` element displays an image. You need to specify the `src` attribute (which stands for *source*) to tell the browser where to find the image.
+- The second `p` adds more text with a hyperlink. To create a clickable link to another page, you must use an `a` element. These elements require an `href` attribute (*HyperText Reference*), which specifies the URL to link to. The `a` elements can wrap any content.
+
+## Conclusion
+
+That's it for this overview of HTML. There are [many elements](https://www.w3schools.com/tags/default.asp) you can use to build your web pages. While you won’t use all of them, it's important to choose the correct ones to make your page more accessible (not just for humans, but also for machines). Don’t worry, we’ll explore more in the upcoming lessons.
+
+So far, we've learned how to structure a web page. In the next lesson, I'll show you how to style it! 💅
+
+<NoticeEnd />
