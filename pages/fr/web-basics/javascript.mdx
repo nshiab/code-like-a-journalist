@@ -1,29 +1,28 @@
 ---
-title: How to use JavaScript to make a web page interactive
-description: In this lesson, we learn what JavaScript is and how to use it.
+title: Comment utiliser JavaScript pour rendre une page web interactive
+description: Dans cette leçon, nous apprenons ce qu'est JavaScript et comment l'utiliser.
 ---
 
 import { Callout } from 'nextra/components'
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
-# How to use JavaScript to make a web page interactive
+# Comment utiliser JavaScript pour rendre une page web interactive
 
-Before starting, make sure you have completed the previous sections, especially **1. First steps 🧑‍🎓**, **2. Pushing further 🚀**, and the lessons on [HTML](/web-basics/html) and [CSS](/web-basics/css).
+Avant de commencer, assurez-vous d’avoir complété les sections précédentes, en particulier **1. Premiers pas 🧑‍🎓**, **2. Aller plus loin 🚀**, ainsi que les leçons sur [HTML](/web-basics/html) et [CSS](/web-basics/css).
 
-JavaScript was created in 1995 by [Brendan Eich](https://fr.wikipedia.org/wiki/Brendan_Eich). Since then, the language has evolved but has continued to power the web. It wasn't until 2012 that TypeScript appeared, adding features like types to JavaScript. TypeScript is called a **superset** of JavaScript.
+JavaScript a été créé en 1995 par [Brendan Eich](https://fr.wikipedia.org/wiki/Brendan_Eich). Depuis, le langage a évolué tout en continuant d’alimenter le web. Ce n’est qu’en 2012 que TypeScript est apparu, ajoutant des fonctionnalités comme les types à JavaScript. TypeScript est appelé un **superset** de JavaScript.
 
-However, browsers still run JavaScript. They don't understand TypeScript. This is why modern web development toolsets transpile TypeScript into JavaScript.
+Cependant, les navigateurs exécutent toujours JavaScript. Ils ne comprennent pas TypeScript. C’est pourquoi les outils modernes de développement web transpilent TypeScript en JavaScript.
 
-In this lesson, we won’t use any tooling. We'll run JavaScript code directly in the browser. Don’t worry: by now, you know TypeScript, so JavaScript will be a piece of cake. Tt’s the same, just without the types!
+Dans cette leçon, nous n’utiliserons aucun outil. Nous exécuterons du code JavaScript directement dans le navigateur. Ne vous inquiétez pas : à ce stade, vous connaissez déjà TypeScript, donc JavaScript sera un jeu d’enfant. C’est la même chose, juste sans les types !
 
 <NoticeIntro />
 
-## Setup
+## Configuration
 
-We don’t need to install anything for this lesson, but we will work with the code from the previous lesson.
+Nous n’avons rien à installer pour cette leçon, mais nous travaillerons avec le code de la leçon précédente.
 
-Open an empty folder in VS Code and create an `index.html` file. Copy and paste the code below into it.
-
+Ouvrez un dossier vide dans VS Code et créez un fichier `index.html`. Copiez et collez le code ci-dessous dedans.
 
 ```html showLineNumbers filename="index.html"
 <!DOCTYPE html>
@@ -44,7 +43,7 @@ Open an empty folder in VS Code and create an `index.html` file. Copy and paste 
 </html>
 ```
 
-Also, create a `style.css` file and copy and paste the code below.
+Aussi, créez un fichier `style.css` et copiez-collez le code ci-dessous.
 
 ```css showLineNumbers filename="style.css"
 p {
@@ -60,19 +59,19 @@ p {
 }
 ```
 
-## Creating a `.js` file
+## Création d’un fichier `.js`
 
-While you can write JavaScript directly into the HTML with the `<script>` and `</script>` tags, it's usually best to isolate your JavaScript into one `.js` file or more. This will make your code easier to maintain in the long run.
+Bien que vous puissiez écrire du JavaScript directement dans le HTML avec les balises `<script>` et `</script>`, il est généralement préférable d’isoler votre code JavaScript dans un ou plusieurs fichiers `.js`. Cela rendra votre code plus facile à maintenir sur le long terme.
 
-Let's create a new file `main.js` with a simple `console.log` in it.
+Créons un nouveau fichier `main.js` avec un simple `console.log` à l’intérieur.
 
 ```js showLineNumbers filename="main.js"
 console.log("Hi!");
 ```
 
-To run this code in your webpage, you need to import it into your HTML. Below, we are specifying the `defer` attribute so our JavaScript code will be executed once the entire page is ready. This is important if you want to modify the content of the page, as we do. If your script runs too soon and the elements have not yet been created by the browser, you'll get an error.
+Pour exécuter ce code sur votre page web, vous devez l’importer dans votre fichier HTML. Ci-dessous, nous spécifions l’attribut `defer` afin que notre code JavaScript soit exécuté une fois que toute la page est prête. C’est important si vous souhaitez modifier le contenu de la page, comme nous le faisons ici. Si votre script s’exécute trop tôt et que les éléments n’ont pas encore été créés par le navigateur, vous obtiendrez une erreur.
 
-However, sometimes you don't need the page elements. If you want your script to run as soon as possible, you can specify the `async` attribute instead of `defer`.
+Cependant, parfois, vous n’avez pas besoin des éléments de la page. Si vous souhaitez que votre script s’exécute dès que possible, vous pouvez spécifier l’attribut `async` au lieu de `defer`.
 
 ```html showLineNumbers filename="index.html" {8}
 <!DOCTYPE html>
@@ -106,23 +105,23 @@ However, sometimes you don't need the page elements. If you want your script to 
 </html>
 ```
 
-To check if our code runs on our page, we can refresh the page and check the console.
+Pour vérifier si notre code s'exécute sur notre page, nous pouvons rafraîchir la page et consulter la console.
 
-When we ran TypeScript with Deno, `console.log` displayed information in the terminal. But now that we are working on a web page, this information is displayed in the browser's console.
+Lorsque nous exécutons du TypeScript avec Deno, `console.log` affiche des informations dans le terminal. Mais maintenant que nous travaillons sur une page web, ces informations s'affichent dans la console du navigateur.
 
-You should see `Hi!` in the console, indicating that our code runs every time the page is loaded!
+Vous devriez voir `Hi!` dans la console, indiquant que notre code s'exécute à chaque chargement de la page !
 
-![A screenshot showing the browser's console and VS Code with some code.](/assets/web-basics/javascript/console.png)
+![Une capture d'écran montrant la console du navigateur et VS Code avec du code.](/assets/web-basics/javascript/console.png)
 
-## Event listeners
+## Écouteurs d'événements
 
-When you want the user to interact with your page, you first need to select the element to be interacted with and then add one or more event listeners. To select elements, you can use selectors just like you would in CSS.
+Lorsque vous voulez que l'utilisateur interagisse avec votre page, vous devez d'abord sélectionner l'élément concerné, puis lui ajouter un ou plusieurs écouteurs d'événements. Pour sélectionner les éléments, vous pouvez utiliser des sélecteurs comme en CSS.
 
-In the example below, we changed the `main.js` file to select the paragraph with the `id` `first-paragraph`. Then, we added two event listeners:
-- A `mouseover` event to underline the text when the user moves their mouse over it.
-- A `mouseout` event to remove the underline when the user moves their mouse away.
+Dans l'exemple ci-dessous, nous avons modifié le fichier `main.js` pour sélectionner le paragraphe ayant l'`id` `first-paragraph`. Ensuite, nous avons ajouté deux écouteurs d'événements :
+- Un événement `mouseover` pour souligner le texte lorsque l'utilisateur passe sa souris dessus.
+- Un événement `mouseout` pour supprimer le soulignement lorsque l'utilisateur éloigne sa souris.
 
-When the page loads, our code looks for the first paragraph and then waits for the user to interact with it. If the interaction is of the right type, it triggers the function passed to the relevant event listener. Easy!
+Lorsque la page se charge, notre code recherche le premier paragraphe, puis attend que l'utilisateur interagisse avec lui. Si l'interaction correspond à un événement défini, la fonction associée est déclenchée. Facile !
 
 ```js showLineNumbers filename="main.js"
 const firstParagraph = document.querySelector("#first-paragraph");
@@ -135,20 +134,20 @@ firstParagraph.addEventListener("mouseout", () => {
     firstParagraph.style.textDecoration = "none";
 });
 ```
-![A screenshot showing event listeners code in VS Code.](/assets/web-basics/javascript/hover.png)
+![Une capture d'écran montrant du code d'écouteurs d'événements dans VS Code.](/assets/web-basics/javascript/hover.png)
 
 <Callout type="info" emoji="💡">
-When reading other online tutorials, you might hear about the DOM (Document Object Model). It's the JavaScript representation of the HTML. When you select an HTML element in JavaScript, you select it from the DOM.
+En lisant d'autres tutoriels en ligne, vous pourriez entendre parler du DOM (Document Object Model). C'est la représentation JavaScript du HTML. Lorsque vous sélectionnez un élément HTML en JavaScript, vous le sélectionnez à partir du DOM.
 </Callout>
 
-There are [many different types of listeners](https://www.w3schools.com/jsref/dom_obj_event.asp), and you can also remove them with the `removeEventListener` method. However, make sure to use a named function instead of an arrow function like above; otherwise, it won't work.
+Il existe [de nombreux types d'écouteurs d'événements](https://www.w3schools.com/jsref/dom_obj_event.asp), et vous pouvez également les supprimer avec la méthode `removeEventListener`. Cependant, assurez-vous d'utiliser une fonction nommée au lieu d'une fonction fléchée comme dans l'exemple ci-dessus ; sinon, cela ne fonctionnera pas.
 
 ## Conclusion
 
-Here, I am just showing you a basic example where we change the style of a paragraph. But you can do anything you want to the page with JavaScript, like creating or removing elements and changing their content based on user interactions.
+Ici, je vous montre juste un exemple basique où nous modifions le style d’un paragraphe. Mais avec JavaScript, vous pouvez faire bien plus : créer ou supprimer des éléments, modifier leur contenu en fonction des interactions de l’utilisateur, et bien plus encore.
 
-You could also use `fetch` to retrieve different data files and create various charts based on user choices. Or you could `fetch` fresh data every 15 seconds with [`setInterval`](https://www.w3schools.com/jsref/met_win_setinterval.asp) and redraw charts, like we do for election dashboards. By the way, `fetch` in Deno works the same way as `fetch` in the browser. 😊
+Vous pourriez aussi utiliser `fetch` pour récupérer différents fichiers de données et créer divers graphiques selon les choix de l’utilisateur. Ou bien vous pourriez `fetch` des données actualisées toutes les 15 secondes avec [`setInterval`](https://www.w3schools.com/jsref/met_win_setinterval.asp) et redessiner des graphiques, comme nous le faisons pour les tableaux de bord électoraux. D’ailleurs, `fetch` fonctionne de la même manière dans Deno et dans le navigateur. 😊
 
-There are also more specialized APIs, like the [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API), to monitor how far the user scrolls and trigger animations, like we do in *scrolly-telling* projects such as [this one](https://ici.radio-canada.ca/info/2022/07/ilots-chaleur-villes-inegalites-injustice-changements-climatiques/en/). (I know the word "API" can be confusing here since we’ve used APIs mainly for retrieving data so far, but an API can be anything, not just for data. This one is more like a function.)
+Il existe également des API plus spécialisées, comme [l’API Intersection Observer](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API), qui permet de surveiller la progression du défilement de l’utilisateur et de déclencher des animations, comme nous le faisons dans les projets de *scrolly-telling* tels que [celui-ci](https://ici.radio-canada.ca/info/2022/07/ilots-chaleur-villes-inegalites-injustice-changements-climatiques/en/). (Je sais que le mot "API" peut prêter à confusion ici, car nous les avons surtout utilisées jusqu'à présent pour récupérer des données, mais une API peut être bien plus que cela. Celle-ci est plus proche d’une fonction.)
 
-I kept this lesson very simple since it's your first time coding JavaScript for the web, and we are quite limited because we haven't run a local server. But I think you are now ready for the next step!
+J’ai volontairement simplifié cette leçon, car c’est votre première fois en JavaScript pour le web et nous sommes assez limités sans serveur local. Mais je pense que vous êtes maintenant prêt pour l’étape suivante !
