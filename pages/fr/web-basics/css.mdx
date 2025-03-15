@@ -1,0 +1,239 @@
+---
+title: How to use CSS to style a web page
+description: In this lesson, we learn what CSS is and how to use it.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# How to use CSS to style a web page
+
+CSS stands for *Cascading Style Sheets*. It defines how elements on a web page should be displayed. Its syntax is simple and straightforward. CSS is not a programming language. There are no conditions, loops, or functions. Instead, it consists of structured text that instructs the browser on how to present elements to the user.
+
+Before starting, make sure you have completed the previous sections, especially **1. First steps 🧑‍🎓**, **2. Pushing further 🚀**, and the lesson on [HTML](/web-basics/html).
+
+<NoticeIntro />
+
+## Setup
+
+You don't need to install anything for this lesson. Simply open an empty folder in VS Code, create an `index.html` file, and copy and paste the code from the previous lesson into it.
+
+```html showLineNumbers filename="index.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Alma Mater</title>
+</head>
+<body>
+    <h1>My Alma Mater: UQAM</h1>
+    <p>I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
+    <p>The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+</body>
+</html>
+```
+![A screenshot showing a basic HTML page.](/assets/web-basics/css/setup.png)
+
+## Inline style
+
+You can style specific HTML elements directly using the `style` attribute. The CSS syntax consists of *properties* assigned to *values*.
+
+For example, we can set the `color` of the first paragraph to `blue` and the second one to `red`. We can also change the `font-weight` to `bold`.
+
+Note that there are many different ways to define colors in code. Here, we are using color *names*. There are around [140 recognized color names](https://www.w3schools.com/cssref/css_colors.php) that browsers understand. If you want to learn more about colors, check [this tutorial](https://www.w3schools.com/colors/default.asp).
+
+In the `style` attribute, each property-value pair must be separated by a `;`.
+
+```html showLineNumbers filename="index.html" /style="color:blue; font-weight: bold;"/ /style="color:red; font-weight: bold;"/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Alma Mater</title>
+</head>
+<body>
+    <h1>My Alma Mater: UQAM</h1>
+    <p style="color:blue; font-weight: bold;">I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
+    <p style="color:red; font-weight: bold;">The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+</body>
+</html>
+```
+![A screenshot showing inline CSS.](/assets/web-basics/css/inline.png)
+
+<Callout type="info" emoji="💡">
+VS Code recognizes some basic CSS properties and values, like colors. Here, it added a small square displaying the selected color. However, this is not part of the code. It’s just a visual guide provided by the code editor.
+</Callout>
+
+## Using the `style` element
+
+### Selecting elements
+
+Inline CSS can be useful for quick, simple projects, but it becomes difficult to maintain in long-term or complex projects. If you want to keep your CSS within the HTML file, it's best to group everything inside a `style` tag.
+
+With inline CSS, the browser knows exactly which element is being styled. However, when using the `style` element, we need to use *selectors* to specify which elements should be styled and how.
+
+The syntax follows this structure: the selector comes first, followed by property-value pairs enclosed in curly brackets. For example, the code below instructs the browser to apply bold formatting to all `p` elements on the page.
+
+```css showLineNumbers
+p {
+    font-weight: bold;
+}
+```
+
+### `id` selectors
+
+Let's update our previous code to use the `style` element. Since this is just to tell the browser how to display elements, we keep it in the `head`.
+
+```html showLineNumbers filename="index.html" {7-19} /id="first-paragraph"/ /id="second-paragraph"/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Alma Mater</title>
+    <style>
+        p {
+            font-weight: bold;
+        }
+
+        #first-paragraph {
+            color: blue;
+        }
+
+        #second-paragraph {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Alma Mater: UQAM</h1>
+    <p id="first-paragraph">I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
+    <p id="second-paragraph">The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+</body>
+</html>
+```
+![A screenshot showing CSS within a `style` element.](/assets/web-basics/css/style.png)
+
+Have you noticed the `#first-paragraph` (line 12) and `#second-paragraph` (line 16) selectors? And the `id` attributes in the HTML (lines 23 and 25)?
+
+Since we want all `p` elements to be bold, we use the `p` selector for `font-weight: bold`. However, we also want the first paragraph to be blue and the second paragraph to be red, so we use `id`s.
+
+In the HTML, we assign the `id` attributes `first-paragraph` and `second-paragraph`. This allows us to target these specific paragraphs in CSS using the `#first-paragraph` and `#second-paragraph` selectors (notice the `#` symbol).
+
+Keep in mind that an `id` should be unique. Each one should appear only once on a page.
+
+### `class` selectors
+
+Element selectors (like `p`) target all matching elements on the page. For example, all `p` elements can be styled as bold.
+
+In contrast, `id`s are useful for targeting a single, specific element.
+
+But what if you want to style multiple elements without affecting all of them? The answer is `class` selectors.
+
+For example, let’s add a third paragraph and say we want the last two paragraphs to be red.
+
+```html showLineNumbers filename="index.html" {16-18, 26} /class="red-text"/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Alma Mater</title>
+    <style>
+        p {
+            font-weight: bold;
+        }
+
+        #first-paragraph {
+            color: blue;
+        }
+
+        .red-text {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Alma Mater: UQAM</h1>
+    <p id="first-paragraph">I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
+    <p class="red-text">The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+    <p class="red-text">Montreal is a wonderful city. You should visit it!</p>
+</body>
+</html>
+```
+![A screenshot showing CSS with classes.](/assets/web-basics/css/classes.png)
+
+In the code above, we replaced the `id` attribute and the `second-paragraph` property with a `class` attribute assigned the value `red-text`.
+
+Now, we can use the class selector `.red-text` (note the `.`) to modify the style of all elements that have this `class` (in this case, the last two paragraphs).
+
+You can assign a class to as many elements as needed.
+
+### More about selectors
+
+If you want to override a property's value, you must understand the hierarchy of selectors:
+
+- Inline styles override any styles defined by other selectors.
+- `id` selectors override styles defined by `class` and element selectors.
+- `class` selectors override styles defined by element selectors.
+- Element selectors are the weakest in terms of specificity.
+
+Additionally, you can combine selectors for more precise styling. [Read this for more](https://www.w3schools.com/css/css_combinators.asp).
+
+## Using a `.css` file
+
+As a web project grows, its styles can become quite complex. To keep the code organized and easier to maintain, it's best to separate the CSS into a dedicated file and *link* it to the HTML.
+
+In this example, we created a new file called `style.css` and moved everything that was previously inside the `<style>` and `</style>` tags into this new file.
+
+```css showLineNumbers filename="style.css"
+p {
+    font-weight: bold;
+}
+
+#first-paragraph {
+    color: blue;
+}
+
+.red-text {
+    color: red;
+}
+```
+
+In the HTML file, we removed the `<style>` and `</style>` tags and added a link to the new `.css` file. This tells the browser to apply the styles from the external file.
+
+```html showLineNumbers filename="index.html" {7}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Alma Mater</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>My Alma Mater: UQAM</h1>
+    <p id="first-paragraph">I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
+    <p class="red-text">The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+    <p class="red-text">Montreal is a wonderful city. You should visit it!</p>
+</body>
+</html>
+```
+![A screenshot showing CSS with classes.](/assets/web-basics/css/classes.png)
+
+As you can see, the styles are still applied. Note that you can link multiple `.css` files if needed.
+
+## Conclusion
+
+There is much more to learn about CSS and its [200+ properties](https://www.w3schools.com/CSSref/index.php), which, when combined, can create stunning visuals and even [animations](https://www.w3schools.com/css/css3_animations.asp).
+
+However, this lesson was just an introduction. With these foundations, you'll be able to explore more on your own, and we will continue using CSS in future lessons and projects.
+
+Now that we know how to structure a webpage with HTML and style it with CSS, it's time to learn how to add user interactivity! 🥳
