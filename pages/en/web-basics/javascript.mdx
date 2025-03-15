@@ -14,7 +14,7 @@ JavaScript has been created in 1995 by [Brendan Eich](https://fr.wikipedia.org/w
 
 Hovewer, browsers still run JavaScript. They don't understand TypeScript. This is why modern web development toolsets transpile TypeScript to JavaScript.
 
-But in this lesson, we won't use any tooling. We will run JavaScript code (without types) that will be run directly by the browser.
+But in this lesson, we won't use any tooling. We will run JavaScript code (without types) that will be run directly by the browser. Don't worry: by know, you know TypeScript, so JavaScript will be a piece of cake. It's the same, without the types!
 
 <NoticeIntro />
 
@@ -66,9 +66,87 @@ While you can write JavaScript directly into the HTML with the `<script>` and `<
 Let's create a new file `main.js` with a simple `console.log` in it.
 
 ```js showLineNumbers filename="main.js"
-console.log("Hi!)
+console.log("Hi!");
 ```
+
+To run this code in your webpage, you need to import it into your HTML. Below, we are specifying the `defer` attribute, so our JavaScript code will be executed once all the page is ready. This is important if you want to modify the content of the page, as we do. If your script is triggered too soon and the elements have not been created yet by the browser, you'll have an error.
+
+But sometimes, you don't need the page elements. If you want you script to run as soon as possible, you can specify the `async` attribute instead of `defer`.
+
+```html showLineNumbers filename="index.html" {8}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Alma Mater</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="main.js" defer></script>
+    </head>
+    <body>
+        <h1>My Alma Mater: UQAM</h1>
+        <p id="first-paragraph">
+            I earned my bachelor's degree in journalism at Université du Québec
+            à Montréal (UQAM).
+        </p>
+        <img
+            src="university.jpg"
+            alt="UQAM campus with Montreal’s downtown skyline in the background."
+        />
+        <p class="red-text">
+            The picture above comes from Wikimedia. You can find it <a
+                href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg"
+            >here</a> along with its license.
+        </p>
+        <p class="red-text">
+            Montreal is a wonderful city. You should visit it!
+        </p>
+    </body>
+</html>
+```
+
+To check if our code runs on our page, we can refresh the page and check the console.
+
+When we run TypeScript with Deno, `console.log` displayed information in the terminal. But now that we are working on a web page, this information is displayed in the browser's console.
+
+You should see `Hi!` in the console, indicating that our code runs everytime the page is loaded!
+
+![A screenshot showing the browser's console and VS Code with some code.](/assets/web-basics/javascript/console.png)
+
+## Event listeners
+
+When you want the user to interact with your page, you first need to select the element to be interacted with and then add an event listener or more. To select the elements, you can use selectors just like you would do in CSS.
+
+In the example below, we changed the `main.js` file to select select the paragraph with the `id` `first-paragraph`. Then we added two event listeners:
+- A "mouseover" to underline the text when the user puts its mouse on it
+- A "mouseout" to remove the underline of the text when the user removes its mouse from it
+
+When the page loads, our code looks for the first paragraph and then waits for the user to interact with it. If the interaction is of the right type, it triggers the function passed to the relevant event listener. Easy!
+
+```js showLineNumbers filename="main.js"
+const firstParagraph = document.querySelector("#first-paragraph");
+
+firstParagraph.addEventListener("mouseover", () => {
+    firstParagraph.style.textDecoration = "underline";
+});
+
+firstParagraph.addEventListener("mouseout", () => {
+    firstParagraph.style.textDecoration = "none";
+});
+```
+![A screenshot showing event listeners code in VS Code.](/assets/web-basics/javascript/hover.png)
+<Callout type="info" emoji="💡">
+When reading other online tutorials, you might hear of the DOM (Document Object Model). It's the JavaScript representation of the HTML. When you select a HTML element in JavaScript, you select it from the DOM.
+</Callout>
+
+There are [many different types of listeners](https://www.w3schools.com/jsref/dom_obj_event.asp) and you can also remove them with the `removeEventListener` method, but make sure to use a named function instead of an arrow function like above otherwise it won't work.
 
 ## Conclusion
 
-ah
+Here, I am just showing you a basic example in which we change the style of a paragraph. But you can do anything you want to the page with JavaScript, like creating or removing new elements and changing their content based on the user interactions.
+
+You could also use `fetch` to retrieve different data files and create different charts based on the user's choices. Or you could `fetch` fresh data every 15 seconds with [`setInterval`](https://www.w3schools.com/jsref/met_win_setinterval.asp) and redraw charts like we do for election dashboards. By the way, `fetch` in Deno works the same way as `fetch` in the browser. 😊
+
+There are also more specialized APIs like the [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) to monitor how far the user scrolls and trigger animations, like we do in story telling projects like [this one](https://ici.radio-canada.ca/info/2022/07/ilots-chaleur-villes-inegalites-injustice-changements-climatiques/en/). (I know the word API can be confusing here since we used APIs to retrieve data so far, but just an API can be anything, not just for data.)
+
+I kept this lesson very simple since it's your first time coding JavaScript for the Web and we are quite limited because we haven't run a local server. But I think your are now ready for the next step!
