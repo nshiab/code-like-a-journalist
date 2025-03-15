@@ -1,0 +1,155 @@
+---
+title: Comment utiliser JavaScript pour rendre une page web interactive
+description: Dans cette leçon, nous apprenons ce qu'est JavaScript et comment l'utiliser.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Comment utiliser JavaScript pour rendre une page web interactive
+
+Avant de commencer, assurez-vous d’avoir complété les sections précédentes, en particulier **1. Premiers pas 🧑‍🎓**, **2. Aller plus loin 🚀**, ainsi que les leçons sur le [HTML](/web-basics/html) et [CSS](/web-basics/css).
+
+JavaScript a été créé en 1995 par [Brendan Eich](https://fr.wikipedia.org/wiki/Brendan_Eich). Depuis, le langage a évolué tout en continuant d’alimenter le web. Ce n’est qu’en 2012 que TypeScript est apparu, ajoutant des fonctionnalités comme les types à JavaScript. TypeScript est appelé un **superset** de JavaScript.
+
+Cependant, les navigateurs exécutent toujours JavaScript. Ils ne comprennent pas TypeScript. C’est pourquoi les outils modernes de développement web transpilent TypeScript en JavaScript.
+
+Dans cette leçon, nous n’utiliserons aucun outil. Nous exécuterons du code JavaScript directement dans le navigateur. Ne vous inquiétez pas : à ce stade, vous connaissez déjà TypeScript, donc JavaScript sera un jeu d’enfant. C’est la même chose, juste sans les types !
+
+<NoticeIntro lang="fr" />
+
+## Configuration
+
+Nous n’avons rien à installer pour cette leçon, mais nous travaillerons avec le code de la leçon précédente.
+
+Ouvrez un dossier vide dans VS Code et créez un fichier `index.html`. Copiez et collez le code ci-dessous dedans.
+
+```html showLineNumbers filename="index.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Alma Mater</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>My Alma Mater: UQAM</h1>
+    <p id="first-paragraph">I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
+    <p class="red-text">The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+    <p class="red-text">Montreal is a wonderful city. You should visit it!</p>
+</body>
+</html>
+```
+
+Aussi, créez un fichier `style.css` et copiez-collez le code ci-dessous.
+
+```css showLineNumbers filename="style.css"
+p {
+    font-weight: bold;
+}
+
+#first-paragraph {
+    color: blue;
+}
+
+.red-text {
+    color: red;
+}
+```
+
+## Création d’un fichier `.js`
+
+Bien que vous puissiez écrire du JavaScript directement dans le HTML avec les balises `<script>` et `</script>`, il est généralement préférable d’isoler votre code JavaScript dans un ou plusieurs fichiers `.js`. Cela rendra votre code plus facile à maintenir sur le long terme.
+
+Créons un nouveau fichier `main.js` avec un simple `console.log` à l’intérieur.
+
+```js showLineNumbers filename="main.js"
+console.log("Hi!");
+```
+
+Pour exécuter ce code sur votre page web, vous devez l’importer dans votre fichier HTML. Ci-dessous, nous spécifions l’attribut `defer` afin que notre code JavaScript soit exécuté une fois que toute la page est prête. C’est important si vous souhaitez modifier le contenu de la page, comme nous le faisons ici. Si votre script s’exécute trop tôt et que les éléments n’ont pas encore été créés par le navigateur, vous obtiendrez une erreur.
+
+Cependant, parfois, vous n’avez pas besoin des éléments de la page. Si vous souhaitez que votre script s’exécute dès que possible, vous pouvez spécifier l’attribut `async` au lieu de `defer`.
+
+```html showLineNumbers filename="index.html" {8}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Alma Mater</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="main.js" defer></script>
+    </head>
+    <body>
+        <h1>My Alma Mater: UQAM</h1>
+        <p id="first-paragraph">
+            I earned my bachelor's degree in journalism at Université du Québec
+            à Montréal (UQAM).
+        </p>
+        <img
+            src="university.jpg"
+            alt="UQAM campus with Montreal’s downtown skyline in the background."
+        />
+        <p class="red-text">
+            The picture above comes from Wikimedia. You can find it <a
+                href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg"
+            >here</a> along with its license.
+        </p>
+        <p class="red-text">
+            Montreal is a wonderful city. You should visit it!
+        </p>
+    </body>
+</html>
+```
+
+Pour vérifier si notre code s'exécute sur notre page, nous pouvons rafraîchir la page et consulter la console.
+
+Lorsque nous exécutons du TypeScript avec Deno, `console.log` affiche des informations dans le terminal. Mais maintenant que nous travaillons sur une page web, ces informations s'affichent dans la console du navigateur.
+
+Vous devriez voir `Hi!` dans la console, indiquant que notre code s'exécute à chaque chargement de la page !
+
+![Une capture d'écran montrant la console du navigateur et VS Code avec du code.](/assets/web-basics/javascript/console.png)
+
+## Écouteurs d'événements
+
+Lorsque vous voulez que l'utilisateur interagisse avec votre page, vous devez d'abord sélectionner l'élément concerné, puis lui ajouter un ou plusieurs écouteurs d'événements. Pour sélectionner les éléments, vous pouvez utiliser des sélecteurs comme en CSS.
+
+Dans l'exemple ci-dessous, nous avons modifié le fichier `main.js` pour sélectionner le paragraphe ayant l'`id` `first-paragraph`. Ensuite, nous avons ajouté deux écouteurs d'événements :
+- Un événement `mouseover` pour souligner le texte lorsque l'utilisateur passe sa souris dessus.
+- Un événement `mouseout` pour supprimer le soulignement lorsque l'utilisateur éloigne sa souris.
+
+Lorsque la page se charge, notre code recherche le premier paragraphe, puis attend que l'utilisateur interagisse avec lui. Si l'interaction correspond à un événement défini, la fonction associée est déclenchée. Facile !
+
+```js showLineNumbers filename="main.js"
+const firstParagraph = document.querySelector("#first-paragraph");
+
+firstParagraph.addEventListener("mouseover", () => {
+    firstParagraph.style.textDecoration = "underline";
+});
+
+firstParagraph.addEventListener("mouseout", () => {
+    firstParagraph.style.textDecoration = "none";
+});
+```
+![Une capture d'écran montrant du code d'écouteurs d'événements dans VS Code.](/assets/web-basics/javascript/hover.png)
+
+<Callout type="info" emoji="💡">
+En lisant d'autres tutoriels en ligne, vous pourriez entendre parler du DOM (Document Object Model). C'est la représentation JavaScript du HTML. Lorsque vous sélectionnez un élément HTML en JavaScript, vous le sélectionnez à partir du DOM.
+</Callout>
+
+Il existe [de nombreux types d'écouteurs d'événements](https://www.w3schools.com/jsref/dom_obj_event.asp), et vous pouvez également les supprimer avec la méthode `removeEventListener`. Cependant, assurez-vous d'utiliser une fonction nommée au lieu d'une fonction fléchée comme dans l'exemple ci-dessus ; sinon, cela ne fonctionnera pas.
+
+## Conclusion
+
+Ici, je vous montre juste un exemple basique où nous modifions le style d’un paragraphe. Mais avec JavaScript, vous pouvez faire bien plus : créer ou supprimer des éléments, modifier leur contenu en fonction des interactions de l’utilisateur, et bien plus encore.
+
+Vous pourriez aussi utiliser `fetch` pour récupérer différents fichiers de données et créer divers graphiques selon les choix de l’utilisateur. Ou bien vous pourriez `fetch` des données actualisées toutes les 15 secondes avec [`setInterval`](https://www.w3schools.com/jsref/met_win_setinterval.asp) et redessiner des graphiques, comme nous le faisons pour les tableaux de bord électoraux. D’ailleurs, `fetch` fonctionne de la même manière dans Deno et dans le navigateur. 😊
+
+Il existe également des API plus spécialisées, comme [l’API Intersection Observer](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API), qui permet de surveiller la progression du défilement de l’utilisateur et de déclencher des animations, comme nous le faisons dans les projets de *scrolly-telling* tels que [celui-ci](https://ici.radio-canada.ca/info/2022/07/ilots-chaleur-villes-inegalites-injustice-changements-climatiques/en/). (Je sais que le mot "API" peut prêter à confusion ici, car nous les avons surtout utilisées jusqu'à présent pour récupérer des données, mais une API peut être bien plus que cela. Celle-ci est plus proche d’une fonction.)
+
+J’ai volontairement simplifié cette leçon, car c’est votre première fois en JavaScript pour le web et nous sommes assez limités sans serveur local. Mais je pense que vous êtes maintenant prêt pour l’étape suivante !
+
+<NoticeEnd lang="fr" />
