@@ -1,22 +1,22 @@
 ---
-title: How to use CSS to style a web page
-description: In this lesson, we learn what CSS is and how to use it.
+title: Comment utiliser le CSS pour styliser une page web
+description: Dans cette leçon, nous apprenons ce qu'est le CSS et comment l'utiliser.
 ---
 
 import { Callout } from 'nextra/components'
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
-# How to use CSS to style a web page
+# Comment utiliser le CSS pour styliser une page web
 
-CSS stands for *Cascading Style Sheets*. It defines how elements on a web page should be displayed. Its syntax is simple and straightforward. CSS is not a programming language. There are no conditions, loops, or functions. Instead, it consists of structured text that instructs the browser on how to present elements to the user.
+CSS signifie *Cascading Style Sheets* (feuilles de style en cascade). Il définit comment les éléments d'une page web doivent être affichés. Sa syntaxe est simple et directe. Le CSS n'est pas un langage de programmation : il n'inclut ni conditions, ni boucles, ni fonctions. Il s'agit simplement d'un texte structuré qui indique au navigateur comment présenter les éléments à l'utilisateur.
 
-Before starting, make sure you have completed the previous sections, especially **1. First steps 🧑‍🎓**, **2. Pushing further 🚀**, and the lesson on [HTML](/web-basics/html).
+Avant de commencer, assurez-vous d'avoir complété les sections précédentes, en particulier **1. Premiers pas 🧑‍🎓**, **2. Aller plus loin 🚀**, ainsi que la leçon sur le [HTML](/web-basics/html).
 
-<NoticeIntro />
+<NoticeIntro lang="fr" />
 
-## Setup
+## Installation
 
-You don't need to install anything for this lesson. Simply open an empty folder in VS Code, create an `index.html` file, and copy and paste the code from the previous lesson into it.
+Vous n'avez rien à installer pour cette leçon. Il vous suffit d'ouvrir un dossier vide dans VS Code, de créer un fichier `index.html`, puis d’y copier et coller le code de la leçon précédente.
 
 ```html showLineNumbers filename="index.html"
 <!DOCTYPE html>
@@ -34,17 +34,17 @@ You don't need to install anything for this lesson. Simply open an empty folder 
 </body>
 </html>
 ```
-![A screenshot showing a basic HTML page.](/assets/web-basics/css/setup.png)
+![Une capture d'écran montrant une page HTML de base.](/assets/web-basics/css/setup.png)
 
-## Inline style
+## CSS en ligne (*inline styles*)
 
-You can style specific HTML elements directly using the `style` attribute. The CSS syntax consists of *properties* assigned to *values*.
+Vous pouvez styliser directement des éléments HTML spécifiques en utilisant l'attribut `style`. La syntaxe CSS est composée de *propriétés* associées à des *valeurs*.
 
-For example, we can set the `color` of the first paragraph to `blue` and the second one to `red`. We can also change the `font-weight` to `bold`.
+Par exemple, nous pouvons définir la `color` du premier paragraphe en `blue` et celle du second en `red`. Nous pouvons également modifier le `font-weight` pour le mettre en `bold`.
 
-Note that there are many different ways to define colors in code. Here, we are using color *names*. There are around [140 recognized color names](https://www.w3schools.com/cssref/css_colors.php) that browsers understand. If you want to learn more about colors, check [this tutorial](https://www.w3schools.com/colors/default.asp).
+Notez qu'il existe de nombreuses façons de définir les couleurs en code. Ici, nous utilisons des *noms* de couleurs. Il existe environ [140 noms de couleurs reconnus](https://www.w3schools.com/cssref/css_colors.php) que les navigateurs comprennent. Si vous souhaitez en savoir plus sur les couleurs, consultez [ce tutoriel](https://www.w3schools.com/colors/default.asp).
 
-In the `style` attribute, each property-value pair must be separated by a `;`.
+Dans l'attribut `style`, chaque paire propriété-valeur doit être séparée par un `;`.
 
 ```html showLineNumbers filename="index.html" /style="color:blue; font-weight: bold;"/ /style="color:red; font-weight: bold;"/
 <!DOCTYPE html>
@@ -62,31 +62,34 @@ In the `style` attribute, each property-value pair must be separated by a `;`.
 </body>
 </html>
 ```
-![A screenshot showing inline CSS.](/assets/web-basics/css/inline.png)
+![Une capture d'écran montrant du CSS en ligne.](/assets/web-basics/css/inline.png)
 
 <Callout type="info" emoji="💡">
-VS Code recognizes some basic CSS properties and values, like colors. Here, it added a small square displaying the selected color. However, this is not part of the code. It’s just a visual guide provided by the code editor.
+VS Code reconnaît certaines propriétés et valeurs CSS de base, comme les couleurs. Ici, il a ajouté un petit carré affichant la couleur sélectionnée. Cependant, cela ne fait pas partie du code : c'est simplement un guide visuel fourni par l'éditeur de code.
 </Callout>
 
-## Using the `style` element
+## Utilisation de l'élément `style`
 
-### Selecting elements
+### Sélectionner des éléments
 
-Inline CSS can be useful for quick, simple projects, but it becomes difficult to maintain in long-term or complex projects. If you want to keep your CSS within the HTML file, it's best to group everything inside a `style` tag.
+Le CSS en ligne peut être utile pour des projets simples et rapides, mais il devient difficile à maintenir pour des projets plus complexes ou à long terme. Si vous souhaitez conserver votre CSS dans le fichier HTML, il est préférable de tout regrouper dans une balise `style`.
 
-With inline CSS, the browser knows exactly which element is being styled. However, when using the `style` element, we need to use *selectors* to specify which elements should be styled and how.
+Avec le CSS en ligne, le navigateur sait exactement quel élément est stylisé. Cependant, lorsque l'on utilise l'élément `style`, il faut employer des *sélecteurs* pour indiquer quels éléments doivent être stylisés et comment.
 
-The syntax follows this structure: the selector comes first, followed by property-value pairs enclosed in curly brackets. For example, the code below instructs the browser to apply bold formatting to all `p` elements on the page.
+La syntaxe suit cette structure : le sélecteur est défini en premier, suivi des paires propriété-valeur, placées entre des accolades. Les paires doivent être séparées par un `;`. Par exemple, le code ci-dessous indique au navigateur d'appliquer un style en gras à tous les éléments `p` de la page.
 
 ```css showLineNumbers
 p {
     font-weight: bold;
 }
 ```
+<Callout type="info" emoji="💡">
+ L'indentation ci-dessus sert uniquement à rendre le CSS plus lisible pour nous, les humains. Les navigateurs n'en ont pas besoin et se basent uniquement sur la structure du code. De nombreux développeurs utilisent des outils pour *minifier* leur CSS en supprimant les espaces et les retours à la ligne afin de créer des fichiers plus légers, qui se chargent plus rapidement et consomment moins de bande passante. Nous aborderons ce sujet dans une autre leçon.
+</Callout>
 
-### `id` selectors
+### Sélecteurs `id`
 
-Let's update our previous code to use the `style` element. Since this is just to tell the browser how to display elements, we keep it in the `head`.
+Mettons à jour notre code précédent pour utiliser l'élément `style`. Comme il sert uniquement à indiquer au navigateur comment afficher les éléments, nous le plaçons dans l'élément `head`.
 
 ```html showLineNumbers filename="index.html" {7-19} /id="first-paragraph"/ /id="second-paragraph"/
 <!DOCTYPE html>
@@ -117,25 +120,25 @@ Let's update our previous code to use the `style` element. Since this is just to
 </body>
 </html>
 ```
-![A screenshot showing CSS within a `style` element.](/assets/web-basics/css/style.png)
+![Une capture d'écran montrant du CSS dans un élément `style`.](/assets/web-basics/css/style.png)
 
-Have you noticed the `#first-paragraph` (line 12) and `#second-paragraph` (line 16) selectors? And the `id` attributes in the HTML (lines 23 and 25)?
+Avez-vous remarqué les sélecteurs `#first-paragraph` (ligne 12) et `#second-paragraph` (ligne 16) ? Et les attributs `id` dans le code HTML (lignes 23 et 25) ?
 
-Since we want all `p` elements to be bold, we use the `p` selector for `font-weight: bold`. However, we also want the first paragraph to be blue and the second paragraph to be red, so we use `id`s.
+Puisque nous voulons que tous les éléments `p` soient en gras, nous utilisons le sélecteur `p` avec `font-weight: bold`. Cependant, nous voulons également que le premier paragraphe soit bleu et le second rouge, donc nous utilisons des `id`.
 
-In the HTML, we assign the `id` attributes `first-paragraph` and `second-paragraph`. This allows us to target these specific paragraphs in CSS using the `#first-paragraph` and `#second-paragraph` selectors (notice the `#` symbol).
+Dans le HTML, nous attribuons les `id` `first-paragraph` et `second-paragraph`. Cela nous permet de cibler ces paragraphes spécifiques en CSS à l'aide des sélecteurs `#first-paragraph` et `#second-paragraph` (notez le symbole `#`).
 
-Keep in mind that an `id` should be unique. Each one should appear only once on a page.
+Gardez à l'esprit qu'un `id` doit être unique. Il ne doit apparaître qu'une seule fois par page.
 
-### `class` selectors
+### Sélecteurs `class`
 
-Element selectors (like `p`) target all matching elements on the page. For example, all `p` elements can be styled as bold.
+Les sélecteurs d'éléments (comme `p`) ciblent tous les éléments correspondants sur la page. Par exemple, tous les éléments `p` peuvent être stylisés en gras.
 
-In contrast, `id`s are useful for targeting a single, specific element.
+À l'inverse, les `id` sont utiles pour cibler un seul élément spécifique.
 
-But what if you want to style multiple elements without affecting all of them? The answer is `class` selectors.
+Mais que faire si vous souhaitez styliser plusieurs éléments sans affecter tous les autres ? La solution est d'utiliser les sélecteurs `class`.
 
-For example, let’s add a third paragraph and say we want the last two paragraphs to be red.
+Par exemple, ajoutons un troisième paragraphe et supposons que nous voulons que les deux derniers paragraphes soient rouges.
 
 ```html showLineNumbers filename="index.html" {16-18, 26} /class="red-text"/
 <!DOCTYPE html>
@@ -167,30 +170,30 @@ For example, let’s add a third paragraph and say we want the last two paragrap
 </body>
 </html>
 ```
-![A screenshot showing CSS with classes.](/assets/web-basics/css/classes.png)
+![Une capture d'écran montrant du CSS avec des classes.](/assets/web-basics/css/classes.png)
 
-In the code above, we replaced the `id` attribute and the `second-paragraph` property with a `class` attribute assigned the value `red-text`.
+Dans le code ci-dessus, nous avons remplacé l'attribut `id` et la propriété `second-paragraph` par un attribut `class` avec la valeur `red-text`.
 
-Now, we can use the class selector `.red-text` (note the `.`) to modify the style of all elements that have this `class` (in this case, the last two paragraphs).
+Nous pouvons maintenant utiliser le sélecteur de classe `.red-text` (notez le `.`) pour modifier le style de tous les éléments ayant cette `class` (ici, les deux derniers paragraphes).
 
-You can assign a class to as many elements as needed.
+Vous pouvez attribuer une classe à autant d'éléments que nécessaire.
 
-### More about selectors
+### En savoir plus sur les sélecteurs
 
-If you want to override a property's value, you must understand the hierarchy of selectors:
+Si vous souhaitez remplacer la valeur d'une propriété, il est important de comprendre la hiérarchie des sélecteurs :
 
-- Inline styles override any styles defined by other selectors.
-- `id` selectors override styles defined by `class` and element selectors.
-- `class` selectors override styles defined by element selectors.
-- Element selectors are the weakest in terms of specificity.
+- Les styles en ligne remplacent les styles définis par d'autres sélecteurs.
+- Les sélecteurs `id` remplacent les styles définis par les sélecteurs de `class` et d'éléments.
+- Les sélecteurs de `class` remplacent les styles définis par les sélecteurs d'éléments.
+- Les sélecteurs d'éléments sont les moins spécifiques.
 
-Additionally, you can combine selectors for more precise styling. [Read this for more](https://www.w3schools.com/css/css_combinators.asp).
+De plus, vous pouvez combiner plusieurs sélecteurs pour un style plus précis. [En savoir plus ici](https://www.w3schools.com/css/css_combinators.asp).
 
-## Using a `.css` file
+## Utilisation d'un fichier `.css`
 
-As a web project grows, its styles can become quite complex. To keep the code organized and easier to maintain, it's best to separate the CSS into a dedicated file and *link* it to the HTML.
+À mesure qu'un projet web se développe, ses styles peuvent devenir assez complexes. Pour garder le code organisé et plus facile à maintenir, il est préférable de séparer le CSS dans un fichier dédié et de *le lier* au fichier HTML.
 
-In this example, we created a new file called `style.css` and moved everything that was previously inside the `<style>` and `</style>` tags into this new file.
+Dans cet exemple, nous avons créé un nouveau fichier appelé `style.css` et déplacé tout ce qui se trouvait auparavant entre les balises `<style>` et `</style>` vers ce fichier.
 
 ```css showLineNumbers filename="style.css"
 p {
@@ -206,7 +209,7 @@ p {
 }
 ```
 
-In the HTML file, we removed the `<style>` and `</style>` tags and added a link to the new `.css` file. This tells the browser to apply the styles from the external file.
+Dans le fichier HTML, nous avons supprimé les balises `<style>` et `</style>` et ajouté un lien vers le nouveau fichier `.css`. Cela indique au navigateur d'appliquer les styles depuis le fichier externe.
 
 ```html showLineNumbers filename="index.html" {7}
 <!DOCTYPE html>
@@ -226,14 +229,14 @@ In the HTML file, we removed the `<style>` and `</style>` tags and added a link 
 </body>
 </html>
 ```
-![A screenshot showing CSS with classes.](/assets/web-basics/css/classes.png)
+![Une capture d'écran montrant du CSS avec des classes.](/assets/web-basics/css/classes.png)
 
-As you can see, the styles are still applied. Note that you can link multiple `.css` files if needed.
+Comme vous pouvez le voir, les styles sont toujours appliqués. Notez que vous pouvez lier plusieurs fichiers `.css` si nécessaire.
 
 ## Conclusion
 
-There is much more to learn about CSS and its [200+ properties](https://www.w3schools.com/CSSref/index.php), which, when combined, can create stunning visuals and even [animations](https://www.w3schools.com/css/css3_animations.asp).
+Il y a encore beaucoup à apprendre sur le CSS et ses [200+ propriétés](https://www.w3schools.com/CSSref/index.php), qui, combinées, permettent de créer des visuels impressionnants et même des [animations](https://www.w3schools.com/css/css3_animations.asp).
 
-However, this lesson was just an introduction. With these foundations, you'll be able to explore more on your own, and we will continue using CSS in future lessons and projects.
+Cependant, cette leçon n'était qu'une introduction. Avec ces bases, vous pourrez explorer davantage par vous-même, et nous continuerons à utiliser le CSS dans les prochaines leçons et projets.
 
-Now that we know how to structure a webpage with HTML and style it with CSS, it's time to learn how to add user interactivity! 🥳
+Maintenant que nous savons structurer une page web avec HTML et la styliser avec CSS, il est temps d'apprendre à ajouter de l'interactivité ! 🥳

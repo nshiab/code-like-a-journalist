@@ -76,13 +76,16 @@ Inline CSS can be useful for quick, simple projects, but it becomes difficult to
 
 With inline CSS, the browser knows exactly which element is being styled. However, when using the `style` element, we need to use *selectors* to specify which elements should be styled and how.
 
-The syntax follows this structure: the selector comes first, followed by property-value pairs enclosed in curly brackets. For example, the code below instructs the browser to apply bold formatting to all `p` elements on the page.
+The syntax follows this structure: the selector comes first, followed by property-value pairs enclosed in curly brackets. The pairs must be separated by a `;`. For example, the code below instructs the browser to apply bold formatting to all `p` elements on the page.
 
 ```css showLineNumbers
 p {
     font-weight: bold;
 }
 ```
+<Callout type="info" emoji="💡">
+ The indentation above is just to make the CSS more readable for us, humans. Browsers don’t need it and rely only on the code structure. Many developers use tools to *minify* their CSS by removing spaces and line breaks, creating smaller files that load faster and use less bandwidth. We’ll cover this topic in another lesson.
+</Callout>
 
 ### `id` selectors
 
