@@ -1,0 +1,74 @@
+---
+title: How to use JavaScript to make a web page interactive
+description: In this lesson, we learn what JavaScript is and how to use it.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# How to use JavaScript to make a web page interactive
+
+Before starting, make sure you have completed the previous sections, especially **1. First steps 🧑‍🎓**, **2. Pushing further 🚀**, and the lesson on [HTML](/web-basics/html) and [CSS](/web-basics/css).
+
+JavaScript has been created in 1995 by [Brendan Eich](https://fr.wikipedia.org/wiki/Brendan_Eich). Since then, the language has evolded but kept powering the Web. It's just in 2012 that TypeScript apperead, adding more features to JavaScript, like types. We say that TypeScript is a **superset** of JavaScript.
+
+Hovewer, browsers still run JavaScript. They don't understand TypeScript. This is why modern web development toolsets transpile TypeScript to JavaScript.
+
+But in this lesson, we won't use any tooling. We will run JavaScript code (without types) that will be run directly by the browser.
+
+<NoticeIntro />
+
+## Setup
+
+We don't have to install anything for this lesson, but we will work with the code of the previous lesson.
+
+Open an empty folder with VS Code and create an `index.html` file. Copy and paste the code below in it.
+
+```html showLineNumbers filename="index.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Alma Mater</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>My Alma Mater: UQAM</h1>
+    <p id="first-paragraph">I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
+    <p class="red-text">The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+    <p class="red-text">Montreal is a wonderful city. You should visit it!</p>
+</body>
+</html>
+```
+
+Also create a `style.css` file and copy and paste the code below.
+
+```css showLineNumbers filename="style.css"
+p {
+    font-weight: bold;
+}
+
+#first-paragraph {
+    color: blue;
+}
+
+.red-text {
+    color: red;
+}
+```
+
+## Creating a `.js` file
+
+While you can write JavaScript directly into the HTML with the `<script>` and `</script>` tags, it's usually best to isolate your JavaScript into one `.js` file or more. It will make your code easier to maintain in the long run.
+
+Let's create a new file `main.js` with a simple `console.log` in it.
+
+```js showLineNumbers filename="main.js"
+console.log("Hi!)
+```
+
+## Conclusion
+
+ah
