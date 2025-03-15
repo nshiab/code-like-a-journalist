@@ -1,5 +1,5 @@
 export default {
     "html": "HTML",
-    //"css": "CSS",
+    "css": "CSS",
     //"javascript": "JavaScript",
 };
