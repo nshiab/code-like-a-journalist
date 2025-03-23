@@ -14,16 +14,15 @@ JavaScript was created in 1995 by [Brendan Eich](https://fr.wikipedia.org/wiki/B
 
 However, browsers still run JavaScript. They don't understand TypeScript. This is why modern web development toolsets transpile TypeScript into JavaScript.
 
-In this lesson, we won’t use any tooling. We'll run JavaScript code directly in the browser. Don’t worry: by now, you know TypeScript, so JavaScript will be a piece of cake. Tt’s the same, just without the types!
+In this lesson, we won’t use any tooling. We'll run JavaScript code directly in the browser. Don’t worry: by now, you know TypeScript, so JavaScript will be a piece of cake. It’s the same, just without the types!
 
 <NoticeIntro />
 
 ## Setup
 
-We don’t need to install anything for this lesson, but we will work with the code from the previous lesson.
+We don’t need to install anything new, but we will work with the code from the previous lesson.
 
-Open an empty folder in VS Code and create an `index.html` file. Copy and paste the code below into it.
-
+Open an empty folder in VS Code. Download [this picture](https://drive.google.com/file/d/1-lQv2ZWOD4xzYqfZTYsOt_QXfyP0WyAr/view?usp=drive_link) from my Google Drive and place it in your project. Then, copy and paste the code below into a new `index.html`.
 
 ```html showLineNumbers filename="index.html"
 <!DOCTYPE html>
@@ -32,47 +31,32 @@ Open an empty folder in VS Code and create an `index.html` file. Copy and paste 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Alma Mater</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
 </head>
 <body>
     <h1>My Alma Mater: UQAM</h1>
-    <p id="first-paragraph">I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <p>I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
     <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
-    <p class="red-text">The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
-    <p class="red-text">Montreal is a wonderful city. You should visit it!</p>
+    <p>The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+    <p>Montreal is a wonderful city. You should visit it!</p>
 </body>
 </html>
 ```
-
-Also, create a `style.css` file and copy and paste the code below.
-
-```css showLineNumbers filename="style.css"
-p {
-    font-weight: bold;
-}
-
-#first-paragraph {
-    color: blue;
-}
-
-.red-text {
-    color: red;
-}
-```
+![Une capture d’écran montrant la console du navigateur et VS Code avec du code.](/assets/web-basics/javascript/setup.png)
 
 ## Creating a `.js` file
 
-While you can write JavaScript directly into the HTML with the `<script>` and `</script>` tags, it's usually best to isolate your JavaScript into one `.js` file or more. This will make your code easier to maintain in the long run.
+While you can write JavaScript directly in the HTML using `<script>` and `</script>` tags, it's usually best to isolate your JavaScript in one or more `.js` files. This will make your code easier to maintain in the long run.
 
-Let's create a new file `main.js` with a simple `console.log` in it.
+Let’s create a new file called `main.js` with a simple `console.log` in it.
 
 ```js showLineNumbers filename="main.js"
 console.log("Hi!");
 ```
 
-To run this code in your webpage, you need to import it into your HTML. Below, we are specifying the `defer` attribute so our JavaScript code will be executed once the entire page is ready. This is important if you want to modify the content of the page, as we do. If your script runs too soon and the elements have not yet been created by the browser, you'll get an error.
+To run this code in your webpage, you need to import it into your HTML. Below, we specify the `defer` attribute so that our JavaScript code will be executed once the entire page is ready. This is important if you want to modify or interact with the content of the page, as we do. If your script runs too soon and the elements have not yet been created by the browser, you’ll get an error.
 
-However, sometimes you don't need the page elements. If you want your script to run as soon as possible, you can specify the `async` attribute instead of `defer`.
+However, sometimes you don’t need the page elements. If you want your script to run as soon as possible, you can specify the `async` attribute instead of `defer`.
 
 ```html showLineNumbers filename="index.html" {8}
 <!DOCTYPE html>
@@ -81,12 +65,12 @@ However, sometimes you don't need the page elements. If you want your script to 
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>My Alma Mater</title>
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
         <script src="main.js" defer></script>
     </head>
     <body>
         <h1>My Alma Mater: UQAM</h1>
-        <p id="first-paragraph">
+        <p>
             I earned my bachelor's degree in journalism at Université du Québec
             à Montréal (UQAM).
         </p>
@@ -94,21 +78,21 @@ However, sometimes you don't need the page elements. If you want your script to 
             src="university.jpg"
             alt="UQAM campus with Montreal’s downtown skyline in the background."
         />
-        <p class="red-text">
+        <p>
             The picture above comes from Wikimedia. You can find it <a
                 href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg"
             >here</a> along with its license.
         </p>
-        <p class="red-text">
+        <p>
             Montreal is a wonderful city. You should visit it!
         </p>
     </body>
 </html>
 ```
 
-To check if our code runs on our page, we can refresh the page and check the console.
+To check if our code runs on the page, we can refresh and check the console.
 
-When we ran TypeScript with Deno, `console.log` displayed information in the terminal. But now that we are working on a web page, this information is displayed in the browser's console.
+When we ran TypeScript with Deno, `console.log` displayed information in the terminal. But now that we are working on a web page, this information is displayed in the browser’s console.
 
 You should see `Hi!` in the console, indicating that our code runs every time the page is loaded!
 
@@ -116,41 +100,92 @@ You should see `Hi!` in the console, indicating that our code runs every time th
 
 ## Event listeners
 
-When you want the user to interact with your page, you first need to select the element to be interacted with and then add one or more event listeners. To select elements, you can use selectors just like you would in CSS.
+When you want the user to interact with your page, you first need to select the element to be interacted with, then add one or more event listeners. To select elements, you can use selectors just like you would in CSS.
 
-In the example below, we changed the `main.js` file to select the paragraph with the `id` `first-paragraph`. Then, we added two event listeners:
-- A `mouseover` event to underline the text when the user moves their mouse over it.
-- A `mouseout` event to remove the underline when the user moves their mouse away.
+For a concrete example, let’s create a button that can be clicked to change the `body` color. In `index.html`, we add the button with the `id` `change-background`.
 
-When the page loads, our code looks for the first paragraph and then waits for the user to interact with it. If the interaction is of the right type, it triggers the function passed to the relevant event listener. Easy!
+```html showLineNumbers filename="index.html" {28-30}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Alma Mater</title>
+        <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+        <script src="main.js" defer></script>
+    </head>
+    <body>
+        <h1>My Alma Mater: UQAM</h1>
+        <p>
+            I earned my bachelor's degree in journalism at Université du Québec
+            à Montréal (UQAM).
+        </p>
+        <img
+            src="university.jpg"
+            alt="UQAM campus with Montreal’s downtown skyline in the background."
+        />
+        <p>
+            The picture above comes from Wikimedia. You can find it <a
+                href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg"
+            >here</a> along with its license.
+        </p>
+        <p>
+            Montreal is a wonderful city. You should visit it!
+        </p>
+        <button id="change-background">
+            Click me to change the background color!
+        </button>
+    </body>
+</html>
+```
+
+Now, let's update `main.js`:
+- First, we create an array of `randomColors` (lines 1–12).
+- Then, we select our button using `document.querySelector` with the selector `#change-background` (line 14). Here, we want to select a single button, but to select multiple elements you can use `querySelectorAll`.
+- We add a click event listener to our `button` with `addEventListener("click", ...)` (line 16).
+- The second argument of `addEventListener` is a function triggered when the user interacts with the element. Here, we pick a random color and apply it as the background for the page’s `body` (lines 17–20).
+
+When the page loads, our code looks for the button and then waits for the user to interact with it.
 
 ```js showLineNumbers filename="main.js"
-const firstParagraph = document.querySelector("#first-paragraph");
+const randomColors = [
+    "red",
+    "blue",
+    "green",
+    "yellow",
+    "pink",
+    "purple",
+    "orange",
+    "brown",
+    "gray",
+    "white",
+];
 
-firstParagraph.addEventListener("mouseover", () => {
-    firstParagraph.style.textDecoration = "underline";
-});
+const button = document.querySelector("#change-background");
 
-firstParagraph.addEventListener("mouseout", () => {
-    firstParagraph.style.textDecoration = "none";
+button.addEventListener("click", () => {
+    const randomIndex = Math.floor(Math.random() * randomColors.length);
+    const randomColor = randomColors[randomIndex];
+
+    document.body.style.backgroundColor = randomColor;
 });
 ```
-![A screenshot showing event listeners code in VS Code.](/assets/web-basics/javascript/hover.png)
+![A screenshot showing event listeners code in VS Code.](/assets/web-basics/javascript/click.png)
 
 <Callout type="info" emoji="💡">
 When reading other online tutorials, you might hear about the DOM (Document Object Model). It's the JavaScript representation of the HTML. When you select an HTML element in JavaScript, you select it from the DOM.
 </Callout>
 
-There are [many different types of listeners](https://www.w3schools.com/jsref/dom_obj_event.asp), and you can also remove them with the `removeEventListener` method. However, make sure to use a named function instead of an arrow function like above; otherwise, it won't work.
+There are [many different types of listeners](https://www.w3schools.com/jsref/dom_obj_event.asp), and you can also remove them with the `removeEventListener` method. However, make sure to use a named function instead of an arrow function like above; otherwise, it won’t work.
 
 ## Conclusion
 
-Here, I am just showing you a basic example where we change the style of a paragraph. But you can do anything you want to the page with JavaScript, like creating or removing elements and changing their content based on user interactions.
+Congratulations! You just made your page interactive! Of course, the interaction here is quite basic, but the same principles can be applied to complex interactive data visualizations: when the user interacts with the page, you update what is being shown.
 
 You could also use `fetch` to retrieve different data files and create various charts based on user choices. Or you could `fetch` fresh data every 15 seconds with [`setInterval`](https://www.w3schools.com/jsref/met_win_setinterval.asp) and redraw charts, like we do for election dashboards. By the way, `fetch` in Deno works the same way as `fetch` in the browser. 😊
 
-There are also more specialized APIs, like the [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API), to monitor how far the user scrolls and trigger animations, like we do in *scrolly-telling* projects such as [this one](https://ici.radio-canada.ca/info/2022/07/ilots-chaleur-villes-inegalites-injustice-changements-climatiques/en/). (I know the word "API" can be confusing here since we’ve used APIs mainly for retrieving data so far, but an API can be anything, not just for data. This one is more like a function.)
+There are also more specialized APIs, like the [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API), to monitor how far the user scrolls and trigger animations—like we do in *scrolly-telling* projects such as [this one](https://ici.radio-canada.ca/info/2022/07/ilots-chaleur-villes-inegalites-injustice-changements-climatiques/en/). (I know the word "API" can be confusing here since we’ve used APIs mainly for retrieving data so far, but an API can be anything—not just for data. This one is more like a function.)
 
-I kept this lesson very simple since it's your first time coding JavaScript for the web, and we are quite limited because we haven't run a local server. But I think you are now ready for the next step!
+I kept this lesson very simple since it’s your first time coding JavaScript for the web, and we are quite limited because we haven’t run a local server. But I think you’re now ready for the next step!
 
 <NoticeEnd />

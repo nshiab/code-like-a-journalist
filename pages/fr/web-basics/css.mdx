@@ -241,6 +241,8 @@ Un que je trouve particulièrement bien fait est [Simple.css](https://github.com
 
 Pour l’utiliser, il suffit de le lier dans votre fichier HTML. Lorsque vous ouvrirez votre fichier dans un navigateur web, le fichier CSS sera récupéré et appliqué.
 
+Ci-dessous, j’ai également supprimé les attributs `id` et `class` pour simplifier les choses.
+
 ```html showLineNumbers filename="index.html" {7}
 <!DOCTYPE html>
 <html lang="en">
@@ -252,10 +254,10 @@ Pour l’utiliser, il suffit de le lier dans votre fichier HTML. Lorsque vous ou
 </head>
 <body>
     <h1>My Alma Mater: UQAM</h1>
-    <p id="first-paragraph">I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <p>I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
     <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
-    <p class="red-text">The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
-    <p class="red-text">Montreal is a wonderful city. You should visit it!</p>
+    <p>The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+    <p>Montreal is a wonderful city. You should visit it!</p>
 </body>
 </html>
 ```
