@@ -233,6 +233,38 @@ In the HTML file, we removed the `<style>` and `</style>` tags and added a link 
 
 As you can see, the styles are still applied. Note that you can link multiple `.css` files if needed.
 
+## Using a `.css` Template
+
+You can also use CSS files that are publicly available on the internet. This is particularly useful when you want to use open-source CSS templates.
+
+One that I find quite well done is [Simple.css](https://github.com/kevquirk/simple.css). It takes care of styling every element on your page.
+
+To use it, simply link to it in your HTML file. When you open your file in a web browser, the CSS file will be fetched and applied.
+
+```html showLineNumbers filename="index.html" {7}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Alma Mater</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+</head>
+<body>
+    <h1>My Alma Mater: UQAM</h1>
+    <p id="first-paragraph">I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
+    <p class="red-text">The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+    <p class="red-text">Montreal is a wonderful city. You should visit it!</p>
+</body>
+</html>
+```
+![A screenshot showing a CSS file linked to an HTML file.](/assets/web-basics/css/external.png)
+<Callout type="info" emoji="💡">
+In the code above, `simple.min.css` is a minified version of the CSS file. If you [open it](https://cdn.simplecss.org/simple.min.css), you’ll see some CSS code that is very difficult to read. It has been optimized to be as small as possible. Compared to the [original CSS](https://unpkg.com/simpledotcss/simple.css), which is easier for humans to read, the minified version is about 30% smaller. It loads faster and provides a better experience for the user. It also uses less server bandwidth, which can reduce costs for large projects with high traffic.
+</Callout>
+
+
 ## Conclusion
 
 There is much more to learn about CSS and its [200+ properties](https://www.w3schools.com/CSSref/index.php), which, when combined, can create stunning visuals and even [animations](https://www.w3schools.com/css/css3_animations.asp).

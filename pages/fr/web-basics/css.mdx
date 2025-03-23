@@ -233,6 +233,37 @@ Dans le fichier HTML, nous avons supprimé les balises `<style>` et `</style>` e
 
 Comme vous pouvez le voir, les styles sont toujours appliqués. Notez que vous pouvez lier plusieurs fichiers `.css` si nécessaire.
 
+## Utiliser un modèle `.css`
+
+Vous pouvez également utiliser des fichiers CSS disponibles publiquement sur Internet. C’est particulièrement utile lorsque vous souhaitez utiliser des modèles CSS en code ouvert.
+
+Un que je trouve particulièrement bien fait est [Simple.css](https://github.com/kevquirk/simple.css). Il s’occupe de styliser chaque élément de votre page.
+
+Pour l’utiliser, il suffit de le lier dans votre fichier HTML. Lorsque vous ouvrirez votre fichier dans un navigateur web, le fichier CSS sera récupéré et appliqué.
+
+```html showLineNumbers filename="index.html" {7}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Alma Mater</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+</head>
+<body>
+    <h1>My Alma Mater: UQAM</h1>
+    <p id="first-paragraph">I earned my bachelor's degree in journalism at Université du Québec à Montréal (UQAM).</p>
+    <img src="university.jpg" alt="UQAM campus with Montreal’s downtown skyline in the background."/>
+    <p class="red-text">The picture above comes from Wikimedia. You can find it <a href="https://commons.wikimedia.org/wiki/File:UQAM-Judith-Jasmin.jpg">here</a> along with its license.</p>
+    <p class="red-text">Montreal is a wonderful city. You should visit it!</p>
+</body>
+</html>
+```
+![Une capture d’écran montrant un fichier CSS lié à un fichier HTML.](/assets/web-basics/css/external.png)
+<Callout type="info" emoji="💡">
+Dans le code ci-dessus, `simple.min.css` est une version minimisée du fichier CSS. Si vous [l’ouvrez](https://cdn.simplecss.org/simple.min.css), vous verrez du code CSS très difficile à lire. Il a été optimisé pour être aussi petit que possible. Comparée au [CSS original](https://unpkg.com/simpledotcss/simple.css), plus facile à lire pour les humains, la version minimisée est environ 30 % plus légère. Elle se charge plus rapidement et offre une meilleure expérience à l’utilisateur. Elle utilise aussi moins de bande passante serveur, ce qui peut réduire les coûts pour les grands projets avec beaucoup de trafic.
+</Callout>
+
 ## Conclusion
 
 Il y a encore beaucoup à apprendre sur le CSS et ses [200+ propriétés](https://www.w3schools.com/CSSref/index.php), qui, combinées, permettent de créer des visuels impressionnants et même des [animations](https://www.w3schools.com/css/css3_animations.asp).
