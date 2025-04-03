@@ -8,7 +8,7 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # How to use Svelte
 
-You can create amazing projects just by using HTML, CSS and JavaScript. But the more complex the webpages, the styles, and the interactions, the more difficult it is to use them.
+You can create amazing projects just by using HTML, CSS and JavaScript. But the more complex the webpages, the styles, and the user interactions, the more difficult it is to use them.
 
 This is why web frameworks have been created. They are toolsets that make the creation of complex web projects easier and optimize them to make them faster to load. You still use HTML, CSS and JS with them, but they often also have some custom syntax to help you out.
 
@@ -40,7 +40,7 @@ To make all of this work properly, we are also going to install the [Svelte exte
 
 ## Data and prototype
 
-Let's start by crunching our data and prototyping a visualization. This is often the first in my projects: using SDA to crunch/analyze the data and exploring dataviz options.
+Let's start by crunching our data and prototyping a visualization. This is often the first step in my projects: using SDA to crunch/analyze the data and exploring dataviz options.
 
 Since this is a Svelte lesson and I assume that you've completed the previous lessons, we will just reuse the code from the **[Visualizing data](https://www.code-like-a-journalist.com/en/simple-data-analysis/dataviz)** lesson.
 
@@ -76,7 +76,7 @@ export default async function crunchData(
 
 Now let's create `sda/helpers/visualizeData.ts` with the code below.
 
-This script use Plot to create a map from the `fires` SDA table and writes it to `sda/output.map.png`. If you want to know more about this code, make sure to check the **[Visualizing data](https://www.code-like-a-journalist.com/en/simple-data-analysis/dataviz)** lesson.
+This script use Plot to create a map from the `fires` SDA table and writes it to `sda/output/map.png`. If you want to know more about this code, make sure to check the **[Visualizing data](https://www.code-like-a-journalist.com/en/simple-data-analysis/dataviz)** lesson.
 
 ```ts showLineNumbers filename="sda/helpers/visualizeData.ts"
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -153,19 +153,22 @@ await sdb.done();
 
 As we did before, we can now run `main.ts` with `deno task sda` in the terminal. Once the first run done, you'll see the data table logged and the map in the `sda/output` folder.
 
-Our goal will be to create the same kind of map on a webpage, but with an option to filter the provinces and causes.
+Our goal will be to create the same kind of map on a webpage, but with an option to filter the provinces.
 
 ![A screenshot showing the fires map in VS Code.](/assets/web-basics/svelte/output-map.png)
+<Callout type="info" emoji="💡">
+    If the table layout is displayed weirdly in your terminal, it's because the width of the table is bigger than the width of your terminal. Right-click on the terminal and look for `Toggle size with content width`. There is also a handy shortcut that I use all the time to do that: `OPTION` + `Z` on Mac and `ALT` + `Z` on PC.
+</Callout>
 
 ## Writing data for the web
 
 For now, we are just creating a map as an image with SDA. But we want to create this map on a webpage with Svelte.
 
-The first step is to write the data to a file that Svelte will be able to use. To make sure that pages load as fast as possible, we are going to select just the columns and rows we need for the visualization in our table.
+The first step is to write the data to a file that Svelte will be able to use. We can do that in `crunchData.ts`. To make sure that the page loads as fast as possible, we are going to select just the columns and rows we need for the visualization in our table.
 
-We can remove fires with no province and we don't need their geometries since the visualization code just uses the `lat` and `lon` coordinates. However, we need the `geom` column for the provincial boundaries. Also, we rename the provinces `nameEnglish` to `province` to keep their names.
+We can remove fires with no province and we don't need their geometries since the visualization code just uses the `lat` and `lon` coordinates. However, we need the `geom` column for the provincial boundaries. Also, we rename the provinces `nameEnglish` column to `province` to keep their names.
 
-Since we will be working on the web, we can write a JSON file, that Svelte and any web browser will be able to handle. We write this file to `src/data/fire.json`. Anything you want to be used by Svelte needs to be in the `src` folder, which is convenient to remember what is for the Web and what is not.
+Since we will be working on the web, we can write a JSON file that Svelte and any web browser will be able to handle. We write this file to `src/data/fire.json`. Anything you want to be used by Svelte needs to be in the `src` folder, which is convenient to remember what is for the Web and what is not.
 
 We can also pass the option `{ rewind: true }` when writing the file just to ensure the coordinates are in the right order for Plot to draw the map. The `fires.json` file should weight around 828 KB and `map.png` should still be rendered without issues.
 
@@ -218,7 +221,6 @@ Run `deno task dev` in your terminal. Svelte will start a local server and your 
 
 ![A screenshot showing VS Code running a Svelte project and Chrome displaying it.](/assets/web-basics/svelte/start-web.png)
 
-
 ## Exploring `src`
 Before diving futher, let's me explain what's in the `src` folder:
 - `components` is where you can store your Svelte components, the building blocks of your webpage.
@@ -233,13 +235,13 @@ All of this might seem like a lot and very complicated, but as we will going for
 And you might be wondering: but where is my HTML? If you peek into `routes`, you'll see three files:
 - `+layout.svelte` wraps each page with what you want, like a header or footer. Here, we use it to add some default CSS (from [Simple CSS](https://github.com/kevquirk/simple.css) as we saw in the **[CSS](/web-basics/css)** lesson).
 - `+layout.ts` is a configuration file. No need to worry about it.
-- `+page.svelte` is your main page! This is where you can see the HTML code being rendered in Chrome. In this project, we have just one page, but Svelte can create multi-page projects without a sweat.
+- `+page.svelte` is your main page! This is where you can see the HTML code being rendered in Chrome. In this project, we have just one page, but Svelte can create multi-page projects without a sweat. 🏋️
 
 ![A screenshot showing the main page of a Svelte project and Chrome displaying it.](/assets/web-basics/svelte/main-page.png)
 
 ## Writing HTML
 
-We want to create a map of forest fires that can be filtered by province and cause. Let's update our page title and paragraph to start with.
+We want to create a map of wildfires that can be filtered by province. Let's update our page title and paragraph to start with.
 
 We can update the page directly with HTML.
 
@@ -251,18 +253,18 @@ We can update the page directly with HTML.
 </p>
 ```
 
-If you save this file, you'll see that Svelte automatically refreshes the page in your browser. This is called *hot reloading* and is very convenient. Svelte watches all the files in your project and you can see the changes you are making live!
+If you save this file, you'll see that Svelte automatically refreshes the page in your browser. This is called *hot reloading* and is very convenient. Svelte watches all the files in your project and you can see the changes you are making live! 🔥
 
 ![A screenshot showing updated HTML code in the Svelte project and in Chrome.](/assets/web-basics/svelte/html-update.png)
 <Callout type="info" emoji="💡">
-In the screenshot above, I toggled the terminal to have more screen space to code, but it's still running. I haven't stopped it.
+In the screenshot above, I toggled the terminal to have more screen space to code, but it's still running. I haven't stopped the local server with Svelte.
 </Callout>
 
 ## Writing CSS
 
 By default, projects started with the `setup-sda` library are using the [Simple CSS](https://github.com/kevquirk/simple.css) template. But if you want to add some CSS, you can use the `<style></style>` tags. By convention, styles are at the bottom of Svelte files.
 
-For example, we could underline our `h1`.
+For example, we could underline our `h1`. 💅
 
 ```svelte showLineNumbers filename="src/routes/+page.svelte" {7-11}
 <h1>Wildfires in Canada</h1>
@@ -287,7 +289,7 @@ To write TypeScript code on our page, we just need to wrap it between `<script><
 
 For example, in the code below, we import our fires data, log it and count the numbers of fires. We then insert the number of fires in our paragraph.
 
-```svelte showLineNumbers filename="src/routes/+page.svelte" {1-7}
+```svelte showLineNumbers filename="src/routes/+page.svelte" {1-7} /{nbFires}/
 <script lang="ts">
     import fires from "../data/fires.json";
 
@@ -310,14 +312,14 @@ For example, in the code below, we import our fires data, log it and count the n
 ```
 ![A screenshot showing updated TS code in the Svelte project and in Chrome.](/assets/web-basics/svelte/ts-update.png)
 <Callout type="info" emoji="💡">
-To toggle the console and see the logs, look for the `Developer tools` option in your browser menus.
+To toggle the console and see the logs, look for the `Developer tools` option in your browser menus. You can click on what you logged in the console to see more details, which is convenient with arrays and objects.
 </Callout>
 
 ## Creating components
 
 In previous lessons, we kept our HTML, CSS, and JS in `.html`, `.css`, and `.js` files. The idea behind it was to keep our code organized by language or syntax. But Svelte allow us to something more interesting: components.
 
-Components can group related HTML, CSS and JS/TS together and can be called anywhere, as many times as you want. 
+Components can group related HTML, CSS and JS/TS together and can be called anywhere, as many times as you want. 😎
 
 For example, we could decide that the code we wrote so far should be part of one component `<Intro />`. Create a new file `Intro.svelte` in `src/components` and put all of the code in it. By convention, component names are capitalized.
 
@@ -344,9 +346,9 @@ PS: I removed the `console.log(fires)`. We don't need it anymore.
 
 ```
 
-Then import this new component in `src/routes/+pages.svelte`. To call a component, call its name like your would call an HTML element, with `<` and `/>`.
+Then import this new component in `src/routes/+page.svelte`. To call a component, call its name like your would call an HTML element, with `<` and `/>`.
 
-If you want to test it out, add multiple `<Intro />` one after the other. You'll see that the code is automatically reused and if update the component, the changes are applied everywhere. Very convenient!
+If you want to test it out, add multiple `<Intro />` one after the other. You'll see that the code is automatically reused and if you update the component (by changing the title for example), the changes are applied everywhere. Very convenient!
 
 ```svelte showLineNumbers filename="src/routes/+page.svelte"
 <script lang="ts">
@@ -359,13 +361,13 @@ If you want to test it out, add multiple `<Intro />` one after the other. You'll
 
 ## Components with props
 
-Right now, our `<Intro />` component is self-sufficient. But what if we wanted to pass it arguments, like we would do with a function? To do that, we must use `props`, which is short for `properties`.
+Right now, our `<Intro />` component is self-sufficient. But what if we wanted to pass it arguments, like we would do with a function? To do that, we must use `props`, which is short for *properties*.
 
 For example, we could decide that `fires` should be imported in `+page.svelte` and passed to components like `<Intro />`.
 
-Let's update `+pages.svelte` first.
+Let's update `+page.svelte` first.
 
-```svelte showLineNumbers filename="src/routes/+page.svelte" {2}
+```svelte showLineNumbers filename="src/routes/+page.svelte" {2} /{fires}/
 <script lang="ts">
     import fires from "../data/fires.json";
     import Intro from "../components/Intro.svelte";
@@ -379,7 +381,7 @@ Let's update `+pages.svelte` first.
 
 And now let's update `Intro.svelte`. To retrieve the `fires`, we must use the `$props()` rune. Anything starting with `$` in Svelte is called a rune. They are special Svelte functions that are globally available.
 
-Here, the rune with retrieve the `fires` prop passed to the component, so we can use it inside the component.
+Here, the rune will retrieve the `fires` prop passed to the component, so we can use it inside the component.
 
 ```svelte showLineNumbers filename="src/components/Intro.svelte" {2}
 <script lang="ts">
@@ -403,9 +405,12 @@ Here, the rune with retrieve the `fires` prop passed to the component, so we can
 
 Currently, our types for `fires` in `Intro.svelte` are quite loose. We can add an explicit type, like we would in regular functions, to make sure the right thing is being passed on. Here, the type is a bit convoluted because we are working with a GeoJSON, but don't worry about it. We'll practice more.
 
-```svelte showLineNumbers filename="src/components/Intro.svelte" /: { fires: { features: { properties: { isFire: boolean | null } }[] } }/
+```svelte showLineNumbers filename="src/components/Intro.svelte" {2-4}
 <script lang="ts">
-    const { fires }: { fires: { features: { properties: { isFire: boolean | null } }[] } } = $props();
+    const { fires }: { 
+      fires: { features: { properties: { isFire: boolean | null } }[] } 
+    } = $props();
+
     const nbFires = fires.features.filter((d) => d.properties.isFire).length;
 </script>
 
@@ -425,26 +430,26 @@ Currently, our types for `fires` in `Intro.svelte` are quite loose. We can add a
 
 Here, using a `prop` might not seem very interesting because we are using `fires` with only one component.
 
-But when you start having multiple components using the same data, they are very useful. They avoid reimporting the same data or recomputing the same calculation multiple times, keeping your web application performant and all of your components in sync.
+But when you start having multiple components using the same data, they are very useful. They avoid reimporting the same data or recomputing the same calculation multiple times, keeping your web application fast and all of your components in sync. 🚀
 
 ## Using states
 
 ### `$state` rune
 
-It's now time to make our project **reactive**. Let's say that we want the user to pick a province and we want the fires to be filter based on its choice.
+It's now time to make our project **reactive**. Let's say that we want the user to pick a province and we want the fires to be filtered based on its choice.
 
-To do that, we need a reactive state that can be created with the [`$state`](https://svelte.dev/docs/svelte/$state) rune. Svelte will automatically look at our code and update anything related to this state when it changes. It's a little bit like the event listeners we saw in the previous lessons, but on steroids!
+To do that, we need a reactive state that can be created with the [`$state`](https://svelte.dev/docs/svelte/$state) rune. Svelte will automatically look at our code and update anything related to this state when it changes. It's a little bit like the event listeners we saw in the previous lessons, but on steroids! 💥
 
-Let's create a `province` state and let's bind it to the `Select.svelte` component that has been created by `setup-sda`. The `Select` needs three props:
-- The value (notice the `:bind` in the code below to bind the value in the drop down menu to the `province` state)
-- The options in the menu
-- A label, which is important for accessibility
+In `+page.svelte`, let's create a `province` state. At first, the province is `Quebec`.
+
+Then let's bind it to the `Select.svelte` component that has been created when set upping with `setup-sda`. The `Select` is a drop down menu that expects three props:
+- The value, which is our `province` state. By using  `:bind`, we tell Svelte we want this state to change with the value selected by the user.
+- The options in the menu, which are the Canadian provinces.
+- A label, which is important for accessibility.
 
 For now, let's pass `province` to `<Intro />` to update the headline.
 
-First, we update `+page.svelte`.
-
-```svelte showLineNumbers filename="src/routes/+pages.svelte" {4, 6, 9-26, 27}
+```svelte showLineNumbers filename="src/routes/+page.svelte" {4, 6, 9-26, 27}
 <script lang="ts">
     import fires from "../data/fires.json";
     import Intro from "../components/Intro.svelte";
@@ -474,7 +479,7 @@ First, we update `+page.svelte`.
 <Intro {fires} {province} />
 ```
 
-And then we update `Intro.svelte` to update the headline based on the province.
+And then we update `Intro.svelte` to retrieve the `province` and update the headline with it.
 
 ```svelte showLineNumbers filename="src/component/Intro.svelte" {4, 7, 13}
 <script lang="ts">
@@ -502,7 +507,7 @@ And then we update `Intro.svelte` to update the headline based on the province.
 </style>
 ```
 
-Now, when you pick a new province, Svelte knows that the `province` state has to be updated. And since the `province` state is passed to the `<Intro />` component, Svelte also knows that this component needs to be updated too. Magic!
+Now, when you pick a new province, Svelte knows that the `province` state has to be updated. And since the `province` state is passed to the `<Intro />` component, Svelte also knows that this component needs to be updated too. Magic! 🪄
 
 ![A screenshot showing a Svelte state being updated.](/assets/web-basics/svelte/state.png)
 <Callout type="info" emoji="💡">
@@ -515,7 +520,7 @@ Updating the headline is a step in the right direction, but we need to filter th
 
 For that, we could create a **derived** state with the [`$derived`](https://svelte.dev/docs/svelte/$derived) rune. In the code below, anytime `province` updates, `provinceFires` will be updated too and we can pass this derived state to `<Intro />`.
 
-```svelte showLineNumbers filename="src/routes/+pages.svelte" {7-9, 30}
+```svelte showLineNumbers filename="src/routes/+page.svelte" {7-9, 30}
 <script lang="ts">
     import fires from "../data/fires.json";
     import Intro from "../components/Intro.svelte";
@@ -578,7 +583,7 @@ Because we replaced `fires` with `provinceFires`, we need to update `<Intro />`.
 </style>
 ```
 
-Isn't this awesome? Now, each time a user selects a Canadian province in the drop-down menu, the headline and the number of fires are updating instantly!
+Isn't this awesome? Now, each time a user selects a Canadian province in the drop-down menu, the headline and the number of fires are updating instantly! 🥳
 
 ![A screenshot showing a Svelte state being derived.](/assets/web-basics/svelte/derived.png)
 
@@ -588,11 +593,11 @@ They are other useful runes:
 - [`$inspect`](https://svelte.dev/docs/svelte/$inspect) is like a `console.log` but for states. It will log states only when initiated or updated. And it logs things just when your develop your website. Once your website is live on production, it won't log anything.
 - [`$effect`](https://svelte.dev/docs/svelte/$inspect) is a little bit like `$derived`, but for more complicated operations or to make specific libraries work. One key thing: it triggers just in a browser. Svelte tries to pre-render your page as much as possible when building your website. But what you put in a `$effet` won't.
 
-Don't worry: we'll practice these in the next projects.
+We'll practice these in the next projects.
 
 ## Adding the dataviz
 
-So far, we created a map with SDA and Plot. The `drawMap` function is in the `sda/helpers/visualizeData.ts` file. Let's refactor our code a little bit to be able to use it with SDA and with Svelte.
+So far, we created a map with SDA and Plot. The `drawMap` function is in the `sda/helpers/visualizeData.ts` file. Let's refactor our code a little bit to be able to use it with both SDA and Svelte.
 
 Create a new file `drawMap.ts` in `src/helpers/`. We put it in the `src/` folder (and not `sda/`) so Svelte will be able to use it. And let's put the function in it and export it. We bring the Plot imports and we transform the arrow function to a named function.
 
@@ -670,7 +675,9 @@ Let's create a new component in `src/components/Map.svelte` with the code below.
 
     const {
         provinceFires,
-    }: { provinceFires: { properties: { [key: string]: unknown } }[] } =
+    }: {
+        provinceFires: { properties: { [key: string]: unknown } }[]
+    } =
         $props();
 
     function appendMap(div: Element) {
@@ -689,12 +696,12 @@ Let's create a new component in `src/components/Map.svelte` with the code below.
 
 There is a lot going on here! Let me explain:
 - First we import our new `drawMap` function.
-- We also retrieve our `provinceFires` and it's type. Note that I am using `unknown` for the properties type to match `drawMap`. A bit loose, but okay.
+- We also retrieve our `provinceFires` and it's type. Note that I am using `unknown` for the properties type to match `drawMap` types. It's a bit loose, but okay.
 - Between the `script` tags, we create a function `appendMap`. It expects a `div` HTML element, which is just an empty basic HTML element. This functions calls `drawMap` and then append the newly created map to the `div`. Note that we put the `provinceFires` in a new object to match the data shape expected by `drawMap`.
 - For the HTML, we use the `#key` syntax with `provinceFires` to tell Svelte to rerender anything in between `{#key provinceFires}` and `{/key}` when `provinceFires` changes. The idea behind is that if `provinceFires` changes, it means that we need to draw a new map.
-- Between the `key`s, we add our `div` and we tell Svelte to use our `appendMap` function on it when it renders. So our map will be added to it!
+- We add our `div` and we tell Svelte to use our `appendMap` function on it when it renders. So our map will be added to it!
 
-It's a lot to take in! But just in a few lines, this small component does so much! And don't worry, we'll practice these technics. :)
+It's a lot to take in! But just in a few lines, this small component does so much! And don't worry, we'll practice these technics. 😅
 
 Let's add this new component to our page.
 
@@ -794,9 +801,9 @@ export default function drawMap(
 ```
 ![A screenshot showing an interactive Plot map.](/assets/web-basics/svelte/map-working.png)
 
-And look at that! Now it works! If you select a different province in the drop-down menu, the maps is redrawn with the relevant data! Isn't this amazing?
+And look at that! Now it works! If you select a different province in the drop-down menu, the maps is redrawn with the relevant data! Isn't this amazing? 🤠
 
-There still a few issues that we can fix to improve the chart:
+There are still a few issues that we can fix to improve the chart:
 - We can create a boolean variable `oneProvince` to detect when we draw just one province. And when there is just one province:
   - We limit the `height` to 500 pixels, otherwise we let Plot decide.
   - We add an `insetTop` of 50 pixels for Alberta and British Columbia to avoid cut-off spikes.
@@ -887,7 +894,9 @@ export default function drawMap(
 ```
 ![A screenshot showing our final Observable Plot map.](/assets/web-basics/svelte/map-final.png)
 
-Just to make sure that our changes don't break our code with SDA, you can stop your terminal (`CTRL` + `C`) and run `deno task sda`. You should see your table in your terminal and the map of the whole country saved as a PNG. This is wonderful! We are using the same function to draw our map with SDA and with Svelte!
+Just to make sure that our changes don't break our code with SDA, you can stop your terminal (`CTRL` + `C`) and run `deno task sda`. You should see your table in your terminal and the map of the whole country saved as a PNG.
+
+This is wonderful! We are using the same function to draw our map with SDA and with Svelte! It's the best of both worlds. It's beautiful. 🥲
 
 ## Building your website
 
@@ -895,15 +904,18 @@ So far, we have developed our website. Now, it's time to build it.
 
 In your terminal, stop what's running and run `deno task build`. This will tell Svelte to build an optimized and minified version of your code.
 
-After a few seconds, you should see files in the `build` folder. This is your website! You can now host these files on a server to show the world your work!
+After a few seconds, you should see files in the `build` folder. This is your website! You can now host these files on a server to show your work to the world! 👏
 
 ## Conclusion
 
-Congratulations! This was your first Svelte project! You created an interactive data visualization for the Web!
+Congratulations! This was your first Svelte project! You created an interactive data visualization for the Web! 🎉
 
 There was a lot in this lesson. Coding for the Web is not an easy task! But with the next projects, you will have enough practice to code your own projects very soon.
 
-See you for the next lesson!
+If you want to dig more into Svelte, I recommend you follow their excellent [tutorial](https://svelte.dev/tutorial/svelte/welcome-to-svelte). It's a bit technical and you might not get everything at the first pass, but it's an excellent ressource.
 
+You also check the `setup-sda` example. In a new folder, run `deno -A jsr:@nshiab/setup-sda --svelte --example` and then run `deno task dev`. You'll see a full example in your browser that is using all of the precoded components and you can explore the code to learn more.
+
+See you for the next lesson! 😊
 
 <NoticeEnd />
