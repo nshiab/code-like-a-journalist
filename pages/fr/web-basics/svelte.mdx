@@ -1,0 +1,941 @@
+---
+title: Comment utiliser Svelte
+description: Dans cette leçon, vous allez apprendre ce qu’est Svelte et comment l’utiliser.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Comment utiliser Svelte
+
+Vous pouvez créer des projets incroyables en utilisant simplement du HTML, CSS et JavaScript. Mais plus les pages web, les styles et les interactions deviennent compliqués, plus il devient difficile de tout gérer.
+
+C’est pourquoi les *frameworks* web existent. Ce sont des ensembles d’outils qui facilitent la création de projets web complexes. Vous continuez à utiliser du HTML, CSS et JS avec eux, mais ils incluent souvent une syntaxe supplémentaire qui simplifie le développement.
+
+Il existe de nombreux *frameworks* en code ouvert, mais celui que je trouve particulièrement efficace et assez simple à apprendre est [Svelte](https://svelte.dev/). Il est utilisé par de nombreuses salles de rédaction pour créer des visualisations de données interactives. C’est ce que nous allons utiliser pour créer une carte interactive des feux de forêt au Canada.
+
+Avant de commencer, assurez-vous d’avoir complété les sections précédentes, en particulier **1. Premiers pas 🧑‍🎓**, **2. Aller plus loin 🚀**, **3. La librairie SDA 🤓**, ainsi que les leçons sur le **[HTML](/web-basics/html)**, **[CSS](/web-basics/css)** et **[JS](/web-basics/js)**.
+
+<NoticeIntro lang="fr" />
+
+## Installation
+
+Pour installer Svelte, vous pouvez utiliser la librarie [`sv`](https://svelte.dev/docs/cli/overview), mais nous allons plutôt utiliser une fois de plus [setup-sda](https://github.com/nshiab/setup-sda) avec l’option `--svelte`. Cela installera SDA (comme vu dans **3. La librairie SDA**) et Svelte ensemble, afin de profiter du meilleur des deux !
+
+Créez un nouveau dossier, ouvrez-le dans VS Code, puis exécutez `deno -A jsr:@nshiab/setup-sda --svelte`. Cela configurera tout pour vous.
+
+![A screenshot showing VS Code with SDA and Svelte installed.](/assets/web-basics/svelte/setup.png)
+
+Il y a beaucoup de choses dans ce dossier ! Laissez-moi vous expliquer :
+- `.svelte-kit` est un dossier utilisé par Svelte. Vous n’avez pas à vous en préoccuper.
+- `node_modules` contient des librairies. Deno s’en occupe.
+- `sda` est l’endroit où nous allons travailler avec SDA. C’est le même dossier que celui vu dans **3. La librairie SDA**.
+- `src` est le dossier dédié à notre développement web. Il contiendra notre code HTML, CSS, JS et Svelte.
+- `static` est un dossier dans lequel placer des ressources, comme des images ou des fichiers de données. Tout ce qui se trouve ici accompagner votre page web et vous pourrez télécharger le tout facilement.
+- Les autres fichiers sont des fichiers de configuration dont vous n’avez pas à vous soucier pour l'instant. La seule exception est `deno.json`, qui contient de nouvelles tâches par rapport aux leçons précédentes, comme `dev` et `build`, que nous utiliserons pendant notre développement web.
+
+Pour que tout cela fonctionne correctement, nous allons également installer l’[extension Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode). Comme l’extension Deno, elle vous aidera à coder plus rapidement grâce à l’auto-complétion, aux avertissements et aux erreurs affichés pendant que vous travaillez sur vos projets.
+
+![A screenshot showing VS Code Svelte extension.](/assets/web-basics/svelte/svelte-extension.png)
+
+## Données et prototype
+
+Commençons par traiter nos données et créer un prototype de visualisation. C’est souvent la première étape dans mes projets : utiliser SDA pour traiter/analyser les données et explorer des options de visualisation.
+
+Comme il s’agit d’une leçon sur Svelte et que je pars du principe que vous avez complété les leçons précédentes, nous allons simplement réutiliser le code de la leçon **[Visualiser des données](/simple-data-analysis/dataviz)**.
+
+Dans `sda/helpers`, créez un nouveau fichier `crunchData.ts` et copiez-collez le code ci-dessous.
+
+Ce fichier récupère les données sur les feux de forêt de 2023 ainsi que les frontières des provinces canadiennes depuis GitHub, puis les prépare pour être visualisées.
+
+
+```ts showLineNumbers filename="sda/helpers/crunchData.ts"
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(
+  fires: SimpleTable,
+  provinces: SimpleTable,
+) {
+  await fires.cache(async () => {
+    await fires.loadData(
+      "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+    );
+    await fires.points("lat", "lon", "geom");
+    await fires.addColumn("isFire", "boolean", `TRUE`);
+    await fires.sort({ lat: "desc" });
+  });
+
+  await provinces.cache(async () => {
+    await provinces.loadGeoData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
+    );
+  });
+
+  await fires.insertTables(provinces, { unifyColumns: true });
+}
+```
+
+Créons maintenant le fichier `sda/helpers/visualizeData.ts` avec le code ci-dessous.
+
+Ce script utilise Plot pour créer une carte à partir de la table SDA `fires` et l’enregistre dans `sda/output/map.png`. Si vous souhaitez en savoir plus sur ce code, n’hésitez pas à consulter la leçon **[Visualiser des données](/simple-data-analysis/dataviz)**.
+
+```ts showLineNumbers filename="sda/helpers/visualizeData.ts"
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { geo, plot, spike } from "@observablehq/plot";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+  const drawMap = (
+    data: { features: { properties: { [key: string]: unknown } }[] },
+  ) => {
+    const firesPoints = data.features.filter(
+      (feature) => feature.properties.isFire,
+    );
+    const provincesPolygons = data.features.filter(
+      (feature) => !feature.properties.isFire,
+    );
+
+    return plot({
+      projection: {
+        type: "conic-conformal",
+        rotate: [100, -60],
+        domain: data,
+      },
+      length: {
+        range: [1, 200],
+      },
+      color: {
+        legend: true,
+      },
+      marks: [
+        geo(provincesPolygons, {
+          stroke: "lightgray",
+          fill: "whitesmoke",
+        }),
+        spike(firesPoints, {
+          x: (d) => d.properties.lon,
+          y: (d) => d.properties.lat,
+          length: (d) => d.properties.hectares,
+          stroke: (d) => d.properties.cause,
+          fillOpacity: 1,
+          fill: (d) => {
+            if (d.properties.cause === "Human") {
+              return "#b5caff";
+            } else if (d.properties.cause === "Natural") {
+              return "#ffe6a8";
+            } else {
+              return "#ffb9ad";
+            }
+          },
+        }),
+      ],
+    });
+  };
+  await fires.writeMap(drawMap, "./sda/output/map.png");
+}
+```
+
+Et nous pouvons maintenant appeler ces fonctions dans `sda/main.ts`.
+
+
+```ts showLineNumbers filename="sda/main.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import crunchData from "./helpers/crunchData.ts";
+import visualizeData from "./helpers/visualizeData.ts";
+
+const sdb = new SimpleDB();
+const fires = sdb.newTable("fires");
+const provinces = sdb.newTable("provinces");
+
+await crunchData(fires, provinces);
+await visualizeData(fires);
+
+await sdb.done();
+```
+
+Comme nous l’avons fait auparavant, nous pouvons maintenant exécuter `main.ts` avec la commande `deno task sda` dans le terminal. Une fois la première exécution terminée, vous verrez la table de données affichée dans le terminal et la carte dans le dossier `sda/output`.
+
+Notre objectif sera de créer le même type de carte sur une page web, mais avec une option pour filtrer les provinces.
+
+![A screenshot showing the fires map in VS Code.](/assets/web-basics/svelte/output-map.png)
+<Callout type="info" emoji="💡">
+    Si l’affichage de la table semble étrange dans votre terminal, c’est probablement parce que sa largeur dépasse celle de votre terminal. Faites un clic droit dans le terminal et cherchez l’option `Toggle size with content width`. Il existe aussi un raccourci pratique que j’utilise tout le temps pour cela : `OPTION` + `Z` sur Mac et `ALT` + `Z` sur PC.
+</Callout>
+
+## Écriture des données pour le web
+
+Pour l’instant, nous créons simplement une carte sous forme d’image avec SDA. Mais nous voulons afficher cette carte sur une page web avec Svelte.
+
+La première étape consiste à écrire les données dans un fichier que Svelte pourra utiliser. Nous pouvons faire cela dans `crunchData.ts`. Pour s’assurer que la page se charge le plus rapidement possible, nous allons sélectionner uniquement les colonnes et lignes nécessaires à la visualisation.
+
+Nous pouvons retirer les feux qui n’ont pas de province, et nous n’avons pas besoin de leurs géométries puisque le code de visualisation utilise uniquement les coordonnées `lat` et `lon`. En revanche, nous avons besoin de la colonne `geom` pour les frontières provinciales. De plus, nous renommons la colonne `nameEnglish` des provinces en `province` pour conserver leurs noms.
+
+Comme nous allons travailler sur le web, nous pouvons écrire un fichier JSON que Svelte et n’importe quel navigateur web pourront interpréter. Nous enregistrons ce fichier dans `src/data/fires.json`. Tout ce que vous souhaitez utiliser avec Svelte doit se trouver dans le dossier `src`, ce qui est pratique pour distinguer ce qui est destiné au web et ce qui ne l’est pas.
+
+Nous pouvons également passer l’option `{ rewind: true }` lors de l’écriture du fichier, afin de garantir que les coordonnées soient dans le bon ordre pour que Plot puisse dessiner la carte correctement. Le fichier `fires.json` devrait peser environ 828 Ko, et `map.png` devrait toujours s’afficher sans problème.
+
+
+```ts showLineNumbers filename="sda/helpers/crunchData.ts" {12, 20, 24-33}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+
+export default async function crunchData(
+  fires: SimpleTable,
+  provinces: SimpleTable,
+) {
+  await fires.cache(async () => {
+    await fires.loadData(
+      "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+    );
+    await fires.addColumn("isFire", "boolean", `TRUE`);
+    await fires.filter(`province !== null`);
+    await fires.sort({ lat: "desc" });
+  });
+
+  await provinces.cache(async () => {
+    await provinces.loadGeoData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
+    );
+    await provinces.renameColumns({ nameEnglish: "province" });
+  });
+
+  await fires.insertTables(provinces, { unifyColumns: true });
+  await fires.selectColumns([
+    "lat",
+    "lon",
+    "hectares",
+    "cause",
+    "province",
+    "geom",
+    "isFire",
+  ]);
+  await fires.writeGeoData("src/data/fires.json", { rewind: true });
+}
+```
+![A screenshot showing a geojson file being written in VS Code.](/assets/web-basics/svelte/write-file.png)
+<Callout type="info" emoji="💡">
+Nous utilisons `writeGeoData` car nous avons des données géospatiales. Le fichier écrit est un GeoJSON. Mais si vous souhaitez écrire des données tabulaires classiques, vous devez utiliser la méthode `writeData`.
+</Callout>
+
+## Serveur local
+
+Maintenant que nous avons nos données, arrêtons d’exécuter et de surveiller `sda/main.ts` dans le terminal (`CTRL` + `C`) et lançons notre projet Svelte !
+
+Exécutez `deno task dev` dans votre terminal. Svelte va démarrer un serveur local et votre projet web sera accessible à une adresse locale comme `http://localhost:5173/`. Ouvrez-la avec votre navigateur préféré et vous verrez votre projet web !
+
+![A screenshot showing VS Code running a Svelte project and Chrome displaying it.](/assets/web-basics/svelte/start-web.png)
+
+## Explorer `src`
+
+Avant d’aller plus loin, laissez-moi vous expliquer ce que contient le dossier `src` :
+- `components` contient vos composants Svelte, les blocs de construction de vos pages web.
+- `data` contient les données que nous allons utiliser dans notre projet.
+- `helpers` servira à stocker quelques fonctions utilitaires.
+- `lib` est un autre endroit où vous pouvez stocker des types, des variables, etc., et les importer facilement dans vos composants Svelte.
+- `routes` est l’endroit où vous créez vos pages. On en parle juste après.
+- `app.d.ts` et `app.html` servent à configurer vos pages.
+
+Tout cela peut sembler beaucoup et assez complexe, mais au fur et à mesure, vous verrez que c’est en réalité une façon très agréable d’organiser le code d’un projet web.
+
+Et vous vous demandez peut-être : mais où est mon HTML ? Si vous jetez un œil dans `routes`, vous verrez trois fichiers :
+- `+layout.svelte` enveloppe chaque page avec ce que vous souhaitez, comme un en-tête ou un pied de page. Ici, nous l’utilisons pour ajouter du CSS par défaut (provenant de [Simple CSS](https://github.com/kevquirk/simple.css), comme vu dans la leçon **[CSS](/web-basics/css)**).
+- `+layout.ts` est un fichier de configuration. Pas besoin de s’en préoccuper.
+- `+page.svelte` est votre page principale ! C’est ici que vous pouvez voir le code HTML affiché dans Chrome. Dans ce projet, nous avons une seule page, mais Svelte peut très facilement gérer des projets multi-pages. 🏋️
+
+![A screenshot showing the main page of a Svelte project and Chrome displaying it.](/assets/web-basics/svelte/main-page.png)
+
+## Écriture du HTML
+
+Nous voulons créer une carte des feux de forêt filtrable par province. Commençons par mettre à jour le titre et le paragraphe de notre page.
+
+Nous pouvons modifier la page directement avec du HTML.
+
+
+```svelte showLineNumbers filename="src/routes/+page.svelte"
+<h1>Wildfires in Canada</h1>
+<p>
+    The map below shows the wildfires reported in 2023. The taller the spikes,
+    the larger the fires.
+</p>
+```
+
+Si vous enregistrez ce fichier, vous verrez que Svelte rafraîchit automatiquement la page dans votre navigateur. Cela s’appelle le *hot reloading* et c’est très pratique. Svelte surveille tous les fichiers de votre projet et vous pouvez voir les changements que vous effectuez en direct ! 🔥
+
+![A screenshot showing updated HTML code in the Svelte project and in Chrome.](/assets/web-basics/svelte/html-update.png)
+<Callout type="info" emoji="💡">
+Dans la capture ci-dessus, j’ai masqué le terminal pour avoir plus d’espace à l’écran pour coder, mais il tourne toujours. Je n’ai pas arrêté le serveur local de Svelte.
+</Callout>
+
+## Écriture de CSS
+
+Par défaut, les projets démarrés avec la librairie `setup-sda` utilisent [Simple CSS](https://github.com/kevquirk/simple.css). Mais si vous souhaitez ajouter du CSS, vous pouvez utiliser les balises `<style></style>`. Par convention, les styles sont placés en bas des fichiers Svelte.
+
+Par exemple, on pourrait souligner notre `h1`. 💅
+
+
+```svelte showLineNumbers filename="src/routes/+page.svelte" {7-11}
+<h1>Wildfires in Canada</h1>
+<p>
+    The map below shows the wildfires reported in 2023. The taller the spikes,
+    the larger the fires.
+</p>
+
+<style>
+    h1 {
+        text-decoration: underline;
+    }
+</style>
+```
+![A screenshot showing updated CSS code in the Svelte project and in Chrome.](/assets/web-basics/svelte/css-update.png)
+
+## Écriture de TypeScript
+
+Dans la leçon précédente, nous avons appris que les navigateurs web ne comprennent pas TypeScript. Ils ne peuvent exécuter que du JavaScript. Mais Svelte règle ce problème pour nous. Si on lui donne du TS, il le transpile en JS, ce qui est formidable !
+
+Pour écrire du code TypeScript sur notre page, il suffit de l’encadrer avec les balises `<script lang="ts"></script>`. Par convention, les scripts sont placés en haut des fichiers Svelte.
+
+Par exemple, dans le code ci-dessous, nous importons nos données de feux, nous les affichons dans la console, puis nous comptons le nombre de feux. Ensuite, nous insérons ce nombre dans notre paragraphe.
+
+
+```svelte showLineNumbers filename="src/routes/+page.svelte" {1-7} /{nbFires}/
+<script lang="ts">
+    import fires from "../data/fires.json";
+
+    console.log(fires);
+
+    const nbFires = fires.features.filter((d) => d.properties.isFire).length;
+</script>
+
+<h1>Wildfires in Canada</h1>
+<p>
+    The map below shows the {nbFires} wildfires reported in 2023. The taller the
+    spikes, the larger the fires.
+</p>
+
+<style>
+    h1 {
+        text-decoration: underline;
+    }
+</style>
+```
+![A screenshot showing updated TS code in the Svelte project and in Chrome.](/assets/web-basics/svelte/ts-update.png)
+<Callout type="info" emoji="💡">
+Pour afficher la console et voir les *logs*, cherchez l’option `Developer tools` dans les menus de votre navigateur. Vous pouvez cliquer sur ce que vous avez affiché dans la console pour voir plus de détails, ce qui est pratique avec les listes et les objets.
+</Callout>
+
+## Création de composants
+
+Dans les leçons précédentes, nous avions séparé notre HTML, CSS et JS dans des fichiers `.html`, `.css` et `.js`. L’idée était d’organiser notre code par langage ou syntaxe. Mais Svelte permet de faire quelque chose de plus intéressant : les composants.
+
+Les composants permettent de regrouper du HTML, du CSS et du JS/TS liés, et peuvent être utilisés n’importe où, autant de fois que vous le souhaitez. 😎
+
+Par exemple, nous pourrions décider que le code que nous avons écrit jusqu’à présent devrait faire partie d’un seul composant : `<Intro />`. Créez un nouveau fichier `Intro.svelte` dans `src/components` et placez-y tout le code. Par convention, les noms de composants commencent par une majuscule.
+
+PS : J’ai retiré le `console.log(fires)`. Nous n’en avons plus besoin.
+
+```svelte showLineNumbers filename="src/components/Intro.svelte"
+<script lang="ts">
+    import fires from "../data/fires.json";
+
+    const nbFires = fires.features.filter((d) => d.properties.isFire).length;
+</script>
+
+<h1>Wildfires in Canada</h1>
+<p>
+    The map below shows the {nbFires} wildfires reported in 2023. The taller the
+    spikes, the larger the fires.
+</p>
+
+<style>
+    h1 {
+        text-decoration: underline;
+    }
+</style>
+
+```
+
+Importez ensuite ce nouveau composant dans `src/routes/+page.svelte`. Pour appeler un composant, utilisez son nom comme vous le feriez avec un élément HTML, avec `<` et `/>`.
+
+Si vous voulez tester, ajoutez plusieurs fois `<Intro />` à la suite. Vous verrez que le code est automatiquement réutilisé, et si vous mettez à jour le composant (en changeant le titre, par exemple), les modifications seront appliquées partout. Très pratique !
+
+
+```svelte showLineNumbers filename="src/routes/+page.svelte"
+<script lang="ts">
+    import Intro from "../components/Intro.svelte";
+</script>
+
+<Intro />
+```
+![A screenshot showing a Svelte component.](/assets/web-basics/svelte/component.png)
+
+## Composants avec des props
+
+Pour l’instant, notre composant `<Intro />` est autonome. Mais que faire si nous voulons lui passer des arguments, comme on le ferait avec une fonction ? Pour cela, nous devons utiliser des `props`, ce qui est l’abréviation de *properties*.
+
+Par exemple, nous pourrions décider que `fires` soit importé dans `+page.svelte` et transmis à des composants comme `<Intro />`.
+
+Commençons par mettre à jour `+page.svelte`.
+
+
+
+```svelte showLineNumbers filename="src/routes/+page.svelte" {2} /{fires}/
+<script lang="ts">
+    import fires from "../data/fires.json";
+    import Intro from "../components/Intro.svelte";
+</script>
+
+<Intro {fires} />
+```
+<Callout type="info" emoji="💡">
+`{fires}` est une version raccourcie de `fires={fires}`. Lorsque le nom de la prop est identique à celui de la variable, vous pouvez utiliser cette syntaxe plus concise. Bien sûr, cela implique ici que nous devons créer une prop `fires` dans notre composant `<Intro />`.
+</Callout>
+
+Et maintenant, mettons à jour `Intro.svelte`. Pour récupérer la valeur de `fires`, nous devons utiliser la rune `$props()`. Tout ce qui commence par `$` dans Svelte est appelé une rune. Ce sont des fonctions spéciales de Svelte, disponibles globalement.
+
+Ici, la rune permet de récupérer la prop `fires` transmise au composant, afin que nous puissions l’utiliser à l’intérieur de celui-ci.
+
+
+```svelte showLineNumbers filename="src/components/Intro.svelte" {2}
+<script lang="ts">
+    const { fires } = $props();
+
+    const nbFires = fires.features.filter((d) => d.properties.isFire).length;
+</script>
+
+<h1>Wildfires in Canada</h1>
+<p>
+    The map below shows the {nbFires} wildfires reported in 2023. The taller the
+    spikes, the larger the fires.
+</p>
+
+<style>
+    h1 {
+        text-decoration: underline;
+    }
+</style>
+```
+
+Actuellement, les types pour `fires` dans `Intro.svelte` sont assez lâches. Nous pouvons ajouter un type explicite, comme nous le ferions dans une fonction classique, pour nous assurer que la bonne valeur est bien transmise. Ici, le type est un peu complexe parce que nous travaillons avec un GeoJSON, mais ne vous en faites pas. Nous allons nous exercer davantage.
+
+
+```svelte showLineNumbers filename="src/components/Intro.svelte" {2-4}
+<script lang="ts">
+    const { fires }: { 
+      fires: { features: { properties: { isFire: boolean | null } }[] } 
+    } = $props();
+
+    const nbFires = fires.features.filter((d) => d.properties.isFire).length;
+</script>
+
+<h1>Wildfires in Canada</h1>
+<p>
+    The map below shows the {nbFires} wildfires reported in 2023. The taller the
+    spikes, the larger the fires.
+</p>
+
+<style>
+    h1 {
+        text-decoration: underline;
+    }
+</style>
+```
+![A screenshot showing a Svelte component with props.](/assets/web-basics/svelte/component-props.png)
+
+Ici, utiliser une `prop` peut ne pas sembler très intéressant car nous utilisons `fires` avec un seul composant.
+
+Mais dès que vous commencez à avoir plusieurs composants utilisant les mêmes données, cela devient très utile. Cela évite de réimporter les mêmes données ou de recalculer les mêmes choses plusieurs fois, ce qui permet de garder votre application web rapide et tous vos composants synchronisés. 🚀
+
+## Utilisation des états
+
+### Rune `$state`
+
+Il est maintenant temps de rendre notre projet **réactif**. Supposons que nous voulions que l’utilisateur choisisse une province et que les feux soient filtrés selon son choix.
+
+Pour cela, nous avons besoin d’un état réactif, que l’on peut créer avec la rune [`$state`](https://svelte.dev/docs/svelte/$state). Svelte va automatiquement analyser notre code et mettre à jour tout ce qui dépend de cet état dès qu’il change. C’est un peu comme les *event listeners* que nous avons vus dans les leçons précédentes, mais sous stéroïdes ! 💥
+
+Dans `+page.svelte`, créons un état `province`. Au départ, la province est `Quebec`.
+
+Ensuite, relions cet état au composant `Select.svelte`, qui a été créé lors de la configuration avec `setup-sda`. Le `Select` est un menu déroulant qui a besoin de trois props :
+- La valeur, qui est notre état `province`. En utilisant `:bind`, nous indiquons à Svelte que nous voulons que cet état change en fonction de la valeur sélectionnée par l’utilisateur.
+- Les options du menu, qui sont les provinces canadiennes.
+- Un label, qui est important pour l’accessibilité.
+
+Pour l’instant, passons `province` à `<Intro />` pour mettre à jour le titre.
+
+
+```svelte showLineNumbers filename="src/routes/+page.svelte" {4, 6, 9-26, 27}
+<script lang="ts">
+    import fires from "../data/fires.json";
+    import Intro from "../components/Intro.svelte";
+    import Select from "../components/Select.svelte";
+
+    let province = $state("Quebec");
+</script>
+
+<Select
+    bind:value={province}
+    options={[
+        "Northwest Territories",
+        "Yukon",
+        "Nunavut",
+        "Alberta",
+        "Saskatchewan",
+        "British Columbia",
+        "Manitoba",
+        "Quebec",
+        "Newfoundland and Labrador",
+        "Ontario",
+        "New Brunswick",
+        "Nova Scotia",
+    ]}
+    label="Pick a province:"
+/>
+<Intro {fires} {province} />
+```
+
+Nous mettons ensuite à jour `Intro.svelte` pour récupérer la `province` et mettre à jour le titre en conséquence.
+
+```svelte showLineNumbers filename="src/component/Intro.svelte" {4, 7, 13}
+<script lang="ts">
+    const {
+        fires,
+        province,
+    }: {
+        fires: { features: { properties: { isFire: boolean | null } }[] };
+        province: string;
+    } = $props();
+
+    const nbFires = fires.features.filter((d) => d.properties.isFire).length;
+</script>
+
+<h1>Wildfires in {province}</h1>
+<p>
+    The map below shows the {nbFires} wildfires reported in 2023. The taller the
+    spikes, the larger the fires.
+</p>
+
+<style>
+    h1 {
+        text-decoration: underline;
+    }
+</style>
+```
+Maintenant, lorsque vous sélectionnez une nouvelle province, Svelte sait que l’état `province` doit être mis à jour. Et comme cet état est transmis au composant `<Intro />`, Svelte sait également que ce composant doit être mis à jour. Magique ! 🪄
+
+![A screenshot showing a Svelte state being updated.](/assets/web-basics/svelte/state.png)
+<Callout type="info" emoji="💡">
+N’hésitez pas à consulter le code du composant `<Select />`. Il est un peu avancé pour l’instant, mais l’astuce est d’utiliser `$bindable()` sur `value`, afin que lorsque l’utilisateur modifie la sélection dans le menu déroulant, l’état `province` soit mis à jour et propagé partout où c’est nécessaire dans votre application web.
+</Callout>
+
+### Rune `$derived`
+
+Mettre à jour le titre est un bon début, mais nous devons également filtrer les feux.
+
+Pour cela, nous pouvons créer un état **dérivé** avec la rune [`$derived`](https://svelte.dev/docs/svelte/$derived). Dans le code ci-dessous, chaque fois que `province` est mise à jour, `provinceFires` le sera aussi, et nous pourrons transmettre cet état dérivé à `<Intro />`.
+
+```svelte showLineNumbers filename="src/routes/+page.svelte" {7-9, 30}
+<script lang="ts">
+    import fires from "../data/fires.json";
+    import Intro from "../components/Intro.svelte";
+    import Select from "../components/Select.svelte";
+
+    let province = $state("Quebec");
+    let provinceFires = $derived(
+        fires.features.filter((d) => d.properties.province === province),
+    );
+</script>
+
+<Select
+    bind:value={province}
+    options={[
+        "Northwest Territories",
+        "Yukon",
+        "Nunavut",
+        "Alberta",
+        "Saskatchewan",
+        "British Columbia",
+        "Manitoba",
+        "Quebec",
+        "Newfoundland and Labrador",
+        "Ontario",
+        "New Brunswick",
+        "Nova Scotia",
+    ]}
+    label="Pick a province:"
+/>
+<Intro {provinceFires} {province} />
+```
+
+Comme nous avons remplacé `fires` par `provinceFires`, nous devons mettre à jour `<Intro />`. De plus, nous devons maintenant dériver `nbFires` puisque `provinceFires` est un état.
+
+
+
+```svelte showLineNumbers filename="src/component/Intro.svelte" {3, 6, 10-12}
+<script lang="ts">
+    const {
+        provinceFires,
+        province,
+    }: {
+        provinceFires: { properties: { isFire: boolean | null } }[];
+        province: string;
+    } = $props();
+
+    const nbFires = $derived(
+        provinceFires.filter((d) => d.properties.isFire).length,
+    );
+</script>
+
+<h1>Wildfires in {province}</h1>
+<p>
+    The map below shows the {nbFires} wildfires reported in 2023. The taller the
+    spikes, the larger the fires.
+</p>
+
+<style>
+    h1 {
+        text-decoration: underline;
+    }
+</style>
+```
+
+N’est-ce pas génial ? Maintenant, chaque fois qu’un utilisateur sélectionne une province canadienne dans le menu déroulant, le titre et le nombre de feux se mettent à jour instantanément ! 🥳
+
+![A screenshot showing a Svelte state being derived.](/assets/web-basics/svelte/derived.png)
+
+### Autres runes
+
+Il existe d’autres runes utiles :
+- [`$inspect`](https://svelte.dev/docs/svelte/$inspect) fonctionne comme un `console.log`, mais pour les états. Elle affiche les états uniquement lorsqu’ils sont initialisés ou mis à jour. Et elle ne les affiche que pendant que vous développez votre site web. Une fois le site en production, elle ne loguera plus rien.
+- [`$effect`](https://svelte.dev/docs/svelte/$effect) ressemble un peu à `$derived`, mais est utilisé pour des opérations plus complexes ou pour faire fonctionner certaines librairies. Une chose importante : elle ne s’exécute que dans le navigateur. Svelte essaie de faire un pré-rendu votre page autant que possible lors de la construction du site. Mais ce que vous placez dans un `$effect` ne sera pas pré-rendu.
+
+Nous pratiquerons tout cela dans les prochains projets.
+
+## Ajout de la dataviz
+
+Jusqu’à présent, nous avons créé une carte avec SDA et Plot. La fonction `drawMap` se trouve dans le fichier `sda/helpers/visualizeData.ts`. Réorganisons un peu notre code pour pouvoir l’utiliser à la fois avec SDA et avec Svelte.
+
+Créez un nouveau fichier `drawMap.ts` dans `src/helpers/`. Nous le plaçons dans le dossier `src/` (et non `sda/`) pour que Svelte puisse l’utiliser. Plaçons-y la fonction et exportons-la. Nous ajoutons les imports de Plot et transformons la fonction fléchée en fonction nommée.
+
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts"
+import { geo, plot, spike } from "@observablehq/plot";
+
+export default function drawMap(
+  data: { features: { properties: { [key: string]: unknown } }[] },
+) {
+  const firesPoints = data.features.filter(
+    (feature) => feature.properties.isFire,
+  );
+  const provincesPolygons = data.features.filter(
+    (feature) => !feature.properties.isFire,
+  );
+
+  return plot({
+    projection: {
+      type: "conic-conformal",
+      rotate: [100, -60],
+      domain: data,
+    },
+    length: {
+      range: [1, 200],
+    },
+    color: {
+      legend: true,
+    },
+    marks: [
+      geo(provincesPolygons, {
+        stroke: "lightgray",
+        fill: "whitesmoke",
+      }),
+      spike(firesPoints, {
+        x: (d) => d.properties.lon,
+        y: (d) => d.properties.lat,
+        length: (d) => d.properties.hectares,
+        stroke: (d) => d.properties.cause,
+        fillOpacity: 1,
+        fill: (d) => {
+          if (d.properties.cause === "Human") {
+            return "#b5caff";
+          } else if (d.properties.cause === "Natural") {
+            return "#ffe6a8";
+          } else {
+            return "#ffb9ad";
+          }
+        },
+      }),
+    ],
+  });
+}
+```
+
+Désormais, `sda/helpers/visualizeData.ts` peut utiliser cette fonction.
+
+
+```ts showLineNumbers filename="sda/helpers/visualizeData.ts" {2}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import drawMap from "../../src/helpers/drawMap.ts";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+
+  await fires.writeMap(drawMap, "./sda/output/map.png");
+}
+```
+
+Et… nous pouvons réutiliser cette fonction pour notre page web !
+
+Créons un nouveau composant dans `src/components/Map.svelte` avec le code ci-dessous.
+
+
+```svelte showLineNumbers filename="src/component/Map.svelte"
+<script lang="ts">
+    import drawMap from "../helpers/drawMap";
+
+    const {
+        provinceFires,
+    }: {
+        provinceFires: { properties: { [key: string]: unknown } }[]
+    } =
+        $props();
+
+    function appendMap(div: Element) {
+        const map = drawMap({
+            features: provinceFires,
+        });
+
+        div.append(map);
+    }
+</script>
+
+{#key provinceFires}
+    <div use:appendMap></div>
+{/key}
+```
+
+Il se passe beaucoup de choses ici ! Laissez-moi vous expliquer :
+- D’abord, nous importons notre nouvelle fonction `drawMap`.
+- Nous récupérons également notre `provinceFires` et son type. Notez que j’utilise `unknown` comme type pour les propriétés afin de correspondre aux types attendus par `drawMap`. C’est un peu approximatif, mais ça fonctionne.
+- Entre les balises `script`, nous créons une fonction `appendMap`. Elle attend un élément HTML `div`, qui est simplement un élément de base vide. Cette fonction appelle `drawMap` puis ajoute la carte générée à la `div`. Notez que nous plaçons `provinceFires` dans un nouvel objet pour correspondre à la structure attendue par `drawMap`.
+- Dans le HTML, nous utilisons la syntaxe `#key` avec `provinceFires` pour indiquer à Svelte de faire un nouveau rendu de tout ce qui se trouve entre `{#key provinceFires}` et `{/key}` lorsque `provinceFires` change. L’idée derrière cela est que si `provinceFires` change, cela signifie que nous devons redessiner une nouvelle carte.
+- Nous ajoutons notre `div` et nous demandons à Svelte d’utiliser notre fonction `appendMap` au moment de son affichage. Ainsi, notre carte sera ajoutée à l’élément.
+
+Cela fait beaucoup à assimiler ! Mais en seulement quelques lignes, ce petit composant fait énormément de choses ! Et ne vous inquiétez pas, nous allons pratiquer ces techniques. Pour être honnête, je copie-colle souvent cette partie depuis mes projets précédents. 😅
+
+Ajoutons maintenant ce nouveau composant à notre page.
+
+
+```svelte showLineNumbers filename="src/routes/+page.svelte" {5, 32}
+<script lang="ts">
+    import fires from "../data/fires.json";
+    import Intro from "../components/Intro.svelte";
+    import Select from "../components/Select.svelte";
+    import Map from "../components/Map.svelte";
+
+    let province = $state("Quebec");
+    let provinceFires = $derived(
+        fires.features.filter((d) => d.properties.province === province),
+    );
+</script>
+
+<Select
+    bind:value={province}
+    options={[
+        "Northwest Territories",
+        "Yukon",
+        "Nunavut",
+        "Alberta",
+        "Saskatchewan",
+        "British Columbia",
+        "Manitoba",
+        "Quebec",
+        "Newfoundland and Labrador",
+        "Ontario",
+        "New Brunswick",
+        "Nova Scotia",
+    ]}
+    label="Pick a province:"
+/>
+<Intro {provinceFires} {province} />
+<Map {provinceFires} />
+```
+
+Hmmm… Il y a un problème avec notre carte. Le petit ⚠️ ajouté par Plot signifie qu’un avertissement s’affiche dans la console. Nous devons ajuster quelques éléments dans `drawMap` pour que la projection fonctionne correctement.
+
+![A screenshot showing a problem in a Plot map.](/assets/web-basics/svelte/problem-map.png)
+
+Le problème vient du fait que lorsqu’il n’y a qu’une seule province, Plot ne sait pas trop comment l’interpréter. Nous pouvons l’aider en lui précisant qu’il peut la traiter comme une collection de *features* — autrement dit, un GeoJSON.
+
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts" {17-20}
+import { geo, plot, spike } from "@observablehq/plot";
+
+export default function drawMap(
+  data: { features: { properties: { [key: string]: unknown } }[] },
+) {
+  const firesPoints = data.features.filter(
+    (feature) => feature.properties.isFire,
+  );
+  const provincesPolygons = data.features.filter(
+    (feature) => !feature.properties.isFire,
+  );
+
+  return plot({
+    projection: {
+      type: "conic-conformal",
+      rotate: [100, -60],
+      domain: {
+        type: "FeatureCollection",
+        features: provincesPolygons,
+      },
+    },
+    length: {
+      range: [1, 200],
+    },
+    color: {
+      legend: true,
+    },
+    marks: [
+      geo(provincesPolygons, {
+        stroke: "lightgray",
+        fill: "whitesmoke",
+      }),
+      spike(firesPoints, {
+        x: (d) => d.properties.lon,
+        y: (d) => d.properties.lat,
+        length: (d) => d.properties.hectares,
+        stroke: (d) => d.properties.cause,
+        fillOpacity: 1,
+        fill: (d) => {
+          if (d.properties.cause === "Human") {
+            return "#b5caff";
+          } else if (d.properties.cause === "Natural") {
+            return "#ffe6a8";
+          } else {
+            return "#ffb9ad";
+          }
+        },
+      }),
+    ],
+  });
+}
+```
+![A screenshot showing an interactive Plot map.](/assets/web-basics/svelte/map-working.png)
+
+Et regardez ça ! Maintenant, ça fonctionne ! Si vous sélectionnez une autre province dans le menu déroulant, la carte est redessinée avec les données correspondantes ! N’est-ce pas incroyable ? 🤠
+
+Il reste encore quelques points que nous pouvons améliorer pour rendre le graphique plus clair :
+- Nous pouvons créer une variable booléenne `oneProvince` pour détecter si nous dessinons une seule province. Et dans ce cas :
+  - Nous limitons la `height` à 500 pixels ; sinon, nous laissons Plot décider.
+  - Nous ajoutons un `insetTop` de 50 pixels pour l’Alberta et la Colombie-Britannique afin d’éviter que les pics soient coupés.
+  - Nous utilisons la projection `mercator` sans rotation.
+- Pour garantir que l’échelle des hauteurs des pics soit identique pour toutes les provinces, nous ajoutons un domaine à `length`. Cette échelle est liée aux valeurs de `hectares` des feux, qui varient de presque 0 à 1 000 000.
+- Certaines provinces incluent toutes les causes, mais d’autres non. Nous spécifions donc toutes les catégories dans l’échelle de `color`.
+- Enfin, nous pouvons ajouter une marque `tip` avec une transformation `pointer` pour afficher une infobulle avec la cause et la superficie brûlée lorsque l’utilisateur survole la carte.
+
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts" {1-2, 14, 17-23, 25-26, 33, 38-39, 62-75}
+import { geo, plot, pointer, spike, tip } from "@observablehq/plot";
+import { formatNumber } from "@nshiab/journalism/web";
+
+export default function drawMap(
+  data: { features: { properties: { [key: string]: unknown } }[] },
+) {
+  const firesPoints = data.features.filter(
+    (feature) => feature.properties.isFire,
+  );
+  const provincesPolygons = data.features.filter(
+    (feature) => !feature.properties.isFire,
+  );
+
+  const oneProvince = provincesPolygons.length === 1;
+
+  return plot({
+    height: oneProvince ? 500 : undefined,
+    insetTop: oneProvince &&
+        ["Alberta", "British Columbia"].includes(
+          provincesPolygons[0].properties.province as string,
+        )
+      ? 50
+      : 0,
+    projection: {
+      type: oneProvince ? "mercator" : "conic-conformal",
+      rotate: oneProvince ? undefined : [100, -60],
+      domain: {
+        type: "FeatureCollection",
+        features: provincesPolygons,
+      },
+    },
+    length: {
+      domain: [0, 1_000_000],
+      range: [1, 200],
+    },
+    color: {
+      legend: true,
+      domain: ["Human", "Natural", "Unknown"],
+      range: ["#4269D0", "#EFB118", "#FF725C"],
+    },
+    marks: [
+      geo(provincesPolygons, {
+        stroke: "lightgray",
+        fill: "whitesmoke",
+      }),
+      spike(firesPoints, {
+        x: (d) => d.properties.lon,
+        y: (d) => d.properties.lat,
+        length: (d) => d.properties.hectares,
+        stroke: (d) => d.properties.cause,
+        fillOpacity: 1,
+        fill: (d) => {
+          if (d.properties.cause === "Human") {
+            return "#b5caff";
+          } else if (d.properties.cause === "Natural") {
+            return "#ffe6a8";
+          } else {
+            return "#ffb9ad";
+          }
+        },
+      }),
+      tip(
+        firesPoints,
+        pointer({
+          x: "lon",
+          y: "lat",
+          title: (d) =>
+            `Cause: ${d.properties.cause}\nHectares: ${
+              formatNumber(d.properties.hectares, {
+                suffix: " ha",
+              })
+            }`,
+          fontSize: 12,
+        }),
+      ),
+    ],
+  });
+}
+```
+![A screenshot showing our final Observable Plot map.](/assets/web-basics/svelte/map-final.png)
+
+Juste pour vérifier que nos modifications n’ont rien cassé du côté de SDA, vous pouvez arrêter votre terminal (`CTRL` + `C`) et exécuter `deno task sda`. Vous devriez voir votre table dans le terminal ainsi que la carte du pays entier enregistrée en PNG.
+
+C’est formidable ! Nous utilisons la même fonction pour dessiner notre carte avec SDA et avec Svelte ! C’est le meilleur des deux mondes. C’est magnifique. 🥲
+
+## Construction de votre site web
+
+Jusqu’à présent, nous avons développé notre site web. Il est maintenant temps de le construire.
+
+Dans votre terminal, arrêtez ce qui est en cours d’exécution et lancez la commande `deno task build`. Cela indiquera à Svelte de construire une version optimisée et minifiée de votre code.
+
+Après quelques secondes, vous devriez voir des fichiers dans le dossier `build`. C’est votre site web ! Vous pouvez maintenant héberger ces fichiers sur un serveur pour partager votre travail avec le monde entier ! 👏
+
+## Conclusion
+
+Félicitations ! C’était votre premier projet Svelte ! Vous avez créé une visualisation de données interactive pour le Web ! 🎉
+
+Il y avait beaucoup de contenu dans cette leçon. Coder pour le Web n’est pas une tâche facile ! Mais avec les prochains projets, vous aurez assez de pratique pour développer vos propres projets très bientôt.
+
+Si vous souhaitez aller plus loin avec Svelte, je vous recommande de suivre leur excellent [tutoriel](https://svelte.dev/tutorial/svelte/welcome-to-svelte). Il est un peu technique, et vous ne comprendrez peut-être pas tout du premier coup, mais c’est une excellente ressource.
+
+Vous pouvez aussi explorer l’exemple fourni avec `setup-sda`. Dans un nouveau dossier, exécutez `deno -A jsr:@nshiab/setup-sda --svelte --example`, puis lancez `deno task dev`. Vous verrez un exemple complet dans votre navigateur, qui utilise tous les composants préconfigurés disponibles dans `src/components`, et vous pourrez explorer le code pour en apprendre davantage.
+
+À très bientôt pour la prochaine leçon ! 😊
+
+<NoticeEnd lang="fr" />
