@@ -163,13 +163,13 @@ For now, we are just creating a map as an image with SDA. But we want to create 
 
 The first step is to write the data to a file that Svelte will be able to use. To make sure that pages load as fast as possible, we are going to select just the columns and rows we need for the visualization in our table.
 
-We can remove fires with no province and we don't need their geometries since the visualization code just uses the `lat` and `lon` coordinates. However, we need the `geom` column for the boundaries.
+We can remove fires with no province and we don't need their geometries since the visualization code just uses the `lat` and `lon` coordinates. However, we need the `geom` column for the provincial boundaries. Also, we rename the provinces `nameEnglish` to `province` to keep their names.
 
 Since we will be working on the web, we can write a JSON file, that Svelte and any web browser will be able to handle. We write this file to `src/data/fire.json`. Anything you want to be used by Svelte needs to be in the `src` folder, which is convenient to remember what is for the Web and what is not.
 
 We can also pass the option `{ rewind: true }` when writing the file just to ensure the coordinates are in the right order for Plot to draw the map. The `fires.json` file should weight around 828 KB and `map.png` should still be rendered without issues.
 
-```ts showLineNumbers filename="sda/helpers/crunchData.ts" {12, 23-32}
+```ts showLineNumbers filename="sda/helpers/crunchData.ts" {12, 20, 24-33}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(
@@ -189,6 +189,7 @@ export default async function crunchData(
     await provinces.loadGeoData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
     );
+    await provinces.renameColumns({ nameEnglish: "province" });
   });
 
   await fires.insertTables(provinces, { unifyColumns: true });
@@ -428,9 +429,11 @@ But when you start having multiple components using the same data, they are very
 
 ## Using states
 
+### `$state` rune
+
 It's now time to make our project **reactive**. Let's say that we want the user to pick a province and we want the fires to be filter based on its choice.
 
-To do that, we need a reactive state that can be created with the `$state` rune. Svelte will automatically look at our code and update anything related to this state when it changes. It's a little bit like the event listeners we saw in the previous lessons, but on steroids!
+To do that, we need a reactive state that can be created with the [`$state`](https://svelte.dev/docs/svelte/$state) rune. Svelte will automatically look at our code and update anything related to this state when it changes. It's a little bit like the event listeners we saw in the previous lessons, but on steroids!
 
 Let's create a `province` state and let's bind it to the `Select.svelte` component that has been created by `setup-sda`. The `Select` needs three props:
 - The value (notice the `:bind` in the code below to bind the value in the drop down menu to the `province` state)
@@ -473,7 +476,7 @@ First, we update `+page.svelte`.
 
 And then we update `Intro.svelte` to update the headline based on the province.
 
-```svelte showLineNumbers filename="src/routes/+pages.svelte" {4, 7, 13}
+```svelte showLineNumbers filename="src/component/Intro.svelte" {4, 7, 13}
 <script lang="ts">
     const {
         fires,
@@ -502,6 +505,389 @@ And then we update `Intro.svelte` to update the headline based on the province.
 Now, when you pick a new province, Svelte knows that the `province` state has to be updated. And since the `province` state is passed to the `<Intro />` component, Svelte also knows that this component needs to be updated too. Magic!
 
 ![A screenshot showing a Svelte state being updated.](/assets/web-basics/svelte/state.png)
+<Callout type="info" emoji="💡">
+Feel free to check out the code in the `<Select />` component. It's a bit advanced for now, but the magic trick is to use `$bindable()` on `value` so when the drop-down menu is updated by the user, the `province` state gets updated and propagated everywhere relevant in your web application.
+</Callout>
+
+### `$derived` rune
+
+Updating the headline is a step in the right direction, but we need to filter the fires as well.
+
+For that, we could create a **derived** state with the [`$derived`](https://svelte.dev/docs/svelte/$derived) rune. In the code below, anytime `province` updates, `provinceFires` will be updated too and we can pass this derived state to `<Intro />`.
+
+```svelte showLineNumbers filename="src/routes/+pages.svelte" {7-9, 30}
+<script lang="ts">
+    import fires from "../data/fires.json";
+    import Intro from "../components/Intro.svelte";
+    import Select from "../components/Select.svelte";
+
+    let province = $state("Quebec");
+    let provinceFires = $derived(
+        fires.features.filter((d) => d.properties.province === province),
+    );
+</script>
+
+<Select
+    bind:value={province}
+    options={[
+        "Northwest Territories",
+        "Yukon",
+        "Nunavut",
+        "Alberta",
+        "Saskatchewan",
+        "British Columbia",
+        "Manitoba",
+        "Quebec",
+        "Newfoundland and Labrador",
+        "Ontario",
+        "New Brunswick",
+        "Nova Scotia",
+    ]}
+    label="Pick a province:"
+/>
+<Intro {provinceFires} {province} />
+```
+
+Because we replaced `fires` with `provinceFires`, we need to update `<Intro />`. Also, we now need to derive `nbFires` since `provinceFires` is a state.
+
+```svelte showLineNumbers filename="src/component/Intro.svelte" {3, 6, 10-12}
+<script lang="ts">
+    const {
+        provinceFires,
+        province,
+    }: {
+        provinceFires: { properties: { isFire: boolean | null } }[];
+        province: string;
+    } = $props();
+
+    const nbFires = $derived(
+        provinceFires.filter((d) => d.properties.isFire).length,
+    );
+</script>
+
+<h1>Wildfires in {province}</h1>
+<p>
+    The map below shows the {nbFires} wildfires reported in 2023. The taller the
+    spikes, the larger the fires.
+</p>
+
+<style>
+    h1 {
+        text-decoration: underline;
+    }
+</style>
+```
+
+Isn't this awesome? Now, each time a user selects a Canadian province in the drop-down menu, the headline and the number of fires are updating instantly!
+
+![A screenshot showing a Svelte state being derived.](/assets/web-basics/svelte/derived.png)
+
+### Other runes
+
+They are other useful runes:
+- [`$inspect`](https://svelte.dev/docs/svelte/$inspect) is like a `console.log` but for states. It will log states only when initiated or updated. And it logs things just when your develop your website. Once your website is live on production, it won't log anything.
+- [`$effect`](https://svelte.dev/docs/svelte/$inspect) is a little bit like `$derived`, but for more complicated operations or to make specific libraries work. One key thing: it triggers just in a browser. Svelte tries to pre-render your page as much as possible when building your website. But what you put in a `$effet` won't.
+
+Don't worry: we'll practice these in the next projects.
+
+## Adding the dataviz
+
+So far, we created a map with SDA and Plot. The `drawMap` function is in the `sda/helpers/visualizeData.ts` file. Let's refactor our code a little bit to be able to use it with SDA and with Svelte.
+
+Create a new file `drawMap.ts` in `src/helpers/`. We put it in the `src/` folder (and not `sda/`) so Svelte will be able to use it. And let's put the function in it and export it. We bring the Plot imports and we transform the arrow function to a named function.
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts"
+import { geo, plot, spike } from "@observablehq/plot";
+
+export default function drawMap(
+  data: { features: { properties: { [key: string]: unknown } }[] },
+) {
+  const firesPoints = data.features.filter(
+    (feature) => feature.properties.isFire,
+  );
+  const provincesPolygons = data.features.filter(
+    (feature) => !feature.properties.isFire,
+  );
+
+  return plot({
+    projection: {
+      type: "conic-conformal",
+      rotate: [100, -60],
+      domain: data,
+    },
+    length: {
+      range: [1, 200],
+    },
+    color: {
+      legend: true,
+    },
+    marks: [
+      geo(provincesPolygons, {
+        stroke: "lightgray",
+        fill: "whitesmoke",
+      }),
+      spike(firesPoints, {
+        x: (d) => d.properties.lon,
+        y: (d) => d.properties.lat,
+        length: (d) => d.properties.hectares,
+        stroke: (d) => d.properties.cause,
+        fillOpacity: 1,
+        fill: (d) => {
+          if (d.properties.cause === "Human") {
+            return "#b5caff";
+          } else if (d.properties.cause === "Natural") {
+            return "#ffe6a8";
+          } else {
+            return "#ffb9ad";
+          }
+        },
+      }),
+    ],
+  });
+}
+```
+
+Now `sda/helpers/visualizeData.ts` can use that function.
+
+```ts showLineNumbers filename="sda/helpers/visualizeData.ts" {2}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import drawMap from "../../src/helpers/drawMap.ts";
+
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.logTable();
+
+  await fires.writeMap(drawMap, "./sda/output/map.png");
+}
+```
+
+And... we can reuse this function for our webpage!
+
+Let's create a new component in `src/components/Map.svelte` with the code below.
+
+```svelte showLineNumbers filename="src/component/Map.svelte"
+<script lang="ts">
+    import drawMap from "../helpers/drawMap";
+
+    const {
+        provinceFires,
+    }: { provinceFires: { properties: { [key: string]: unknown } }[] } =
+        $props();
+
+    function appendMap(div: Element) {
+        const map = drawMap({
+            features: provinceFires,
+        });
+
+        div.append(map);
+    }
+</script>
+
+{#key provinceFires}
+    <div use:appendMap></div>
+{/key}
+```
+
+There is a lot going on here! Let me explain:
+- First we import our new `drawMap` function.
+- We also retrieve our `provinceFires` and it's type. Note that I am using `unknown` for the properties type to match `drawMap`. A bit loose, but okay.
+- Between the `script` tags, we create a function `appendMap`. It expects a `div` HTML element, which is just an empty basic HTML element. This functions calls `drawMap` and then append the newly created map to the `div`. Note that we put the `provinceFires` in a new object to match the data shape expected by `drawMap`.
+- For the HTML, we use the `#key` syntax with `provinceFires` to tell Svelte to rerender anything in between `{#key provinceFires}` and `{/key}` when `provinceFires` changes. The idea behind is that if `provinceFires` changes, it means that we need to draw a new map.
+- Between the `key`s, we add our `div` and we tell Svelte to use our `appendMap` function on it when it renders. So our map will be added to it!
+
+It's a lot to take in! But just in a few lines, this small component does so much! And don't worry, we'll practice these technics. :)
+
+Let's add this new component to our page.
+
+```svelte showLineNumbers filename="src/routes/+page.svelte" {5, 32}
+<script lang="ts">
+    import fires from "../data/fires.json";
+    import Intro from "../components/Intro.svelte";
+    import Select from "../components/Select.svelte";
+    import Map from "../components/Map.svelte";
+
+    let province = $state("Quebec");
+    let provinceFires = $derived(
+        fires.features.filter((d) => d.properties.province === province),
+    );
+</script>
+
+<Select
+    bind:value={province}
+    options={[
+        "Northwest Territories",
+        "Yukon",
+        "Nunavut",
+        "Alberta",
+        "Saskatchewan",
+        "British Columbia",
+        "Manitoba",
+        "Quebec",
+        "Newfoundland and Labrador",
+        "Ontario",
+        "New Brunswick",
+        "Nova Scotia",
+    ]}
+    label="Pick a province:"
+/>
+<Intro {provinceFires} {province} />
+<Map {provinceFires} />
+```
+
+Hmmm... There is a problem with our map. The little ⚠️ added by Plot means there is a warning in the console. We need to adjust a few things in `drawMap` to make the projection work.
+
+![A screenshot showing an problem in a Plot map.](/assets/web-basics/svelte/problem-map.png)
+
+The problem is that when there is just one province, Plot is not sure what to do with it. We can help it out by specifying that it can be handled as a collection of features, in other words a GeoJSON.
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts" {17-20}
+import { geo, plot, spike } from "@observablehq/plot";
+
+export default function drawMap(
+  data: { features: { properties: { [key: string]: unknown } }[] },
+) {
+  const firesPoints = data.features.filter(
+    (feature) => feature.properties.isFire,
+  );
+  const provincesPolygons = data.features.filter(
+    (feature) => !feature.properties.isFire,
+  );
+
+  return plot({
+    projection: {
+      type: "conic-conformal",
+      rotate: [100, -60],
+      domain: {
+        type: "FeatureCollection",
+        features: provincesPolygons,
+      },
+    },
+    length: {
+      range: [1, 200],
+    },
+    color: {
+      legend: true,
+    },
+    marks: [
+      geo(provincesPolygons, {
+        stroke: "lightgray",
+        fill: "whitesmoke",
+      }),
+      spike(firesPoints, {
+        x: (d) => d.properties.lon,
+        y: (d) => d.properties.lat,
+        length: (d) => d.properties.hectares,
+        stroke: (d) => d.properties.cause,
+        fillOpacity: 1,
+        fill: (d) => {
+          if (d.properties.cause === "Human") {
+            return "#b5caff";
+          } else if (d.properties.cause === "Natural") {
+            return "#ffe6a8";
+          } else {
+            return "#ffb9ad";
+          }
+        },
+      }),
+    ],
+  });
+}
+```
+![A screenshot showing an interactive Plot map.](/assets/web-basics/svelte/map-working.png)
+
+And look at that! Now it works! If you select a different province in the drop-down menu, the maps is redrawn with the relevant data! Isn't this amazing?
+
+There still a few issues that we can fix to improve the chart:
+- We can create a boolean variable `oneProvince` to detect when we draw just one province. And when there is just one province:
+  - We limit the `height` to 500 pixels, otherwise we let Plot decide.
+  - We add an `insetTop` of 50 pixels for Alberta and British Columbia to avoid cut-off spikes.
+  - We use the `mercator` projection without rotation.
+- To ensure the scale is the same for the spikes height for all provinces, we add a domain to `length`. This scale is tied to the fires `hectares` values, which goes from almost 0 to 1,000,000.
+- Some provinces have all causes, but others don't. So we specify all categories in the `color` scale.
+- Finally, we can add a `tip` mark with a `pointer` transform to add a tooltip with the cause and the hectares burned when the user hover over the map.
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts" {1-2, 14, 17-23, 25-26, 33, 38-39, 62-75}
+import { geo, plot, pointer, spike, tip } from "@observablehq/plot";
+import { formatNumber } from "@nshiab/journalism/web";
+
+export default function drawMap(
+  data: { features: { properties: { [key: string]: unknown } }[] },
+) {
+  const firesPoints = data.features.filter(
+    (feature) => feature.properties.isFire,
+  );
+  const provincesPolygons = data.features.filter(
+    (feature) => !feature.properties.isFire,
+  );
+
+  const oneProvince = provincesPolygons.length === 1;
+
+  return plot({
+    height: oneProvince ? 500 : undefined,
+    insetTop: oneProvince &&
+        ["Alberta", "British Columbia"].includes(
+          provincesPolygons[0].properties.province as string,
+        )
+      ? 50
+      : 0,
+    projection: {
+      type: oneProvince ? "mercator" : "conic-conformal",
+      rotate: oneProvince ? undefined : [100, -60],
+      domain: {
+        type: "FeatureCollection",
+        features: provincesPolygons,
+      },
+    },
+    length: {
+      domain: [0, 1_000_000],
+      range: [1, 200],
+    },
+    color: {
+      legend: true,
+      domain: ["Human", "Natural", "Unknown"],
+      range: ["#4269D0", "#EFB118", "#FF725C"],
+    },
+    marks: [
+      geo(provincesPolygons, {
+        stroke: "lightgray",
+        fill: "whitesmoke",
+      }),
+      spike(firesPoints, {
+        x: (d) => d.properties.lon,
+        y: (d) => d.properties.lat,
+        length: (d) => d.properties.hectares,
+        stroke: (d) => d.properties.cause,
+        fillOpacity: 1,
+        fill: (d) => {
+          if (d.properties.cause === "Human") {
+            return "#b5caff";
+          } else if (d.properties.cause === "Natural") {
+            return "#ffe6a8";
+          } else {
+            return "#ffb9ad";
+          }
+        },
+      }),
+      tip(
+        firesPoints,
+        pointer({
+          x: "lon",
+          y: "lat",
+          title: (d) =>
+            `Cause: ${d.properties.cause}\nHectares: ${
+              formatNumber(d.properties.hectares, {
+                suffix: " ha",
+              })
+            }`,
+          fontSize: 12,
+        }),
+      ),
+    ],
+  });
+}
+```
+![A screenshot showing our final Observable Plot map.](/assets/web-basics/svelte/map-final.png)
+
+Just to make sure that our changes don't break our code with SDA, you can stop your terminal (`CTRL` + `C`) and run `deno task sda`. You should see your table in your terminal and the map of the whole country saved as a PNG!
 
 ## Conclusion
 
