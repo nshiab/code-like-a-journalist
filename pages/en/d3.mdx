@@ -1,0 +1,101 @@
+---
+title: Animated charts and maps with D3.js 🧑‍🎨
+description: In this project, we use earthquake data to build animated scatterplot and map with d3.js
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+
+# Animated charts and maps with D3.js 🧑‍🎨
+
+[D3.js](https://d3js.org/) is the most famous data visualization library, and for a good reason: it's a very cleverly made collection of functions and methods that allow you to create totally customizable data visualization on the Web. It's also exceptionnaly good to create maps. It's been created around 2011 by [Mick Bostock](https://github.com/mbostock) and other computer scientists. Most recently, [Philippe Rivière](https://github.com/fil) became one of the main maintainers and contributors.
+
+In previous lesson, we used the [Plot library](https://observablehq.com/plot/) for our visualizations. Under the hood, Plot uses...D3! And it's mainly maintained by Bostock and Rivière! Suprise! 😁 Plot is so good that I find myself using it most of the time for my dataviz needs. But when I want to create something very customized, especially with animations, D3 is still my go-to.
+
+In this project, we will use earthquake data to create animated scatterplot and map with D3 and Svelte. I strongly suggest you complete the previous sections of the course before diving in. I am taking for granted that you have installed Deno and VS Code with Deno and Svelte extensions, as shown in previous lessons.
+
+<NoticeIntro />
+
+## Setup
+
+We will use [setup-sda](https://github.com/nshiab/setup-sda) to setup and install everything we need.
+
+Open a new folder with VS Code and run `deno -A jsr:@nshiab/setup-sda --svelte`.
+
+![A screenshot of VS Code after running the setup-sda library.](/assets/d3/setup.png)
+
+## Earthquake data
+
+To retrieve earthquake data, I used the [USGS Earthquake Catalog](https://earthquake.usgs.gov/earthquakes/search/). Since 2021 appeared to be a very active year, I downloaded two csv files for this year and pushed the files to GitHub.
+
+Using the Simple Data Analysis library in the `sda` folder, we can easily retrieve them and cache them.
+
+```ts showLineNumbers filename="sda/main.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const earthquakes = sdb.newTable("earthquakes");
+await earthquakes.cache(async () => {
+  await earthquakes.loadData([
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-1.csv",
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-2.csv",
+  ]);
+});
+
+await earthquakes.logTable();
+
+await sdb.done();
+```
+
+![A screenshot of VS Code after running the Simple Data Analysis library.](/assets/d3/retrieve-earthquakes.png)
+
+As you can see, there are over 28 thousands earthquakes in our data and many columns. We could filter it and keep only what we are interested in:
+- We only want `earthquake` in the `type` column and `reviewed` in the `status` column
+- We filter to only have earthquakes of magnitude of 5 or more.
+- We rename `latitude` and `longitude` columns to shorter names.
+- We keep only the `time`, `lat`, `lon`, `depth`and `mag` columns.
+- We round the numerical values to 3 decimals.
+- Because it makes more sense, we make the `depth` values negative
+- And finally we remove duplicates, just in case.
+
+```ts showLineNumbers filename="sda/main.ts" {13-31}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const earthquakes = sdb.newTable("earthquakes");
+await earthquakes.cache(async () => {
+  await earthquakes.loadData([
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-1.csv",
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-2.csv",
+  ]);
+});
+
+await earthquakes.sort({ time: "asc" });
+await earthquakes.keep({
+  "type": "earthquake",
+  "status": "reviewed",
+});
+await earthquakes.filter(`mag >= 5`);
+await earthquakes.renameColumns({ latitude: "lat", longitude: "lon" });
+await earthquakes.selectColumns([
+  "time",
+  "lat",
+  "lon",
+  "depth",
+  "mag",
+]);
+await earthquakes.round(["lat", "lon", "depth", "mag"], {
+  decimals: 3,
+});
+await earthquakes.updateColumn("depth", `depth * -1`);
+await earthquakes.removeDuplicates();
+await earthquakes.logTable();
+
+await sdb.done();
+```
+
+![The cleaned earthquake data in VS Code terminal.](/assets/d3/filter-and-clean.png)
+
+<NoticeEnd />
