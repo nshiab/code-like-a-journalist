@@ -1,6 +1,6 @@
 ---
 title: Animated charts and maps with D3.js 🧑‍🎨
-description: In this project, we use earthquake data to build animated scatterplot and map with d3.js
+description: In this project, we use earthquake data to build animated scatterplot and map with D3.js
 ---
 
 import { Callout } from "nextra/components";
@@ -8,7 +8,7 @@ import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
 
 # Animated charts and maps with D3.js 🧑‍🎨
 
-[D3.js](https://d3js.org/) is the most famous data visualization library, and for a good reason: it's a very cleverly made collection of functions and methods that allow you to create totally customizable data visualization on the Web. It's also exceptionnaly good to create maps. It's been created around 2011 by [Mick Bostock](https://github.com/mbostock) and other computer scientists. Most recently, [Philippe Rivière](https://github.com/fil) became one of the main maintainers and contributors.
+[D3.js](https://d3js.org/) is the most famous data visualization library, and for a good reason: it's a very cleverly made collection of functions and methods that allow you to create totally customizable data visualization on the Web as [SVG images](https://www.w3schools.com/graphics/svg_intro.asp). D3 is also exceptionnaly good to create maps. It's been created around 2011 by [Mick Bostock](https://github.com/mbostock) and other computer scientists. Most recently, [Philippe Rivière](https://github.com/fil) became one of the main maintainers and contributors.
 
 In previous lesson, we used the [Plot library](https://observablehq.com/plot/) for our visualizations. Under the hood, Plot uses...D3! And it's mainly maintained by Bostock and Rivière! Suprise! 😁 Plot is so good that I find myself using it most of the time for my dataviz needs. But when I want to create something very customized, especially with animations, D3 is still my go-to.
 
@@ -52,12 +52,14 @@ await sdb.done();
 
 As you can see, there are over 28 thousands earthquakes in our data and many columns. We could filter it and keep only what we are interested in:
 - We only want `earthquake` in the `type` column and `reviewed` in the `status` column
-- We filter to only have earthquakes of magnitude of 5 or more.
+- We filter to only have earthquakes that could actually be noticed by people, with a magnitude of 5 or more.
 - We rename `latitude` and `longitude` columns to shorter names.
 - We keep only the `time`, `lat`, `lon`, `depth`and `mag` columns.
 - We round the numerical values to 3 decimals.
 - Because it makes more sense, we make the `depth` values negative
-- And finally we remove duplicates, just in case.
+- And finally we remove duplicates.
+
+We end up with around 2 thousand earthquakes.
 
 ```ts showLineNumbers filename="sda/main.ts" {13-31}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -97,5 +99,749 @@ await sdb.done();
 ```
 
 ![The cleaned earthquake data in VS Code terminal.](/assets/d3/filter-and-clean.png)
+
+## Exploratory dataviz
+
+Before diving into customized data visualizations, it's important to first explore the data a little bit. We can use the `writeChart` and `writeMap` with Plot to draw a first few charts quickly and have a sense of what we are working with:
+- `sda/output/earthquakes-lat-lon.png` shows us where most earthquakes happen, along the earthquake faults. All coordinates seem good.
+- With `sda/output/earthquakes-time-mag.png`, we can clearly see the most powerful earthquakes. The three above an 8 magnitude match the Wikipedia [List of earthquakes in 2021](https://en.wikipedia.org/wiki/List_of_earthquakes_in_2021).
+- `sda/output/earthquakes-mag-depth.png` hints that most earthquakes happen above a 250 km depth. The four most powerful ones were actually close to the surface.
+
+
+```ts showLineNumbers filename="sda/main.ts" {2, 34-70}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { dot, plot } from "@observablehq/plot";
+
+const sdb = new SimpleDB();
+
+const earthquakes = sdb.newTable("earthquakes");
+await earthquakes.cache(async () => {
+  await earthquakes.loadData([
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-1.csv",
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-2.csv",
+  ]);
+});
+
+await earthquakes.sort({ time: "asc" });
+await earthquakes.keep({
+  "type": "earthquake",
+  "status": "reviewed",
+});
+await earthquakes.filter(`mag >= 5`);
+await earthquakes.renameColumns({ latitude: "lat", longitude: "lon" });
+await earthquakes.selectColumns([
+  "time",
+  "lat",
+  "lon",
+  "depth",
+  "mag",
+]);
+await earthquakes.round(["lat", "lon", "depth", "mag"], {
+  decimals: 3,
+});
+await earthquakes.updateColumn("depth", `depth * -1`);
+await earthquakes.removeDuplicates();
+await earthquakes.logTable();
+await earthquakes.writeChart(
+  (data) =>
+    plot({
+      marks: [
+        dot(data, {
+          x: "lon",
+          y: "lat",
+        }),
+      ],
+    }),
+  "sda/output/earthquakes-lat-lon.png",
+);
+await earthquakes.writeChart(
+  (data) =>
+    plot({
+      marks: [
+        dot(data, {
+          x: "time",
+          y: "mag",
+        }),
+      ],
+    }),
+  "sda/output/earthquakes-time-mag.png",
+);
+await earthquakes.writeChart(
+  (data) =>
+    plot({
+      y: { labelArrow: "down" },
+      marks: [
+        dot(data, {
+          x: "mag",
+          y: "depth",
+        }),
+      ],
+    }),
+  "sda/output/earthquakes-mag-depth.png",
+);
+
+await sdb.done();
+```
+![Three charts rendered with Simple Data Analysis and Plot in VS Code.](/assets/d3/exploratory-charts.png)
+<Callout type="info" emoji="💡">
+   To open two tabs one on top of the other, right-click on the tab you want at the bottom and click on `Split down`. You can also `Split left`, `Split right`, or `Split top`. You can also drag and drop a tab on another screen, if you have more than one.
+</Callout>
+
+## Writing data for the web
+
+Since our data looks good, we can now write our data to a JSON file that Svelte and any web browser will be able to handle. We just need to add one line with the `writeData` method and make sure to write the file to the `src` folder (instead of `sda`, where we've been working so far).
+
+If you remember the previous lessons, `writeData` creates an array of objects. This exactly what D3 needs. 😉
+
+Note that JSON files can't store `Date` objects, so our dates have been serialized. They are saved as strings following the [ISO 8601 format](https://en.wikipedia.org/wiki/ISO_8601). They will be easy to convert back to dates.
+
+```ts showLineNumbers filename="sda/main.ts" {71}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { dot, plot } from "@observablehq/plot";
+
+const sdb = new SimpleDB();
+
+const earthquakes = sdb.newTable("earthquakes");
+await earthquakes.cache(async () => {
+  await earthquakes.loadData([
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-1.csv",
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-2.csv",
+  ]);
+});
+
+await earthquakes.sort({ time: "asc" });
+await earthquakes.keep({
+  "type": "earthquake",
+  "status": "reviewed",
+});
+await earthquakes.filter(`mag >= 5`);
+await earthquakes.renameColumns({ latitude: "lat", longitude: "lon" });
+await earthquakes.selectColumns([
+  "time",
+  "lat",
+  "lon",
+  "depth",
+  "mag",
+]);
+await earthquakes.round(["lat", "lon", "depth", "mag"], {
+  decimals: 3,
+});
+await earthquakes.updateColumn("depth", `depth * -1`);
+await earthquakes.removeDuplicates();
+await earthquakes.logTable();
+await earthquakes.writeChart(
+  (data) =>
+    plot({
+      marks: [
+        dot(data, {
+          x: "lon",
+          y: "lat",
+        }),
+      ],
+    }),
+  "sda/output/earthquakes-lat-lon.png",
+);
+await earthquakes.writeChart(
+  (data) =>
+    plot({
+      marks: [
+        dot(data, {
+          x: "time",
+          y: "mag",
+        }),
+      ],
+    }),
+  "sda/output/earthquakes-time-mag.png",
+);
+await earthquakes.writeChart(
+  (data) =>
+    plot({
+      y: { labelArrow: "down" },
+      marks: [
+        dot(data, {
+          x: "mag",
+          y: "depth",
+        }),
+      ],
+    }),
+  "sda/output/earthquakes-mag-depth.png",
+);
+await earthquakes.writeData("src/data/earthquakes.json");
+
+await sdb.done();
+```
+![A JSON file written by the Simple Data Analysis library.](/assets/d3/serialized-dates.png)
+
+## Scatterplot with D3
+
+### Chart component
+
+Let's set up a new Svelte component with a helper function for our scatter plot.
+
+But before we do, it's always helpful to set some types that we will use over and over again. In `src/lib/index.ts`, we can put types and variables that will be easily accessible throught out our Svelte project.
+
+We can create `earthquake` and `variable` types, and export them. They'll be very handy going forward.
+
+```ts showLineNumbers filename="src/lib/index.ts"
+type earthquake = {
+  time: Date;
+  lat: number;
+  lon: number;
+  depth: number;
+  mag: number;
+};
+
+type variable = keyof earthquake;
+
+export type { earthquake, variable };
+```
+
+Now let's create the helper function `drawChart.ts`. It's where our D3 code with live. This function will need a few things:
+- An `id`, which will be the `id` of the `svg` element in which we will draw our chart. More about `svg` below.
+- The `earthquakes` data.
+- The `x`, `y`, and `r` (radius of our dots) variables.
+- The `width` and `height` for the chart.
+
+For now, let's just log the parameters.
+
+Note that since we used the `src/lib/index.ts`, we can easily import our types (and anything else we want) with `from $lib`. It's a handy short cut!
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts"
+import type { earthquake, variable } from "$lib";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  console.log({ id, earthquakes, x, y, r, width, height });
+}
+```
+
+We can now create a new `Chart.svelte` component that:
+- Imports our `earthquakes.json` data as `earthquakesRaw` (line 3) and map over it to convert the `time` values back to `Date` objects (lines 13-16).
+- Retrieves the `id`, `x`, `y` and `r` as `props` (lines 6-11).
+- Creates a `width` and `height` states (lines 18-19) and binds them to the `clientWidth` and `clientHeight` of the `svg` element in which we will draw our chart (line 26). We will talk more about `svg` elements later on.
+- Uses the `$effect` rune to call `drawChart` with the all the props and states. This means Svelte will recall `drawChart` if any of the arguments changes, including the width and height, making the chart responsive.
+- Sets a `margin-top`, `width`, and `height` for the `svg` between the `style` tags.
+
+```svelte showLineNumbers filename="src/components/Chart.svelte"
+<script lang="ts">
+    import type { variable } from "$lib";
+    import earthquakesRaw from "../data/earthquakes.json";
+    import drawChart from "../helpers/drawChart";
+
+    const { id, x, y, r }: {
+      id: string;
+      x: variable;
+      y: variable;
+      r: variable
+    } = $props();
+
+    const earthquakes = earthquakesRaw.map((d) => ({
+        ...d,
+        time: new Date(d.time),
+    }));
+
+    let width = $state(0);
+    let height = $state(0);
+
+    $effect(() => {
+        drawChart(id, earthquakes, x, y, r, width, height);
+    });
+</script>
+
+<svg {id} bind:clientWidth={width} bind:clientHeight={height}></svg>
+
+<style>
+    svg {
+        margin-top: 2rem;
+        width: 100%;
+        height: 400px;
+    }
+</style>
+```
+
+And finally, we can import our new component `<Chart />` on our page, which is `src/routes/+page.svelte`. We set appropriate `id`, `x`, `y` and `r` props. To start, let's draw a chart of earthquakes and their magnitude over time. While at it, we add titles and a bit of text.
+
+If you were still watching `sda/main.ts`, you can stop (`CTRL` + `C`) and run `deno task dev` instead to start a local server. Open the URL given to you in your terminal in your favorite web browser.
+
+In your web browser console, you should see the log from `drawChart.ts`. We are ready to code our chart!
+
+```svelte showLineNumbers filename="src/routes/+page.svelte"
+<script lang="ts">
+    import Chart from "../components/Chart.svelte";
+</script>
+
+<h1>Earthquakes</h1>
+<p>
+    The data used below includes only earthquakes with a magnitude of 5 or more
+    that occurred in 2021.
+</p>
+
+<h2>Scatter plot</h2>
+<Chart id="scatterplot" x="time" y="mag" r="mag" />
+```
+
+![VS Code and Code with a Svelte project running locally .](/assets/d3/chart-component.png)
+
+### Drawing with D3
+
+All of this setup might seem complicated... But there is actually a lot of value to compartimenting your code. When each file is focused on doing one thing, it's easier to debug. There is less repetition in your code base. Also, small pieces of code doing a few things are easier to rework than one very big file doing everything. This will be particularly obvious when we will be add animations.
+
+But we've waited long enough! Let's play with D3 now!
+
+Stop your local server (`CTRL` + `C`) and install D3 with `deno add npm:d3`. Then rerun your local server with `deno task dev`.
+
+Let's start slowly by drawing one big blue circle in our svg with our `drawChart` function. In the code below D3:
+- Selects the `svg` element with the `id`
+- Appends a `circle` to the `svg`
+- Specifies several attribute for the circle by chaining.
+- `cx` and `cy` are the coordinates of the center of the circle. We place it at the center of the `svg` by using `width/2` and `height/2`
+- `r` is the circle radius. Here, it's 50 pixels.
+- `fill` is the color inside the circle. Here, it's blue.
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts" {2, 13-19}
+import type { earthquake, variable } from "$lib";
+import { select } from "d3";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+
+  svg.append("circle")
+    .attr("cx", width / 2)
+    .attr("cy", height / 2)
+    .attr("r", 50)
+    .attr("fill", "blue");
+}
+```
+
+If you right click on your blue circle and inspect it in your browser, you'll see your `svg` with the `circle` added to the code of your page. This is how you draw SVG elements with D3: by telling it exactly what you want and where.
+
+![Some D3 code creating a blue circle rendered in Google Chrome.](/assets/d3/blue-circle.png)
+
+Now, this is not tied to any data. And we have more than two thousand earthquakes. How can we plot all of them?
+
+First, we need scales to convert the earthquakes values to pixels, radiuses and colors. D3 scales ([there are a lot of them](https://d3js.org/d3-scale)) need two things: a domain and a range.
+
+For example, in the code below, we use the `extent` function to retrieve the minimum and maximum value of `x` values. This function returns an array like this `[min, max]`. Just in case you don't remember, `x` is set as `time` in `src/routes/+page.svelte`.
+
+Then we create a `scaleTime` (since `x` contains dates) with:
+- the min and max times values as domain
+- `[0 , width]` as the range.
+
+Now, the scale is able to map `Date` objects to pixel values. Instead of `width/2` for `cx`, we can now use a date in 2021! `xScale` will automatically convert it to the appropriate number of pixels and the circle will be placed accordingly.
+
+Change the month and day of the date to see it in action!
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts" {2, 15-16} /xScale(new Date("2021-06-01T00:00:00Z"))/
+import type { earthquake, variable } from "$lib";
+import { extent, scaleTime, select } from "d3";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+
+  const xDomain = extent(earthquakes, (d: earthquake) => d[x]);
+  const xScale = scaleTime().domain(xDomain).range([0, width]);
+
+  svg.append("circle")
+    .attr("cx", xScale(new Date("2021-06-01T00:00:00Z")))
+    .attr("cy", height / 2)
+    .attr("r", 50)
+    .attr("fill", "blue");
+}
+```
+
+We can do the same thing for `y` (which is set to `mag` right now) and `cy` with a `scaleLinear`.
+
+Again, change the magnitude value in line 22 to see the `yScale` in action. Remember that magnitude goes from 5 to 8 in our data.
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts" {2, 18-19} /yScale(7)/
+import type { earthquake, variable } from "$lib";
+import { extent, scaleLinear, scaleTime, select } from "d3";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+
+  const xDomain = extent(earthquakes, (d: earthquake) => d[x]);
+  const xScale = scaleTime().domain(xDomain).range([0, width]);
+
+  const yDomain = extent(earthquakes, (d: earthquake) => d[y]);
+  const yScale = scaleLinear().domain(yDomain).range([height, 0]);
+
+  svg.append("circle")
+    .attr("cx", xScale(new Date("2021-06-01T00:00:00Z")))
+    .attr("cy", yScale(7))
+    .attr("r", 50)
+    .attr("fill", "blue");
+}
+```
+
+We can also add a scale for the `r` attribute, this time with a square root scale (`scaleSqrt`) because we want the area of the circle to be proportionnal to the data.
+
+And let's add another scale for the color which could be tied to the `rDomain` too.
+
+Yes, I know: D3 scales are amazing! And since there are just functions, you can use them for anything you want, D3 charts or not!
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts" {2, 21-23} /rScale(7)/ /fillScale(7)/
+import type { earthquake, variable } from "$lib";
+import { extent, scaleLinear, scaleSqrt, scaleTime, select } from "d3";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+
+  const xDomain = extent(earthquakes, (d: earthquake) => d[x]);
+  const xScale = scaleTime().domain(xDomain).range([0, width]);
+
+  const yDomain = extent(earthquakes, (d: earthquake) => d[y]);
+  const yScale = scaleLinear().domain(yDomain).range([height, 0]);
+
+  const rDomain = extent(earthquakes, (d: earthquake) => d[r]);
+  const rScale = scaleSqrt().domain(rDomain).range([0, 20]);
+  const fillScale = scaleLinear().domain(rDomain).range(["yellow", "red"]);
+
+  svg.append("circle")
+    .attr("cx", xScale(new Date("2021-06-01T00:00:00Z")))
+    .attr("cy", yScale(7))
+    .attr("r", rScale(7))
+    .attr("fill", fillScale(7));
+}
+```
+
+Now that we have scale, we can harness D3 to its fullest! Instead of append just one circle, let's bind SVG elements to our data!
+
+Here's a step by step explanation of the new code below:
+- First, we select all circles in the SVG (line 25). At the first render, there is none and that's okay.
+- Then we bind the data (line 26). Here, we have over 2,000+ earthquakes. So this tells D3 "Hey, I will ask to you to draw something 2,000+ times".
+- We join the data to SVG elements (line 27). Here, for each earthquake, we will draw a `circle`.
+- Now we can use functions to tell D3 what we want for each attributes. Here, we are using `x`, `y` and `r` with the appropriate scales.
+
+Since we have overlapping earthquakes, I've also set the `opacity` to `0.5`.
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts" {25-32}
+import type { earthquake, variable } from "$lib";
+import { extent, scaleLinear, scaleSqrt, scaleTime, select } from "d3";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+
+  const xDomain = extent(earthquakes, (d: earthquake) => d[x]);
+  const xScale = scaleTime().domain(xDomain).range([0, width]);
+
+  const yDomain = extent(earthquakes, (d: earthquake) => d[y]);
+  const yScale = scaleLinear().domain(yDomain).range([height, 0]);
+
+  const rDomain = extent(earthquakes, (d: earthquake) => d[r]);
+  const rScale = scaleSqrt().domain(rDomain).range([0, 20]);
+  const fillScale = scaleLinear().domain(rDomain).range(["yellow", "red"]);
+
+  svg.selectAll("circle")
+    .data(earthquakes)
+    .join("circle")
+    .attr("cx", (d: earthquake) => xScale(d[x]))
+    .attr("cy", (d: earthquake) => yScale(d[y]))
+    .attr("r", (d: earthquake) => rScale(d[r]))
+    .attr("fill", (d: earthquake) => fillScale(d[r]))
+    .attr("opacity", 0.5);
+}
+```
+
+And look at that! You now have all of your earthquakes added to your `svg`! And if you inspect a circle and check its `Properties`, you'll see this earthquake data! It's really *binded* to the SVG element.
+
+![Drawing two thousands circles in a SVG element with D3.](/assets/d3/join-data.png)
+
+### Axis
+
+We drew our earthquakes but it would be great to add `x` and `y` axis. To make sure we have enough room for them, we also need margins.
+
+Let's create a `margins` object to add margins to our scales and to translate our axis to their right position.
+
+To actually draw axis, we can use the `axisLeft` and `axisBottom` functions with our scales. We usually put them in a `g` element (which stands for *group*) to easily identify them (with a `class` or `id`) or move them, if needed.
+
+D3 axis are quite clever and will try to automatically create tick labels that make sense. Here, since we used a `scaleTime` for the `axisBottom`, and its domain is just in 2021, the function shows 2021 at the beginning and then just months. However, to avoid overlapping months, I set the number of ticks to 3.
+
+Also, to avoid redrawing axis over and over again when a prop or state changes (like when we resize the window), I gave them a `class` `axis` and use it to select and remove them, before drawing them again (line 55).
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts" {3-4, 23-28, 55-70}
+import type { earthquake, variable } from "$lib";
+import {
+  axisBottom,
+  axisLeft,
+  extent,
+  scaleLinear,
+  scaleSqrt,
+  scaleTime,
+  select,
+} from "d3";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+
+  const margins = {
+    top: 20,
+    right: 20,
+    bottom: 35,
+    left: 80,
+  };
+
+  const xDomain = extent(earthquakes, (d: earthquake) => d[x]);
+  const xScale = scaleTime().domain(xDomain).range([
+    margins.left,
+    width - margins.right,
+  ]);
+
+  const yDomain = extent(earthquakes, (d: earthquake) => d[y]);
+  const yScale = scaleLinear().domain(yDomain).range([
+    height - margins.bottom,
+    margins.top,
+  ]);
+
+  const rDomain = extent(earthquakes, (d: earthquake) => d[r]);
+  const rScale = scaleSqrt().domain(rDomain).range([0, 20]);
+  const fillScale = scaleLinear().domain(rDomain).range(["yellow", "red"]);
+
+  svg.selectAll("circle")
+    .data(earthquakes)
+    .join("circle")
+    .attr("cx", (d: earthquake) => xScale(d[x]))
+    .attr("cy", (d: earthquake) => yScale(d[y]))
+    .attr("r", (d: earthquake) => rScale(d[r]))
+    .attr("fill", (d: earthquake) => fillScale(d[r]))
+    .attr("opacity", 0.5);
+
+  svg.selectAll(".axis").remove();
+
+  svg
+    .append("g")
+    .attr("class", "axis")
+    .attr(
+      "transform",
+      `translate(0, ${height - margins.bottom})`,
+    )
+    .call(axisBottom(xScale).ticks(3));
+
+  svg
+    .append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(${margins.left}, 0)`)
+    .call(axisLeft(yScale));
+}
+```
+
+Finally, it would be great to add labels to the axis too. And maybe some inset to avoid circles overlapping with the axis.
+
+To have proper labels instead of the abreviations used in our data, I created an object `labels` that we can use for the text.
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts" {29, 73-94} /+ inset/ /- inset/
+import type { earthquake, variable } from "$lib";
+import {
+  axisBottom,
+  axisLeft,
+  extent,
+  scaleLinear,
+  scaleSqrt,
+  scaleTime,
+  select,
+} from "d3";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+
+  const margins = {
+    top: 20,
+    right: 20,
+    bottom: 35,
+    left: 80,
+  };
+  const inset = 10;
+
+  const xDomain = extent(earthquakes, (d: earthquake) => d[x]);
+  const xScale = scaleTime().domain(xDomain).range([
+    margins.left,
+    width - margins.right,
+  ]);
+
+  const yDomain = extent(earthquakes, (d: earthquake) => d[y]);
+  const yScale = scaleLinear().domain(yDomain).range([
+    height - margins.bottom,
+    margins.top,
+  ]);
+
+  const rDomain = extent(earthquakes, (d: earthquake) => d[r]);
+  const rScale = scaleSqrt().domain(rDomain).range([0, 20]);
+  const fillScale = scaleLinear().domain(rDomain).range(["yellow", "red"]);
+
+  svg.selectAll("circle")
+    .data(earthquakes)
+    .join("circle")
+    .attr("cx", (d: earthquake) => xScale(d[x]))
+    .attr("cy", (d: earthquake) => yScale(d[y]))
+    .attr("r", (d: earthquake) => rScale(d[r]))
+    .attr("fill", (d: earthquake) => fillScale(d[r]))
+    .attr("opacity", 0.5);
+
+  svg.selectAll(".axis").remove();
+
+  svg
+    .append("g")
+    .attr("class", "axis")
+    .attr(
+      "transform",
+      `translate(0, ${height - margins.bottom + inset})`,
+    )
+    .call(axisBottom(xScale).ticks(3));
+
+  svg
+    .append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(${margins.left - inset}, 0)`)
+    .call(axisLeft(yScale));
+
+  svg.selectAll(".labels").remove();
+
+  const labels: { [key: string]: string } = {
+    "time": "Time",
+    "mag": "Magnitude",
+  };
+
+  svg.append("text")
+    .attr("class", "labels")
+    .attr("x", width - margins.right)
+    .attr("y", height)
+    .attr("font-size", 12)
+    .attr("text-anchor", "end")
+    .text(`${labels[x]} →`);
+
+  svg.append("text")
+    .attr("class", "labels")
+    .attr("x", margins.left - inset / 2)
+    .attr("y", margins.top - inset)
+    .attr("font-size", 12)
+    .attr("text-anchor", "end")
+    .text(`${labels[y]} ↑`);
+}
+```
+
+This is looking quite good for a first D3 chart! And it's fully responsive! Try resizing your web browser and see the magic happend!
+
+![Drawing two thousands circles in a SVG element with D3.](/assets/d3/scatter-plot.png)
+
+### Animations
+
+Our chart is great, but let's be honest: we could create the same thing way faster and easily with Plot...
+
+However, there is one thing that Plot can't do easily: animations.
+
+Let's update our `src/routes/+pages.svelte` to give the user two choices of charts. We can use the pre-coded `<Radio />` components, which creates radio buttons, and we can `bind` the `chartType` to the selected option.
+
+Depending on the `chartType` state, we can update newly created `x` and `y` states, which are then passed to our `<Chart />` component.
+
+```svelte showLineNumbers filename="src/routes/+pages.svelte" {2, 4, 8-9, 11-19, 29-33} /{x}/ /{y}/
+<script lang="ts">
+    import type { variable } from "$lib";
+    import Chart from "../components/Chart.svelte";
+    import Radio from "../components/Radio.svelte";
+
+    let chartType = $state("Time/Magnitude");
+
+    let x = $state<variable>("time");
+    let y = $state<variable>("mag");
+
+    $effect(() => {
+        if (chartType === "Time/Magnitude") {
+            x = "time";
+            y = "mag";
+        } else {
+            x = "mag";
+            y = "depth";
+        }
+    });
+</script>
+
+<h1>Earthquakes</h1>
+<p>
+    The data used below includes only earthquakes with a magnitude of 5 or more
+    that occurred in 2021.
+</p>
+
+<h2>Scatter plot</h2>
+<Radio
+    bind:value={chartType}
+    values={["Time/Magnitude", "Magnitude/Depth"]}
+    label="Pick a chart:"
+/>
+<Chart id="scatterplot" {x} {y} r="mag" />
+```
+<Callout type="info" emoji="💡">
+   You might be wondering what the `<variable>` are on lines 8 and 9. Just as you can pass arguments to some functions, you can also pass types. This is the syntax for it. Here, it tells `$state` that the state it will create should be of type `variable`.
+</Callout>
+
+Now, each time we switch the chart type, our `<Chart />` component gets rerendered with new `x` and `y`, which are used by our `drawChart` function!
+
+![Radio buttons updating a D3 chart.](/assets/d3/chart-types.png)
+
+This is cool but it's not animated. Let rework `src/helpers/drawChat.ts` to create a smooth transition for the circles.
+
+## Conclusion
 
 <NoticeEnd />
