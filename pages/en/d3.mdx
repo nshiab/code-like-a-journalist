@@ -840,7 +840,527 @@ Now, each time we switch the chart type, our `<Chart />` component gets rerender
 
 ![Radio buttons updating a D3 chart.](/assets/d3/chart-types.png)
 
-This is cool but it's not animated. Let rework `src/helpers/drawChat.ts` to create a smooth transition for the circles.
+There is a few visual bugs that we can fix right away in `src/helpers/drawChart.ts`:
+- If `x` is `time`, we should use a `scaleTime`, but if it's `mag`, we should use `scaleLinear`.
+- If `x` is `time`, we can stick with 3 ticks, but if it's `mag`, we can let D3 decide.
+- We can add `Depth` to our `labels` object and change the direction of the y axis arrow if it's `depth`.
+- We can tweak `margins` and the labels positions to avoid cutting off our new text.
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts" {26-27, 32-38, 68, 81, 87, 98}
+import type { earthquake, variable } from "$lib";
+import {
+  axisBottom,
+  axisLeft,
+  extent,
+  scaleLinear,
+  scaleSqrt,
+  scaleTime,
+  select,
+} from "d3";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+
+  const margins = {
+    top: 20,
+    right: 20,
+    bottom: 45,
+    left: 85,
+  };
+  const inset = 10;
+
+  const xDomain = extent(earthquakes, (d: earthquake) => d[x]);
+  const xRange = [
+    margins.left,
+    width - margins.right,
+  ];
+  const xScale = x === "time"
+    ? scaleTime().domain(xDomain).range(xRange)
+    : scaleLinear().domain(xDomain).range(xRange);
+
+  const yDomain = extent(earthquakes, (d: earthquake) => d[y]);
+  const yScale = scaleLinear().domain(yDomain).range([
+    height - margins.bottom,
+    margins.top,
+  ]);
+
+  const rDomain = extent(earthquakes, (d: earthquake) => d[r]);
+  const rScale = scaleSqrt().domain(rDomain).range([0, 20]);
+  const fillScale = scaleLinear().domain(rDomain).range(["yellow", "red"]);
+
+  svg.selectAll("circle")
+    .data(earthquakes)
+    .join("circle")
+    .attr("cx", (d: earthquake) => xScale(d[x]))
+    .attr("cy", (d: earthquake) => yScale(d[y]))
+    .attr("r", (d: earthquake) => rScale(d[r]))
+    .attr("fill", (d: earthquake) => fillScale(d[r]))
+    .attr("opacity", 0.5);
+
+  svg.selectAll(".axis").remove();
+
+  svg
+    .append("g")
+    .attr("class", "axis")
+    .attr(
+      "transform",
+      `translate(0, ${height - margins.bottom + inset})`,
+    )
+    .call(x === "time" ? axisBottom(xScale).ticks(3) : axisBottom(xScale));
+
+  svg
+    .append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(${margins.left - inset}, 0)`)
+    .call(axisLeft(yScale));
+
+  svg.selectAll(".labels").remove();
+
+  const labels: { [key: string]: string } = {
+    "time": "Time",
+    "mag": "Magnitude",
+    "depth": "Depth (km)",
+  };
+
+  svg.append("text")
+    .attr("class", "labels")
+    .attr("x", width - margins.right)
+    .attr("y", height - 3)
+    .attr("font-size", 12)
+    .attr("text-anchor", "end")
+    .text(`${labels[x]} →`);
+
+  svg.append("text")
+    .attr("class", "labels")
+    .attr("x", margins.left - inset / 2)
+    .attr("y", margins.top - inset)
+    .attr("font-size", 12)
+    .attr("text-anchor", "end")
+    .text(y === "depth" ? `${labels[y]} ↓` : `${labels[y]} ↑`);
+}
+```
+![A scatter plot being redrawn with different variables](/assets/d3/no-animations.gif)
+
+This is cool but it's not animated. The chart just get being redrawned without any transitions. Let rework `src/helpers/drawChat.ts` to create a smooth transition for the circles.
+
+Creating animations with D3 is very easy. You first need to select the elements you want, call `.transition()` and then chain the attribute you want to change.
+
+In our case, we first need to check if we need to draw or to animate. To do that, we check if there is anything already in our `svg` (line 23). If there is nothing, it means we need to draw (lines 53-60). Otherwise, we want to animate the elements already there (lines 62-65).
+
+To animate, we select all the circles, call `.transition()` to tell D3 to interpolate between the current properties of the circles and the new ones right after. Here, we just update `cx` and `cy` with the new domain and range of `xScale` and `yScale`.
+
+Easy!
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts" {23, 52, 61-66}
+import type { earthquake, variable } from "$lib";
+import {
+  axisBottom,
+  axisLeft,
+  extent,
+  scaleLinear,
+  scaleSqrt,
+  scaleTime,
+  select,
+} from "d3";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+
+  const animate = svg.selectAll("*").nodes().length > 0;
+
+  const margins = {
+    top: 20,
+    right: 20,
+    bottom: 45,
+    left: 85,
+  };
+  const inset = 10;
+
+  const xDomain = extent(earthquakes, (d: earthquake) => d[x]);
+  const xRange = [
+    margins.left,
+    width - margins.right,
+  ];
+  const xScale = x === "time"
+    ? scaleTime().domain(xDomain).range(xRange)
+    : scaleLinear().domain(xDomain).range(xRange);
+
+  const yDomain = extent(earthquakes, (d: earthquake) => d[y]);
+  const yScale = scaleLinear().domain(yDomain).range([
+    height - margins.bottom,
+    margins.top,
+  ]);
+
+  const rDomain = extent(earthquakes, (d: earthquake) => d[r]);
+  const rScale = scaleSqrt().domain(rDomain).range([0, 20]);
+  const fillScale = scaleLinear().domain(rDomain).range(["yellow", "red"]);
+
+  if (!animate) {
+    svg.selectAll("circle")
+      .data(earthquakes)
+      .join("circle")
+      .attr("cx", (d: earthquake) => xScale(d[x]))
+      .attr("cy", (d: earthquake) => yScale(d[y]))
+      .attr("r", (d: earthquake) => rScale(d[r]))
+      .attr("fill", (d: earthquake) => fillScale(d[r]))
+      .attr("opacity", 0.5);
+  } else {
+    svg.selectAll("circle")
+      .transition()
+      .attr("cx", (d: earthquake) => xScale(d[x]))
+      .attr("cy", (d: earthquake) => yScale(d[y]));
+  }
+
+  svg.selectAll(".axis").remove();
+
+  svg
+    .append("g")
+    .attr("class", "axis")
+    .attr(
+      "transform",
+      `translate(0, ${height - margins.bottom + inset})`,
+    )
+    .call(x === "time" ? axisBottom(xScale).ticks(3) : axisBottom(xScale));
+
+  svg
+    .append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(${margins.left - inset}, 0)`)
+    .call(axisLeft(yScale));
+
+  svg.selectAll(".labels").remove();
+
+  const labels: { [key: string]: string } = {
+    "time": "Time",
+    "mag": "Magnitude",
+    "depth": "Depth (km)",
+  };
+
+  svg.append("text")
+    .attr("class", "labels")
+    .attr("x", width - margins.right)
+    .attr("y", height - 3)
+    .attr("font-size", 12)
+    .attr("text-anchor", "end")
+    .text(`${labels[x]} →`);
+
+  svg.append("text")
+    .attr("class", "labels")
+    .attr("x", margins.left - inset / 2)
+    .attr("y", margins.top - inset)
+    .attr("font-size", 12)
+    .attr("text-anchor", "end")
+    .text(y === "depth" ? `${labels[y]} ↓` : `${labels[y]} ↑`);
+}
+```
+
+But it you test the animation right now, it's not very interesting. It's too fast and all the dots are moving at the same time. We can fancy that up by passing a `duration`, an `ease` and a `delay`.
+
+![An basic animation of a scatter plot.](/assets/d3/basic-animation-scatter.gif)
+
+For the duration, I picked 1000 miliseconds. For the ease, I like the `easeCubicInOut` but you have a [lot of options](https://observablehq.com/@d3/easing-animations) with D3. And for the delay, I am just using the duration multiplied by a random number between 0 and 1. So each dot will have a different delay, between 0 and the chosen duration.
+
+Now, this feels more organic and enjoyable to watch!
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts" {5, 25, 66-68}
+import type { earthquake, variable } from "$lib";
+import {
+  axisBottom,
+  axisLeft,
+  easeCubicInOut,
+  extent,
+  scaleLinear,
+  scaleSqrt,
+  scaleTime,
+  select,
+} from "d3";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+
+  const animate = svg.selectAll("*").nodes().length > 0;
+  const duration = 1000;
+
+  const margins = {
+    top: 20,
+    right: 20,
+    bottom: 45,
+    left: 85,
+  };
+  const inset = 10;
+
+  const xDomain = extent(earthquakes, (d: earthquake) => d[x]);
+  const xRange = [
+    margins.left,
+    width - margins.right,
+  ];
+  const xScale = x === "time"
+    ? scaleTime().domain(xDomain).range(xRange)
+    : scaleLinear().domain(xDomain).range(xRange);
+
+  const yDomain = extent(earthquakes, (d: earthquake) => d[y]);
+  const yScale = scaleLinear().domain(yDomain).range([
+    height - margins.bottom,
+    margins.top,
+  ]);
+
+  const rDomain = extent(earthquakes, (d: earthquake) => d[r]);
+  const rScale = scaleSqrt().domain(rDomain).range([0, 20]);
+  const fillScale = scaleLinear().domain(rDomain).range(["yellow", "red"]);
+
+  if (!animate) {
+    svg.selectAll("circle")
+      .data(earthquakes)
+      .join("circle")
+      .attr("cx", (d: earthquake) => xScale(d[x]))
+      .attr("cy", (d: earthquake) => yScale(d[y]))
+      .attr("r", (d: earthquake) => rScale(d[r]))
+      .attr("fill", (d: earthquake) => fillScale(d[r]))
+      .attr("opacity", 0.5);
+  } else {
+    svg.selectAll("circle")
+      .transition()
+      .duration(duration)
+      .ease(easeCubicInOut)
+      .delay(() => Math.random() * duration)
+      .attr("cx", (d: earthquake) => xScale(d[x]))
+      .attr("cy", (d: earthquake) => yScale(d[y]));
+  }
+
+  svg.selectAll(".axis").remove();
+
+  svg
+    .append("g")
+    .attr("class", "axis")
+    .attr(
+      "transform",
+      `translate(0, ${height - margins.bottom + inset})`,
+    )
+    .call(x === "time" ? axisBottom(xScale).ticks(3) : axisBottom(xScale));
+
+  svg
+    .append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(${margins.left - inset}, 0)`)
+    .call(axisLeft(yScale));
+
+  svg.selectAll(".labels").remove();
+
+  const labels: { [key: string]: string } = {
+    "time": "Time",
+    "mag": "Magnitude",
+    "depth": "Depth (km)",
+  };
+
+  svg.append("text")
+    .attr("class", "labels")
+    .attr("x", width - margins.right)
+    .attr("y", height - 3)
+    .attr("font-size", 12)
+    .attr("text-anchor", "end")
+    .text(`${labels[x]} →`);
+
+  svg.append("text")
+    .attr("class", "labels")
+    .attr("x", margins.left - inset / 2)
+    .attr("y", margins.top - inset)
+    .attr("font-size", 12)
+    .attr("text-anchor", "end")
+    .text(y === "depth" ? `${labels[y]} ↓` : `${labels[y]} ↑`);
+}
+```
+
+We could also animate axis and labels.
+
+For the x axis, since it's updating from dates to numbers and vice versa, there is no nice way of switching values like we do with the y axis. So instead, I chained transitions to make it fade, update, and then come back. It's the same trick for the text labels.
+
+Also, note that we don't need to remove the axis or the labels anymore, since we are updating them now.
+
+```ts showLineNumbers filename="src/helpers/drawChart.ts" {73, 76, 82-94, 96, 102-106, 114, 130-154}
+import type { earthquake, variable } from "$lib";
+import {
+  axisBottom,
+  axisLeft,
+  easeCubicInOut,
+  extent,
+  scaleLinear,
+  scaleSqrt,
+  scaleTime,
+  select,
+} from "d3";
+
+export default function drawChart(
+  id: string,
+  earthquakes: earthquake[],
+  x: variable,
+  y: variable,
+  r: variable,
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+
+  const animate = svg.selectAll("*").nodes().length > 0;
+  const duration = 1000;
+
+  const margins = {
+    top: 20,
+    right: 20,
+    bottom: 45,
+    left: 85,
+  };
+  const inset = 10;
+
+  const xDomain = extent(earthquakes, (d: earthquake) => d[x]);
+  const xRange = [
+    margins.left,
+    width - margins.right,
+  ];
+  const xScale = x === "time"
+    ? scaleTime().domain(xDomain).range(xRange)
+    : scaleLinear().domain(xDomain).range(xRange);
+
+  const yDomain = extent(earthquakes, (d: earthquake) => d[y]);
+  const yScale = scaleLinear().domain(yDomain).range([
+    height - margins.bottom,
+    margins.top,
+  ]);
+
+  const rDomain = extent(earthquakes, (d: earthquake) => d[r]);
+  const rScale = scaleSqrt().domain(rDomain).range([0, 20]);
+  const fillScale = scaleLinear().domain(rDomain).range(["yellow", "red"]);
+
+  if (!animate) {
+    svg.selectAll("circle")
+      .data(earthquakes)
+      .join("circle")
+      .attr("cx", (d: earthquake) => xScale(d[x]))
+      .attr("cy", (d: earthquake) => yScale(d[y]))
+      .attr("r", (d: earthquake) => rScale(d[r]))
+      .attr("fill", (d: earthquake) => fillScale(d[r]))
+      .attr("opacity", 0.5);
+  } else {
+    svg.selectAll("circle")
+      .transition()
+      .duration(duration)
+      .ease(easeCubicInOut)
+      .delay(() => Math.random() * duration)
+      .attr("cx", (d: earthquake) => xScale(d[x]))
+      .attr("cy", (d: earthquake) => yScale(d[y]));
+  }
+
+  if (!animate) {
+    svg
+      .append("g")
+      .attr("id", "x-axis")
+      .attr(
+        "transform",
+        `translate(0, ${height - margins.bottom + inset})`,
+      )
+      .call(x === "time" ? axisBottom(xScale).ticks(3) : axisBottom(xScale));
+  } else {
+    svg.select("#x-axis")
+      .attr("opacity", 1)
+      .transition()
+      .duration(duration / 2)
+      .attr("opacity", 0)
+      .transition()
+      .duration(0)
+      .call(x === "time" ? axisBottom(xScale).ticks(3) : axisBottom(xScale))
+      .transition()
+      .duration(duration / 2)
+      .attr("opacity", 1);
+  }
+
+  if (!animate) {
+    svg
+      .append("g")
+      .attr("id", "y-axis")
+      .attr("transform", `translate(${margins.left - inset}, 0)`)
+      .call(axisLeft(yScale));
+  } else {
+    svg.select("#y-axis")
+      .transition()
+      .duration(duration).call(axisLeft(yScale));
+  }
+
+  const labels: { [key: string]: string } = {
+    "time": "Time",
+    "mag": "Magnitude",
+    "depth": "Depth (km)",
+  };
+
+  if (!animate) {
+    svg.append("text")
+      .attr("id", "label-x")
+      .attr("x", width - margins.right)
+      .attr("y", height - 3)
+      .attr("font-size", 12)
+      .attr("text-anchor", "end")
+      .text(`${labels[x]} →`);
+
+    svg.append("text")
+      .attr("class", "label-y")
+      .attr("x", margins.left - inset / 2)
+      .attr("y", margins.top - inset)
+      .attr("font-size", 12)
+      .attr("text-anchor", "end")
+      .text(y === "depth" ? `${labels[y]} ↓` : `${labels[y]} ↑`);
+  } else {
+    svg.select("#label-x")
+      .attr("opacity", 1)
+      .transition()
+      .duration(duration / 2)
+      .attr("opacity", 0)
+      .transition()
+      .duration(0)
+      .text(`${labels[x]} →`)
+      .transition()
+      .duration(duration / 2)
+      .attr("opacity", 1);
+
+    svg.select("#label-y")
+      .attr("opacity", 1)
+      .transition()
+      .duration(duration / 2)
+      .attr("opacity", 0)
+      .transition()
+      .duration(0)
+      .text(y === "depth" ? `${labels[y]} ↓` : `${labels[y]} ↑`)
+      .transition()
+      .duration(duration / 2)
+      .attr("opacity", 1);
+  }
+}
+```
+
+Sooo smoooooth! And beautiful! We could keep iterating on this chart to improve even more but I think we've done already a lot! Congratulations! You now know how to create an animate D3 charts! You can be proud!
+
+![An animated scatter plot.](/assets/d3/final-animation-scatter.gif)
 
 ## Conclusion
 
