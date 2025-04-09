@@ -9,7 +9,7 @@ export default {
     "stats-can-census": "Wrangling Census data 🇨🇦",
     "one-billion-row-challenge": "One billion row challenge 😱",
     "web-basics": "4. Web basics 🌐",
-    "d3": "Charts & maps with D3 🧑‍🎨",
+    "d3-chart": "Animated charts with D3 🧑‍🎨",
     "ninja-moves": "Ninja moves 🥷",
     inspirations: "Inspiring people & content 📚",
     "more": "More to come...",
