@@ -1,36 +1,37 @@
 ---
-title: Animated charts with D3.js 🧑‍🎨
-description: In this project, we use earthquake data to build an animated scatterplot with D3.js
+title: Graphiques animés avec D3.js 🧑‍🎨
+description: Dans ce projet, nous utilisons des données sur les tremblements de terre pour créer un nuage de points animé avec D3.js
 ---
 
 import { Callout } from "nextra/components";
 import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
 
-# Animated charts with D3.js 🧑‍🎨
+# Graphiques animés avec D3.js 🧑‍🎨
 
-[D3.js](https://d3js.org/) is the most famous data visualization library, and for good reason: it's a cleverly designed collection of functions and methods that allow you to create fully customizable data visualizations on the Web as [SVG images](https://www.w3schools.com/graphics/svg_intro.asp). It was created around 2011 by [Mike Bostock](https://github.com/mbostock) and other computer scientists. More recently, [Philippe Rivière](https://github.com/fil) became one of the main maintainers and contributors.
+[D3.js](https://d3js.org/) est la librairie de visualisation de données la plus célèbre, et pour une bonne raison : c’est une collection ingénieusement conçue de fonctions et de méthodes qui permettent de créer des visualisations de données entièrement personnalisables sur le Web sous forme d’[images SVG](https://www.w3schools.com/graphics/svg_intro.asp). Elle a été créée vers 2011 par [Mike Bostock](https://github.com/mbostock) et d'autres informaticiens. Plus récemment, [Philippe Rivière](https://github.com/fil) est devenu l’un des principaux mainteneurs et contributeurs.
 
-In a previous lesson, we used the [Plot library](https://observablehq.com/plot/) for our visualizations. Under the hood, Plot uses... D3! And it's mainly maintained by Bostock and Rivière! Surprise! 😁 Plot is so good that I find myself using it most of the time for my dataviz needs. But when I want to create something highly customized, especially with animations, D3 is still my go-to.
+Dans une leçon précédente, nous avons utilisé la [librairie Plot](https://observablehq.com/plot/) pour nos visualisations. En coulisses, Plot utilise... D3 ! Et elle est principalement maintenue par Bostock et Rivière ! Surprise ! 😁 Plot est formidable et je l’utilise la majorité du temps pour mes dataviz. Mais lorsque je veux créer quelque chose de très personnalisé, en particulier avec des animations, D3 reste ma préférence.
 
-In this project, we will use earthquake data to create an animated scatterplot with D3 and Svelte, as shown below. I strongly suggest you complete the previous sections of the course before diving in. I won't spend much time on setup, using the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis) or the [Svelte framework](https://svelte.dev/).
+Dans ce projet, nous allons utiliser des données sur les tremblements de terre pour créer un nuage de points animés avec D3 et Svelte, comme montré ci-dessous. Je vous recommande fortement de compléter les sections précédentes du cours avant de vous lancer. Je ne passerai pas beaucoup de temps sur la configuration, l’utilisation de la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) ou du [framework Svelte](https://svelte.dev/).
 
-![An animated scatter plot.](/assets/d3-chart/final-animation-scatter.gif)
+![Un nuage de points animés.](/assets/d3-chart/final-animation-scatter.gif)
 
-<NoticeIntro />
+<NoticeIntro lang="fr" />
 
-## Setup
+## Configuration
 
-We will use [setup-sda](https://github.com/nshiab/setup-sda) to set up and install everything we need.
+Nous allons utiliser [setup-sda](https://github.com/nshiab/setup-sda) pour tout configurer et installer ce dont nous avons besoin.
 
-Open a new folder with VS Code and run `deno -A jsr:@nshiab/setup-sda --svelte`.
+Ouvrez un nouveau dossier avec VS Code et exécutez `deno -A jsr:@nshiab/setup-sda --svelte`.
 
-![A screenshot of VS Code after running the setup-sda library.](/assets/d3-chart/setup.png)
+![Une capture d’écran de VS Code après avoir exécuté la librairie setup-sda.](/assets/d3-chart/setup.png)
 
-## Earthquake data
+## Données sur les tremblements de terre
 
-To retrieve earthquake data, I used the [USGS Earthquake Catalog](https://earthquake.usgs.gov/earthquakes/search/). Since 2021 appeared to be a very active year, I downloaded two CSV files for this year and pushed the files to GitHub.
+Pour récupérer les données sur les tremblements de terre, j’ai utilisé le [catalogue USGS Earthquake](https://earthquake.usgs.gov/earthquakes/search/). Comme l’année 2021 semblait particulièrement active, j’ai téléchargé deux fichiers CSV pour cette année et je les ai mis en ligne sur GitHub.
 
-Using the Simple Data Analysis library in the `sda` folder, we can easily retrieve and cache them. Update `sda/main.ts`, then run `deno task sda` to execute and watch it.
+En utilisant la librairie Simple Data Analysis dans le dossier `sda`, nous pouvons facilement les récupérer et les mettre en cache. Mettez à jour `sda/main.ts`, puis exécutez `deno task sda` pour l’exécuter et l’observer.
+
 
 
 ```ts showLineNumbers filename="sda/main.ts"
@@ -51,19 +52,20 @@ await earthquakes.logTable();
 await sdb.done();
 ```
 
-![A screenshot of VS Code after running the Simple Data Analysis library.](/assets/d3-chart/retrieve-earthquakes.png)
+![Une capture d’écran de VS Code après avoir exécuté la librairie Simple Data Analysis.](/assets/d3-chart/retrieve-earthquakes.png)
 
-As you can see, there are over 28,000 earthquakes in our data and many columns. We can filter it and keep only what we're interested in:
-- We make sure to convert `time` values to dates and sort them. Sometimes they are loaded as strings.
-- We only want `earthquake` in the `type` column and `reviewed` in the `status` column.
-- We filter to keep only earthquakes that could cause damage, with a magnitude of 5 or more.
-- We rename the `latitude` and `longitude` columns to shorter names.
-- We keep only the `time`, `lat`, `lon`, `depth`, and `mag` columns.
-- We round the numerical values to 3 decimals.
-- Because it makes more sense, we make the `depth` values negative.
-- And finally, we remove duplicates.
+Comme vous pouvez le voir, notre jeu de données contient plus de 28 000 tremblements de terre et de nombreuses colonnes. Nous pouvons le filtrer et ne garder que ce qui nous intéresse :
+- Nous nous assurons de convertir les valeurs `time` en objets `Date` et de les trier. Parfois, elles sont chargées comme des chaînes de caractères.
+- Nous ne voulons que `earthquake` dans la colonne `type` et `reviewed` dans la colonne `status`.
+- Nous filtrons pour ne garder que les tremblements de terre qui pourraient causer des dommages, avec une magnitude de 5 ou plus.
+- Nous renommons les colonnes `latitude` et `longitude` avec des noms plus courts.
+- Nous ne gardons que les colonnes `time`, `lat`, `lon`, `depth` et `mag`.
+- Nous arrondissons les valeurs numériques à 3 décimales.
+- Pour que ce soit plus logique, nous rendons les valeurs de `depth` négatives.
+- Et enfin, nous supprimons les doublons.
 
-We end up with around 2,000 earthquakes.
+Nous obtenons environ 2 000 tremblements de terre.
+
 
 ```ts showLineNumbers filename="sda/main.ts" {13-32}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -103,14 +105,14 @@ await earthquakes.logTable();
 await sdb.done();
 ```
 
-![The cleaned earthquake data in VS Code terminal.](/assets/d3-chart/filter-and-clean.png)
+![Les données sur les tremblements de terre nettoyées dans le terminal de VS Code.](/assets/d3-chart/filter-and-clean.png)
 
-## Exploratory dataviz
+## Exploration des données
 
-Before diving into customized data visualizations, it's important to first explore the data a little bit. We can use the `writeChart` function with Plot to quickly draw a few charts and get a sense of what we're working with:
-- `sda/output/earthquakes-lat-lon.png` shows us where most earthquakes happen—along the earthquake faults. All coordinates seem correct.
-- With `sda/output/earthquakes-time-mag.png`, we can clearly see the most powerful earthquakes. The three above magnitude 8 match the Wikipedia [List of earthquakes in 2021](https://en.wikipedia.org/wiki/List_of_earthquakes_in_2021).
-- `sda/output/earthquakes-mag-depth.png` suggests that most earthquakes occur above a depth of 250 km. The four most powerful ones were actually close to the surface.
+Avant de plonger dans des visualisations personnalisées, il est important d’explorer un peu les données. Nous pouvons utiliser la fonction `writeChart` avec Plot pour dessiner rapidement quelques graphiques et avoir une idée de ce avec quoi nous travaillons :
+- `sda/output/earthquakes-lat-lon.png` nous montre où se produisent la plupart des tremblements de terre — le long des failles sismiques. Toutes les coordonnées semblent correctes.
+- Avec `sda/output/earthquakes-time-mag.png`, on peut clairement voir les tremblements de terre les plus puissants. Les trois de magnitude supérieure à 8 correspondent à la [Liste des tremblements de terre en 2021](https://en.wikipedia.org/wiki/List_of_earthquakes_in_2021) sur Wikipédia.
+- `sda/output/earthquakes-mag-depth.png` suggère que la plupart des séismes se produisent à moins de 250 km de profondeur. Les quatre plus puissants étaient proches de la surface.
 
 ```ts showLineNumbers filename="sda/main.ts" {2, 35-71}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -187,19 +189,20 @@ await earthquakes.writeChart(
 
 await sdb.done();
 ```
-![Three charts rendered with Simple Data Analysis and Plot in VS Code.](/assets/d3-chart/exploratory-charts.png)
+![Trois graphiques générés avec Simple Data Analysis et Plot dans VS Code.](/assets/d3-chart/exploratory-charts.png)
 
 <Callout type="info" emoji="💡">
-   To open two tabs one on top of the other, right-click on the tab you want at the bottom and click on `Split down`. You can also `Split left`, `Split right`, or `Split top`. You can also drag and drop a tab to another screen, if you have more than one.
+   Pour ouvrir deux onglets l’un au-dessus de l’autre, faites un clic droit sur l’onglet que vous voulez en bas et cliquez sur `Split down`. Vous pouvez aussi utiliser `Split left`, `Split right` ou `Split top`. Vous pouvez également faire glisser un onglet vers un autre écran, si vous en avez plusieurs.
 </Callout>
 
-## Writing data for the web
+## Écriture des données pour le web
 
-Since our data looks good, we can now write it to a JSON file that Svelte—and any web browser—will be able to handle. We just need to add one line with the `writeData` method and make sure to write the file to the `src` folder (instead of `sda`, where we've been working so far).
+Comme nos données sont prêtes, nous pouvons maintenant les écrire dans un fichier JSON que Svelte — et tout navigateur web — pourra lire. Il suffit d’ajouter une ligne avec la méthode `writeData` et de s’assurer d’écrire le fichier dans le dossier `src` (au lieu de `sda`, où nous avons travaillé jusqu’ici).
 
-If you remember the previous lessons, `writeData` creates an array of objects. This is exactly what D3 needs. 😉
+Si vous vous souvenez des leçons précédentes, `writeData` crée une liste d’objets. C’est exactement ce dont D3 a besoin. 😉
 
-Note that JSON files can't store `Date` objects, so our dates have been serialized. They are saved as strings following the [ISO 8601 format](https://en.wikipedia.org/wiki/ISO_8601). They’ll be easy to convert back to dates.
+Notez que les fichiers JSON ne peuvent pas stocker d’objets `Date`, donc nos dates ont été sérialisées. Elles sont enregistrées en tant que chaînes de caractères au format [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601). Elles seront faciles à reconvertir en dates.
+
 
 
 ```ts showLineNumbers filename="sda/main.ts" {72}
@@ -278,15 +281,16 @@ await earthquakes.writeData("src/data/earthquakes.json");
 
 await sdb.done();
 ```
-![A JSON file written by the Simple Data Analysis library.](/assets/d3-chart/serialized-dates.png)
+![Un fichier JSON écrit par la librairie Simple Data Analysis.](/assets/d3-chart/serialized-dates.png)
 
-## Chart component
+## Composant de graphique
 
-Let's set up a new Svelte component with a helper function for our scatter plot.
+Créons un nouveau composant Svelte avec une fonction utilitaire pour notre nuage de points.
 
-But before we do, it's always helpful to define some types that we'll use repeatedly. In `src/lib/index.ts`, we can place types and variables that will be easily accessible throughout our Svelte project.
+Mais avant cela, il est toujours utile de définir quelques types que nous allons utiliser à plusieurs reprises. Dans `src/lib/index.ts`, nous pouvons placer les types et variables qui seront facilement accessibles dans tout notre projet Svelte.
 
-We can create `earthquake` and `variable` types, and export them. They'll be very handy going forward.
+Nous pouvons créer les types `earthquake` et `variable`, et les exporter. Ils seront très pratiques par la suite.
+
 
 ```ts showLineNumbers filename="src/lib/index.ts"
 type earthquake = {
@@ -302,15 +306,16 @@ type variable = keyof earthquake;
 export type { earthquake, variable };
 ```
 
-Now let's create the helper function `drawChart.ts` in the `src/helpers` folder (again, not `sda`). It's where our D3 code will live. This function will need a few things:
-- An `id`, which will be the `id` of the `svg` element in which we will draw our chart. More about `svg` below.
-- The `earthquakes` data.
-- The `x`, `y`, and `r` (radius of our dots) variables.
-- The `width` and `height` of the chart.
+Créons maintenant la fonction utilitaire `drawChart.ts` dans le dossier `src/helpers` (et non dans `sda`, encore une fois). C’est là que notre code D3 va vivre. Cette fonction aura besoin de quelques éléments :
+- Un `id`, qui sera l’identifiant de l’élément `svg` dans lequel nous allons dessiner notre graphique. Plus d’informations sur `svg` ci-dessous.
+- Les données `earthquakes`.
+- Les variables `x`, `y` et `r` (le rayon de nos points).
+- La `width` et la `height` du graphique.
 
-For now, let's just log the parameters.
+Pour l’instant, contentons-nous d’afficher ces paramètres dans la console.
 
-Note that since we used `src/lib/index.ts`, we can easily import our types (and anything else we want in it) with `from $lib`. It's a handy shortcut!
+Notez que comme nous utilisons `src/lib/index.ts`, nous pouvons facilement importer nos types (et tout ce que nous voulons y mettre) avec `from $lib`. C’est un raccourci bien pratique !
+
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts"
 import type { earthquake, variable } from "$lib";
@@ -328,13 +333,14 @@ export default function drawChart(
 }
 ```
 
-We can now create a new `Chart.svelte` component that:
+Nous pouvons maintenant créer un nouveau composant `Chart.svelte` qui :
 
-- Imports our `earthquakes.json` data as `earthquakesRaw` (line 3), and maps over it to convert the `time` values back to `Date` objects (lines 13–16).
-- Retrieves the `id`, `x`, `y`, and `r` as `props` (lines 6–11).
-- Creates `width` and `height` states (lines 18–19) and binds them to the `clientWidth` and `clientHeight` of the `svg` element in which we will draw our chart (line 26). We’ll talk more about `svg` elements later on.
-- Uses the `$effect` rune to call `drawChart` with all the props and states. This means Svelte will recall `drawChart` if any of the arguments change, including `width` and `height`, making the chart responsive.
-- Sets a `margin-top`, `width`, and `height` for the `svg` inside the `style` tags.
+- Importe les données de `earthquakes.json` sous le nom `earthquakesRaw` (ligne 3), puis les transforme pour convertir les valeurs `time` en objets `Date` (lignes 13–16).
+- Récupère `id`, `x`, `y` et `r` comme `props` (lignes 6–11).
+- Crée les états `width` et `height` (lignes 18–19) et les lie à `clientWidth` et `clientHeight` de l’élément `svg` dans lequel nous allons dessiner notre graphique (ligne 26). Nous parlerons plus en détail des éléments `svg` plus tard.
+- Utilise la rune `$effect` pour appeler `drawChart` avec toutes les `props` et les états. Cela signifie que Svelte rappellera `drawChart` si un des arguments change, y compris `width` et `height`, rendant ainsi le graphique réactif.
+- Définit une `margin-top`, une `width` et une `height` pour le `svg` dans les balises `style`.
+
 
 
 ```svelte showLineNumbers filename="src/components/Chart.svelte"
@@ -374,11 +380,11 @@ We can now create a new `Chart.svelte` component that:
 </style>
 ```
 
-And finally, we can import our new `<Chart />` component on our page, which is `src/routes/+page.svelte`. We set the appropriate `id`, `x`, `y`, and `r` props. To start, let's draw a chart of earthquakes and their magnitude over time. While we're at it, we can add titles and a bit of text.
+Et enfin, nous pouvons importer notre nouveau composant `<Chart />` dans notre page, qui se trouve dans `src/routes/+page.svelte`. Nous définissons les `props` appropriés : `id`, `x`, `y` et `r`. Pour commencer, dessinons un graphique des tremblements de terre et de leur magnitude au fil du temps. Au passage, nous pouvons ajouter des titres et un peu de texte.
 
-If you were still watching `sda/main.ts`, you can stop it (`CTRL` + `C`) and run `deno task dev` instead to start a local server. Open the URL provided in your terminal in your favorite web browser.
+Si vous surveillez encore `sda/main.ts`, vous pouvez l’arrêter (`CTRL` + `C`) et lancer `deno task dev` à la place pour démarrer un serveur local. Ouvrez l’URL affichée dans votre terminal dans votre navigateur préféré.
 
-In your web browser's console, you should see the log from `drawChart.ts`. We’re ready to code our chart!
+Dans la console de votre navigateur, vous devriez voir le log provenant de `drawChart.ts`. Nous sommes prêts à coder notre graphique !
 
 ```svelte showLineNumbers filename="src/routes/+page.svelte"
 <script lang="ts">
@@ -395,23 +401,24 @@ In your web browser's console, you should see the log from `drawChart.ts`. We’
 <Chart id="scatterplot" x="time" y="mag" r="mag" />
 ```
 
-![VS Code and Code with a Svelte project running locally.](/assets/d3-chart/chart-component.png)
+![VS Code et Code avec un projet Svelte lancé en local.](/assets/d3-chart/chart-component.png)
 
-## Drawing with D3
+## Dessiner avec D3
 
-All of this setup might seem complicated... but there’s actually a lot of value in compartmentalizing your code. When each file is focused on doing one thing, it's easier to debug. There’s less repetition in your codebase. Also, small pieces of code doing just a few things are easier to rework than one big file doing everything. This will become especially clear when we add animations.
+Toute cette configuration peut sembler compliquée... mais il y a en réalité beaucoup d’avantages à compartimenter votre code. Quand chaque fichier est dédié à une seule tâche, il est plus facile à déboguer. Il y a moins de répétition dans votre projet. De plus, de petits morceaux de code qui ne font des choses précises sont plus faciles à retravailler qu’un gros fichier qui fait tout. Cela deviendra particulièrement évident quand nous ajouterons des animations.
 
-But we’ve waited long enough—let’s play with D3 now!
+Mais nous avons assez attendu — jouons enfin avec D3 !
 
-Stop your local server (`CTRL` + `C`) and install D3 with `deno add npm:d3`. Then rerun your local server with `deno task dev`.
+Arrêtez votre serveur local (`CTRL` + `C`) et installez D3 avec `deno add npm:d3`. Puis relancez votre serveur local avec `deno task dev`.
 
-Let's start slowly by drawing one big blue circle in our `svg` with our `drawChart` function. In the code below, D3:
-- Selects the `svg` element with the given `id`.
-- Appends a `circle` to the `svg`.
-- Specifies several attributes for the circle by chaining methods.
-- `cx` and `cy` are the coordinates of the center of the circle. We place it at the center of the `svg` using `width / 2` and `height / 2`.
-- `r` is the circle’s radius—here, it's 50 pixels.
-- `fill` is the color inside the circle—here, it's blue.
+Commençons doucement en dessinant un grand cercle bleu dans notre `svg` avec la fonction `drawChart`. Dans le code ci-dessous, D3 :
+- Sélectionne l’élément `svg` avec l’`id` donné.
+- Ajoute un élément `circle` au `svg`.
+- Spécifie plusieurs attributs pour le cercle en enchaînant les méthodes.
+- `cx` et `cy` sont les coordonnées du centre du cercle. Nous le plaçons au centre du `svg` en utilisant `width / 2` et `height / 2`.
+- `r` est le rayon du cercle — ici, 50 pixels.
+- `fill` est la couleur à l’intérieur du cercle — ici, bleu.
+
 
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts" {2, 13-19}
@@ -437,21 +444,22 @@ export default function drawChart(
 }
 ```
 
-If you right-click on your blue circle and inspect it in your browser, you'll see your `svg` with the `circle` added to the code of your page. This is how you draw SVG elements with D3: by telling it exactly what you want and where.
+Si vous faites un clic droit sur votre cercle bleu et que vous l’inspectez dans votre navigateur, vous verrez votre `svg` avec le `circle` ajouté au code de votre page. C’est ainsi que l’on dessine des éléments SVG avec D3 : en lui indiquant exactement ce que l’on veut et où le placer.
 
-![Some D3 code creating a blue circle rendered in Google Chrome.](/assets/d3-chart/blue-circle.png)
+![Du code D3 créant un cercle bleu affiché dans Google Chrome.](/assets/d3-chart/blue-circle.png)
 
-Now, this isn't tied to any data. And we have more than two thousand earthquakes. How can we plot all of them?
+Pour l’instant, ce cercle n’est lié à aucune donnée. Et nous avons plus de deux mille tremblements de terre. Comment les afficher tous ?
 
-First, we need scales to convert the earthquake values into pixels, radii, and colors. D3 scales ([there are a lot of them](https://d3js.org/d3-scale)) need two things: a **domain** and a **range**.
+D’abord, nous avons besoin d’échelles (`scales`) pour convertir les valeurs des tremblements de terre en pixels, rayons et couleurs. Les échelles D3 ([il y en a beaucoup](https://d3js.org/d3-scale)) ont besoin de deux choses : un **domain** et un **range**.
 
-For example, in the code below, we use the `extent` function to retrieve the minimum and maximum of the `x` values. This function returns an array like `[min, max]`. Just in case you don’t remember, `x` is set to `time` in `src/routes/+page.svelte`.
+Par exemple, dans le code ci-dessous, nous utilisons la fonction `extent` pour récupérer les valeurs minimale et maximale des données `x`. Cette fonction retourne une liste du type `[min, max]`. Au cas où vous ne vous en souvenez pas, `x` est défini comme `time` dans `src/routes/+page.svelte`.
 
-Then we create a `scaleTime` (since `x` contains dates) with:
-- the min and max time values as the domain
-- `[0, width]` as the range
+Nous créons ensuite une `scaleTime` (car `x` contient des dates) avec :
+- les valeurs minimales et maximales de temps comme *domain*
+- `[0, width]` comme *range*
 
-Now, the scale can map `Date` objects to pixel values. Instead of `width / 2` for `cx`, we can now use a date in 2021! `xScale` will automatically convert it to the appropriate pixel value.
+Désormais, cette échelle peut convertir des objets `Date` en valeurs de pixels. Au lieu de `width / 2` pour `cx`, nous pouvons maintenant utiliser une date en 2021 ! `xScale` la convertira automatiquement en la bonne position en pixels.
+
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts" {2, 15-16} /xScale(new Date("2021-06-01T00:00:00Z"))/
 import type { earthquake, variable } from "$lib";
@@ -479,9 +487,10 @@ export default function drawChart(
 }
 ```
 
-We can do the same thing for `y` (which is set to `mag` right now) and `cy` using a `scaleLinear`.
+Nous pouvons faire la même chose pour `y` (qui est actuellement défini sur `mag`) et `cy` en utilisant une `scaleLinear`.
 
-Again, change the magnitude value in line 23 to see the `yScale` in action. Remember that magnitudes in our data range from 5 to 8.
+Encore une fois, modifiez la valeur de magnitude à la ligne 23 pour voir `yScale` en action. Rappelez-vous que les magnitudes dans nos données varient entre 5 et 8.
+
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts" {2, 18-19} /yScale(7)/
 import type { earthquake, variable } from "$lib";
@@ -512,11 +521,11 @@ export default function drawChart(
 }
 ```
 
-We can also add a scale for the `r` attribute—this time using a square root scale (`scaleSqrt`) because we want the area of the circle to be proportional to the data.
+Nous pouvons aussi ajouter une échelle pour l’attribut `r` — cette fois en utilisant une échelle racine carrée (`scaleSqrt`), car nous voulons que la surface du cercle soit proportionnelle aux données.
 
-And let's add another scale for the color, which could also be tied to the `rDomain`.
+Et ajoutons une autre échelle pour la couleur, qui pourrait également être liée à `rDomain`.
 
-Yes, I know—D3 scales are amazing! And since they're just functions, you can use them for anything you want, D3 charts or not!
+Oui, je sais — les échelles D3 sont incroyables ! Et comme ce sont simplement des fonctions, vous pouvez les utiliser pour tout ce que vous voulez, que ce soit dans des graphiques D3 ou ailleurs !
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts" {2, 21-23} /rScale(7)/ /fillScale(7)/
 import type { earthquake, variable } from "$lib";
@@ -551,15 +560,15 @@ export default function drawChart(
 }
 ```
 
-Now that we have scales, we can harness D3 to its fullest! Instead of appending just one circle, let's bind SVG elements to our data.
+Maintenant que nous avons nos échelles, nous pouvons exploiter tout le potentiel de D3 ! Au lieu d’ajouter un seul cercle, attachons des éléments SVG à nos données.
 
-Here's a step-by-step explanation of the new code below:
-- First, we select all circles in the SVG (line 25). On the first render, there are none—and that's okay.
-- Then we bind the data (line 26). Here, we have over 2,000 earthquakes. So this tells D3: "Hey, I'm going to ask you to draw something 2,000+ times."
-- We join the data to SVG elements (line 27). For each earthquake, we will draw a `circle`.
-- Now we can use functions to tell D3 what attributes we want for each earthquake. Here, we're using `x`, `y`, and `r` with the appropriate scales.
+Voici une explication étape par étape du nouveau code ci-dessous :
+- D’abord, nous sélectionnons tous les cercles dans le SVG (ligne 25). Lors du premier rendu, il n’y en a aucun — et c’est normal.
+- Ensuite, nous lions les données (ligne 26). Ici, nous avons plus de 2 000 tremblements de terre. Cela signifie que nous disons à D3 : « Hé, je vais te demander de dessiner quelque chose plus de 2 000 fois. »
+- Nous lions les données aux éléments SVG (ligne 27). Pour chaque tremblement de terre, nous allons dessiner un `circle`.
+- Nous pouvons maintenant utiliser des fonctions pour indiquer à D3 quels attributs nous voulons pour chaque tremblement de terre. Ici, nous utilisons `x`, `y` et `r` avec les échelles appropriées.
 
-Since we have overlapping earthquakes, I’ve also set the `opacity` to `0.5`.
+Comme certains tremblements de terre se chevauchent, j’ai également défini l’`opacity` à `0.5`.
 
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts" {25-32}
@@ -598,21 +607,22 @@ export default function drawChart(
 }
 ```
 
-And look at that! You now have all of your earthquakes added to your `svg`! And if you inspect a circle and check its `Properties`, you'll see the earthquake data. It's really *bound* to the SVG element.
+Et regardez-moi ça ! Vous avez maintenant tous vos tremblements de terre ajoutés à votre `svg` ! Et si vous inspectez un cercle et consultez ses `Properties`, vous verrez les données du tremblement de terre. Elles sont réellement *liées* à l’élément SVG.
 
-![Drawing two thousand circles in a SVG element with D3.](/assets/d3-chart/join-data.png)
+![Deux mille cercles dessinés dans un élément SVG avec D3.](/assets/d3-chart/join-data.png)
 
-## Axis
+## Axes
 
-We drew our earthquakes, but it would be great to add `x` and `y` axes. To make sure we have enough room for them, we also need margins.
+Nous avons dessiné nos tremblements de terre, mais ce serait bien d’ajouter des axes `x` et `y`. Pour nous assurer qu’il y ait suffisamment d’espace autour, nous devons aussi définir des marges.
 
-Let's create a `margins` object to add space around our chart and to translate our axes to the right positions.
+Créons un objet `margins` pour ajouter de l’espace autour du graphique et pour positionner correctement nos axes.
 
-To actually draw axes, we can use the `axisLeft` and `axisBottom` functions with our scales. We usually place them in a `g` element (which stands for *group*) to easily identify or move them with a `class` or `id`, if needed.
+Pour dessiner les axes, nous pouvons utiliser les fonctions `axisLeft` et `axisBottom` avec nos échelles. En général, on les place dans un élément `g` (pour *group*) afin de pouvoir facilement les identifier (avec une `class` ou un `id`) ou les déplacer si nécessaire.
 
-D3 axes are quite clever and will try to automatically create tick labels that make sense. Here, since we used a `scaleTime` for the `axisBottom`, and its domain is limited to 2021, the function shows 2021 at the start and then just months. However, to avoid overlapping labels, I set the number of ticks to 3.
+Les axes D3 sont assez intelligents et essaient automatiquement de créer des étiquettes de graduation pertinentes. Ici, comme nous utilisons une `scaleTime` pour l’axe du bas (`axisBottom`), et que son domaine est limité à 2021, la fonction affiche 2021 au début, puis uniquement les mois. Toutefois, pour éviter le chevauchement des étiquettes, j’ai défini le nombre de *ticks* à 3.
 
-Also, to avoid redrawing the axes over and over again when a prop or state changes (like when resizing the window), I gave them a `class` called `axis` and used it to select and remove them before drawing them again (line 55). Note that we don't need to do that for the circles because they are binded to their data, even between renders.
+Aussi, pour éviter de redessiner les axes encore et encore lorsqu’une `prop` ou un état change (comme lors du redimensionnement de la fenêtre), je leur ai donné une `class` appelée `axis` et je l’utilise pour les sélectionner et les supprimer avant de les redessiner (ligne 55). Notez que nous n’avons pas besoin de faire cela pour les cercles car ils sont liés à leurs données, même entre les rendus.
+
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts" {3-4, 23-28, 55-70}
 import type { earthquake, variable } from "$lib";
@@ -688,9 +698,9 @@ export default function drawChart(
 }
 ```
 
-Finally, it would be great to add labels to the axes too—and maybe some insets to prevent circles from overlapping with the axes.
+Enfin, ce serait une bonne idée d’ajouter des étiquettes aux axes également — et peut-être un peu de marge intérieure pour éviter que les cercles ne chevauchent les axes.
 
-To have proper labels instead of the abbreviations used in our data, I created a `labels` object that we can use for the text.
+Pour avoir de vraies étiquettes au lieu des abréviations utilisées dans nos données, j’ai créé un objet `labels` que nous pouvons utiliser pour le texte.
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts" {29, 73-94} /+ inset/ /- inset/
 import type { earthquake, variable } from "$lib";
@@ -790,19 +800,19 @@ export default function drawChart(
 }
 ```
 
-This is looking quite good for a first D3 chart! And it's fully responsive! Try resizing your web browser and see the magic happen!
+Ce rendu est vraiment chouette pour un premier graphique D3 ! Et en plus, il est entièrement réactif ! Essayez de redimensionner votre navigateur et admirez la magie !
 
-![Drawing two thousand circles in a SVG element with D3.](/assets/d3-chart/scatter-plot.png)
+![Deux mille cercles dessinés dans un élément SVG avec D3.](/assets/d3-chart/scatter-plot.png)
 
 ## Animations
 
-Our chart is great, but let's be honest: we could create the same thing much faster and more easily with Plot...
+Notre graphique est super, mais soyons honnêtes : on pourrait créer la même chose beaucoup plus rapidement et facilement avec Plot...
 
-However, there’s one thing that Plot can’t do easily: animations.
+Cependant, il y a une chose qui est difficile à faire avec Plot : les animations.
 
-Let's update our `src/routes/+page.svelte` to give the user two chart options. We can use the pre-coded `<Radio />` components, which create radio buttons, and we can `bind` the `chartType` to the selected option.
+Mettons à jour notre fichier `src/routes/+page.svelte` pour offrir à l’utilisateur deux types de graphiques. Nous pouvons utiliser le composant pré-codé `<Radio />`, qui crée des boutons radio, et lier (`bind`) la variable `chartType` à l’option sélectionnée.
 
-Depending on the `chartType` state, we can update the newly created `x` and `y` states, which are then passed to our `<Chart />` component.
+En fonction de l’état de `chartType`, nous pouvons mettre à jour les états `x` et `y` nouvellement créés, qui seront ensuite transmis à notre composant `<Chart />`.
 
 
 ```svelte showLineNumbers filename="src/routes/+pages.svelte" {2, 4, 8-9, 11-19, 29-33} /{x}/ /{y}/
@@ -842,19 +852,18 @@ Depending on the `chartType` state, we can update the newly created `x` and `y` 
 <Chart id="scatterplot" {x} {y} r="mag" />
 ```
 <Callout type="info" emoji="💡">
-   You might be wondering what the `<variable>` is on lines 8 and 9. Just as you can pass arguments to some functions, you can also pass types. This is the syntax for it. Here, it tells `$state` that the state it will create should be of type `variable`.
+   Vous vous demandez peut-être ce que signifie `<variable>` aux lignes 8 et 9. Tout comme vous pouvez passer des arguments à certaines fonctions, vous pouvez aussi passer des types. C’est la syntaxe prévue pour cela. Ici, cela indique à `$state` que l’état créé devra être du type `variable`.
 </Callout>
 
-Now, each time we switch the chart type, our `<Chart />` component gets re-rendered with new `x` and `y` values, which are used by our `drawChart` function!
+Maintenant, chaque fois que nous changeons le type de graphique, notre composant `<Chart />` est re-rendu avec de nouvelles valeurs `x` et `y`, qui sont utilisées par notre fonction `drawChart` !
 
-![Radio buttons updating a D3 chart.](/assets/d3-chart/chart-types.png)
+![Des boutons radio mettant à jour un graphique D3.](/assets/d3-chart/chart-types.png)
 
-There are a few visual bugs that we can fix right away in `src/helpers/drawChart.ts`:
-- If `x` is `time`, we should use a `scaleTime`, but if it's `mag`, we should use `scaleLinear`.
-- If `x` is `time`, we can stick with 3 ticks, but if it's `mag`, we can let D3 decide.
-- We can add `Depth` to our `labels` object and change the direction of the y-axis arrow if it's `depth`.
-- We can tweak `margins` and the label positions to avoid cutting off our new text.
-
+Il y a quelques petits bugs visuels que nous pouvons corriger tout de suite dans `src/helpers/drawChart.ts` :
+- Si `x` est `time`, nous devons utiliser une `scaleTime`, mais si c’est `mag`, nous devons utiliser `scaleLinear`.
+- Si `x` est `time`, nous pouvons garder 3 ticks, mais si c’est `mag`, on peut laisser D3 décider.
+- Nous pouvons ajouter `Depth` à notre objet `labels` et inverser la flèche de l’axe Y si c’est `depth`.
+- Nous pouvons ajuster les `margins` et la position des étiquettes pour éviter que notre nouveau texte soit coupé.
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts" {26-27, 32-38, 68, 81, 87, 98}
 import type { earthquake, variable } from "$lib";
@@ -957,17 +966,17 @@ export default function drawChart(
     .text(y === "depth" ? `${labels[y]} ↓` : `${labels[y]} ↑`);
 }
 ```
-![A scatter plot being redrawn with different variables](/assets/d3-chart/no-animations.gif)
+![Un nuage de points redessiné avec différentes variables.](/assets/d3-chart/no-animations.gif)
 
-This is cool, but it's not animated. The chart just keeps getting redrawn without any transitions. Let’s rework `src/helpers/drawChart.ts` to create a smooth transition for the circles.
+C’est sympa, mais ce n’est pas animé. Le graphique est simplement redessiné à chaque fois, sans aucune transition. Reprenons `src/helpers/drawChart.ts` pour créer une transition fluide des cercles.
 
-Creating animations with D3 is very easy. You first need to select the elements you want, call `.transition()`, and then chain the attributes you want to change.
+Créer des animations avec D3 est très simple. Il suffit d’abord de sélectionner les éléments que vous voulez animer, d’appeler `.transition()`, puis d’enchaîner les attributs que vous souhaitez modifier.
 
-In our case, we first need to check whether we need to draw or animate. To do that, we check if there's anything already in our `svg` (line 23). If there’s nothing, it means we need to draw (lines 53–60). Otherwise, we want to animate the elements that are already there (lines 62–65).
+Dans notre cas, nous devons d’abord vérifier s’il faut dessiner ou animer. Pour cela, on regarde s’il y a déjà quelque chose dans le `svg` (ligne 23). S’il n’y a rien, cela signifie qu’on doit dessiner (lignes 53–60). Sinon, on veut animer les éléments déjà présents (lignes 62–65).
 
-To animate, we select all the circles, call `.transition()` to tell D3 to interpolate between their current attributes and the new ones. Here, we just update `cx` and `cy` using the updated domain and range from `xScale` and `yScale`.
+Pour animer, on sélectionne tous les cercles, on appelle `.transition()` pour dire à D3 d’interpoler entre leurs attributs actuels et les nouveaux. Ici, on met simplement à jour `cx` et `cy` à l’aide du *domain* et *range* mis à jour de `xScale` et `yScale`.
 
-Easy!
+Facile !
 
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts" {23, 52, 61-66}
@@ -1081,14 +1090,13 @@ export default function drawChart(
 }
 ```
 
-But if you test the animation right now, it's not very interesting. It's too fast, and all the dots move at the same time. We can fancy that up by passing a `duration`, an `ease`, and a `delay`.
+Mais si vous testez l’animation maintenant, ce n’est pas très intéressant. Elle est trop rapide, et tous les points bougent en même temps. On peut rendre ça plus sympa en ajoutant une `duration`, une `ease` et un `delay`.
 
-![A basic animation of a scatter plot.](/assets/d3-chart/basic-animation-scatter.gif)
+![Une animation simple d’un nuage de points.](/assets/d3-chart/basic-animation-scatter.gif)
 
-For the duration, I picked 1,000 milliseconds. For the easing, I like `easeCubicInOut`, but you have [lots of options](https://observablehq.com/@d3/easing-animations) with D3. And for the delay, I'm just using the duration multiplied by a random number between 0 and 1. So each dot will have a different delay—between 0 and the full duration.
+Pour la durée, j’ai choisi 1 000 millisecondes. Pour l’easing, j’aime bien `easeCubicInOut`, mais vous avez [plein d’options](https://observablehq.com/@d3/easing-animations) avec D3. Et pour le délai, j’utilise simplement la durée multipliée par un nombre aléatoire entre 0 et 1. Ainsi, chaque point aura un délai différent — compris entre 0 et la durée choisie.
 
-Now, this feels more organic and enjoyable to watch!
-
+Maintenant, l’ensemble paraît plus organique et agréable à regarder !
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts" {5, 25, 66-68}
 import type { earthquake, variable } from "$lib";
@@ -1206,11 +1214,11 @@ export default function drawChart(
 }
 ```
 
-We could also animate the axes and labels.
+Nous pourrions aussi animer les axes et les étiquettes.
 
-For the x-axis, since it's updating from dates to numbers and vice versa, there's no smooth way to transition the values like we do with the y-axis. So instead, I chained transitions to make it fade out, update, and then fade back in. It’s the same trick for the text labels.
+Pour l’axe des x, comme il passe de dates à des nombres et inversement, il n’y a pas de manière fluide de faire la transition des valeurs comme on le fait avec l’axe des y. À la place, j’ai enchaîné des transitions pour le faire disparaître, le mettre à jour, puis le faire réapparaître. C’est le même principe pour les étiquettes de texte.
 
-Also, note that we no longer need to remove the axes or labels, since we're now updating them directly.
+À noter également : nous n’avons plus besoin de supprimer les axes ou les étiquettes, puisqu’on les met désormais à jour directement.
 
 
 ```ts showLineNumbers filename="src/helpers/drawChart.ts" {73, 76, 82-94, 96, 99, 102-106, 114, 116, 124, 130-154}
@@ -1370,16 +1378,20 @@ export default function drawChart(
   }
 }
 ```
-![An animated scatter plot.](/assets/d3-chart/final-animation-scatter.gif)
+![Un nuage de points animés.](/assets/d3-chart/final-animation-scatter.gif)
+
+## Construction de la page
+
+Jusqu'à présent, nous avons exécuté notre page avec un serveur local. Si vous souhaitez construire votre site web, exécutez la commande `deno task build`. Svelte minimisera et optimisera votre code et créera les fichiers de votre site web dans le dossier `build`. Vous pourrez ensuite héberger ces fichiers sur un serveur pour partager votre travail avec le monde entier !
 
 ## Conclusion
 
-Our chart is sooo smoooooth! And beautiful! We could keep iterating on this chart to improve it even more, but I think we’ve already done a lot. You can be proud of yourself.
+Notre graphique est magniiifiiiique ! Nous pourrions continuer à itérer pour l'améliorer encore plus, mais je pense que nous en avons déjà fait beaucoup. Vous pouvez être fier de vous.
 
-If you want to explore more D3 examples, make sure to check the [D3 gallery](https://observablehq.com/@d3/gallery). All the code is open source!
+Si vous souhaitez explorer davantage d'exemples D3, n'oubliez pas de consulter la [galerie D3](https://observablehq.com/@d3/gallery). Tout le code est en code ouvert !
 
-If you’re up for an extra challenge, we haven’t used the `lat` and `lon` values. Try adding another option to the radio buttons that updates `x` to `lon` and `y` to `lat`, then adjust the `drawChart` function to make sure everything works properly with this new option.
+Si vous êtes prêt à relever un défi supplémentaire, nous n'avons pas utilisé les valeurs `lat` et `lon`. Essayez d'ajouter une autre option aux boutons radio qui met à jour `x` vers `lon` et `y` vers `lat`, puis ajustez la fonction `drawChart` pour vous assurer que tout fonctionne correctement avec cette nouvelle option.
 
-D3 isn’t just good for charts. It’s also A-M-A-Z-I-N-G for maps! And that’s what the next lesson is all about. See you there!
+D3 n'est pas seulement bon pour les graphiques. C'est aussi G-É-N-I-A-L pour les cartes ! Et c'est ce dont traitera la prochaine leçon. À bientôt !
 
-<NoticeEnd />
+<NoticeEnd lang="fr" />
