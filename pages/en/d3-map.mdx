@@ -1,0 +1,535 @@
+---
+title: Animated maps with D3.js 🗺️
+description: In this project, we use earthquake data to build an animated map with D3.js
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+
+# Animated maps with D3.js 🗺️
+
+As we've seen in the [previous lesson](/d3-chart), [D3.js](https://d3js.org/) is an amazing library to build charts. But it also excels to make maps.
+
+In this project, we will use earthquake data to create an animated map with D3 and Svelte, as shown below. I strongly suggest you complete the previous sections of the course before diving in, especially the [Animated charts with D3](/d3-chart).
+
+ADD THE ANIMATION HERE.
+
+<NoticeIntro />
+
+## Setup
+
+We will use [setup-sda](https://github.com/nshiab/setup-sda) to set up and install everything we need.
+
+Open a new folder with VS Code and run `deno -A jsr:@nshiab/setup-sda --svelte`.
+
+![A screenshot of VS Code after running the setup-sda library.](/assets/d3-map/setup.png)
+
+## Earthquake data and countries boundaries
+
+To retrieve earthquake data, I used the [USGS Earthquake Catalog](https://earthquake.usgs.gov/earthquakes/search/). Since 2021 appeared to be a very active year, I downloaded two CSV files for this year and pushed the files to GitHub.
+
+For the country boundaries, I downloaded them from [Natural Earth](https://www.naturalearthdata.com/) as a zipped shapefile.
+
+Using the Simple Data Analysis library in the `sda` folder, we can easily retrieve and cache them. Update `sda/main.ts`, then run `deno task sda` to execute and watch it.
+
+For the earthquakes:
+- We make sure to convert the `time` values to dates
+- We keep only rows with a `type` of `earthquake` and `status` of `reviewed`
+- We filter out earthquakes with a magnitude less than 5
+- Since we will be drawing circles on our map, it's more interesting to use the amplitude, which we can easily compute from the magnitude
+- We rename `latitude` and `longitude` to shorter names
+- We keep only the columns that we will be using, which are `time`, `ampl`, `lat` and `lon`
+- We round numerical values to three decimal places
+- On our map, we want the bigger earthquakes to be on top of the smaller ones, so we sort `ampl` ascendingly.
+- After logging the table to ensure everything is okay, we write the data to a JSON file in the `src` folder (not `sda`) to be used in our Svelte project. Since these are just point, it's easier to keep this data tabular. We have over 2,000 earthquakes that we want to draw and animate on a map.
+
+For the countries:
+- When fetching the data with `loadDataGeo`, we make sure to reproject the data to `WGS84`.
+- We select only the column `geom`, since we don't need anything more than the boundaries.
+- After logging the table to make sure everything is okay, we write a GeoJSON file to the `src` folder (not `sda`) to be used in our Svelte project. Here, we use `writeGeoData` instead of `writeData`, and we pass the option `rewind` to make sure the coordinates are in the right order for D3 to draw the polygons correctly. We have 127 geospatial features that we will add to our map.
+
+```ts showLineNumbers filename="sda/main.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const earthquakes = sdb.newTable("earthquakes");
+await earthquakes.cache(async () => {
+  await earthquakes.loadData([
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-1.csv",
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-2.csv",
+  ]);
+});
+
+await earthquakes.convert({ time: "datetime" });
+await earthquakes.keep({
+  "type": "earthquake",
+  "status": "reviewed",
+});
+await earthquakes.filter(`mag >= 5`);
+await earthquakes.addColumn("ampl", "number", `POW(10, mag)`);
+await earthquakes.renameColumns({ latitude: "lat", longitude: "lon" });
+await earthquakes.selectColumns([
+  "time",
+  "ampl",
+  "lat",
+  "lon",
+]);
+await earthquakes.round(["ampl", "lat", "lon"], { decimals: 3 });
+await earthquakes.removeDuplicates();
+await earthquakes.sort({ ampl: "asc" });
+await earthquakes.logTable();
+await earthquakes.writeData("src/data/earthquakes.json");
+
+const countries = sdb.newTable("countries");
+await countries.cache(async () => {
+  await countries.loadGeoData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/ne_110m_land.shp.zip",
+    { toWGS84: true },
+  );
+});
+await countries.selectColumns("geom");
+await countries.logTable();
+await countries.writeGeoData("src/data/countries.json", { rewind: true });
+
+await sdb.done();
+```
+![A screenshot of VS Code with data tables logged in the terminal.](/assets/d3-map/data.png)
+
+## Exploratory dataviz
+
+Before diving into D3 code, I always first use SDA and [Plot](https://observablehq.com/plot/) to quickly draw a first dataviz. It helps understanding the data at hand.
+
+Since we have data for the whole country, we can test the [`equal-earth`](https://www.researchgate.net/publication/326879978_The_Equal_Earth_map_projection) projection. It will be avaible with D3 too.
+
+Here's a step by step explanation of the new code below:
+- We clone the earthquakes table
+- We create point geometries from the `lat` and `lon` columns into a new `geom` column
+- We insert the countries table in it, which already has a `geom` column
+- We use the `writeMap` method with Plot to write a map as a PNG file
+- We add `sphere()` and `graticule()` to make the map easier to understand with the projection `equal-earth`
+- We draw the countries first
+- Then we draw the earthquakes by using their `ampl` values
+
+
+```ts showLineNumbers filename="sda/main.ts" {2, 45-66}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { geo, graticule, plot, sphere } from "@observablehq/plot";
+
+const sdb = new SimpleDB();
+
+const earthquakes = sdb.newTable("earthquakes");
+await earthquakes.cache(async () => {
+  await earthquakes.loadData([
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-1.csv",
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/earthquakes-2021-2.csv",
+  ]);
+});
+
+await earthquakes.convert({ time: "datetime" });
+await earthquakes.keep({
+  "type": "earthquake",
+  "status": "reviewed",
+});
+await earthquakes.filter(`mag >= 5`);
+await earthquakes.addColumn("ampl", "number", `POW(10, mag)`);
+await earthquakes.renameColumns({ latitude: "lat", longitude: "lon" });
+await earthquakes.selectColumns([
+  "time",
+  "ampl",
+  "lat",
+  "lon",
+]);
+await earthquakes.round(["ampl", "lat", "lon"], { decimals: 3 });
+await earthquakes.removeDuplicates();
+await earthquakes.sort({ ampl: "asc" });
+await earthquakes.logTable();
+await earthquakes.writeData("src/data/earthquakes.json");
+
+const countries = sdb.newTable("countries");
+await countries.cache(async () => {
+  await countries.loadGeoData(
+    "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/ne_110m_land.shp.zip",
+    { toWGS84: true },
+  );
+});
+await countries.selectColumns("geom");
+await countries.logTable();
+await countries.writeGeoData("src/data/countries.json", { rewind: true });
+
+const earthquakesAndCountries = await earthquakes.cloneTable({
+  outputTable: "earthquakesAndCountries",
+});
+await earthquakesAndCountries.points("lat", "lon", "geom");
+await earthquakesAndCountries.insertTables(countries);
+await earthquakesAndCountries.writeMap((geodata) =>
+  plot({
+    projection: "equal-earth",
+    marks: [
+      sphere(),
+      graticule(),
+      geo(geodata.features.filter((d) => !d.properties.ampl)),
+      geo(
+        geodata.features.filter((d) => typeof d.properties.ampl === "number"),
+        {
+          r: "ampl",
+          fill: "red",
+          opacity: 0.5,
+        },
+      ),
+    ],
+  }), "sda/output/earthquakesAndCountries.png");
+
+await sdb.done();
+```
+![A screenshot of VS Code with a map displayed.](/assets/d3-map/plot-map.png)
+
+Things are looking quite good! We can now dive into our Svelte project.
+
+## Svelte component
+
+Let's setup a new Svelte component with a helper function for our map.
+
+But before we do, it’s always helpful to define some types that we’ll use repeatedly. In src/lib/index.ts, we can place types and variables that will be easily accessible throughout our Svelte project.
+
+```ts showLineNumbers filename="src/lib/index.ts"
+type earthquake = {
+  time: Date;
+  lat: number;
+  lon: number;
+  ampl: number;
+};
+
+export type { earthquake };
+```
+
+Now let's create the helper function `drawMap.ts` in the `src/helpers` folder (again, not `sda`). It's where our D3 code will live. This function will need a few things:
+- An `id`, which will be the `id` of the `svg` element in which we will draw our map.
+- The `earthquakes` data.
+- The `width` and `height` of the map.
+
+For now, let's just log the parameters.
+
+Note that since we used `src/lib/index.ts`, we can easily import our types (and anything else we want in it) with `from $lib`. It's a handy shortcut!
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts"
+import type { earthquake } from "$lib";
+
+export default function drawMap(
+  id: string,
+  earthquakes: earthquake[],
+  width: number,
+  height: number,
+) {
+  console.log({ id, earthquakes, width, height });
+}
+```
+
+We can now create a new `Map.svelte` component that:
+
+- Imports our `earthquakes.json` data as `earthquakesRaw` (line 2), and maps over it to convert the `time` values back to `Date` objects (lines 7-10).
+- Retrieves the `id` as `props` (lines 5).
+- Creates `width` and `height` states (lines 12-13) and binds them to the `clientWidth` and `clientHeight` of the `svg` element in which we will draw our chart (line 21). We’ll talk more about `svg` elements later on.
+- Uses the `$effect` rune to call `drawMap` with all the props and states. This means Svelte will recall `drawMap` if any of the arguments change, including `width` and `height`, making the map responsive.
+- To keep a constant aspect ratio for our map, we wrap the `svg` in a `div`, and we use the `style` tags to set the `div` width to `100%` and the `svg` aspect-ratio to `16/9`.
+
+```svelte showLineNumbers filename="src/components/Map.svelte"
+<script lang="ts">
+    import earthquakesRaw from "../data/earthquakes.json";
+    import drawMap from "../helpers/drawMap";
+
+    const { id }: { id: string } = $props();
+
+    const earthquakes = earthquakesRaw.map((d) => ({
+        ...d,
+        time: new Date(d.time),
+    }));
+
+    let width = $state(0);
+    let height = $state(0);
+
+    $effect(() => {
+        drawMap(id, earthquakes, width, height);
+    });
+</script>
+
+<div>
+    <svg {id} bind:clientWidth={width} bind:clientHeight={height}></svg>
+</div>
+
+<style>
+    div {
+        width: 100%;
+    }
+    svg {
+        aspect-ratio: 16/9;
+    }
+</style>
+```
+
+And finally, we can import our new `<Map />` component on our page, which is `src/routes/+page.svelte`. We set an appropriate `id`. While we're at it, we can update the text.
+
+If you were still watching `sda/main.ts`, you can stop it (`CTRL` + `C`) and run `deno task dev` instead to start a local server. Open the URL provided in your terminal in your favorite web browser.
+
+In your web browser's console, you should see the log from `drawMap.ts`. We’re ready to code our map!
+
+```svelte showLineNumbers filename="src/routes/+page.svelte"
+<script lang="ts">
+    import Map from "../components/Map.svelte";
+</script>
+
+<h1>Earthquakes</h1>
+<p>
+    The data used below includes only earthquakes with a magnitude of 5 or more
+    that occurred in 2021.
+</p>
+<Map id="earthquakes" />
+```
+
+![VS Code with a Svelte project running locally.](/assets/d3-map/map-component.png)
+
+## Drawing a map with D3
+
+Let's play with D3 now!
+
+Stop your local server (`CTRL` + `C`) and install D3 with `deno add npm:d3`. Then rerun your local server with `deno task dev`.
+
+In the previous lesson, we've learnt about D3 `scales` that can convert data values to pixel values, colors, and more.
+
+When working with maps, we need to do the same thing for the geospatial coodinates (latitude and longitude). We need to convert them to pixels, but... there's a trick. The earth is round but our screens (and paper maps) are flat!
+
+This is why cartographers created `projections`, which are kind of like scales, but for maps. Each projection and its mathematical calculations come with their pros and cons. For example, the Mercator projection, which is probably the most-known of all, is great for navigation because directions are preserved, but distances and areas are distored for northern and southern areas.
+
+One reason why D3 is so great for maps is that you easily have access to [a looooot of projections](https://observablehq.com/@fil/d3-projections). In this project, we'll use the `geoEqualEarth()` projection, like we did with Plot at the begigining.
+
+Let's update `drawMap.ts` to use it. Here's what the new code does, step by step:
+- We select the `svg` that we will use to draw our map and we remove anything in it, to avoid keep adding elements in it between renders (lines 10-11).
+- We create a `sphere` that will contain the whole map (line 13-15).
+- We call the `geoEqualEarth` projection and we use the `fitSize` method to make sure our map will fit the `width` and `height` of our `svg`. We also pass our `sphere` to make sure our content will be well positionned on the map. If we add just one country, we would pass the country instead of the `sphere` to zoom on the country. We store the projection in the `projection` variable.
+- We call `geoPath` and pass it our `projection`. We store the result in the `geoGenerator` variable. This function will be able to draw shapes based on our latitudes and longitudes.
+- We can now append a `path` to the `svg`, which is a shape.
+- In the previous lesson, we passed an array of objects to `.data()` to bind data. But when we have just one item, like here with `sphere`, we must use `.datum()`.
+- Now we can set the attribute `d` (which is the shape of the `path`) to the `geoGenerator` function. The function will look at the binded data and translate it to coodinates. Here, it will just fill the map for now.
+- Finally, we can set other attributes, like the `fill` color.
+
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts" {10-25}
+import type { earthquake } from "$lib";
+import { geoEqualEarth, geoPath, select } from "d3";
+
+export default function drawMap(
+  id: string,
+  earthquakes: earthquake[],
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+  svg.selectAll("*").remove();
+
+  const sphere = {
+    type: "Sphere",
+  };
+  const projection = geoEqualEarth()
+    .fitSize([width, height], sphere);
+
+  const geoGenerator = geoPath().projection(projection);
+
+  svg
+    .append("path")
+    .datum(sphere)
+    .attr("d", geoGenerator)
+    .attr("fill", "black");
+}
+```
+
+If you right click on the black area and inspect it in your web browser, you'll see your `svg` with a `path`. The `path` has a `d` attribute that are SVG coordinates generated by our code!
+
+![A sphere created with D3.](/assets/d3-map/sphere.png)
+
+To make our map easier to read, we can also add graticules. The `geoGraticule()` generates a GeoJSON with the graticules coordinates.
+
+We put them after our Sphere in our code to ensure they will be drawn on top it. To give them a light grey, I drew them as white lines but with an opacity.
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts" {2, 27-33}
+import type { earthquake } from "$lib";
+import { geoEqualEarth, geoGraticule, geoPath, select } from "d3";
+
+export default function drawMap(
+  id: string,
+  earthquakes: earthquake[],
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+  svg.selectAll("*").remove();
+
+  const sphere = {
+    type: "Sphere",
+  };
+  const projection = geoEqualEarth()
+    .fitSize([width, height], sphere);
+
+  const geoGenerator = geoPath().projection(projection);
+
+  svg
+    .append("path")
+    .datum(sphere)
+    .attr("d", geoGenerator)
+    .attr("fill", "black");
+
+  svg
+    .append("path")
+    .datum(geoGraticule())
+    .attr("d", geoGenerator)
+    .attr("fill", "none")
+    .attr("stroke", "white")
+    .attr("opacity", 0.3);
+}
+```
+![Graticules created with D3.](/assets/d3-map/graticules.png)
+
+Now would be a good time to add the countries to our map. Since we are not interested in the actual borders, we can just fill them in in grey, without any stroke.
+
+There are over 100 of them, so we can use the `.data(countries.features)` and `.join("path")` syntax to bind the data to the new `path`s. Just to make sure we don't select the previous path by mistakes, we `selectAll` with the class `.countries`, which is set as an attribute.
+
+Also, we need the `.features` in `.data(countries.features)` because we wrote the file as a GeoJSON, which is an object with all features stored as a list with the key `features`.
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts" {3, 36-41}
+import type { earthquake } from "$lib";
+import { geoEqualEarth, geoGraticule, geoPath, select } from "d3";
+import countries from "../data/countries.json" with { type: "json" };
+
+export default function drawMap(
+  id: string,
+  earthquakes: earthquake[],
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+  svg.selectAll("*").remove();
+
+  const sphere = {
+    type: "Sphere",
+  };
+  const projection = geoEqualEarth()
+    .fitSize([width, height], sphere);
+
+  const geoGenerator = geoPath().projection(projection);
+
+  svg
+    .append("path")
+    .datum(sphere)
+    .attr("d", geoGenerator)
+    .attr("fill", "black");
+
+  svg
+    .append("path")
+    .datum(geoGraticule())
+    .attr("d", geoGenerator)
+    .attr("fill", "none")
+    .attr("stroke", "white")
+    .attr("opacity", 0.3);
+
+  svg.selectAll(".countries")
+    .data(countries.features)
+    .join("path")
+    .attr("class", "countries")
+    .attr("d", geoGenerator)
+    .attr("fill", "grey");
+}
+```
+![Countries on a map created with D3.](/assets/d3-map/countries.png)
+
+The only thing left are the earthquakes!
+
+They are a few things we need to take care of to show them properly:
+- We use the `extent` function to retrieve the minimum and maximum of the `ampl` values (lines 51-54). This function returns an array like `[min, max]`.
+- We create a scale for the `r` attribute (lines 56-58). We use a square root scale (`scaleSqrt`) because we want the area of the circle to be proportional to the data. We set its domain to the `ampl` extent and it's range to radii between 2 and 20 pixels.
+- We create a color scale, also tied to the `ampl` extent, going from yellow to red (lines 60-61).
+
+With the scales in place, and the projection set up previously, we can create circles for our earthquakes. For `cx` and `cy`, we pass the `lon` and `lat` (in this order) to the `projection`. It returns the pixel values as `[x, y]`, which we can use to place our circles on the map.
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts" {3, 7, 8, 51-69}
+import type { earthquake } from "$lib";
+import {
+  extent,
+  geoEqualEarth,
+  geoGraticule,
+  geoPath,
+  scaleLinear,
+  scaleSqrt,
+  select,
+} from "d3";
+import countries from "../data/countries.json" with { type: "json" };
+
+export default function drawMap(
+  id: string,
+  earthquakes: earthquake[],
+  width: number,
+  height: number,
+) {
+  const svg = select(`#${id}`);
+  svg.selectAll("*").remove();
+
+  const sphere = {
+    type: "Sphere",
+  };
+  const projection = geoEqualEarth()
+    .fitSize([width, height], sphere);
+
+  const geoGenerator = geoPath().projection(projection);
+
+  svg
+    .append("path")
+    .datum(sphere)
+    .attr("d", geoGenerator)
+    .attr("fill", "black");
+
+  svg
+    .append("path")
+    .datum(geoGraticule())
+    .attr("d", geoGenerator)
+    .attr("fill", "none")
+    .attr("stroke", "white")
+    .attr("opacity", 0.3);
+
+  svg.selectAll(".countries")
+    .data(countries.features)
+    .join("path")
+    .attr("class", "countries")
+    .attr("d", geoGenerator)
+    .attr("fill", "grey");
+
+  const amplExtent = extent(
+    earthquakes,
+    (d: earthquake) => d.ampl,
+  );
+
+  const rScale = scaleSqrt()
+    .domain(amplExtent)
+    .range([2, 20]);
+
+  const colorScale = scaleLinear().domain(amplExtent)
+    .range(["yellow", "red"]);
+
+  svg.selectAll("circle")
+    .data(earthquakes)
+    .join("circle")
+    .attr("cx", (d: earthquake) => projection([d.lon, d.lat])[0])
+    .attr("cy", (d: earthquake) => projection([d.lon, d.lat])[1])
+    .attr("r", (d: earthquake) => rScale(d.ampl))
+    .attr("fill", (d: earthquake) => colorScale(d.ampl));
+}
+```
+![Earthquakes on a map created with D3.](/assets/d3-map/earthquakes.png)
+
+Look at that! Isn't it beautiful? We plotted 2,000+ earthquakes on map, with continents and graticules, with a fancy projection! 🥳
+
+## Animating a map
+
+Now, how can we animate this map? It would be great to show the earthquakes as time goes.
+
+## Conclusion
+
+
+<NoticeEnd />
