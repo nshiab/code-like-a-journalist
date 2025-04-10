@@ -270,7 +270,7 @@ We can now create a new `Map.svelte` component that:
 
 And finally, we can import our new `<Map />` component on our page, which is `src/routes/+page.svelte`. We set an appropriate `id`. While we're at it, we can update the text.
 
-If you were still watching `sda/main.ts`, you can stop it (`CTRL + C`) and run `deno task dev` instead to start a local server. Open the URL provided in your terminal in your favorite web browser.
+If you were still watching `sda/main.ts` in your terminal, you can stop it (`CTRL + C`) and run `deno task dev` instead to start a local server. Open the URL provided in your terminal in your favorite web browser.
 
 In your browser’s console, you should see the log from `drawMap.ts`. We’re ready to code our map!
 
@@ -911,7 +911,7 @@ We can tweak our `$effect` in the `<Map />` component to fix the last few issues
 
 First, we retrieve the `intervalId` from `drawMap`. We also create a `setTimeout`, which triggers a function after a specified amount of time. In this case, if `animationDuration + transitionDuration` has elapsed, it means the last circle has finished animating. We can then switch the `animate` state back to `false`, which updates the button text. We also clear the date paragraph.
 
-Now, when working with events or timers, it’s important to remember that you need to **clean them up manually**. For example, what happens if a user clicks the button multiple times? As it stands, it would create multiple `setInterval` calls, and the date paragraph would be updated chaotically!
+But be careful: when working with events or timers, it’s important to remember that you need to **clean them up manually**. For example, what happens if a user clicks the button multiple times? As it stands, it would create multiple `setInterval` calls, and the date paragraph would be updated chaotically!
 
 That’s why at the end of the `$effect`, we add a cleanup function. This function is called **before** the effect runs again — perfect for canceling the previous `setInterval` and `setTimeout` before starting new ones.
 
