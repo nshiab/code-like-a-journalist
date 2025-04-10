@@ -10,9 +10,9 @@ import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
 
 As we've seen in the [previous lesson](/d3-chart), [D3.js](https://d3js.org/) is an amazing library to build charts. But it also excels to make maps.
 
-In this project, we will use earthquake data to create an animated map with D3 and Svelte, as shown below. I strongly suggest you complete the previous sections of the course before diving in, especially the [Animated charts with D3](/d3-chart).
+In this project, we will use earthquake data to create an animated map with D3 and Svelte, as shown below. I strongly suggest you complete the previous sections of the course before diving in, especially the [Animated charts with D3.js 🧑‍🎨](/d3-chart).
 
-ADD THE ANIMATION HERE.
+![Demo animation of earthquakes animated on a map created with D3 and Svelte.](/assets/d3-map/demo-earthquakes.gif)
 
 <NoticeIntro />
 
@@ -527,9 +527,465 @@ Look at that! Isn't it beautiful? We plotted 2,000+ earthquakes on map, with con
 
 ## Animating a map
 
-Now, how can we animate this map? It would be great to show the earthquakes as time goes.
+Now, how can we animate this map? It would be great to show the earthquakes as time goes by.
+
+First, let's create a `button` with a state `animate`. If we click on the button, we want the state to switch between `true` and `false`. And, of course, we pass this new state to our `drawMap` function.
+
+The `drawMap` function will also need a `animationDuration` (10s for now) and a `transitionDuration` (500ms). The first one will be the total length of the animation while the second one will the duration of each circle animation. Note that we don't expect them to change, so we can simply create regular constant variables.
+
+We can also already plan on a new paragraph in which we will display the current date for the animation. We can set its CSS `display` property to `inline` so it will on the same line as the button.
+
+```svelte showLineNumbers filename="src/components/Map.svelte" {15-17, 25-27, 32-37, 49-51}
+<script lang="ts">
+    import earthquakesRaw from "../data/earthquakes.json";
+    import drawMap from "../helpers/drawMap";
+
+    const { id }: { id: string } = $props();
+
+    const earthquakes = earthquakesRaw.map((d) => ({
+        ...d,
+        time: new Date(d.time),
+    }));
+
+    let width = $state(0);
+    let height = $state(0);
+
+    let animate = $state(false);
+    const animationDuration = 10000;
+    const transitionDuration = 500;
+
+    $effect(() => {
+        drawMap(
+            id,
+            earthquakes,
+            width,
+            height,
+            animate,
+            animationDuration,
+            transitionDuration,
+        );
+    });
+</script>
+
+<button
+    onclick={() => {
+        animate = !animate;
+    }}>{animate ? "Stop ⏹" : "Play ⏵"}</button
+>
+<p id={`${id}-date`}></p>
+<div>
+    <svg {id} bind:clientWidth={width} bind:clientHeight={height}></svg>
+</div>
+
+<style>
+    div {
+        width: 100%;
+    }
+    svg {
+        aspect-ratio: 16/9;
+    }
+    p {
+        display: inline;
+    }
+</style>
+```
+
+Now we can work in our `drawMap` function. Let's retrieve the new parameters `animate` and use it. For now, if `animate` is `true`, let's draw the earthquakes. Otherwise, we don't. We'll use `animationDuration` and `transitionDuration` later.
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts" {18-20, 54, 74}
+import type { earthquake } from "$lib";
+import {
+  extent,
+  geoEqualEarth,
+  geoGraticule,
+  geoPath,
+  scaleLinear,
+  scaleSqrt,
+  select,
+} from "d3";
+import countries from "../data/countries.json" with { type: "json" };
+
+export default function drawMap(
+  id: string,
+  earthquakes: earthquake[],
+  width: number,
+  height: number,
+  animate: boolean,
+  animationDuration: number,
+  transitionDuration: number,
+) {
+  const svg = select(`#${id}`);
+  svg.selectAll("*").remove();
+
+  const sphere = {
+    type: "Sphere",
+  };
+  const projection = geoEqualEarth()
+    .fitSize([width, height], sphere);
+
+  const geoGenerator = geoPath().projection(projection);
+
+  svg
+    .append("path")
+    .datum(sphere)
+    .attr("d", geoGenerator)
+    .attr("fill", "black");
+
+  svg
+    .append("path")
+    .datum(geoGraticule())
+    .attr("d", geoGenerator)
+    .attr("fill", "none")
+    .attr("stroke", "white")
+    .attr("opacity", 0.3);
+
+  svg.selectAll(".countries")
+    .data(countries.features)
+    .join("path")
+    .attr("class", "countries")
+    .attr("d", geoGenerator)
+    .attr("fill", "grey");
+
+  if (animate) {
+    const amplExtent = extent(
+      earthquakes,
+      (d: earthquake) => d.ampl,
+    );
+
+    const rScale = scaleSqrt()
+      .domain(amplExtent)
+      .range([2, 20]);
+
+    const colorScale = scaleLinear().domain(amplExtent)
+      .range(["yellow", "red"]);
+
+    svg.selectAll("circle")
+      .data(earthquakes)
+      .join("circle")
+      .attr("cx", (d: earthquake) => projection([d.lon, d.lat])[0])
+      .attr("cy", (d: earthquake) => projection([d.lon, d.lat])[1])
+      .attr("r", (d: earthquake) => rScale(d.ampl))
+      .attr("fill", (d: earthquake) => colorScale(d.ampl));
+  }
+}
+```
+
+This was easy. And we are on the right path! Now we can focus on creating an animation with D3.
+
+![Toggling earthquakes on a map created with D3.](/assets/d3-map/start-stop.gif)
+
+One way to show things one after the others with D3 is by using `.transition()` with `.delay()`. We could first draw the circles with an `r` of `0`, then give them each a delay based on their `time` value. Once the delay expires, we could use `.transition()` again to bring the `r` to what it's supposed to be. If you want to know more about D3 transitions, make check to check the previous lesson [Animated charts with D3.js 🧑‍🎨](/d3-chart)
+
+And how could we compute the right delay for each circle? Well, with a scale!
+
+Let's code that!
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts" {67-72, 80-84}
+import type { earthquake } from "$lib";
+import {
+  extent,
+  geoEqualEarth,
+  geoGraticule,
+  geoPath,
+  scaleLinear,
+  scaleSqrt,
+  select,
+} from "d3";
+import countries from "../data/countries.json" with { type: "json" };
+
+export default function drawMap(
+  id: string,
+  earthquakes: earthquake[],
+  width: number,
+  height: number,
+  animate: boolean,
+  animationDuration: number,
+  transitionDuration: number,
+) {
+  const svg = select(`#${id}`);
+  svg.selectAll("*").remove();
+
+  const sphere = {
+    type: "Sphere",
+  };
+  const projection = geoEqualEarth()
+    .fitSize([width, height], sphere);
+
+  const geoGenerator = geoPath().projection(projection);
+
+  svg
+    .append("path")
+    .datum(sphere)
+    .attr("d", geoGenerator)
+    .attr("fill", "black");
+
+  svg
+    .append("path")
+    .datum(geoGraticule())
+    .attr("d", geoGenerator)
+    .attr("fill", "none")
+    .attr("stroke", "white")
+    .attr("opacity", 0.3);
+
+  svg.selectAll(".countries")
+    .data(countries.features)
+    .join("path")
+    .attr("class", "countries")
+    .attr("d", geoGenerator)
+    .attr("fill", "grey");
+
+  if (animate) {
+    const amplExtent = extent(
+      earthquakes,
+      (d: earthquake) => d.ampl,
+    );
+
+    const rScale = scaleSqrt()
+      .domain(amplExtent)
+      .range([2, 20]);
+
+    const colorScale = scaleLinear().domain(amplExtent)
+      .range(["yellow", "red"]);
+
+    const timeExtent = extent(
+      earthquakes,
+      (d: earthquake) => d.time,
+    );
+    const delayScale = scaleLinear().domain(timeExtent)
+      .range([0, animationDuration]);
+
+    svg.selectAll("circle")
+      .data(earthquakes)
+      .join("circle")
+      .attr("cx", (d: earthquake) => projection([d.lon, d.lat])[0])
+      .attr("cy", (d: earthquake) => projection([d.lon, d.lat])[1])
+      .attr("fill", (d: earthquake) => colorScale(d.ampl))
+      .attr("r", 0)
+      .transition()
+      .duration(transitionDuration)
+      .delay((d: earthquake) => delayScale(d.time))
+      .attr("r", (d: earthquake) => rScale(d.ampl));
+  }
+}
+```
+
+And just like that, we animated our earthquakes! But it would be better if the earthquakes would grow in size and then disappear.
+
+![Animated earthquakes on a map created with D3.](/assets/d3-map/first-play.gif)
+
+Let's add another transition so after growing, our circles would go back to an `r` of `0`.
+
+We can also update the paragraph we created earlier to show the current date. We can use the globally available function `setInterval`, that triggers a function on a set interval. Here, every 100ms, we use the `.invert()` method of our `delayScale` to retrieve a time value. We format this time value with the `formatDate` function from the [journalism library](https://jsr.io/@nshiab/journalism), which I maintain. And we put that formatted data into the paragraph.
+
+To stop the `setInterval` from running, we use its `intervalId`. When it has been running for longer than the total animation, it means it should stop, which is done by calling `clearInterval(intervalId)`. We also return the `intervalId`, so we can use it in our `<Map />` component. More about it in a minute.
+
+```ts showLineNumbers filename="src/helpers/drawMap.ts" {86-88, 90-108}
+import type { earthquake } from "$lib";
+import {
+  extent,
+  geoEqualEarth,
+  geoGraticule,
+  geoPath,
+  scaleLinear,
+  scaleSqrt,
+  select,
+} from "d3";
+import { formatDate } from "@nshiab/journalism/web";
+import countries from "../data/countries.json" with { type: "json" };
+
+export default function drawMap(
+  id: string,
+  earthquakes: earthquake[],
+  width: number,
+  height: number,
+  animate: boolean,
+  animationDuration: number,
+  transitionDuration: number,
+) {
+  const svg = select(`#${id}`);
+  svg.selectAll("*").remove();
+
+  const sphere = {
+    type: "Sphere",
+  };
+  const projection = geoEqualEarth()
+    .fitSize([width, height], sphere);
+
+  const geoGenerator = geoPath().projection(projection);
+
+  svg
+    .append("path")
+    .datum(sphere)
+    .attr("d", geoGenerator)
+    .attr("fill", "black");
+
+  svg
+    .append("path")
+    .datum(geoGraticule())
+    .attr("d", geoGenerator)
+    .attr("fill", "none")
+    .attr("stroke", "white")
+    .attr("opacity", 0.3);
+
+  svg.selectAll(".countries")
+    .data(countries.features)
+    .join("path")
+    .attr("class", "countries")
+    .attr("d", geoGenerator)
+    .attr("fill", "grey");
+
+  if (animate) {
+    const amplExtent = extent(
+      earthquakes,
+      (d: earthquake) => d.ampl,
+    );
+
+    const rScale = scaleSqrt()
+      .domain(amplExtent)
+      .range([2, 20]);
+
+    const colorScale = scaleLinear().domain(amplExtent)
+      .range(["yellow", "red"]);
+
+    const timeExtent = extent(
+      earthquakes,
+      (d: earthquake) => d.time,
+    );
+    const delayScale = scaleLinear().domain(timeExtent)
+      .range([0, animationDuration]);
+
+    svg.selectAll("circle")
+      .data(earthquakes)
+      .join("circle")
+      .attr("cx", (d: earthquake) => projection([d.lon, d.lat])[0])
+      .attr("cy", (d: earthquake) => projection([d.lon, d.lat])[1])
+      .attr("fill", (d: earthquake) => colorScale(d.ampl))
+      .attr("r", 0)
+      .transition()
+      .duration(transitionDuration)
+      .delay((d: earthquake) => delayScale(d.time))
+      .attr("r", (d: earthquake) => rScale(d.ampl))
+      .transition()
+      .duration(transitionDuration)
+      .attr("r", 0);
+
+    const dateParagraph = document.querySelector(`#${id}-date`);
+    if (dateParagraph) {
+      const interval = 100;
+      let duration = 0;
+      const intervalId = setInterval(() => {
+        if (duration > animationDuration) {
+          clearInterval(intervalId);
+        } else {
+          const date = new Date(delayScale.invert(duration));
+          dateParagraph.innerHTML = formatDate(
+            date,
+            "YYYY-MM-DD",
+            { utc: true },
+          );
+          duration += interval;
+        }
+      }, interval);
+      return intervalId;
+    }
+  }
+}
+```
+
+We are getting there! But we need to do something with this button and data paragraph once the animation is done.
+
+![Animated earthquakes appearing and disappearing on a map created with D3.](/assets/d3-map/animating-circles.gif)
+
+We can tweak our `$effect` in our `<Map />` component to fix the last few problems.
+
+First, we can retrieve our `intervalId` from `drawMap`. We can also create a `setTimeout`, which triggers a function after a specified amount of time. Here, if the `animationDuration + duration` has elapsed, it means the last circle has been animated. We can switch bach the `animate` state to false, which will update the text in our `button`. We can also empty our date paragraph.
+
+Now, when you work with events or timers, it also very important to remember that you need to **clean them up manually**. For example, what happens if a user clicks multiple times on the button? Right now, it will create multiple `setInterval` calls and our date paragraph will be updated like crazy!
+
+This is why at the end of the `$effect`, I added a cleanup function. This function will be called **before** anything else runs **again**. It's the perfect place to tell our browser to cancel the previous `setInterval` and `setTimeout`, before creating new ones.
+
+```ts showLineNumbers filename="src/components/Map.svelte" {20, 30-36, 38-41}
+<script lang="ts">
+    import earthquakesRaw from "../data/earthquakes.json";
+    import drawMap from "../helpers/drawMap";
+
+    const { id }: { id: string } = $props();
+
+    const earthquakes = earthquakesRaw.map((d) => ({
+        ...d,
+        time: new Date(d.time),
+    }));
+
+    let width = $state(0);
+    let height = $state(0);
+
+    let animate = $state(false);
+    const animationDuration = 10000;
+    const transitionDuration = 500;
+
+    $effect(() => {
+        const intervalId = drawMap(
+            id,
+            earthquakes,
+            width,
+            height,
+            animate,
+            animationDuration,
+            transitionDuration,
+        );
+
+        const timeoutId = setTimeout(() => {
+            animate = false;
+            const dateParagraph = document.querySelector(`#${id}-date`);
+            if (dateParagraph) {
+                dateParagraph.textContent = "";
+            }
+        }, animationDuration + transitionDuration);
+
+        return () => {
+            clearInterval(intervalId);
+            clearTimeout(timeoutId);
+        };
+    });
+</script>
+
+<button
+    onclick={() => {
+        animate = !animate;
+    }}>{animate ? "Stop ⏹" : "Play ⏵"}</button
+>
+<p id={`${id}-date`}></p>
+<div>
+    <svg {id} bind:clientWidth={width} bind:clientHeight={height}></svg>
+</div>
+
+<style>
+    div {
+        width: 100%;
+    }
+    svg {
+        aspect-ratio: 16/9;
+    }
+    p {
+        display: inline;
+    }
+</style>
+```
+
+And it woooooorks! A beautiful animated map of earthquakes made with D3.js and Svelte!
+
+![Final animation of earthquakes animated on a map created with D3 and Svelte.](/assets/d3-map/final-animation.gif)
+
+## Building the page
+
+So far, we've run our page with a local server. If you want to build your website, run `deno task build`. Svelte will minimize and optimize your code and create your website files in the `build` folder. You can then host these files on a server to share your work with the world!
 
 ## Conclusion
 
+Congratulations! You coded an smooth animated map. It was no easy task but you got to the end!
+
+If you want to explore more D3 examples, including maps, make sure to check the [D3 gallery](https://observablehq.com/@d3/gallery). All the code is open source!
+
+I hope you enjoyed the lesson and I can't wait to see your next map published on the Web. Please [let me know](/contact) if you do! 😊
 
 <NoticeEnd />
