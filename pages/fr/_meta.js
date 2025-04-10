@@ -10,6 +10,7 @@ export default {
     "one-billion-row-challenge": "Le défi du milliard de lignes 😱",
     "web-basics": "4. Les bases du Web 🌐",
     "d3-chart": "Graphiques animés avec D3 🧑‍🎨",
+    "d3-map": "Cartes animées avec D3 🗺️",
     "ninja-moves": "Techniques de ninja 🥷",
     inspirations: "Personnes & contenus inspirants 📚",
     "more": "Prochaines leçons...",
