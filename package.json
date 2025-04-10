@@ -23,7 +23,7 @@
   "dependencies": {
     "@nshiab/journalism": "npm:@jsr/nshiab__journalism@^1.21.9",
     "@vercel/analytics": "^1.4.1",
-    "next": "^15.1.2",
+    "next": "^15.3.0",
     "nextra": "^3.3.1",
     "nextra-theme-docs": "^3.3.1",
     "react": "^19.0.0",
