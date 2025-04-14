@@ -11,6 +11,7 @@ export default {
     "web-basics": "4. Web basics 🌐",
     "d3-chart": "Animated charts with D3 🧑‍🎨",
     "d3-map": "Animated maps with D3 🗺️",
+    "web-scraping": "Web scraping 🔍",
     "ninja-moves": "Ninja moves 🥷",
     inspirations: "Inspiring people & content 📚",
     "more": "More to come...",
