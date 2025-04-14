@@ -1,0 +1,772 @@
+---
+title: Extraction de données web 🔍
+description: Apprenez à extraire des données depuis des sites et des pages web avec TypeScript.
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+
+# Extraction de données web 🔍
+
+Internet est une source d'information incroyable. Mais les données ne sont pas toujours facilement téléchargeables. Parfois, l'information est simplement affichée sur des pages web et… c'est tout !
+
+Pour la récupérer, vous devez extraire les données directement à partir du code HTML et, sur des sites plus complexes, vous devez automatiser ou simuler des clics sur la page pour obtenir ce que vous voulez.
+
+Un mot d'avertissement : avant toute extraction, **assurez-vous toujours que ce que vous faites est légal**. Dans certains cas, l’extraction et la copie de données sont interdites. De plus, **respectez toujours l’infrastructure**. N’inondez pas les sites web de requêtes. Soyez conscient des ressources et des coûts que votre scraping peut engendrer pour les personnes et les organisations qui hébergent ces sites.
+
+Notez que je pars du principe que vous avez complété les sessions précédentes de ce cours. La section **4. Fondamentaux du web 🌐** est particulièrement importante. Si vous ne savez pas comment une page web est construite, il vous sera très difficile d’en extraire des données.
+
+<NoticeIntro lang="fr" />
+
+## Configuration
+
+Pour configurer notre projet, utilisons [setup-sda](https://github.com/nshiab/setup-sda), comme nous l'avons fait dans les leçons précédentes, mais avec l’option `--scrape` pour installer quelques librairies supplémentaires.
+
+Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez `deno -A jsr:@nshiab/setup-sda --scrape`.
+
+![Une capture d'écran de VS Code montrant un script simulant la bourse](/assets/web-scraping/setup.png)
+
+## Extraction de tableaux
+
+[Les tableaux HTML](https://www.w3schools.com/html/html_tables.asp) sont communs pour afficher des données sur les sites web.
+
+Par exemple, sur [cette page Wikipédia](https://en.wikipedia.org/wiki/Medieval_demography#Demographic_tables_of_Europe's_population) sur la démographie médiévale en Europe, vous pouvez voir plusieurs tableaux.
+
+Si vous inspectez celui nommé *European population dynamics, years 1000–1500* dans un navigateur (clic droit sur le tableau puis *Inspecter* dans le menu qui s'ouvre), vous verrez l’élément HTML du tableau. Si vous explorez son code, vous verrez les différents éléments qui composent ce tableau avec les données qu’il contient.
+
+![Inspection d’une page HTML avec Chrome.](/assets/web-scraping/wikipedia-table.png)
+
+Comme ces structures HTML sont toujours les mêmes, j’ai publié une fonction pour extraire les données intégrées dans des tableaux comme celui-ci dans la [librairie journalism](https://github.com/nshiab/journalism/). La librairie est installée automatiquement lorsque vous installez tout avec `setup-sda`.
+
+### Avec un `index`
+
+Vous pouvez passer à `getHtmlTable` l’URL que vous souhaitez utiliser. Par défaut, elle renverra les données du premier tableau de la page. Mais sur la page Wikipédia, le tableau que nous voulons est en réalité le quatrième dans le code HTML. Nous pouvons donc passer l’option `{ index: 3 }`.
+
+Copiez-collez le code ci-dessous dans `sda/main.ts` et exécutez `deno task sda` dans votre terminal pour lancer et surveiller l’exécution.
+
+
+```ts showLineNumbers filename="sda/main.ts" {2, 6-11}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { getHtmlTable } from "@nshiab/journalism";
+
+const sdb = new SimpleDB();
+
+const medievalData = await getHtmlTable(
+  "https://en.wikipedia.org/wiki/Medieval_demography",
+  { index: 3 },
+);
+
+console.table(medievalData);
+
+await sdb.done();
+```
+![Un tableau Wikipédia extrait.](/assets/web-scraping/medieval.png)
+
+<Callout type="info" emoji="💡">
+    Si la mise en page du tableau s'affiche étrangement dans votre terminal, c'est parce que la largeur du tableau dépasse celle du terminal. Faites un clic droit dans le terminal et cherchez l’option `Toggle size with content width`. Il existe aussi un raccourci très pratique que j’utilise tout le temps pour ça : `OPTION` + `Z` sur Mac et `ALT` + `Z` sur PC.
+</Callout>
+
+Les données retournées par `getHtmlTable` sont une liste d’objets, ce qui signifie que vous pouvez facilement les utiliser avec la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) pour les mettre en cache et les analyser.
+
+
+```ts showLineNumbers filename="sda/main.ts" {2, 6, 8, 13-14, 16-24}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { getHtmlTable } from "@nshiab/journalism";
+
+const sdb = new SimpleDB();
+
+const medievalDemography = sdb.newTable("mediavalDemography");
+
+await medievalDemography.cache(async () => {
+  const medievalData = await getHtmlTable(
+    "https://en.wikipedia.org/wiki/Medieval_demography",
+    { index: 3 },
+  );
+  await medievalDemography.loadArray(medievalData);
+});
+
+await medievalDemography.convert({
+  Year: "number",
+  "Total European population,millions": "number",
+});
+await medievalDemography.logTable();
+await medievalDemography.logLineChart(
+  "Year",
+  "Total European population,millions",
+);
+
+await sdb.done();
+```
+![Un tableau Wikipédia mis en cache.](/assets/web-scraping/medieval-cache.png)
+<Callout type="info" emoji="💡">
+    Mettre les données en cache est très important. Si vous ne vous attendez pas à ce que les données changent, vous pouvez les sauvegarder sur votre ordinateur au lieu de les récupérer encore et encore. Avec la librairie SDA, le cache est très simple à gérer. La méthode `cache` crée un dossier `.sda-cache` qui stocke les données dans votre projet. Si vous souhaitez que les données expirent après un certain temps, consultez l’option `ttl` dans la [documentation](https://jsr.io/@nshiab/simple-data-analysis/doc/~/SimpleTable.prototype.cache). Pour en savoir plus sur la librairie SDA, consultez la section [`3. La librairie SDA 🤓`](/tabular-data).
+</Callout>
+
+### Avec un `selector`
+
+La fonction `getHtmlTable` peut aussi utiliser un sélecteur CSS pour récupérer les données d’un tableau spécifique que vous souhaitez cibler.
+
+Par exemple, [les députés canadiens doivent divulguer leurs dépenses tous les trois mois](https://www.ourcommons.ca/proactivedisclosure/en/members/2024/1). Sur cette page, on peut voir que les données sont stockées dans un tableau avec l’identifiant `data-table`. On peut utiliser cet identifiant directement avec notre fonction.
+
+PS : Notez que vous pouvez télécharger les données directement au format CSV. Mais je cherchais un site public qui ne change pas trop avec le temps, et celui-ci correspond bien à ce critère !
+
+```ts showLineNumbers filename="sda/main.ts" {6-9, 11}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { getHtmlTable } from "@nshiab/journalism";
+
+const sdb = new SimpleDB();
+
+const expensesData = await getHtmlTable(
+  "https://www.ourcommons.ca/proactivedisclosure/en/members/2024/1",
+  { selector: "#data-table" },
+);
+
+console.table(expensesData);
+
+await sdb.done();
+```
+![Dépenses des députés extraites d’un tableau web.](/assets/web-scraping/MPS-expenses.png)
+
+Comme nous l’avons fait avec le tableau Wikipédia, nous pouvons mettre en cache et analyser ces données avec SDA. Ici, nous calculons les dépenses moyennes par parti.
+
+```ts showLineNumbers filename="sda/main.ts" {6-7, 12-13, 15-32}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { getHtmlTable } from "@nshiab/journalism";
+
+const sdb = new SimpleDB();
+
+const MPs = sdb.newTable("MPs");
+await MPs.cache(async () => {
+  const expensesData = await getHtmlTable(
+    "https://www.ourcommons.ca/proactivedisclosure/en/members/2024/1",
+    { selector: "#data-table" },
+  );
+  await MPs.loadArray(expensesData);
+});
+
+await MPs.replace(["Salaries", "Travel", "Hospitality", "Contracts"], {
+  "$": "",
+  ",": "",
+});
+await MPs.convert({
+  Salaries: "number",
+  Travel: "number",
+  Hospitality: "number",
+  Contracts: "number",
+}, { try: true });
+await MPs.summarize({
+  values: ["Salaries", "Travel", "Hospitality", "Contracts"],
+  categories: "Caucus",
+  summaries: "mean",
+  decimals: 0,
+});
+await MPs.wider("Caucus", "mean");
+await MPs.logTable();
+
+await sdb.done();
+```
+![Dépenses des députés extraites et résumées avec SDA.](/assets/web-scraping/MPS-summary.png)
+
+## Extraction depuis des pages
+
+### Pages simples
+
+Les données ne sont pas toujours bien rangées dans des tableaux. Parfois, elles traînent un peu partout dans le code des pages web.
+
+Par exemple, voici la [liste de tous les députés canadiens actuellement en fonction](https://www.ourcommons.ca/Members/en/search?parliament). Cette liste change avec le temps, donc vous n’aurez peut-être pas exactement les mêmes que moi, mais ce n’est pas grave pour cette leçon.
+
+![Tous les députés actuellement en fonction.](/assets/web-scraping/all-MPS.png)
+
+Si vous voulez connaître leur langue d'usage (le Canada est bilingue 🇨🇦), vous devez cliquer sur la page personnelle de chacun d’eux.
+
+Comment pourrait-on récupérer la langue préférée de tous les députés ?
+
+![Page personnelle d’un député.](/assets/web-scraping/personal-page-MP.png)
+
+Quand les données sont réparties sur plusieurs pages, la première étape consiste souvent à rassembler toutes les URLs.
+
+Pour récupérer toutes les URLs, on peut utiliser [Playwright](https://github.com/microsoft/playwright). C’est un projet en code ouvert de Microsoft. Il a été créé pour automatiser les tests de sites web, mais c’est aussi un excellent outil pour l'extraction de données. Playwright permet de prendre le contrôle d’un navigateur web avec du code et d’extraire ce que vous voulez des pages visitées par votre script.
+
+Playwright est installé automatiquement quand vous installez tout avec `setup-sda`.
+
+Si on inspecte les cartes sur le site web, on peut voir que la balise `a` contient le lien vers la page personnelle du député. Toutes les balises ont la classe `ce-mip-mp-tile`.
+
+![Inspection de la page personnelle d’un député.](/assets/web-scraping/link-MP.png)
+
+Commençons par visiter la page et extraire les URLs. Voici ce que fait le code ci-dessous, étape par étape :
+- D'abord, on importe le navigateur [`chromium`](https://www.chromium.org/chromium-projects/) depuis Playwright. Chromium est un projet en code ouvert à la base de Google Chrome. On crée un nouveau `browser`, puis un nouveau `context`, et enfin une `newPage` (lignes 1–5).
+- Ensuite, on demande à cette page d’aller sur la page des députés (ligne 7).
+- On récupère tous les éléments avec la classe `ce-mip-mp-tile` (ligne 9).
+- Puis on utilise la méthode `evaluateAll`, qui permet d’exécuter du code dans le navigateur — très pratique pour le scraping. Ici, on l’utilise pour extraire facilement les attributs `href` et récupérer les URLs (ligne 10).
+- On affiche les URLs dans le terminal (ligne 12).
+- Enfin, on ferme tout ce qui est lié à `chromium` (lignes 14–16).
+
+Dans votre terminal, vous devriez voir toutes les URLs affichées !
+
+
+```ts showLineNumbers filename="sda/main.ts"
+import { chromium } from "playwright-chromium";
+
+const browser = await chromium.launch();
+const context = await browser.newContext();
+const page = await context.newPage();
+
+await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
+
+const urls = await page.locator(".ce-mip-mp-tile")
+  .evaluateAll((elements) => elements.map((a) => a.href));
+
+console.log(urls);
+
+await page.close();
+await context.close();
+await browser.close();
+```
+![Toutes les URLs des pages personnelles des députés.](/assets/web-scraping/mps-urls.png)
+
+Maintenant que nous avons toutes les URLs des pages personnelles des députés, nous pouvons itérer sur chacune d’elles et extraire des informations pour chaque député.
+
+Si vous avez accès à une IA dans les outils de développement de votre navigateur (comme dans Chrome) et que vous ne savez pas trop quel code écrire, vous pouvez lui poser la question directement. C’est plutôt pratique. Bien sûr, faites attention à ce que vous demandez : ces données sont envoyées sur Internet (ici, à Google) et les réponses ne sont pas toujours justes !
+
+Par exemple, dans la capture ci-dessous, j’ai inspecté le nom du député, puis j’ai fait un clic droit dessus dans le code HTML et j’ai cliqué sur `Ask AI`. Dans la discussion en bas, j’ai demandé : `How can I retrieve the text content with Playwright?`. Et le code fourni fonctionne !
+
+![IA utilisée pour récupérer le contenu textuel dans Playwright.](/assets/web-scraping/ask-AI.png)
+
+Dans le code ci-dessous, on extrait le nom, le parti, la circonscription, la province ou le territoire, et bien sûr la langue d'usage du député.
+
+Ici, on parcourt toutes les pages des députés ! Donc on s’assure d’ajouter un petit délai (500 ms) à la fin de chaque itération pour éviter de surcharger le serveur du site web avec trop de requêtes. De nombreux sites vous bloqueront si vous les visitez trop fréquemment.
+
+Dans votre terminal, vous devriez voir les données s’afficher au fur et à mesure de l’extraction !
+
+
+```ts showLineNumbers filename="sda/main.ts" {12-25}
+import { chromium } from "playwright-chromium";
+
+const browser = await chromium.launch();
+const context = await browser.newContext();
+const page = await context.newPage();
+
+await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
+
+const urls = await page.locator(".ce-mip-mp-tile")
+  .evaluateAll((elements) => elements.map((a) => a.href));
+
+for (const url of urls) {
+  console.log(`\n${url}`);
+  await page.goto(url);
+  const name = await page.locator("h1").textContent();
+  const party = await page.locator(".mip-mp-profile-caucus").textContent();
+  const district = await page.locator("dd > a").textContent();
+  const province = await page.locator("dl > dd:nth-child(6)").textContent();
+  const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+
+  const data = { name, party, district, province, language };
+  console.log(data);
+
+  await page.waitForTimeout(500);
+}
+
+await page.close();
+await context.close();
+await browser.close();
+```
+![Données extraites pour les députés.](/assets/web-scraping/mps-extraction.png)
+
+Quand j’extrais des données sur des pages comme celle-ci, j’aime généralement ajouter quelques éléments supplémentaires au script :
+- Un compteur pour estimer le temps restant.
+- Un log au début de chaque boucle pour savoir quel élément est en cours de traitement.
+- Une étape de mise en cache pour éviter de re-télécharger les données déjà extraites.
+
+
+```ts showLineNumbers filename="sda/main.ts" {2-3, 14, 16-19, 21, 23-26, 37-38,  41-42}
+import { chromium } from "playwright-chromium";
+import { exists } from "@std/fs";
+import { DurationTracker } from "@nshiab/journalism";
+
+const browser = await chromium.launch();
+const context = await browser.newContext();
+const page = await context.newPage();
+
+await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
+
+const urls = await page.locator(".ce-mip-mp-tile")
+  .evaluateAll((elements) => elements.map((a) => a.href));
+
+const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
+
+for (let i = 0; i < urls.length; i++) {
+  const url = urls[i];
+  const id = url.split("/").pop();
+  const filePath = `./sda/data/${id}.json`;
+
+  console.log(`\nProcessing ${i + 1} of ${urls.length}: ${url}`);
+
+  if (await exists(filePath)) {
+    console.log(`File already exists: ${filePath}`);
+  } else {
+    tracker.start();
+
+    await page.goto(url);
+    const name = await page.locator("h1").textContent();
+    const party = await page.locator(".mip-mp-profile-caucus").textContent();
+    const district = await page.locator("dd > a").textContent();
+    const province = await page.locator("dl > dd:nth-child(6)").textContent();
+    const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+
+    const data = { name, party, district, province, language };
+
+    const json = JSON.stringify(data, null, 2);
+    await Deno.writeTextFile(filePath, json);
+
+    await page.waitForTimeout(500);
+    tracker.log();
+  }
+}
+
+await page.close();
+await context.close();
+await browser.close();
+```
+
+Maintenant, lorsque vous exécutez le script, vous avez une meilleure idée de sa vitesse d’exécution et du temps estimé qu’il lui reste. Et surtout, s’il plante à un moment pour n’importe quelle raison, vous n’avez pas besoin de tout réextraire. Les données précédemment extraites ont été sauvegardées sous forme de fichiers JSON !
+
+![Données extraites pour les députés, avec plus d’informations sur l’extraction.](/assets/web-scraping/mps-caching.png)
+
+Par défaut, Playwright fonctionne en mode `headless`, ce qui signifie que le navigateur automatisé ne s’affiche pas. Mais si vous voulez voir votre script en action, vous pouvez passer l’option `{ headless: false }`.
+
+
+```ts showLineNumbers filename="sda/main.ts" {5}
+import { chromium } from "playwright-chromium";
+import { exists } from "@std/fs";
+import { DurationTracker } from "@nshiab/journalism";
+
+const browser = await chromium.launch({ headless: false });
+const context = await browser.newContext();
+const page = await context.newPage();
+
+await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
+
+const urls = await page.locator(".ce-mip-mp-tile")
+  .evaluateAll((elements) => elements.map((a) => a.href));
+
+const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
+
+for (let i = 0; i < urls.length; i++) {
+  const url = urls[i];
+  const id = url.split("/").pop();
+  const filePath = `./sda/data/${id}.json`;
+
+  console.log(`\nProcessing ${i + 1} of ${urls.length}: ${url}`);
+
+  if (await exists(filePath)) {
+    console.log(`File already exists: ${filePath}`);
+  } else {
+    tracker.start();
+
+    await page.goto(url);
+    const name = await page.locator("h1").textContent();
+    const party = await page.locator(".mip-mp-profile-caucus").textContent();
+    const district = await page.locator("dd > a").textContent();
+    const province = await page.locator("dl > dd:nth-child(6)").textContent();
+    const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+
+    const data = { name, party, district, province, language };
+
+    const json = JSON.stringify(data, null, 2);
+    await Deno.writeTextFile(filePath, json);
+
+    await page.waitForTimeout(500);
+    tracker.log();
+  }
+}
+
+await page.close();
+await context.close();
+await browser.close();
+```
+
+Et maintenant, vous voyez votre code en action ! Cela peut être très utile pour déboguer un script qui ne fonctionne pas comme prévu.
+
+![Playwright avec le mode headless désactivé.](/assets/web-scraping/mps-browser.gif)
+
+Enfin, vous pouvez charger tous ces fichiers JSON avec SDA et traiter vos données. Par exemple, ici, une fois l’extraction terminée, on compte le nombre de députés selon leur langue d'usage.
+
+```ts showLineNumbers filename="sda/main.ts" {4, 50-60}
+import { chromium } from "playwright-chromium";
+import { exists } from "@std/fs";
+import { DurationTracker } from "@nshiab/journalism";
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const browser = await chromium.launch();
+const context = await browser.newContext();
+const page = await context.newPage();
+
+await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
+
+const urls = await page.locator(".ce-mip-mp-tile")
+  .evaluateAll((elements) => elements.map((a) => a.href));
+
+const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
+
+for (let i = 0; i < urls.length; i++) {
+  const url = urls[i];
+  const id = url.split("/").pop();
+  const filePath = `./sda/data/${id}.json`;
+
+  console.log(`\nProcessing ${i + 1} of ${urls.length}: ${url}`);
+
+  if (await exists(filePath)) {
+    console.log(`File already exists: ${filePath}`);
+  } else {
+    tracker.start();
+
+    await page.goto(url);
+    const name = await page.locator("h1").textContent();
+    const party = await page.locator(".mip-mp-profile-caucus").textContent();
+    const district = await page.locator("dd > a").textContent();
+    const province = await page.locator("dl > dd:nth-child(6)").textContent();
+    const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+
+    const data = { name, party, district, province, language };
+
+    const json = JSON.stringify(data, null, 2);
+    await Deno.writeTextFile(filePath, json);
+
+    await page.waitForTimeout(500);
+    tracker.log();
+  }
+}
+
+await page.close();
+await context.close();
+await browser.close();
+
+const sdb = new SimpleDB();
+
+const MPs = sdb.newTable("MPs");
+await MPs.loadData("sda/data/*.json");
+await MPs.summarize({
+  categories: ["party", "language"],
+});
+await MPs.wider("party", "count");
+await MPs.logTable();
+
+await sdb.done();
+```
+![Chargement et résumé des données extraites sur les députés.](/assets/web-scraping/mps-sda.png)
+
+Félicitations ! Vous savez maintenant comment utiliser Playwright pour extraire des données de pages web !
+
+### Pages complexes
+
+Certains sites web sont plus compliqués à extraire. Il n’est pas toujours possible de récupérer simplement une liste d’URLs. Parfois, il faut cliquer sur plusieurs menus et boutons pour accéder aux données souhaitées.
+
+Dans l’exemple ci-dessous, nous allons explorer le site d’Élections Canada. Vous pourriez télécharger toutes les données assez facilement, mais cette interface publique est une excellente occasion d’apprendre à extraire des données depuis des pages web plus complexes.
+
+Disons que nous voulons récupérer les dépenses déclarées des candidats aux élections fédérales canadiennes. Il faut cliquer sur plusieurs options sur la [page d’accueil](https://www.elections.ca/WPAPPS/WPF/EN/Home/Index).
+
+![Sélection de plusieurs options sur le site d’Élections Canada.](/assets/web-scraping/EC-home.png)
+
+Cela nous amène ensuite à une nouvelle page, avec encore de nombreuses options à choisir.
+
+![Sélection d’autres options sur le site d’Élections Canada.](/assets/web-scraping/EC-more-options.png)
+
+Et enfin, nous avons accès aux données, mais il faut encore parcourir un menu pour extraire les données de chaque candidat.
+
+![Données des candidats sur le site d’Élections Canada.](/assets/web-scraping/EC-candidates-data.png)
+
+Heureusement, c’est assez facile à faire avec les méthodes `selectOption` et `click` de Playwright !
+
+Le code ci-dessous utilise l’option `{ headless: false }`, plusieurs appels à `await page.waitForTimeout(500)`, et un `scrollIntoViewIfNeeded` pour que vous puissiez voir le script interagir avec la page.
+
+```ts showLineNumbers filename="sda/main.ts"
+import { chromium } from "playwright-chromium";
+
+const browser = await chromium.launch({ headless: false });
+const context = await browser.newContext();
+const page = await context.newPage();
+
+await page.goto("https://www.elections.ca/WPAPPS/WPF/EN/Home/Index");
+await page.selectOption("#actsList", "CC_C76");
+await page.waitForTimeout(500);
+await page.selectOption("#CCEventList", "53");
+await page.waitForTimeout(500);
+await page.selectOption("#reportTypeList", "8");
+await page.waitForTimeout(500);
+await page.click("#SearchButton");
+
+await page.click("#ReturnStatusList2");
+await page.waitForTimeout(500);
+await page.click("#ReportOptionList1");
+await page.waitForTimeout(500);
+await page.click("#button3");
+await page.waitForTimeout(500);
+await page.click("#SelectAllCandidates");
+await page.waitForTimeout(500);
+await page.click("#SearchSelected");
+
+const selectElement = page.locator("#SelectedClientId");
+const optionCount = await selectElement.locator("option").count();
+
+for (let i = 0; i < optionCount; i++) {
+  const optionValue = await selectElement.locator("option").nth(i)
+    .getAttribute("value");
+
+  await selectElement.selectOption(optionValue);
+  await page.click("#ReportOptions");
+
+  await page.locator("#sumrpt").scrollIntoViewIfNeeded();
+
+  await page.waitForTimeout(500);
+}
+
+await page.close();
+await context.close();
+await browser.close();
+```
+![Itération sur les candidats sur le site d’Élections Canada.](/assets/web-scraping/complex-website.gif)
+
+Maintenant que nous sommes capables d’itérer sur les candidats, nous pouvons extraire les données du tableau, comme le nom du candidat, la circonscription, le parti et les dépenses. Nous pouvons aussi mesurer la durée de l’extraction et mettre les données en cache.
+
+Pour éviter les problèmes, assurez-vous de vider votre dossier `sda/data` avant d’exécuter ce nouveau script.
+
+```ts showLineNumbers filename="sda/main.ts" {2-3, 24, 27, 31, 33-36, 40-69, 72-73}
+import { chromium } from "playwright-chromium";
+import { exists } from "@std/fs";
+import { DurationTracker } from "@nshiab/journalism";
+
+const browser = await chromium.launch({ headless: false });
+const context = await browser.newContext();
+const page = await context.newPage();
+
+await page.goto("https://www.elections.ca/WPAPPS/WPF/EN/Home/Index");
+await page.selectOption("#actsList", "CC_C76");
+await page.selectOption("#CCEventList", "53");
+await page.selectOption("#reportTypeList", "8");
+await page.click("#SearchButton");
+
+await page.click("#ReturnStatusList2");
+await page.click("#ReportOptionList1");
+await page.click("#button3");
+await page.click("#SelectAllCandidates");
+await page.click("#SearchSelected");
+
+const selectElement = page.locator("#SelectedClientId");
+const optionCount = await selectElement.locator("option").count();
+
+const tracker = new DurationTracker(optionCount, { prefix: "Remaining: " });
+
+for (let i = 0; i < optionCount; i++) {
+  tracker.start();
+  const optionValue = await selectElement.locator("option").nth(i)
+    .getAttribute("value");
+
+  const path = `sda/data/${optionValue}.json`;
+
+  if (await exists(path)) {
+    console.log(`File already exists: ${path}`);
+  } else {
+    console.log(`\nRetrieving ${optionValue} (${i + 1}/${optionCount})`);
+    await selectElement.selectOption(optionValue);
+    await page.click("#ReportOptions");
+
+    const name = await page.textContent("#ename1");
+    if (name === null) {
+      throw new Error("name is null");
+    }
+    const partyAndDIstrict = await page.textContent("#partydistrict1");
+    if (partyAndDIstrict === null) {
+      throw new Error("partyAndDIstrict is null");
+    }
+    const party = partyAndDIstrict.split("/")[0].trim();
+    const district = partyAndDIstrict.split("/")[1].trim();
+    const expenses = await page.textContent(
+      "#sumrpt > tbody > tr:nth-child(16) > td > span",
+    );
+
+    console.log({
+      name,
+      party,
+      district,
+      expenses,
+    });
+
+    await Deno.writeTextFile(
+      path,
+      JSON.stringify([{
+        name,
+        party,
+        district,
+        expenses,
+      }]),
+    );
+
+    await page.waitForTimeout(500);
+    tracker.log();
+  }
+}
+
+await page.close();
+await context.close();
+await browser.close();
+```
+![Mise en cache des données des candidats sur le site d’Élections Canada.](/assets/web-scraping/caching-EC.png)
+
+Et enfin, comme d’habitude, on peut utiliser SDA pour charger toutes les données extraites et les analyser. Par exemple, on pourrait calculer les dépenses moyennes par parti.
+
+
+```ts showLineNumbers filename="sda/main.ts" {4, 81-92}
+import { chromium } from "playwright-chromium";
+import { exists } from "@std/fs";
+import { DurationTracker } from "@nshiab/journalism";
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const browser = await chromium.launch({ headless: false });
+const context = await browser.newContext();
+const page = await context.newPage();
+
+await page.goto("https://www.elections.ca/WPAPPS/WPF/EN/Home/Index");
+await page.selectOption("#actsList", "CC_C76");
+await page.selectOption("#CCEventList", "53");
+await page.selectOption("#reportTypeList", "8");
+await page.click("#SearchButton");
+
+await page.click("#ReturnStatusList2");
+await page.click("#ReportOptionList1");
+await page.click("#button3");
+await page.click("#SelectAllCandidates");
+await page.click("#SearchSelected");
+
+const selectElement = page.locator("#SelectedClientId");
+const optionCount = await selectElement.locator("option").count();
+
+const tracker = new DurationTracker(optionCount, { prefix: "Remaining: " });
+
+for (let i = 0; i < optionCount; i++) {
+  tracker.start();
+  const optionValue = await selectElement.locator("option").nth(i)
+    .getAttribute("value");
+
+  const path = `sda/data/${optionValue}.json`;
+
+  if (await exists(path)) {
+    console.log(`File already exists: ${path}`);
+  } else {
+    console.log(`\nRetrieving ${optionValue} (${i + 1}/${optionCount})`);
+    await selectElement.selectOption(optionValue);
+    await page.click("#ReportOptions");
+
+    const name = await page.textContent("#ename1");
+    if (name === null) {
+      throw new Error("name is null");
+    }
+    const partyAndDIstrict = await page.textContent("#partydistrict1");
+    if (partyAndDIstrict === null) {
+      throw new Error("partyAndDIstrict is null");
+    }
+    const party = partyAndDIstrict.split("/")[0].trim();
+    const district = partyAndDIstrict.split("/")[1].trim();
+    const expenses = await page.textContent(
+      "#sumrpt > tbody > tr:nth-child(16) > td > span",
+    );
+
+    console.log({
+      name,
+      party,
+      district,
+      expenses,
+    });
+
+    await Deno.writeTextFile(
+      path,
+      JSON.stringify([{
+        name,
+        party,
+        district,
+        expenses,
+      }]),
+    );
+
+    await page.waitForTimeout(100);
+    tracker.log();
+  }
+}
+
+await page.close();
+await context.close();
+await browser.close();
+
+const sdb = new SimpleDB();
+const returns = sdb.newTable("returns");
+await returns.loadData("sda/data/*.json");
+await returns.convert({ expenses: "number" }, { try: true });
+await returns.summarize({
+  values: "expenses",
+  categories: "party",
+  summaries: ["mean", "count"],
+  decimals: 0,
+});
+await returns.sort({ mean: "desc" });
+await returns.logTable(13);
+```
+![Résumé des dépenses des candidats avec SDA.](/assets/web-scraping/sda-EC.png)
+
+## Extraction via des APIs non documentées
+
+Parfois, au lieu d’extraire à partir du code HTML, vous pouvez utiliser directement l’API qui alimente la page. Par exemple, le site de [Yahoo Finance](https://finance.yahoo.com/) affiche beaucoup de données qu’on pourrait extraire avec Playwright. Mais une autre technique consiste à repérer l’API que la page appelle pour obtenir ses données.
+
+<Callout type="info" emoji="💡">
+    API signifie *Application Programming Interface*. Sur le web, les API sont souvent utilisées pour transférer des données. Lorsque vous appelez un point d'accès API (via une URL et parfois des paramètres), l'API renvoie les données correspondantes. Les API sont très utiles pour les sites affichant des données en temps réel, entre autres. Au lieu de reconstruire et republier le site avec de nouvelles données — ce qui peut être lent et coûteux — il suffit de mettre à jour les points d'accès de l'API. Les réponses des API sont souvent en JSON, mais elles peuvent aussi être en CSV, XML et d'autres formats.
+</Callout>
+
+Sur la [page d’accueil](https://finance.yahoo.com/), vous pouvez chercher une entreprise cotée en bourse. Par exemple, recherchez Apple et cliquez sur le résultat correspondant.
+
+![Une capture d’écran montrant le site Yahoo Finance.](/assets/web-scraping/search-apple.png)
+
+Vous arriverez sur la page boursière d’Apple. Sur la gauche, cliquez sur *Historical Data*.
+
+![Une capture d’écran montrant le site Yahoo Finance.](/assets/web-scraping/apple-page.png)
+
+Ces données ne sortent pas de nulle part. Elles viennent d’une API qui alimente la page. Jetons un coup d'œil sous le capot pour en trouver la source. 🧐
+
+![Une capture d’écran montrant le site Yahoo Finance.](/assets/web-scraping/all-data.png)
+
+Note : j’utiliserai Google Chrome pour les étapes suivantes, mais vous pouvez faire la même chose avec Firefox ou Safari.
+
+Ouvrez les *Outils de développement* et cliquez sur l’onglet *Network*.
+
+![Une capture d’écran montrant le site Yahoo Finance avec les outils de développement ouverts.](/assets/web-scraping/network.png)
+
+Cet onglet affiche toutes les requêtes faites par la page. Lorsqu’elle se charge, elle a besoin de diverses ressources comme des polices, images, styles… et des données ! Toutes ces requêtes sont listées ici, et vous pouvez les explorer.
+
+Dans notre cas, on s’intéresse aux données boursières d’Apple affichées dans un tableau sur la page.
+
+Rafraîchissez la page, puis sélectionnez à nouveau l’option **Max** pour récupérer toutes les données disponibles. Cherchez une requête contenant `AAPL`, le symbole boursier d’Apple. C’est aussi le symbole utilisé dans l’URL de la page, donc c’est un bon indice.
+
+Vous remarquerez une ou plusieurs requêtes `fetch` qui commencent par `AAPL`. Ça semble très prometteur !
+
+![Une capture d’écran montrant le site Yahoo Finance avec les requêtes réseau détaillées.](/assets/web-scraping/appl-request.png)
+
+Faites un clic droit sur l’une d’elles et ouvrez-la dans un nouvel onglet. Wow ! Vous reconnaissez cette syntaxe ? C’est du JSON ! Et il y a beaucoup de données. 😏
+
+Voici [le lien](https://query1.finance.yahoo.com/v8/finance/chart/AAPL?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=AAPL&userYfid=true&lang=en-CA&region=CA) au cas où vous en auriez besoin.
+
+![Une capture d’écran montrant l’API de Yahoo Finance.](/assets/web-scraping/raw-data.png)
+
+Si vous regardez de près l’URL, vous remarquerez des paramètres comme `symbol`, `interval`, `period1` et `period2`. Il y a aussi des paramètres `region` et `lang`, qui peuvent varier selon votre emplacement.
+
+`https://query1.finance.yahoo.com/v8/finance/chart/AAPL?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=AAPL&userYfid=true&lang=en-CA&region=CA`
+
+Cela signifie que vous pouvez appeler cette URL pour extraire les données de Yahoo Finance, simplement en changeant les paramètres. Et beaucoup de sites web fonctionnent de cette manière, via une API.
+
+Notez que cet exemple vient du projet [Simulateur boursier 📈](/web-scraping). Allez le voir si vous voulez en savoir plus sur l’utilisation d’APIs non documentées dans vos projets.
+
+## Conclusion
+
+Quel parcours ! Nous avons couvert beaucoup de choses dans cette leçon et j’espère que vous l’avez trouvée utile. Le web scraping est une compétence essentielle pour récolter des données, surtout pour les journalistes computationnels.
+
+Mais souvenez-vous : assurez-vous de toujours respecter les lois en vigueur, et ne mettez pas trop de pression sur les serveurs hébergeant les données qui vous intéressent.
+
+Bon scraping ! 🤠
+
+<NoticeEnd lang="fr"/>
