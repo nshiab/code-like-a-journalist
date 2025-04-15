@@ -12,6 +12,7 @@ export default {
     "d3-chart": "Graphiques animés avec D3 🧑‍🎨",
     "d3-map": "Cartes animées avec D3 🗺️",
     "web-scraping": "Extraction de données web 🔍",
+    "git-and-github": "5. Git et GitHub 🐙",
     "ninja-moves": "Techniques de ninja 🥷",
     inspirations: "Personnes & contenus inspirants 📚",
     "more": "Prochaines leçons...",
