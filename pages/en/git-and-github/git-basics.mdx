@@ -16,6 +16,8 @@ In this project, we will create a simple program to retrieve the current tempera
 
 Note that I'll show you how to use Git in the terminal. I think it's important to understand how this tool works. But later on, you'll be able to pick and install one of the many Git extensions available for VS Code.
 
+<NoticeIntro />
+
 ## Setup
 
 First, you need to install Git. The steps might be different depending on your operating system. Follow [the relevant steps on the Git official website](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
@@ -44,7 +46,7 @@ Everything you save with Git will be stored in a hidden `.git` folder in your pr
 
 Let's create a new file `main.ts` and fetch the latest weather data in Montreal from the [Meteorological Service of Canada API](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
 
-This API returns data as XML. We'll log it to the terminal.
+This API returns data as XML. We log it to the terminal.
 
 ```ts showLineNumbers filename="main.ts"
 const response = await fetch(
@@ -55,7 +57,7 @@ const xml = await response.text();
 console.log(xml)
 ```
 
-Now, you can see your new file under `Changes`. Its color also switched to green and there is a `U` next to it, meaning `Untracked`. You can also see a `1` in the left sidebar, next to the Source Control button, indicating that one file has been changed.
+Now, you can see your new file under `Changes`. Its color also switched to green and there is a `U` next to it, meaning `Untracked`. You can also see a `1` in the left sidebar, next to the `Source Control` button, indicating that one file has been changed.
 
 Git is telling you that it's a new file—it hasn't seen it before and it's not currently being tracked.
 
@@ -73,7 +75,7 @@ Committing is a two-step process:
 - First, you track the files (new files, deleted files)
 - Then, you commit them with a message
 
-Let's do it. To track all files in the project, run: `git add -A`
+Let's do it. To track all files in the project, run this in your terminal: `git add -A`
 
 Then commit with: `git commit -m "Fetching XML data"`
 
@@ -207,7 +209,7 @@ The `checkout` command tells Git you want to switch to another branch. The `-b` 
 
 If you want to see a list of all branches, you can run `git branch`. The one with a `*` in front of it is the branch you're currently on.
 
-![The main branch on VS Code.](/assets/git-and-github/git-basics/new-branch.png)
+![The temperature branch on VS Code.](/assets/git-and-github/git-basics/new-branch.png)
 
 ### Working on a branch
 
@@ -310,3 +312,5 @@ By the way, Git is great with any text-based files, but you can also track image
 And one last piece of advice: always assume that your commit messages are public. You never know when you'll be asking a colleague for help! And if you're working on an open-source project, well, everyone will see your commits! 😅
 
 Now, using Git is great, but so far we've kept everything on our computer. In the next lesson, we'll talk about GitHub, which can store your code in the cloud for free!
+
+<NoticeEnd />

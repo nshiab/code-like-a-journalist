@@ -1,50 +1,53 @@
 ---
-title: What is Git and how to use it?
-description: In this lesson, we learn the basics of using Git.
+title: Comment utiliser Git ?
+description: Dans cette leçon, nous apprenons les bases de l'utilisation de Git.
 ---
 
 import { Callout } from "nextra/components";
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
 
-# What is Git and how to use it?
+# Comment utiliser Git ?
 
-Programming is hard. You have a lot of code in many files, making it difficult to keep track of everything you're doing. It's even harder if you're collaborating with other people!
+Programmer, c’est dur. Vous avez beaucoup de code réparti dans nombreux fichiers, ce qui rend compliqué le suivi de tout ce que vous faites. Et c’est encore plus difficile si vous collaborez avec d’autres personnes !
 
-This is why [Git](https://git-scm.com/) was released in 2005 and is now used by millions of coders around the world. It's an open source **version control system**. It's the kind of tool that, once you start using it, you wonder how you ever worked without it!
+C’est pourquoi [Git](https://git-scm.com/) a été lancé en 2005 et est maintenant utilisé par des millions de programmeurs à travers le monde. C’est un **système de gestion de versions** en code ouvert. C’est le genre d’outil qui, une fois adopté, vous fait vous demander comment vous avez pu travailler sans !
 
-In this project, we will create a simple program to retrieve the current temperature in Montreal and use Git to version it at every step.
+Dans ce projet, nous allons créer un programme simple pour récupérer la température actuelle à Montréal et utiliser Git pour le versionner à chaque étape.
 
-Note that I'll show you how to use Git in the terminal. I think it's important to understand how this tool works. But later on, you'll be able to pick and install one of the many Git extensions available for VS Code.
+Notez que je vais vous montrer comment utiliser Git dans le terminal. Je pense que c'est important pour comprendre comment cet outil fonctionne. Mais par la suite, vous pourrez choisir et installer l’une des nombreuses extensions Git disponibles pour VS Code.
 
-## Setup
+<NoticeIntro lang="fr" />
 
-First, you need to install Git. The steps might be different depending on your operating system. Follow [the relevant steps on the Git official website](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+## Installation
 
-![Git installation steps.](/assets/git-and-github/git-basics/install.png)
+Tout d’abord, vous devez installer Git. Les étapes peuvent varier selon votre système d’exploitation. Suivez [les étapes correspondantes sur le site officiel de Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 
-## Initialization
+![Étapes d’installation de Git.](/assets/git-and-github/git-basics/install.png)
 
-Once Git installed, create a new folder and open it with VS Code.
+## Initialisation
 
-If you click on `Source Control` in the left sidebar, you'll see that there is no Git repository in this project.
+Une fois Git installé, créez un nouveau dossier et ouvrez-le avec VS Code.
 
-![Message in VS Code saying that there is no Git repository.](/assets/git-and-github/git-basics/no-repo.png)
+Si vous cliquez sur `Source Control` dans la barre latérale gauche, vous verrez qu’il n’y a pas de dépôt Git dans ce projet.
 
-To initialize a new Git repository, run this command in the terminal: `git init`.
+![Message dans VS Code indiquant qu’il n’y a pas de dépôt Git.](/assets/git-and-github/git-basics/no-repo.png)
 
-Now, your project is using Git! But there’s nothing in it yet.
+Pour initialiser un nouveau dépôt Git, exécutez cette commande dans le terminal : `git init`.
 
-![Message in VS Code saying that there is a Git repository.](/assets/git-and-github/git-basics/repo-init.png)
+Votre projet utilise maintenant Git ! Mais il n’y a rien dedans pour l'instant.
 
-Everything you save with Git will be stored in a hidden `.git` folder in your project.
+![Message dans VS Code indiquant qu’un dépôt Git est présent.](/assets/git-and-github/git-basics/repo-init.png)
 
-![A hidden git folder.](/assets/git-and-github/git-basics/git-folder.png)
+Tout ce que vous sauvegardez avec Git sera stocké dans un dossier caché `.git` dans votre projet.
 
-## New files
+![Un dossier Git caché.](/assets/git-and-github/git-basics/git-folder.png)
 
-Let's create a new file `main.ts` and fetch the latest weather data in Montreal from the [Meteorological Service of Canada API](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
+## Nouveaux fichiers
 
-This API returns data as XML. We'll log it to the terminal.
+Créons un nouveau fichier `main.ts` et allons chercher les données météo les plus récentes à Montréal depuis l'[API du Service météorologique du Canada](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
+
+Cette API retourne les données au format XML. Nous les affichons dans le terminal.
+
 
 ```ts showLineNumbers filename="main.ts"
 const response = await fetch(
@@ -55,43 +58,43 @@ const xml = await response.text();
 console.log(xml)
 ```
 
-Now, you can see your new file under `Changes`. Its color also switched to green and there is a `U` next to it, meaning `Untracked`. You can also see a `1` in the left sidebar, next to the Source Control button, indicating that one file has been changed.
+Vous pouvez maintenant voir votre nouveau fichier sous `Changes`. Sa couleur est aussi passée au vert et un `U` est affiché à côté, ce qui signifie `Untracked`. Vous pouvez également voir un `1` dans la barre latérale gauche, à côté du bouton `Source Control`, indiquant qu’un fichier a été modifié.
 
-Git is telling you that it's a new file—it hasn't seen it before and it's not currently being tracked.
+Git vous informe qu’il s’agit d’un nouveau fichier — il ne l’a jamais vu auparavant et ne le suit pas encore.
 
-![Message in VS Code saying that there is an untracked file.](/assets/git-and-github/git-basics/new-file.png)
+![Message dans VS Code indiquant qu’un fichier n’est pas suivi.](/assets/git-and-github/git-basics/new-file.png)
 
-Just to make sure the code works, you can run `deno -A main.ts`. You should see the XML data logged in the terminal.
+Juste pour vérifier que le code fonctionne, vous pouvez exécuter `deno -A main.ts`. Vous devriez voir les données XML affichées dans le terminal.
 
-![XML data logged in the terminal.](/assets/git-and-github/git-basics/xml-logged.png)
+![Données XML affichées dans le terminal.](/assets/git-and-github/git-basics/xml-logged.png)
 
-## Tracking and committing
+## Suivi et enregistrement
 
-Git doesn't auto-save your work. You need to tell it when to save your project. To save your changes, you need to **commit** them. Each commit has an ID (generated by Git) and a message you provide.
+Git ne sauvegarde pas automatiquement votre travail. Vous devez lui indiquer quand sauvegarder votre projet. Pour enregistrer vos modifications, vous devez les **valider** (*commit*). Chaque commit possède un identifiant (généré par Git) et un message que vous devez fournir.
 
-Committing is a two-step process:
-- First, you track the files (new files, deleted files)
-- Then, you commit them with a message
+Faire un commit se fait en deux étapes :
+- D’abord, vous suivez les fichiers (nouveaux fichiers, fichiers supprimés)
+- Ensuite, vous validez avec un message
 
-Let's do it. To track all files in the project, run: `git add -A`
+Faisons-le. Pour suivre tous les fichiers du projet, exécutez dans votre terminal : `git add -A`
 
-Then commit with: `git commit -m "Fetching XML data"`
+Puis validez avec cette commande, encore une fois dans votre terminal : `git commit -m "Fetching XML data"`
 
-The `-m` flag tells Git that you're providing a message, which you write in quotes immediately after.
+L’option `-m` indique à Git que vous fournissez un message, que vous écrivez juste après entre guillemets.
 
-And that's it! Now, you can see your commit under the `Graph` section.
+Et voilà ! Vous pouvez maintenant voir votre commit dans la section `Graph`.
 
-![First commit.](/assets/git-and-github/git-basics/first-commit.png)
+![Premier commit.](/assets/git-and-github/git-basics/first-commit.png)
 
-## Updating files
+## Mise à jour des fichiers
 
-We have XML data, which is not very convenient. It would be better to have JSON data.
+Nous avons des données XML, ce qui n’est pas très pratique. Il serait préférable d’avoir des données au format JSON.
 
-Let's install the [`fast-xml-parser`](https://www.npmjs.com/package/fast-xml-parser) from NPM to convert our data.
+Installons la librairie [`fast-xml-parser`](https://www.npmjs.com/package/fast-xml-parser) depuis NPM pour convertir nos données.
 
-In your terminal, run: `deno add npm:fast-xml-parser`
+Dans votre terminal, exécutez : `deno add npm:fast-xml-parser`
 
-Then update your `main.ts`.
+Puis mettez à jour votre fichier `main.ts`.
 
 ```ts showLineNumbers filename="main.ts" {1, 6-9}
 import { XMLParser } from "fast-xml-parser";
@@ -105,46 +108,47 @@ const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
 console.log(json);
 ```
 
-Now, you’ll see more changes. Because we installed a library, Deno created a `deno.json` and a `deno.lock` file. They are green and untracked.
+Vous verrez maintenant d’autres changements. Comme nous avons installé une librairie, Deno a créé les fichiers `deno.json` et `deno.lock`. Ils sont en vert et non suivis.
 
-But `main.ts` is yellow with an `M` next to it. This is Git telling you the file has been modified.
+Mais `main.ts` est en jaune avec un `M` à côté. Cela signifie que Git indique que ce fichier a été modifié.
 
-You can run `deno -A main.ts` just to make sure the code works.
+Vous pouvez exécuter `deno -A main.ts` juste pour vous assurer que le code fonctionne.
 
-![Files have been modified.](/assets/git-and-github/git-basics/changes.png)
+![Des fichiers ont été modifiés.](/assets/git-and-github/git-basics/changes.png)
 
-You can check the changes line by line in the file. Next to the line numbers, you’ll see colored gutters:
-- Green means the line is new
-- Blue means the line has been modified
-- Red means the line has been removed
+Vous pouvez vérifier les changements ligne par ligne dans le fichier. À côté des numéros de ligne, vous verrez des barres colorées :
+- Vert signifie que la ligne est nouvelle
+- Bleu signifie que la ligne a été modifiée
+- Rouge signifie que des lignes ont été supprimées
 
-If you click on the gutters, you’ll see the details. Additions are shown in green, deletions in red. If you want to go back to the previous version, click on the rollback arrow.
+Si vous cliquez sur les barres, vous verrez les détails. Les ajouts sont affichés en vert, les suppressions en rouge. Si vous souhaitez revenir à la version précédente, cliquez sur la flèche de retour.
 
-![Inspecting the changes in the file.](/assets/git-and-github/git-basics/inspecting-changes.png)
+![Inspection des modifications dans le fichier.](/assets/git-and-github/git-basics/inspecting-changes.png)
 
-You can also see all the differences in the `Source Control` tab. Click on `main.ts` to view the `Working Tree`.
+Vous pouvez également voir toutes les différences dans l’onglet `Source Control`. Cliquez sur `main.ts` pour afficher le `Working Tree`.
 
-For example, here we can clearly see that we are using a new library (green lines on the right) and that we removed `console.log(xml)` (in red on the left).
+Par exemple, ici, on voit clairement que nous utilisons une nouvelle librairie (lignes vertes à droite) et que nous avons supprimé `console.log(xml)` (en rouge à gauche).
 
-If you want to roll back to a previous version of the file, you can also click the rollback arrow under `Changes`.
+Si vous souhaitez revenir à une version précédente du fichier, vous pouvez aussi cliquer sur la flèche de retour sous `Changes`.
 
-![Inspecting the changes in the file with the working tree.](/assets/git-and-github/git-basics/working-tree.png)
+![Inspection des modifications dans le fichier via la working tree.](/assets/git-and-github/git-basics/working-tree.png)
 
-Let's commit these changes:
-- Run `git add -A`
-- Then `git commit -m "XML to JSON"`
+Faisons un commit de ces changements :
+- Exécutez `git add -A`
+- Puis `git commit -m "XML to JSON"`
 
-Now, you can see your second commit in the `Graph`. And if you click on it, you can view all the changes made compared to the previous commit.
+Vous pouvez maintenant voir votre deuxième commit dans le `Graph`. Et si vous cliquez dessus, vous pouvez voir tous les changements effectués par rapport au commit précédent.
 
-Make sure to scroll to see the changes in `deno.json`, `deno.lock`, and `main.ts`.
+N’oubliez pas de faire défiler pour voir les modifications dans `deno.json`, `deno.lock` et `main.ts`.
 
-![Inspecting all the changes for a commit.](/assets/git-and-github/git-basics/second-commit.png)
+![Inspection de toutes les modifications d’un commit.](/assets/git-and-github/git-basics/second-commit.png)
 
-## Reverting a commit
+## Annuler un commit
 
-One very powerful feature of Git is the ability to easily roll back to a previous commit.
+L'une des fonctionnalités les plus puissantes de Git est la possibilité de revenir facilement à un commit précédent.
 
-For example, let's create an error in our code. Let’s parse the fetch response as JSON instead of text in `main.ts`.
+Par exemple, créons une erreur dans notre code. Essayons d’analyser la réponse du `fetch` comme du JSON au lieu de texte dans `main.ts`.
+
 
 ```ts showLineNumbers filename="main.ts" /.json()/
 import { XMLParser } from "fast-xml-parser";
@@ -157,63 +161,66 @@ const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
 
 console.log(json);
 ```
-Let's commit this before testing it 😱:  
+
+Faisons un commit de cette modification avant de la tester 😱 :  
 - `git add -A`  
 - `git commit -m "Parsing response as JSON"`
 
-And then let's test our new code with `deno -A main.ts`.
+Et ensuite, testons notre nouveau code avec `deno -A main.ts`.
 
-![A third commit.](/assets/git-and-github/git-basics/error.png)
+![Un troisième commit.](/assets/git-and-github/git-basics/error.png)
 
-Oh no! It crashes! And we’ve committed! How do we roll back?
 
-Of course, you could always check the changes and update the code manually. But if you're working on a big project, this might not always be realistic. Instead, you can use the `git revert` command with a commit ID.
+Oh non ! Ça plante ! Et nous avons déjà validé ! Comment revenir en arrière ?
 
-To retrieve a commit ID, right-click on the commit and click on `Copy Commit ID`. Here, the commit we want to revert is the latest one.
+Bien sûr, vous pouvez toujours vérifier les changements et corriger le code manuellement. Mais si vous travaillez sur un gros projet, ce n’est pas toujours réaliste. À la place, vous pouvez utiliser la commande `git revert` avec l’identifiant du commit.
 
-![Copying a commit ID](/assets/git-and-github/git-basics/copy-id.png)
+Pour récupérer un identifiant de commit, faites un clic droit sur le commit et cliquez sur `Copy Commit ID`. Ici, le commit que nous voulons annuler est le plus récent.
 
-Then start typing `git revert` in the terminal, paste the commit ID (don't forget a space between `revert` and your commit ID), and run the command!
+![Copie de l’ID d’un commit.](/assets/git-and-github/git-basics/copy-id.png)
 
-What you’re seeing in your terminal is a text editor. The lines above the `#` section are the suggested commit message.
+Commencez ensuite à taper `git revert` dans le terminal, collez l’identifiant du commit (n’oubliez pas l’espace entre `revert` et l’ID du commit), puis exécutez la commande !
 
-![Reverting a commit.](/assets/git-and-github/git-basics/revert.png)
+Ce que vous voyez dans votre terminal est un éditeur de texte. Les lignes au-dessus de la section `#` représentent le message de commit proposé.
 
-To accept the suggested commit, just type `:q` in the terminal and press Enter to confirm and quit the terminal text editor. You can also click on the big blue `Commit` button.
+![Annulation d’un commit.](/assets/git-and-github/git-basics/revert.png)
 
-Now, you'll see a fourth commit, indicating that you reverted! For a *real* rollback, you can also use [`git reset`](https://git-scm.com/docs/git-reset), but reverting is safer and keeps a history of everything—including the revert!
+Pour accepter le message proposé, tapez simplement `:q` dans le terminal et appuyez sur Entrée pour confirmer et quitter l’éditeur de texte du terminal. Vous pouvez aussi cliquer sur le gros bouton bleu `Commit`.
 
-Now, if you run `deno -A main.ts`, everything works like before this silly code mistake.
+Vous verrez maintenant un quatrième commit, indiquant que vous avez annulé le précédent ! Pour un *vrai* retour en arrière, vous pouvez aussi utiliser [`git reset`](https://git-scm.com/docs/git-reset), mais `revert` est plus sûr et garde une trace de tout — y compris de l’annulation !
 
-![A reverted commit.](/assets/git-and-github/git-basics/reverted.png)
+Maintenant, si vous exécutez `deno -A main.ts`, tout fonctionne comme avant notre stupide erreur.
+
+![Un commit annulé.](/assets/git-and-github/git-basics/reverted.png)
 
 ## Branches
 
-Another important concept in Git is **branches**.
+Un autre concept important dans Git est celui des **branches**.
 
-By default, a repository has a `main` branch. You can see your branch in the bottom-left corner of VS Code and next to your commits. So far, we've been working on `main`.
+Par défaut, un dépôt a une branche `main`. Vous pouvez voir votre branche en bas à gauche dans VS Code, ainsi qu’à côté de vos commits. Jusqu’ici, nous avons travaillé sur `main`.
 
-![The main branch on VS Code.](/assets/git-and-github/git-basics/main-branch.png)
+![La branche main dans VS Code.](/assets/git-and-github/git-basics/main-branch.png)
 
-Usually, we (try 😅) to keep `main` clean and work on branches instead.
+En général, on essaie (😅) de garder `main` propre et on travaille dans des branches séparées.
 
-For example, let's say we now want to extract the date and temperature from the data we fetched for Montreal. We could create a new branch to add this code to the project.
+Par exemple, disons que nous voulons maintenant extraire la date et la température à partir des données récupérées pour Montréal. On pourrait créer une nouvelle branche pour ajouter ce code au projet.
 
-### Adding a branch
+### Ajouter une branche
 
-To create a new branch named `temperature`, run: `git checkout -b temperature`
+Pour créer une nouvelle branche nommée `temperature`, exécutez : `git checkout -b temperature`
 
-The `checkout` command tells Git you want to switch to another branch. The `-b` followed by `temperature` tells it to create the new branch `temperature` before switching to it. Because you are on `main`, the branch will be created from `main`. The code will be exactly the same on both branches at first.
+La commande `checkout` indique à Git que vous voulez changer de branche. L’option `-b` suivie de `temperature` lui dit de créer une nouvelle branche `temperature` avant de s’y positionner. Comme vous êtes sur `main`, la branche sera créée à partir de `main`. Le code sera exactement le même sur les deux branches au départ.
 
-If you want to see a list of all branches, you can run `git branch`. The one with a `*` in front of it is the branch you're currently on.
+Pour voir la liste de toutes les branches, exécutez `git branch`. Celle avec un `*` devant est celle sur laquelle vous êtes actuellement.
 
-![The main branch on VS Code.](/assets/git-and-github/git-basics/new-branch.png)
+![La branche temperature branch dans VS Code.](/assets/git-and-github/git-basics/new-branch.png)
 
-### Working on a branch
+### Travailler dans une branche
 
-We can now update our code in `main.ts`. The data is a deeply nested JSON, but retrieving the `resultTime` and the `temperature` is straightforward.
+Nous pouvons maintenant mettre à jour notre code dans `main.ts`. Les données sont un JSON profondément imbriqué, mais récupérer `resultTime` et `temperature` est simple.
 
-If you run `deno -A main.ts`, you should see the temperature logged in the terminal.
+Si vous exécutez `deno -A main.ts`, vous devriez voir la température affichée dans le terminal.
+
 
 ```ts showLineNumbers filename="main.ts" {9-23}
 import { XMLParser } from "fast-xml-parser";
@@ -241,72 +248,74 @@ const temp = elements
 console.log(temp);
 ```
 
-Let's commit this update:  
+Faisons un commit de cette mise à jour :  
 - `git add -A`  
 - `git commit -m "Extracting temp and time"`
 
-![Working on the temperature branch.](/assets/git-and-github/git-basics/commit-new-branch.png)
+![Travail sur la branche temperature.](/assets/git-and-github/git-basics/commit-new-branch.png)
 
-This has been committed to the `temperature` branch. The `main` branch has not changed. To check the `main` branch, you can use `git checkout main`.
+Ce commit a été fait sur la branche `temperature`. La branche `main`, elle, n’a pas été modifiée. Pour revenir à la branche `main`, utilisez `git checkout main`.
 
-As you can see, our new code is not there! In case we created an error or introduced a new bug on the `temperature` branch, we know that `main` won't have it.
+Comme vous pouvez le constater, notre nouveau code n’est pas là ! Si jamais nous avons introduit une erreur ou un bug dans la branche `temperature`, nous savons que `main` ne l’a pas.
 
-This is why branches are so great: you can work confidently on them. You can test and break things without worrying about your previous achievements—they're kept safe! Branches are also very useful when multiple people are collaborating. Each one can work on their own thing in their own branch.
+C’est pour cela que les branches sont si pratiques : vous pouvez travailler en toute confiance dessus. Vous pouvez tester et casser des choses sans craindre de perdre vos avancées. Elles sont à l’abri ! Les branches sont aussi très utiles quand plusieurs personnes collaborent. Chacun peut travailler sur sa propre fonctionnalité dans sa propre branche.
 
-![Checking out the main branch.](/assets/git-and-github/git-basics/checkout-main.png)
+![Passer sur la branche main.](/assets/git-and-github/git-basics/checkout-main.png)
 
-### Merging branches
+### Fusionner des branches
 
-Now, let's say we are happy with our new code on the `temperature` branch. We would like to bring it to the `main` branch.
+Disons maintenant que nous sommes satisfaits du nouveau code dans la branche `temperature`. Nous voulons l’intégrer à la branche `main`.
 
-To do that, we have to **merge** the branches.
+Pour cela, nous devons **fusionner** les branches.
 
-Make sure you are on the `main` branch (`git checkout main`) and then run `git merge temperature`. This command will merge the `temperature` branch into the `main` branch.
+Assurez-vous d’être sur la branche `main` (`git checkout main`), puis exécutez `git merge temperature`. Cette commande va fusionner la branche `temperature` dans `main`.
 
-Now, the new code is on `main`! And you can see the commit that we created in `temperature`. The history has been merged.
+Et voilà, le nouveau code est sur `main` ! Et vous pouvez voir le commit que nous avons fait dans `temperature`. L’historique a été fusionné.
 
-![Merging the main branch.](/assets/git-and-github/git-basics/merge-main.png)
+![Fusion avec la branche main.](/assets/git-and-github/git-basics/merge-main.png)
 
-### Deleting branches
+### Supprimer une branche
 
-We don't need the `temperature` branch anymore. Let's remove it by running: `git branch -d temperature`
+Nous n’avons plus besoin de la branche `temperature`. Supprimons-la avec la commande : `git branch -d temperature`
 
-As you can see, the syntax is the same as when creating a branch, except the option is `-d` instead of `-b`. Be careful! 😬
+Comme vous pouvez le voir, la syntaxe est la même que pour créer une branche, sauf que l’option est `-d` au lieu de `-b`. Faites attention ! 😬
 
-Now, if you run `git branch`, you won’t see `temperature` anymore.
+Maintenant, si vous exécutez `git branch`, vous ne verrez plus `temperature`.
 
-![Deleting the temperature branch.](/assets/git-and-github/git-basics/delete-branch.png)
+![Suppression de la branche temperature.](/assets/git-and-github/git-basics/delete-branch.png)
 
-## Removing git
+## Supprimer Git
 
-If, for some reason, you need to remove Git from one of your projects, you must delete the hidden `.git` folder.
+Si, pour une raison quelconque, vous devez supprimer Git d’un projet, vous devez supprimer le dossier caché `.git`.
 
-You can do that with your file explorer.
+Vous pouvez le faire depuis votre explorateur de fichiers.
 
-![A hidden git folder.](/assets/git-and-github/git-basics/git-folder.png)
+![Un dossier Git caché.](/assets/git-and-github/git-basics/git-folder.png)
 
-Or you can do it in your terminal with this command: `rm -fr .git`
+Ou depuis votre terminal avec cette commande : `rm -fr .git`
 
-But you need to be **extremely careful** when running it. This command deletes everything recursively. It could wipe out your entire computer. You must ensure you are in your project folder and be careful of typos.
+Mais vous devez être **extrêmement prudent** en l’utilisant. Cette commande supprime tout de manière récursive. Elle pourrait effacer l’intégralité de votre ordinateur. Assurez-vous d’être dans votre projet et vérifiez bien ce que vous tapez.
 
 ## Conclusion
 
-Congratulations! You've learned the most important Git commands:
-- `git init` to start a new Git repository
-- `git add -A` to track the files
-- `git commit -m "A message"` to save the project
-- `git revert commitID` to revert a commit
-- `git branch -b my-new-branch` to create a new branch
-- `git checkout my-new-branch` to switch to a different branch
-- `git merge my-new-branch` to merge branches
-- `git branch -d my-new-branch` to delete a branch
+Félicitations ! Vous avez appris les commandes Git les plus importantes :
+- `git init` pour démarrer un nouveau dépôt Git
+- `git add -A` pour suivre les fichiers
+- `git commit -m "Un message"` pour enregistrer le projet
+- `git revert commitID` pour annuler un commit
+- `git branch -b ma-nouvelle-branche` pour créer une nouvelle branche
+- `git checkout ma-nouvelle-branche` pour changer de branche
+- `git merge ma-nouvelle-branche` pour fusionner des branches
+- `git branch -d ma-nouvelle-branche` pour supprimer une branche
 
-These eight commands will cover 95% of your daily needs.
+Ces huit commandes couvrent 95 % de vos besoins quotidiens.
 
-Of course, our use case here was quite simple. Things can get more complicated when multiple people work at the same time on different branches and conflicts between branches can happen. But this should be enough to get you started on your Git journey!
+Bien sûr, notre exemple ici était assez simple. Les choses peuvent devenir plus complexes quand plusieurs personnes travaillent en même temps sur différentes branches, et des conflits peuvent survenir. Mais cela devrait suffire pour bien démarrer votre aventure avec Git !
 
-By the way, Git is great with any text-based files, but you can also track images, videos, and more!
+Au fait, Git fonctionne très bien avec tous les fichiers texte, mais vous pouvez aussi suivre des images, des vidéos, et bien plus encore !
 
-And one last piece of advice: always assume that your commit messages are public. You never know when you'll be asking a colleague for help! And if you're working on an open-source project, well, everyone will see your commits! 😅
+Et un dernier conseil : considérez toujours vos messages de commit comme publics. Vous ne savez jamais quand vous demanderez de l’aide à un collègue ! Et si vous travaillez sur un projet en code ouvert, eh bien… tout le monde verra vos commits. 😅
 
-Now, using Git is great, but so far we've kept everything on our computer. In the next lesson, we'll talk about GitHub, which can store your code in the cloud for free!
+Git, c’est super, mais jusqu’à présent, tout reste sur notre ordinateur. Dans la prochaine leçon, nous parlerons de GitHub, qui permet de stocker votre code dans le cloud, gratuitement !
+
+<NoticeEnd lang="fr" />
