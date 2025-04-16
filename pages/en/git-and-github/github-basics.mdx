@@ -8,57 +8,58 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
 
 # What is GitHub and how to use it?
 
-[GitHub](https://github.com/) is a platform owned by Microsoft. It became the place of choice for many developpers and companies working on open-source projects. You can host public projects for free on GitHub and enjoy the many great features that will make your coding life easier.
+[GitHub](https://github.com/) is a platform owned by Microsoft. It became the place of choice for many developers and companies working on open-source projects. You can host public projects for free on GitHub and enjoy the many great features that will make your coding life easier.
 
-You can also create private repositories with a free account, of course. And [you can pay if you need more ressources](https://github.com/pricing). But I've been using GitHub for my open-source projects for years (the [SDA](https://github.com/nshiab/simple-data-analysis) and [journalism](https://github.com/nshiab/journalism) libraries, and [this course too](https://github.com/nshiab/code-like-a-journalist)) and I never reached the limits of the free plan!
+You can also create private repositories with a free account, of course. And [you can pay if you need more resources](https://github.com/pricing). But I've been using GitHub for my open-source projects for years (the [SDA](https://github.com/nshiab/simple-data-analysis) and [journalism](https://github.com/nshiab/journalism) libraries, and [this course too](https://github.com/nshiab/code-like-a-journalist)) and I never reached the limits of the free plan!
 
-As its name states it: GitHub works with Git. So I strongly suggest you follow the previous lesson [How to use Git?](/git-and-github/git-basics) before diving into this one. Here, we are going to follow the same steps as the previous lesson: building a simple program to retrieve the temperature in Montreal. But we are going to store our code in the cloud, with GitHub!
+As its name states: GitHub works with Git. So I strongly suggest you follow the previous lesson [How to use Git?](/git-and-github/git-basics) before diving into this one. Here, we are going to follow the same steps as the previous lesson: building a simple program to retrieve the temperature in Montreal. But we are going to store our code in the cloud, with GitHub!
 
 <NoticeIntro />
 
 ## GitHub account
 
-To work with Git, you first need to [create an account](https://github.com/). So start with that.
+To work with GitHub, you first need to [create an account](https://github.com/). So start with that.
 
 ![GitHub homepage.](/assets/git-and-github/github-basics/github-account.png)
 
 ## A social network
 
-When you log to GitHub and land on your home page, you'll see a **Feed** section. That's because GitHub is also a social network. For example, you can see my feed below as the current time of writing. It's great to stay up-to-date with open-source projects you are interested in or just to see what people you find interesting are working on.
+When you log into GitHub and land on your home page, you'll see a **Feed** section. That's because GitHub is also a social network. For example, you can see my feed below at the time of writing. It's great to stay up to date with open-source projects you are interested in or just to see what people you find interesting are working on.
 
 ![GitHub feed.](/assets/git-and-github/github-basics/feed.png)
 
-Users have a public profile showing their public activity and you can follow them to see their activity in your feed. [Here's my profil for example](https://github.com/nshiab). **Follow me!** 🤗
+Users have a public profile showing their public activity, and you can follow them to see their activity in your feed. [Here's my profile, for example](https://github.com/nshiab). **Follow me!** 🤗
 
-Personnally, I like to follow other computational journalists or maintainers of open-source projects I am using.
+Personally, I like to follow other computational journalists or maintainers of open-source projects I use.
 
-You can update your profile and settings by clicking on the button at top right corner.
+You can update your profile and settings by clicking on the button in the top right corner.
 
 ![GitHub profile.](/assets/git-and-github/github-basics/profile.png)
 
 Public repositories also have a public page. When you like a project, you can give it a star. For example, here's the page for the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis) I maintain and we've been using in previous lessons. **Give it a 🌟!**
 
-You can also **Watch** a project to see its activity on your feed. I usually watch for the releases of new version of open-source projects I am using, just stay up-to-date.
+You can also **Watch** a project to see its activity in your feed. I usually watch for the releases of new versions of open-source projects I use, just to stay up to date.
 
 ![GitHub repository.](/assets/git-and-github/github-basics/sda-repo.png)
 
 ## Creating a repository
 
-Let's create your first repository! Click on the + button on the top right corner.
+Let's create your first repository! Click on the + button in the top right corner.
 
 ![Creating a new repository.](/assets/git-and-github/github-basics/new-button.png)
 
-Then give you repository a name and make it private (so you won't be afraid of making mistakes 😉). No need for a `readme` and `.gitignore` for now. We'll talk about it later on. Then hit `Create repository` at the bottom.
+Then give your repository a name and make it private (so you won't be afraid of making mistakes 😉). No need for a `readme` and `.gitignore` for now. We'll talk about those later. Then hit `Create repository` at the bottom.
 
 ![Settings of a new repository.](/assets/git-and-github/github-basics/new-repo-settings.png)
 
-Now, the next page tells you how to connect a repository on your computer with the repository we just created on Github.
+Now, the next page tells you how to connect a repository on your computer with the repository we just created on GitHub.
 
-We are going to follow the steps on pushing `an existing repository from the command line`. Keep this page open.
+We are going to follow the steps under *pushing an existing repository from the command line*. Keep this page open.
 
 ![The steps to connect an existing repo to a new one.](/assets/git-and-github/github-basics/new-repo-steps.png)
 
-Create a new folder with the same name as the repository and open it with VS Code. Add a `main.ts` in it with a simple log for now.
+Create a new folder with the same name as the repository and open it with VS Code. Add a `main.ts` file with a simple log for now.
+
 
 ```ts showLineNumbers filename="main.ts"
 console.log("Hello!");
@@ -70,9 +71,10 @@ Then track the new file we just created with `git add -A` and then let's commit 
 
 ![First commit.](/assets/git-and-github/github-basics/first-commit.png)
 
-Right now, your code is saved with Git locally, on our computer. It's time to save it remotely, in the cloud, on GitHub!
+Right now, your code is saved with Git locally, on your computer. It's time to save it remotely, in the cloud, on GitHub!
 
-You can copy the instructions on the GitHub page and paste them in your terminal. Then press enter to run them! You URL should be different than mine but the rest should be similar.
+You can copy the instructions from the GitHub page and paste them into your terminal. Then press Enter to run them! Your URL should be different from mine, but the rest should be similar.
+
 
 ```
 git remote add origin https://github.com/nshiab/my-first-repo.git
@@ -80,23 +82,24 @@ git branch -M main
 git push -u origin main
 ```
 
-Note that you'll probably be asked to identify yourself. Follow the suggested steps. If you are asked about a password, **you won't see what you are typing for security reasons**, but typing actually works! It's always weird the first time. 🤪
+Note that you'll probably be asked to identify yourself. Follow the suggested steps. If you are asked about a password in the terminal, **you won't see what you are typing for security reasons**, but typing actually works! It's always weird the first time. 🤪
 
 ![Syncing the local and remote repositories.](/assets/git-and-github/github-basics/sync.png)
 
-And if you refresh your repository page, you'll see your code synced! Your `main.ts` file is there and you see your latest commit.
+And if you refresh your repository page on GitHub, you'll see your code synced! Your `main.ts` file is there and you see your latest commit.
 
 ![The remote repository page.](/assets/git-and-github/github-basics/repo-page-sync.png)
 
 ## Pushing to the repository
 
-There is no `README.md` in your repository and GitHub is (strongly) suggesting that we add one. This file content will be displayed on the repository page. It's usually the first thing people will read before checking the code. So let's do that.
+There is no `README.md` in your repository, and GitHub is (strongly) suggesting that we add one. This file's content will be displayed on the repository page. It's usually the first thing people will read before checking the code. So let's do that.
 
-As the `.md` extension suggests, it's a Mardown file. Markdown is a convenient and simple syntax often used for documentation. The code will be rendered into good looking text by the tool or platform you are using. You can focus on the content without worrying about the style, which is nice! We will write some markdown together, but if you want to know more, check this [cheat sheet](https://www.markdownguide.org/cheat-sheet/).
+As the `.md` extension suggests, it's a Markdown file. Markdown is a convenient and simple syntax often used for documentation. The code will be rendered into good-looking text by the tool or platform you are using. You can focus on the content without worrying about the style, which is nice! We will write some Markdown together, but if you want to know more, check this [cheat sheet](https://www.markdownguide.org/cheat-sheet/).
 
 Create a new `README.md` file in your repo in VS Code and copy and paste this below. As I said at the beginning, our goal will be to fetch the temperature in Montreal.
 
-The `#` is used for titles. The `[text](link)` syntax allow you to add links to your text and the use of backticks creates code blocks.
+The `#` is used for titles. The `[text](link)` syntax allows you to add links to your text, and the use of backticks creates code blocks.
+
 
 ```md showLineNumbers filename="README.md"
 # My first repository
@@ -107,7 +110,7 @@ This project retrieves the latest temperature in Montreal from the
 Here's the command to run the project: `deno -A main.ts`
 ```
 
-In VS Code, if you right click on `.md` files, you can preview them.
+In VS Code, if you right-click on `.md` files, you can preview them.
 
 ![The README.](/assets/git-and-github/github-basics/markdown.png)
 
@@ -120,7 +123,7 @@ And there is an extra command to push:
 
 ![Pushing the README to GitHub.](/assets/git-and-github/github-basics/push.png)
 
-Tada! 🪄 It's now on GitHub! And your README is used to welcome the visitors!
+Tada! 🪄 It's now on GitHub! And your README is used to welcome visitors!
 
 ![The README on GitHub.](/assets/git-and-github/github-basics/readme.png)
 
@@ -130,7 +133,9 @@ It's time to fetch and extract the temperature in Montreal!
 
 As we saw in the previous lesson, we try to keep the `main` branch clean and functional. We work on new features on **branches** in which we can test and break things without a worry.
 
-In the previous lesson, we created a branch manually in the terminal. But with Github there is a better way: using **issues**.
+In the previous lesson, we created a branch manually in the terminal. But with GitHub there is a better way: using **issues**.
+
+On public repositories, anyone can create an issue. This is how library maintainers are warned about bugs or receive suggestions for new features or improvements. For example, you can create a new issue for [this course](https://github.com/nshiab/code-like-a-journalist/issues) or for the [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis/issues) library!
 
 Click on your `Issues` tab in your project.
 
@@ -148,13 +153,13 @@ Hit the `Create` button.
 
 ![The title and description of a new issue.](/assets/git-and-github/github-basics/issue-description.png)
 
-Your issue is now created! Each issue has a unique ID (here it's `#1`) and people (or youself 🥸) can comment on it.
+Your issue is now created! Each issue has a unique ID (here it's `#1`), and people (or yourself 🥸) can comment on it.
 
 To work on this specific issue on a branch, you can click on `Create a branch`!
 
 ![Issue and its branch.](/assets/git-and-github/github-basics/issue-branch.png)
 
-GitHub will automatically generate a name for the branch and will suggest to branch out from `main` which is exactly what we want.
+GitHub will automatically generate a name for the branch and will suggest branching out from `main`, which is exactly what we want.
 
 Keep the option `Checkout locally` selected and hit `Create branch`.
 
@@ -170,6 +175,7 @@ The second command is just to switch to your new branch.
 
 Here are my commands. The second one might be a bit different if you wrote a different title.
 
+
 ```
 git fetch origin
 git checkout 1-return-montreal-temperature
@@ -179,7 +185,8 @@ We are now on our new branch. We can safely work on our code!
 
 ![Working on the new branch.](/assets/git-and-github/github-basics/new-branch.png)
 
-Let's add the code from the previous lesson into our `main.ts`. This script pings the Meteorological Service of Canada API and retrieve data as XML. The `fast-xml-parser` library converts it to JSON. And the rest of the code extracts the temperature and the time, before logging them.
+Let's add the code from the previous lesson into our `main.ts`. This script pings the Meteorological Service of Canada API and retrieves data as XML. The `fast-xml-parser` library converts it to JSON. And the rest of the code extracts the temperature and the time before logging them.
+
 
 ```ts showLineNumbers filename="main.ts"
 import { XMLParser } from "fast-xml-parser";
@@ -207,7 +214,7 @@ const temp = elements
 console.log(temp);
 ```
 
-Install the `fast-xml-parser` dependency by running deno `deno add npm:fast-xml-parser`.
+Install the `fast-xml-parser` dependency by running `deno add npm:fast-xml-parser`.
 
 And now the temperature should be logged in the terminal when you run `deno -A main.ts`.
 
@@ -218,7 +225,7 @@ Finally, commit and push your work:
 
 ![Pushing the new code from the new branch.](/assets/git-and-github/github-basics/branch-push.png)
 
-Now, if you refresh your repository page on GitHub, you'll see two branches. By default, the `main` branch is shown but you can click on `2 Branches` and explore if you are curious.
+Now, if you refresh your repository page on GitHub, you'll see two branches. By default, the `main` branch is shown, but you can click on `2 Branches` and explore if you are curious.
 
 But we also have a big banner suggesting to create a **pull request**! Interesting... 😏
 
@@ -226,7 +233,7 @@ But we also have a big banner suggesting to create a **pull request**! Interesti
 
 ## Creating pull requests
 
-**Pull requests** are a request to **merge** a branch into another. Before approving the merge, the code is compared and the changes must be approved. Hit the `Compare & pull request`.
+**Pull requests** are a request to **merge** a branch into another. Before approving the merge, the code is compared and the changes must be approved. Hit the `Compare & pull request` button on the banner.
 
 You can then add a title and a description (optional). You can scroll down to see all the commits and changes between the two branches.
 
@@ -236,13 +243,13 @@ Click on the `Create pull request`.
 
 You created your first PR! This is a great place to review what this request is adding to the project. Here, you can review the commits, the files, and the code. If you work with other people, you can tag them on specific lines to discuss the changes.
 
-GitHub will check that you can actually merge the two branches and that they are no conflicts between the two. You can also add automatically trigerred tests to check that core features or functions of your project are not getting broken by the changes.
+GitHub will check that you can actually merge the two branches and that there are no conflicts between them. You can also add automatically triggered tests to check that core features or functions of your project are not getting broken by the changes.
 
 Here, everything looks good, so you can click on the `Merge pull request` button and then confirm the merge.
 
 ![Creating a new PR on Github.](/assets/git-and-github/github-basics/pr-merge.png)
 
-Once the merge confirmed, the changes are brought to the `main` branch!
+Once the merge is confirmed, the changes are brought to the `main` branch!
 
 GitHub will suggest removing the branch we created. It's safe to delete it now.
 
@@ -252,7 +259,7 @@ If we check the main page of the repository, we see that our changes are on `mai
 
 ![The main page of the repo with the changes.](/assets/git-and-github/github-basics/changes-main.png)
 
-This all happened in the cloud, on GitHub platform. To bring the changes to your local repository, first checkout to the `main` branch:
+This all happened in the cloud, on GitHub's platform. To bring the changes to your local repository, first checkout to the `main` branch:
 - `git checkout main`
 
 Then **pull** the changes:
@@ -262,13 +269,13 @@ And now your `main` branch on your computer is synced with the remote repository
 
 ## Cloning repositories
 
-Now, let's imagine that your computer took fire and is completly destroyed. 🔥
+Now, let's imagine that your computer caught fire and is completely destroyed. 🔥
 
-How can you retrieve all of your precious work? By **cloning** the repository.
+How can you retrieve all of your precious work from the cloud? By **cloning** the repository.
 
 Delete the folder you worked on so far. Yes, delete it! Trust me!
 
-On your repository page, click on the `<> Code` button. There is where you'll have options to clone your code.
+On your repository page, click on the `<> Code` button. This is where you'll find options to clone your code.
 
 Copy the URL.
 
@@ -279,7 +286,7 @@ Next, create a new folder with the same name as your repo and open it with VS Co
 For me, the command looks like this:
 - `git clone https://github.com/nshiab/my-first-repo.git .`
 
-The dot at the end is important. It tells git to clone the repo in the current folder. Without it, it will create a new folder in your folder.
+The dot at the end is important. It tells Git to clone the repo in the current folder. Without it, it will create a new folder inside your folder.
 
 And just like that, you have recovered all of your code.
 
@@ -287,47 +294,47 @@ And just like that, you have recovered all of your code.
 
 Of course, cloning is also great when you are collaborating with other people. They can easily retrieve your latest code, with all the branches and commits.
 
-Once a repository is cloned, the next step is usually to install all dependencies with `deno install`. Because we have a `deno.json` in our project, Deno will now exactly what to install and which versions.
+Once a repository is cloned, the next step is usually to install all dependencies with `deno install`. Because we have a `deno.json` in our project, Deno will know exactly what to install and which versions.
 
 And then you are good to go to keep working on your amazing project!
 
 ## Forking a repository
 
-If everyone can clone a public repository (or a private one if they were invited to collaborate on it), not everyone is allowed to push to it and merge in it. And this is a good thing! Imagine the mess and the critical security problems! 😈
+If everyone can clone a public repository (or a private one if they were invited to collaborate on it), not everyone is allowed to push to it and merge into it. And this is a good thing! Imagine the mess and the critical security problems! 😈
 
 When you want to create your own copy of a repository, you can **fork** it. It will create a copy of the project in your account. You can then work on it and modify whatever you want.
 
-It works kind like of a *branch of a repository*. There is no impact on the original repository, but if you want, you can create a pull request aimed at the owners of the original repository.
+It works kind of like a *branch of a repository*. There is no impact on the original repository, but if you want, you can create a pull request aimed at the owners of the original repository.
 
-For example, as the time of writing, 16 GitHub users forked the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis). I have no idea what they are doing with it and that's okay!
+For example, at the time of writing, 16 GitHub users have forked the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis). I have no idea what they are doing with it and that's okay!
 
 If you are curious, feel free to fork it too!
 
 ![Forking SDA.](/assets/git-and-github/github-basics/forking.png)
 
-Forking is how a lot of open sources contributions and collaborations happen:
+Forking is how a lot of open-source contributions and collaborations happen:
 - Someone creates an open-source project.
-- Someone else finds it interesting but want to tweak or fix something. They fork it, update the code, and send a PR to the owner of the original repository.
-- The owner checks the PR and if happy merges it.
-- The contributions is now part of the project and everyone can benefit from it!
+- Someone else finds it interesting but wants to tweak or fix something. They fork it, update the code, and send a PR to the owner of the original repository.
+- The owner checks the PR and, if happy, merges it.
+- The contribution is now part of the project and everyone can benefit from it!
 
 ## Conclusion
 
-Git and GitHub work amazingly well together. With Git, you can keep track of your work while GitHub adds a useful interface to help you organize your work and help you collaborate with others.
+Git and GitHub work amazingly well together. With Git, you can keep track of your work while GitHub adds a useful interface to help you organize your work and collaborate with others.
 
 In this lesson, you've learned new important Git commands:
 - `git push` to push code to a remote repository saved in the cloud
 - `git pull` to retrieve the latest changes from a remote repository
-- `git clone` to copy a whole repository on your computer
+- `git clone` to copy a whole repository onto your computer
 
-You have also learned about GitHub issues and pull requests.
+You have also learned about GitHub issues, pull requests, forks and `.gitignore`.
 
 But... you might be tempted to keep creating branches locally and merging directly on your computer when working alone. Or even just to work in the `main` branch! 🤠
 
-And that's totally fine. Just find the recipe that works for you. But keep in mind that creating issues and reviewing pull requests are a great way to organize yourself and review your own work! It's also an opportunity to be confortable with tools used by many teams and companies around the world.
+And that's totally fine. Just find the recipe that works for you. But keep in mind that creating issues and reviewing pull requests are great ways to stay focused and review your own work! It's also an opportunity to be comfortable with tools used by many teams and companies around the world.
 
-And when we will use GitHub actions to automate tasks like testing, web scraping, publishing libraries and webpages, you'll be amazed by everything this workflow has to offer.
+Also, when we learn about GitHub Actions to automate tasks like testing, web scraping, publishing libraries and web pages, you'll be amazed by everything this workflow has to offer.
 
-Interested for more? Join me for the next lesson about GitHub Actions! 🤩
+Interested in more? Join me for the next lesson about GitHub Actions! 🤩
 
 <NoticeEnd />
