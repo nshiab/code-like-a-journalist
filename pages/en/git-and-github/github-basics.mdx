@@ -254,6 +254,10 @@ Once the merge is confirmed, the changes are brought to the `main` branch!
 GitHub will suggest removing the branch we created. It's safe to delete it now.
 
 ![Merged PR and delete branch.](/assets/git-and-github/github-basics/delete-branch.png)
+<Callout type="info" emoji="💡">
+   Have you noticed the `Revert` button? If you merged something too fast and want to revert the changes, this is the button for it! In the previous lesson, we did it manually, but with GitHub it's easier thanks to the PR interface.
+</Callout>
+
 
 If we check the main page of the repository, we see that our changes are on `main`. You can check the `main.ts` file if you are curious. The issue we created has been automatically closed when we merged the PR. It's convenient, isn't it? 🥳
 
@@ -317,6 +321,41 @@ Forking is how a lot of open-source contributions and collaborations happen:
 - Someone else finds it interesting but wants to tweak or fix something. They fork it, update the code, and send a PR to the owner of the original repository.
 - The owner checks the PR and, if happy, merges it.
 - The contribution is now part of the project and everyone can benefit from it!
+
+## Adding a `.gitignore`
+
+People can clone and fork your repositories but... what if you want something locally on your computer but don't want to share it with anyone?
+
+For example, let's create a new `password.txt` file in our repo.
+
+```
+This is a very important password: potato. Don't share it.
+```
+
+![Password in the repository.](/assets/git-and-github/github-basics/password.png)
+
+**You absolutely don't want to commit this!** 🫣
+
+If you commit it, it will be in your Git history **forever**. And, of course, you don't want to push it.
+
+For situations like these, you need to add a `.gitignore` file to your project. If you have one, Git will check it and ignore any folders or files listed in it. They will become greyed out in your project, meaning they won't be tracked, committed, and pushed.
+
+Add `password.txt` to it.
+
+![Adding a gitignore file.](/assets/git-and-github/github-basics/gitignore.png)
+
+Now, the file `password.txt` will be ignored, but you still need to commit and push your new `.gitignore` file:
+- `git add -A`
+- `git commit -m "Adding .gitignore"`
+- `git push`
+
+On your repository page, you can now see your `.gitignore`, but the `password.txt` has been ignored and is not part of your project!
+
+![A gitignore file has been added to the repository.](/assets/git-and-github/github-basics/repo-gitignore.png)
+
+<Callout type="info" emoji="💡">
+   If you committed and pushed sensitive information by mistake (like so many of us 😬), [follow these steps](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)!
+</Callout>
 
 ## Conclusion
 
