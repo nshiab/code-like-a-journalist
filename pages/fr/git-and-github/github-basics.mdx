@@ -1,0 +1,381 @@
+---
+title: Qu'est-ce que GitHub et comment l'utiliser ?
+description: Dans cette leçon, on apprend les bases de l'utilisation de GitHub.
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
+
+# Qu'est-ce que GitHub et comment l'utiliser ?
+
+[GitHub](https://github.com/) est une plateforme appartenant à Microsoft. Elle est devenue le lieu de prédilection pour de nombreux développeurs et entreprises travaillant sur des projets en code ouvert. Vous pouvez héberger des projets publics gratuitement sur GitHub et profiter de nombreuses fonctionnalités qui facilitent la vie des programmeurs.
+
+Vous pouvez aussi créer des dépôts privés avec un compte gratuit, bien sûr. Et [vous pouvez payer si vous avez besoin de plus de ressources](https://github.com/pricing). Mais j'utilise GitHub pour mes projets en code ouvert depuis des années (les librairies [SDA](https://github.com/nshiab/simple-data-analysis) et [journalism](https://github.com/nshiab/journalism), ainsi que [ce cours aussi](https://github.com/nshiab/code-like-a-journalist)) et je n'ai jamais atteint les limites du plan gratuit !
+
+Comme son nom l'indique, GitHub fonctionne avec Git. Je vous recommande donc fortement de suivre la leçon précédente [Comment utiliser Git ?](/git-and-github/git-basics) avant de vous plonger dans celle-ci. Ici, on va suivre les mêmes étapes que dans la leçon précédente : créer un programme simple pour récupérer la température à Montréal. Mais cette fois, on va stocker notre code dans le nuage, avec GitHub !
+
+<NoticeIntro lang="fr" />
+
+## Compte GitHub
+
+Pour utiliser GitHub, il faut d'abord [créer un compte](https://github.com/). Commencez donc par là.
+
+![Page d’accueil de GitHub.](/assets/git-and-github/github-basics/github-account.png)
+
+## Un réseau social
+
+Quand vous vous connectez à GitHub et arrivez sur votre page d’accueil, vous verrez une section **Feed**. C’est parce que GitHub est aussi un réseau social. Par exemple, vous pouvez voir mon fil d’actualité ci-dessous au moment où j’écris ces lignes. C’est super pour rester à jour sur les projets en code ouvert qui vous intéressent ou simplement pour voir sur quoi travaillent les personnes que vous trouvez inspirantes.
+
+![Fil GitHub.](/assets/git-and-github/github-basics/feed.png)
+
+Chaque utilisateur a un profil public qui montre son activité publique, et vous pouvez les suivre pour voir leur activité dans votre fil. [Voici mon profil, par exemple](https://github.com/nshiab). **Suivez-moi !** 🤗
+
+Personnellement, j’aime suivre d’autres journalistes computationnels ou les mainteneurs de projets en code ouvert que j’utilise.
+
+Vous pouvez mettre à jour votre profil et vos paramètres en cliquant sur le bouton en haut à droite.
+
+![Profil GitHub.](/assets/git-and-github/github-basics/profile.png)
+
+Les dépôts publics ont aussi une page publique. Quand vous aimez un projet, vous pouvez lui attribuer une étoile. Par exemple, voici la page de la librairie [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) que je maintiens et qu’on utilise dans les leçons précédentes. **Ajoutez-lui une 🌟 !**
+
+Vous pouvez aussi ***Watch*** un projet pour voir son activité dans votre fil. En général, je suis les projets que j'utilise pour être informé des nouvelles versions.
+
+![Dépôt GitHub.](/assets/git-and-github/github-basics/sda-repo.png)
+
+## Créer un dépôt
+
+Créons votre premier dépôt ! Cliquez sur le bouton + en haut à droite.
+
+![Créer un nouveau dépôt.](/assets/git-and-github/github-basics/new-button.png)
+
+Puis donnez un nom à votre dépôt et rendez-le privé (comme ça, vous n’aurez pas peur de faire des erreurs 😉). Pas besoin de `readme` ni de `.gitignore` pour l’instant. On en parlera plus tard. Ensuite, cliquez sur `Create repository` en bas.
+
+![Paramètres d’un nouveau dépôt.](/assets/git-and-github/github-basics/new-repo-settings.png)
+
+La page suivante vous explique comment connecter un dépôt sur votre ordinateur avec celui qu’on vient de créer sur GitHub.
+
+On va suivre les étapes sous *pushing an existing repository from the command line*. Gardez cette page ouverte.
+
+![Les étapes pour connecter un dépôt existant à un nouveau.](/assets/git-and-github/github-basics/new-repo-steps.png)
+
+Créez un nouveau dossier avec le même nom que le dépôt et ouvrez-le avec VS Code. Ajoutez-y un fichier `main.ts` avec un simple log pour l’instant.
+
+
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
+
+Initialisez ensuite un nouveau dépôt Git dans ce dossier en exécutant `git init`.
+
+Ensuite, suivez le nouveau fichier qu’on vient de créer avec `git add -A`, puis faisons un commit avec `git commit -m "My first commit"`.
+
+![Premier commit.](/assets/git-and-github/github-basics/first-commit.png)
+
+À ce stade, votre code est enregistré localement avec Git, sur votre ordinateur. Il est temps de l’enregistrer à distance, dans le nuage, sur GitHub !
+
+Vous pouvez copier les instructions affichées sur la page GitHub et les coller dans votre terminal. Appuyez sur Entrée pour les exécuter ! Votre URL sera différente de la mienne, mais le reste devrait être similaire.
+
+
+
+```
+git remote add origin https://github.com/nshiab/my-first-repo.git
+git branch -M main
+git push -u origin main
+```
+
+Notez qu’on vous demandera probablement de vous identifier. Suivez les étapes suggérées. Si on vous demande un mot de passe dans le terminal, **vous ne verrez pas ce que vous tapez pour des raisons de sécurité**, mais ce que vous tapez fonctionne bel et bien ! C’est toujours un peu bizarre la première fois. 🤪
+
+![Synchronisation des dépôts local et distant.](/assets/git-and-github/github-basics/sync.png)
+
+Et si vous actualisez la page de votre dépôt sur GitHub, vous verrez que votre code est synchronisé ! Le fichier `main.ts` est là et vous voyez votre dernier commit.
+
+![Page du dépôt distant.](/assets/git-and-github/github-basics/repo-page-sync.png)
+
+## Pousser vers le dépôt
+
+Il n’y a pas de fichier `README.md` dans votre dépôt, et GitHub vous recommande (fortement) d’en ajouter un. Le contenu de ce fichier sera affiché sur la page du dépôt. C’est généralement la première chose que les gens liront avant de consulter le code. Alors faisons-le.
+
+Comme l’indique son extension `.md`, c’est un fichier Markdown. Markdown est une syntaxe simple et pratique souvent utilisée pour la documentation. Le code sera transformé en un joli texte lisible par l’outil ou la plateforme que vous utilisez. Vous pouvez ainsi vous concentrer sur le contenu sans vous soucier du style, ce qui est plutôt sympa ! On va écrire un peu de Markdown ensemble, mais si vous voulez en savoir plus, consultez cette [cheat sheet](https://www.markdownguide.org/cheat-sheet/).
+
+Créez un nouveau fichier `README.md` dans votre dépôt dans VS Code et copiez-collez le contenu ci-dessous. Comme je l’ai dit au début, notre objectif sera de récupérer la température à Montréal.
+
+Le `#` sert à faire des titres. La syntaxe `[texte](lien)` permet d’ajouter des liens dans votre texte, et l’utilisation de backticks permet de créer des blocs de code.
+
+
+
+```md showLineNumbers filename="README.md"
+# My first repository
+
+This project retrieves the latest temperature in Montreal from the
+[Meteorological Service of Canada API](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
+
+Here's the command to run the project: `deno -A main.ts`
+```
+
+Dans VS Code, si vous faites un clic droit sur les fichiers `.md`, vous pouvez les prévisualiser.
+
+![Le README.](/assets/git-and-github/github-basics/markdown.png)
+
+Notre nouveau fichier est sur notre ordinateur. Poussons-le maintenant vers GitHub. Il faut d'abord le committer :
+- `git add -A`
+- `git commit -m "Adding README.md"`
+
+Et il y a une commande en plus pour le pousser :
+- `git push`
+
+![Pousser le README vers GitHub.](/assets/git-and-github/github-basics/push.png)
+
+Tada ! 🪄 C’est maintenant sur GitHub ! Et votre README est utilisé pour accueillir les visiteurs !
+
+![Le README sur GitHub.](/assets/git-and-github/github-basics/readme.png)
+
+## Créer des *issues*
+
+Il est temps de récupérer et d’extraire la température à Montréal !
+
+Comme on l’a vu dans la leçon précédente, on essaie de garder la branche `main` propre et fonctionnelle. On travaille sur les nouvelles fonctionnalités dans des **branches** où l’on peut tester et casser des choses sans souci.
+
+Dans la leçon précédente, on avait créé une branche manuellement dans le terminal. Mais avec GitHub, il existe une meilleure manière : utiliser les ***issues***.
+
+Sur les dépôts publics, n’importe qui peut créer une *issue*. C’est comme ça que les mainteneurs de librairies sont informés de bugs ou reçoivent des suggestions pour de nouvelles fonctionnalités ou des améliorations. Par exemple, vous pouvez créer une *issue* pour [ce cours](https://github.com/nshiab/code-like-a-journalist/issues) ou pour la librairie [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis/issues) !
+
+Cliquez sur l’onglet `Issues` dans votre projet.
+
+![L’onglet Issues sur GitHub.](/assets/git-and-github/github-basics/issues-tab.png)
+
+Puis cliquez sur le bouton `New issue`.
+
+![Le bouton pour créer une nouvelle issue sur GitHub.](/assets/git-and-github/github-basics/issues-button.png)
+
+Ajoutez un titre et une courte description (optionnelle). D’ailleurs, la description est en Markdown ! Et vous avez un bouton pour prévisualiser ce que vous avez écrit. 😏
+
+Si vous travaillez avec d’autres personnes, les *issues* peuvent être assignées, ce qui est une excellente façon d’organiser le travail. Vous pouvez aussi leur attribuer des étiquettes.
+
+Cliquez sur le bouton `Create`.
+
+![Le titre et la description d’une nouvelle issue.](/assets/git-and-github/github-basics/issue-description.png)
+
+Votre *issue* est maintenant créée ! Chaque *issue* a un identifiant unique (ici c’est `#1`), et des personnes (ou vous-même 🥸) peuvent y laisser des commentaires.
+
+Pour travailler sur cette *issue* dans une branche dédiée, vous pouvez cliquer sur `Create a branch` !
+
+![Issue et sa branche.](/assets/git-and-github/github-basics/issue-branch.png)
+
+GitHub va automatiquement générer un nom pour la branche et proposer de partir de `main`, ce qui est exactement ce qu’on veut.
+
+Gardez l’option `Checkout locally` sélectionnée et cliquez sur `Create branch`.
+
+![Options de la branche.](/assets/git-and-github/github-basics/branch-options.png)
+
+Copiez les commandes et exécutez-les dans votre terminal.
+
+![Commandes de la branche.](/assets/git-and-github/github-basics/branch-command.png)
+
+La branche a été créée sur GitHub mais n’est pas encore sur votre ordinateur. C’est pour cela que la première commande est `git fetch origin`. Elle permet de synchroniser votre dépôt local avec le dépôt distant.
+
+La deuxième commande sert simplement à basculer vers votre nouvelle branche.
+
+Voici mes commandes. La deuxième pourrait être légèrement différente si vous avez utilisé un autre titre.
+
+```
+git fetch origin
+git checkout 1-return-montreal-temperature
+```
+
+Nous sommes maintenant sur notre nouvelle branche. On peut travailler sur notre code en toute sécurité !
+
+![Travailler sur la nouvelle branche.](/assets/git-and-github/github-basics/new-branch.png)
+
+Ajoutons le code de la leçon précédente dans notre fichier `main.ts`. Ce script interroge l’API du Service météorologique du Canada et récupère les données au format XML. La librairie `fast-xml-parser` les convertit en JSON. Et le reste du code extrait la température et l’heure avant de les afficher dans la console.
+
+
+
+```ts showLineNumbers filename="main.ts"
+import { XMLParser } from "fast-xml-parser";
+
+const response = await fetch(
+  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+);
+const xml = await response.text();
+const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
+
+const observation =
+  json["om:ObservationCollection"]["om:member"]["om:Observation"];
+
+const resultTime =
+  observation["om:resultTime"]["gml:TimeInstant"]["gml:timePosition"];
+console.log(resultTime);
+
+const elements = observation["om:result"]["elements"]["element"];
+type element = {
+  "@_name": string;
+  "@_value": string;
+};
+const temp = elements
+  .find((d: element) => d["@_name"] === "air_temp")["@_value"];
+console.log(temp);
+```
+
+Installez la dépendance `fast-xml-parser` en exécutant `deno add npm:fast-xml-parser`.
+
+Et maintenant, la température devrait s'afficher dans le terminal quand vous exécutez `deno -A main.ts`.
+
+Enfin, commitez et poussez votre travail :
+- `git add -A`
+- `git commit -m "Fetching and extracting temperature"`
+- `git push`
+
+![Pousser le nouveau code depuis la nouvelle branche.](/assets/git-and-github/github-basics/branch-push.png)
+
+Maintenant, si vous actualisez la page de votre dépôt sur GitHub, vous verrez deux branches. Par défaut, la branche `main` est affichée, mais vous pouvez cliquer sur `2 Branches` pour explorer si vous êtes curieux.
+
+Mais on a aussi une grande bannière qui suggère de créer une ***pull request*** ! Intéressant... 😏
+
+![GitHub suggère de créer une pull request.](/assets/git-and-github/github-basics/pr-suggestion.png)
+
+## Créer une *pull request*
+
+Les **pull requests** sont une demande de **merge** d'une branche dans une autre. Avant d’approuver la fusion, le code est comparé et les changements doivent être validés. Cliquez sur le bouton `Compare & pull request` dans la bannière.
+
+Vous pouvez ensuite ajouter un titre et une description (optionnelle). Vous pouvez faire défiler pour voir tous les commits et changements entre les deux branches.
+
+Cliquez sur `Create pull request`.
+
+![Créer une nouvelle PR sur GitHub.](/assets/git-and-github/github-basics/pr-create.png)
+
+Vous avez créé votre première PR ! C’est un excellent endroit pour revoir ce que cette demande ajoute au projet. Ici, vous pouvez revoir les commits, les fichiers et le code. Si vous travaillez avec d’autres personnes, vous pouvez les mentionner sur des lignes spécifiques pour discuter des modifications.
+
+GitHub va vérifier que vous pouvez effectivement fusionner les deux branches et qu’il n’y a pas de conflits entre elles. Vous pouvez aussi ajouter des tests déclenchés automatiquement pour vérifier que les fonctionnalités principales du projet ne sont pas cassées par les changements.
+
+Ici, tout semble bon, donc vous pouvez cliquer sur le bouton `Merge pull request`, puis confirmer la fusion.
+
+![Créer une nouvelle PR sur GitHub.](/assets/git-and-github/github-basics/pr-merge.png)
+
+Une fois la fusion confirmée, les changements sont ajoutés à la branche `main` !
+
+GitHub va suggérer de supprimer la branche qu’on a créée. Vous pouvez la supprimer sans problème maintenant.
+
+![PR fusionnée et supprimer la branche.](/assets/git-and-github/github-basics/delete-branch.png)
+
+<Callout type="info" emoji="💡">
+   Vous avez remarqué le bouton `Revert` ? Si vous avez fusionné quelque chose un peu trop vite et que vous voulez revenir en arrière, ce bouton est là pour ça ! Dans la leçon précédente, on l’a fait manuellement, mais avec GitHub, c’est plus simple grâce à l’interface des PR.
+</Callout>
+
+Si on regarde la page principale du dépôt, on voit que nos changements sont bien dans `main`. Vous pouvez consulter le fichier `main.ts` si vous êtes curieux. L’issue qu’on avait créée a été automatiquement fermée quand on a fusionné la PR. Pratique, non ? 🥳
+
+![La page principale du dépôt avec les changements.](/assets/git-and-github/github-basics/changes-main.png)
+
+Tout ça s’est passé dans le nuage, sur la plateforme GitHub. Pour récupérer les changements dans votre dépôt local, commencez par vous replacer sur la branche `main` :
+- `git checkout main`
+
+Puis **pull** les changements :
+- `git pull`
+
+Et voilà, votre branche `main` sur votre ordinateur est maintenant synchronisée avec le dépôt distant !
+
+## Cloner un dépôt
+
+Imaginons maintenant que votre ordinateur ait pris feu et soit complètement détruit. 🔥
+
+Comment récupérer tout votre travail précieux depuis le nuage ? En **clonant** le dépôt.
+
+Supprimez le dossier sur lequel vous avez travaillé jusqu’à maintenant. Oui, supprimez-le ! Faites-moi confiance !
+
+Sur la page de votre dépôt, cliquez sur le bouton `<> Code`. C’est là que vous trouverez les options pour cloner votre code.
+
+Copiez l’URL.
+
+![La commande pour cloner un dépôt.](/assets/git-and-github/github-basics/clone-command.png)
+
+Ensuite, créez un nouveau dossier avec le même nom que votre dépôt et ouvrez-le avec VS Code. Commencez à taper `git clone`, collez l’URL copiée (n’oubliez pas l’espace entre `clone` et l’URL), puis ajoutez un espace et un `.`.
+
+Pour moi, la commande ressemble à ceci :
+- `git clone https://github.com/nshiab/my-first-repo.git .`
+
+Le point à la fin est important. Il indique à Git de cloner le dépôt dans le dossier courant. Sans lui, Git créera un nouveau dossier à l’intérieur du dossier actuel.
+
+Et voilà, vous avez récupéré tout votre code.
+
+![Un dépôt cloné.](/assets/git-and-github/github-basics/cloned.png)
+
+Bien sûr, cloner est aussi très utile quand on collabore avec d’autres personnes. Elles peuvent facilement récupérer votre dernier code, avec toutes les branches et tous les commits.
+
+Une fois le dépôt cloné, l’étape suivante consiste généralement à installer toutes les dépendances avec `deno install`. Comme on a un fichier `deno.json` dans notre projet, Deno saura exactement quoi installer et à quelles versions.
+
+Et vous êtes prêt à continuer à travailler sur votre projet incroyable !
+
+## *Forker* un dépôt
+
+Tout le monde peut cloner un dépôt public (ou un dépôt privé s’ils ont été invités à collaborer), mais tout le monde n’a pas le droit d’y pousser du code ni de fusionner. Et c’est une bonne chose ! Imaginez le chaos et les problèmes de sécurité ! 😈
+
+Quand vous voulez créer votre propre copie d’un dépôt, vous pouvez le ***forker***. Cela créera une copie du projet dans votre compte. Vous pourrez ensuite y travailler et modifier ce que vous voulez.
+
+Ça fonctionne un peu comme une *branche d’un dépôt*. Il n’y a aucun impact sur le dépôt original, mais si vous le souhaitez, vous pouvez créer une *pull request* à destination des propriétaires du dépôt original.
+
+Par exemple, au moment d’écrire ces lignes, 16 utilisateurs GitHub ont *forké* la librairie [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Je n’ai aucune idée de ce qu’ils en font, et c’est très bien comme ça !
+
+Si vous êtes curieux, n’hésitez pas à la *forker* aussi !
+
+![Forker SDA.](/assets/git-and-github/github-basics/forking.png)
+
+Le *forking* est au cœur de nombreuses contributions et collaborations en code ouvert :
+- Quelqu’un crée un projet en code ouvert.
+- Une autre personne le trouve intéressant mais veut y apporter des modifications ou corriger quelque chose. Elle le *fork*, modifie le code, et envoie une PR au propriétaire du dépôt original.
+- Le propriétaire examine la PR et, s’il est satisfait, la fusionne.
+- La contribution fait désormais partie du projet, et tout le monde peut en bénéficier !
+
+## Ajouter un `.gitignore`
+
+Les gens peuvent cloner et *forker* vos dépôts, mais... que faire si vous avez quelque chose sur votre ordinateur que vous ne voulez pas partager ?
+
+Par exemple, créons un nouveau fichier `password.txt` dans notre dépôt.
+
+```
+This is a very important password: potato. Don't share it.
+```
+
+![Mot de passe dans le dépôt.](/assets/git-and-github/github-basics/password.png)
+
+**Vous ne voulez surtout pas *committer* ce fichier !** 🫣
+
+Si vous le *committer*, il sera dans l’historique Git **pour toujours**. Et bien sûr, vous ne voulez pas non plus le pousser.
+
+Dans ce genre de situations, vous devez ajouter un fichier `.gitignore` à votre projet. Si ce fichier existe, Git va le consulter et ignorer tous les dossiers ou fichiers listés dedans. Ils deviendront grisés dans votre projet, ce qui signifie qu’ils ne seront ni suivis, ni commités, ni poussés.
+
+Ajoutez `password.txt` dedans.
+
+![Ajout d’un fichier gitignore.](/assets/git-and-github/github-basics/gitignore.png)
+
+Maintenant, le fichier `password.txt` sera bien ignoré, mais il faut quand même *committer* et pousser votre nouveau fichier `.gitignore` :
+- `git add -A`
+- `git commit -m "Adding .gitignore"`
+- `git push`
+
+Sur la page de votre dépôt, vous pouvez maintenant voir votre `.gitignore`, mais le fichier `password.txt` a bien été ignoré et ne fait pas partie du projet !
+
+![Un fichier gitignore a été ajouté au dépôt.](/assets/git-and-github/github-basics/repo-gitignore.png)
+
+<Callout type="info" emoji="💡">
+   Si vous avez *committé* et poussé par erreur des informations sensibles (comme beaucoup d’entre nous 😬), [suivez ces étapes](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository) !
+</Callout>
+
+## Conclusion
+
+Git et GitHub fonctionnent incroyablement bien ensemble. Avec Git, vous pouvez versionner votre travail, tandis que GitHub vous offre une interface pratique pour organiser vos tâches et collaborer avec d’autres personnes.
+
+Dans cette leçon, vous avez appris de nouvelles commandes Git importantes :
+- `git push` pour pousser du code vers un dépôt distant enregistré dans le nuage
+- `git pull` pour récupérer les dernières modifications depuis un dépôt distant
+- `git clone` pour copier un dépôt entier sur votre ordinateur
+
+Vous avez aussi découvert les *issues* GitHub, les *pull requests*, les *forks* et le fichier `.gitignore`.
+
+Mais… vous pourriez être tenté de simplement créer des branches localement et de fusionner directement sur votre ordinateur lorsque vous travaillez seul. Ou même de tout faire dans la branche `main` ! 🤠
+
+Et c’est parfaitement acceptable. Trouvez la méthode qui fonctionne pour vous. Mais gardez en tête que créer des *issues* et passer par des *pull requests* sont d’excellentes façons de rester concentré et de revoir votre propre travail ! C’est aussi une opportunité de vous familiariser avec des outils utilisés dans de nombreuses équipes et entreprises à travers le monde.
+
+Et lorsqu’on couvrira les actions GitHub pour automatiser des tâches comme les tests, le web scraping, la publication de librairies ou de pages web, vous serez bluffé par tout ce que cette méthode de travail permet de faire.
+
+Vous en voulez plus ? Rejoignez-moi dans la prochaine leçon sur les actions GitHub! 🤩
+
+<NoticeEnd lang="fr" />
