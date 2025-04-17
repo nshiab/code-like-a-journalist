@@ -1,0 +1,200 @@
+---
+title: Publishing on GitHub pages with Svelte
+description: In this lesson, we learn how to use GitHub pages and host a website built with Svelte on it.
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
+
+# Publishing on GitHub pages with Svelte
+
+In previous lessons, we've learned how to use GitHub to run code with GitHub Actions. There is another amazing feature of GitHub I wanted to share with you: **Pages**.
+
+If you tell GitHub where are located static files for a website in a repository, it will automatically create a website with them, for free! Pages are often used to host library documentation, but they can be anything you want!
+
+In this lesson, I am going to show you how to use the [setup-sda library](https://github.com/nshiab/setup-sda) we've been using in many previous projects to (very) quickly publish your data projects on GitHub.
+
+If you haven't done so, I suggest you check the **[Svelte lesson](/web-basics/svelte)**, since we are going to use it to build our website.
+
+<NoticeIntro />
+
+## Setup
+
+Create a new folder and open it in VS Code. Then run this command to install and set up everything we need with [setup-sda](https://github.com/nshiab/setup-sda):
+- `deno -A jsr:@nshiab/setup-sda --svelte --example --pages --git`
+
+The library sets up a `sda` folder to work with the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis), as we saw in [**3. The SDA library 🤓**](simple-data-analysis/tabular-data). But the options add a few things:
+- `--svelte` will also set up a Svelte project
+- `--example` will add data and code to show a full project example
+- `--pages` will add a GitHub workflow (as we saw in the [previous lesson](/git-and-github/github-actions)) and tweak some configuration files
+- `--git` will initialize and make the first commit once all files are in.
+
+![Running setup-sda.](/assets/git-and-github/github-pages/setup.png)
+
+Once the command ran, you can execture `deno task dev`, open the local URL and you should see an example website! Feel free to explore the code and the page.
+
+![An example website.](/assets/git-and-github/github-pages/demo.png)
+
+## Creating a repository
+
+It's now time to head over GitHub and create a new repository. Give it a name (`my-website` for example), make it public, and there is no need for a `README` and `.gitignore` since `setup-sda` took care of all that.
+
+![Creating a new repository.](/assets/git-and-github/github-pages/new-repo.png)
+
+Now copy the commands to *push an existing repository from the command line**.
+
+![Git commands.](/assets/git-and-github/github-pages/commands.png)
+
+And paste and run them in your repository. 
+
+![Running commands.](/assets/git-and-github/github-pages/run-commands.png)
+
+Now, if you refresh your repository page, you'll your code!
+
+![The page of the repo.](/assets/git-and-github/github-pages/repo-page.png)
+
+## Enabling GitHub Pages
+
+Now, it's time to enable GitHub pages on the repository!
+
+Click on your repository `Settings` and then on `Pages` on the left side-bar. Then select `GitHub Actions` for the `Build and deployment` source.
+
+![Enabling GitHub pages.](/assets/git-and-github/github-pages/enabling-pages.png)
+
+Now, go check your actions. We have one to build and deploy our website. But it failed because GitHub Pages was not enabled when we did our first push. Click on it.
+
+![Failed to deploy to GitHub pages.](/assets/git-and-github/github-pages/failed.png)
+
+Click on `Rerun jobs` and wait for a few seconds.
+
+And now it works! GitHub Actions successfully did the two jobs: building our website and then publishing it! You now have a link for your website!
+
+![Successfully deployed to GitHub pages.](/assets/git-and-github/github-pages/success.png)
+
+If you click on the link, you'll see your website live!
+
+![The website.](/assets/git-and-github/github-pages/website.png)
+
+You can retrieve the link to the website in your settings too.
+
+![The url.](/assets/git-and-github/github-pages/url.png)
+
+## Updating `main`
+
+Now, let's do something fun. Let's update the code on the `main` branch and push it to GitHub.
+
+In `src/routes/+page.svelte`, I changed `<h2>Climate change</h2>` to `<h2>Climate change example</h2>`. I know, I am going crazy.
+
+Let's commit and push this to GitHub:
+- `git add -A`
+- `git commit -m "Update"`
+- `git push`
+
+![Making a change.](/assets/git-and-github/github-pages/change.png)
+
+If you check your actions, you'll see one being triggered by your push. Everytime you update the `main` branch, your site will be rebuilt and republished! Magic! 🧙
+
+PS: I have two `Update` in the screenshot because I messed up. But you should have just one!
+
+![The workflow being triggered.](/assets/git-and-github/github-pages/update-action.png)
+
+And after a few seconds, your website will be updated!
+
+![The website being updated.](/assets/git-and-github/github-pages/update-website.png)
+
+With this setup, you can focus on your code, work on branches, see your website locally as you work on it and when happy, make a pull request to merge on main.
+
+Once merged, you website will automatically be republished! 🤩
+
+## But... how?
+
+That was easy, wasn't it? 🥳 To make it work, there are a few things `setup-sda` did for us.
+
+In the `svelte.config.js` file, it set up a `paths.base` to make sure Svelte knows that the website address will start with something like `https//your-username.github.io/my-website/`. This information will be passed with an environment variable in the GitHub workflow.
+
+```js showLineNumbers filename="svelte.config.js" {3, 10-12}
+import adapter from "@sveltejs/adapter-static";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
+import process from "node:process";
+
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+  preprocess: vitePreprocess(),
+  kit: {
+    adapter: adapter(),
+    paths: {
+      base: process.argv.includes("dev") ? "" : process.env.BASE_PATH,
+    },
+  },
+};
+
+export default config;
+```
+
+The next big thing is the GitHub Actions workflow, of course.
+
+In `.github/workflows/deploy.yml`, many things are happening and if you want to fully understand them, check the [GitHub Actions lesson](/git-and-github/github-actions).
+
+But to summarize, there are two jobs here that are triggered when there is a push on main:
+- `build_site` which builds the website by passing an environment variable `github.event.repository.name` (used in our `svelte.config.js` covered just above)
+- `deploy` which publishes the files created by `build_site`.
+
+```yml showLineNumbers filename=".github/workflows/deploy.yml"
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: "main"
+
+jobs:
+  build_site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install dependencies
+        run: deno install
+
+      - name: build
+        env:
+          BASE_PATH: "/${{ github.event.repository.name }}"
+        run: deno task build
+
+      - name: Upload Artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "build/"
+
+  deploy:
+    needs: build_site
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+# Conclusion
+
+I hope you'll find this setup useful. I created `setup_sda` to make my life easier. With it, I can crunch and analyse data with the `Simple Data Analysis` library in the `sda` folder and then work on interactive visualizations in the folder `src` with `Svelte`. It's the best of both world!
+
+And with GitHub pages, I can easily share my findings to the world. And now that you completed this lesson, you can too!
+
+Let me know if you use it! 🤗
+
+<NoticeEnd />
