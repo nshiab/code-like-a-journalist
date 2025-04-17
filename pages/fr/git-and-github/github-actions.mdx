@@ -1,36 +1,35 @@
 ---
-title: Web scraping with GitHub Actions and workflows
-description: In this lesson, we learn the basics of using GitHub Actions and workflows, and we use them to scrape data.
+title: Extraire des données avec GitHub Actions
+description: Dans cette leçon, nous apprenons les bases de l'utilisation des GitHub Actions et des workflows, et nous les utilisons pour collecter des données.
 ---
 
 import { Callout } from "nextra/components";
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
 
-# Web scraping with GitHub Actions and workflows
+# Extraire des données avec GitHub Actions
 
-GitHub is a platform to store your code, organize your work, collaborate with other fellow coders, but... it's also a place where you can **run code**! 🤩
+GitHub est une plateforme pour stocker votre code, organiser votre travail, collaborer avec d'autres codeurs... mais c'est aussi un endroit où vous pouvez **exécuter du code** ! 🤩
 
-GitHub Actions are mostly used to automatically run tests, builds, and deployments on projects. But for data wranglers like us, they can also be used to scrape data.
+Les GitHub Actions sont principalement utilisées pour exécuter automatiquement des tests et des déploiements pour des projets. Mais pour les amateurs de données comme nous, elles peuvent aussi servir à faire du *web scraping*.
 
-In this lesson, we reuse the code that fetches and extracts the latest temperature in Montreal from the previous lessons. But this time, we’ll use GitHub Actions to trigger it every hour and accumulate the data — for free!  
-If you want to see the final product, [head over here](https://github.com/nshiab/temperature-scraper).
+Dans cette leçon, nous réutilisons le code des leçons précédentes qui récupère et extrait la température la plus récente à Montréal. Mais cette fois, nous utiliserons les GitHub Actions pour le déclencher toutes les heures et accumuler les données — gratuitement !  
+Si vous voulez voir le projet final, [c’est par ici](https://github.com/nshiab/temperature-scraper).
 
-I strongly encourage you to complete the two previous lessons ([What is Git?](/git-and-github/git-basics) and [What is GitHub?](/git-and-github/github-basics)) before diving into this one. I'll assume you have a GitHub account and know the basic Git commands.
+Si ce n'est pas déjà fait, je vous recommande fortement de suivre les deux leçons précédentes ([Qu’est-ce que Git ?](/git-and-github/git-basics) et [Qu’est-ce que GitHub ?](/git-and-github/github-basics)) avant de commencer celle-ci. Je pars du principe que vous avez un compte GitHub et que vous connaissez les commandes Git de base.
 
-<NoticeIntro />
+<NoticeIntro lang="fr" />
 
-## Setup
+## Configuration
 
-Create a new folder and open it with VS Code.
+Créez un nouveau dossier et ouvrez-le avec VS Code.
 
-In it, create a `main.ts` file with the code below. Here's what it does:
-- It fetches the latest weather data in Montreal from the [Meteorological Service of Canada API](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
-- The data is in XML format. We use the library [`fast-xml-parser`](https://www.npmjs.com/package/fast-xml-parser) to convert it to JSON.
-- Then we extract the temperature and the time from the nested JSON. We also create a variable with the current time of the scrape.
-- Finally, we append the scraped data to `data.csv`.
+À l’intérieur, créez un fichier `main.ts` avec le code ci-dessous. Voici ce qu’il fait :
+- Il récupère les dernières données météo à Montréal depuis l' [API du Service météorologique du Canada](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
+- Les données sont au format XML. On utilise la librairie [`fast-xml-parser`](https://www.npmjs.com/package/fast-xml-parser) pour les convertir en JSON.
+- Ensuite, on extrait la température et l’heure depuis le JSON imbriqué. On crée aussi une variable avec l’heure actuelle de la collecte.
+- Enfin, on ajoute les données extraites dans le fichier `data.csv`.
 
-Each time this script runs, a new row is added to the CSV. So the data is accumulated over time.
-
+Chaque fois que ce script s’exécute, une nouvelle ligne est ajoutée au CSV. Les données s’accumulent donc au fil du temps.
 
 ```ts showLineNumbers filename="main.ts"
 import { XMLParser } from "fast-xml-parser";
@@ -69,13 +68,13 @@ await Deno.writeTextFile(
 );
 ```
 
-`main.ts` needs a `data.csv` file, so let's create one in the project folder.
+`main.ts` a besoin d’un fichier `data.csv`, alors créons-en un dans le dossier du projet.
 
 ```csv showLineNumbers filename="data.csv"
 scrapeTime,resultTime,temp
 ```
 
-We will push this project to GitHub, so let's add a `README.md` to the project to make it more presentable.
+Nous allons pousser ce projet sur GitHub, alors ajoutons un fichier `README.md` pour le rendre plus présentable.
 
 ```md showLineNumbers filename="README.md"
 # Montreal temperature scraper
@@ -85,90 +84,91 @@ from the [Meteorological Service of Canada API](https://eccc-msc.github.io/open-
 and appends a new row to the `data.csv` file.
 ```
 
-Let's take this for a run!
+Testons ce code!
 
-First, install `fast-xml-parser`:
+D'abord, installez `fast-xml-parser` :
 - `deno add npm:fast-xml-parser`
 
-Then run `main.ts`:
+Puis exécutez `main.ts` :
 - `deno -A main.ts`
 
-And you should see the temperature being logged and a row added to the `data.csv` file!
+Vous devriez voir la température s’afficher et une ligne ajoutée au fichier `data.csv` !
 
-![The README.](/assets/git-and-github/github-actions/setup.png)
+![Le README.](/assets/git-and-github/github-actions/setup.png)
 
-## Creating a new GitHub repository
+## Créer un nouveau dépôt GitHub
 
-Let's initialize a new Git repository and push it to GitHub.
+Initialisons un nouveau dépôt Git et poussons-le sur GitHub.
 
-First, we initialize and make a first commit:
+D’abord, on l’initialise et on fait un premier commit :
 - `git init`
 - `git add -A`
 - `git commit -m "First commit"`
 
-Then, create a new repository on GitHub.
+Ensuite, créez un nouveau dépôt sur GitHub.
 
-![New repository on GitHub.](/assets/git-and-github/github-actions/setup.png)
+![Nouveau dépôt sur GitHub.](/assets/git-and-github/github-actions/new-repo.png)
 
-Give it a name and a description (optional). You can make it private or public, as you wish.
+Donnez-lui un nom et une description (facultatif). Vous pouvez le rendre privé ou public, comme vous le souhaitez.
 
-You don't need a `README` because we created one. You don't need a `.gitignore` and you don't need a license for now.
+Vous n’avez pas besoin de `README`, car nous en avons déjà créé un. Pas besoin non plus de `.gitignore`, ni de licence pour le moment.
 
-Then hit `Create repository`.
+Puis cliquez sur `Create repository`.
 
-![Settings for a new repository on GitHub.](/assets/git-and-github/github-actions/repo-settings.png)
+![Paramètres pour un nouveau dépôt GitHub.](/assets/git-and-github/github-actions/repo-settings.png)
 
-Copy the commands *to push an existing repository from the command line*.
+Copiez les commandes *to push an existing repository from the command line*.
 
-![Commands to sync the new GitHub repository.](/assets/git-and-github/github-actions/commands.png)
+![Commandes pour synchroniser avec le nouveau dépôt GitHub.](/assets/git-and-github/github-actions/commands.png)
 
-And run these commands in your project terminal.
+Et exécutez ces commandes dans le terminal de votre projet.
 
-![Repository synced with the new GitHub repository.](/assets/git-and-github/github-actions/first-push.png)
+![Dépôt synchronisé avec le nouveau dépôt GitHub.](/assets/git-and-github/github-actions/first-push.png)
 
-Now, if you refresh your GitHub repository page, you'll see your code and the `README.md` below it.
+Maintenant, si vous actualisez la page de votre dépôt GitHub, vous verrez votre code et le fichier `README.md` juste en dessous.
 
-![A fresh repository on GitHub](/assets/git-and-github/github-actions/fresh-repo.png)
+![Un dépôt fraîchement créé sur GitHub](/assets/git-and-github/github-actions/fresh-repo.png)
 
-## Adding a workflow
+## Ajouter un workflow
 
-While it's called *GitHub Actions*, you are not creating *actions* but **workflows**. And you can see your workflows in the `Actions` section.
+Même si cela s’appelle *GitHub Actions*, vous ne créez pas des *actions*, mais des **workflows**. Et vous pouvez voir vos workflows dans l’onglet `Actions`.
 
-![The Actions tab in new GitHub repository.](/assets/git-and-github/github-actions/actions.png)
+![L’onglet Actions dans un nouveau dépôt GitHub.](/assets/git-and-github/github-actions/actions.png)
 
-Right now, there are no workflows in our repository. GitHub suggests a few for us. Feel free to explore, but we are going to add one manually.
+Pour l’instant, il n’y a aucun workflow dans notre dépôt. GitHub nous en suggère quelques-uns. N’hésitez pas à les explorer, mais nous allons en ajouter un manuellement.
 
-![GitHub suggesting actions.](/assets/git-and-github/github-actions/no-actions.png)
+![Actions suggérées par GitHub.](/assets/git-and-github/github-actions/no-actions.png)
 
-For GitHub to automatically detect workflows in the repository, we need to create YAML files in `.github/workflows/`.
+Pour que GitHub détecte automatiquement les workflows dans le dépôt, nous devons créer des fichiers YAML dans `.github/workflows/`.
 
-YAML stands for *YAML Ain’t Markup Language* — but to me, it still feels a bit like markup… just stricter. Indentation matters, for example. It’s very common for configuration files. It's not complicated and we will write some together, so don't worry about it.
+YAML signifie *YAML Ain’t Markup Language* — mais pour moi, ça ressemble quand même un peu à du markup en plus strict. L’indentation, par exemple, est très importante. C’est un format très courant pour les fichiers de configuration. Ce n’est pas compliqué, et nous allons en écrire ensemble, donc ne vous en faites pas.
 
-Let's create new folders and a new file `.github/workflows/scrape.yml`. Let's keep it empty for now.
+Créons donc les dossiers nécessaires et un nouveau fichier `.github/workflows/scrape.yml`. Laissons-le vide pour l’instant.
 
-Commit it and push it to GitHub:
+Validez-le et poussez-le sur GitHub :
 - `git add -A`
 - `git commit -m "Adding scrape.yml"`
 - `git push`
 
-![An empty .yml file.](/assets/git-and-github/github-actions/YML.png)
+![Un fichier .yml vide.](/assets/git-and-github/github-actions/YML.png)
 
-After a few seconds, if you refresh the Actions page of your repo, you'll see your workflow automatically detected by GitHub! But since the file is empty, it's failing.
+Après quelques secondes, si vous actualisez la page Actions de votre dépôt, vous verrez que GitHub a détecté automatiquement votre workflow ! Mais comme le fichier est vide, il échoue.
 
-![Failed workflow.](/assets/git-and-github/github-actions/failed.png)
+![Workflow échoué.](/assets/git-and-github/github-actions/failed.png)
 
-## Writing a workflow
+## Écrire un workflow
 
-Let's do that step by step.
+Faisons cela étape par étape.
 
-### Name and events
+### Nom et événements
 
-When you create a workflow, you first need to give it a name and decide when it should be triggered.
+Quand vous créez un workflow, vous devez d’abord lui donner un nom et définir quand il doit être déclenché.
 
-Below, we tell GitHub to trigger this workflow in three situations:
-- `push` means when we push new code to the `main` branch. Note the indentation — it indicates hierarchy and grouping.
-- `workflow_dispatch` means we will be able to click on a button to manually trigger the workflow. Always handy.
-- `schedule` sets a **cron job**, which is a way to run scripts on a schedule. Here, `0 * * * *` means the workflow will run at the start of every hour (minute `0`).
+Ci-dessous, on indique à GitHub de déclencher ce workflow dans trois situations :
+- `push` signifie lorsqu’on pousse du nouveau code dans la branche `main`. Notez l’indentation — elle indique la hiérarchie et les regroupements.
+- `workflow_dispatch` signifie qu’on pourra cliquer sur un bouton pour déclencher manuellement le workflow. Toujours pratique.
+- `schedule` définit un **cron job**, c’est-à-dire une manière d’exécuter des scripts à intervalles réguliers. Ici, `0 * * * *` signifie que le workflow s’exécutera au début de chaque heure (minute `0`).
+
 
 
 ```yml showLineNumbers filename=".github/workflows/scrape.yml" {1-9}
@@ -183,16 +183,17 @@ on:
     - cron: "0 * * * *"
 ```
 <Callout type="info" emoji="💡">
-   Cron jobs are widely used, but their syntax is not intuitive. I usually use [crontab.guru](https://crontab.guru/) to make sense of them. Also, it's important to note that cron jobs in GitHub workflows are not perfectly accurate. When your workflow needs to run, GitHub pushes it to a queue where it waits for a virtual machine to become available. So it might actually run a few minutes late. For most web scraping tasks, that's fine. But if you need to trigger critical scripts at very specific times, GitHub Actions might not be for you.
+   Les cron jobs sont largement utilisés, mais leur syntaxe n’est pas très intuitive. J’utilise souvent [crontab.guru](https://crontab.guru/) pour m’y retrouver. Il est aussi important de noter que les cron jobs dans les workflows GitHub ne sont pas parfaitement précis. Quand votre workflow doit s’exécuter, GitHub le place dans une file d’attente en attendant qu’une machine virtuelle soit disponible. Il peut donc se lancer avec quelques minutes de retard. Pour la plupart des tâches de web scraping, ce n’est pas un problème. Mais si vous avez besoin de lancer des scripts critiques à des horaires très précis, GitHub Actions n’est peut-être pas la meilleure solution.
 </Callout>
 
 ### Jobs
 
-Now we need to describe the **jobs** we want the workflow to accomplish. You can have multiple jobs in a workflow. Here, we have just one. We name it `scrape`.
+Nous devons maintenant décrire les **jobs** que nous voulons que le workflow accomplisse. Un workflow peut contenir plusieurs jobs. Ici, nous n’en avons qu’un seul, que nous appelons `scrape`.
 
-We tell GitHub we want it to run on a virtual machine with the latest Ubuntu distribution. This means it will run on a cheap virtual machine, which is perfectly fine for us. But you have [choices](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#choosing-github-hosted-runners), if you ever need something different.
+Nous indiquons à GitHub que nous voulons l’exécuter sur une machine virtuelle avec la dernière version d’Ubuntu. Cela signifie qu’il s’exécutera sur une machine virtuelle peu coûteuse, ce qui nous convient parfaitement. Mais vous avez [le choix](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#choosing-github-hosted-runners) si vous avez besoin de quelque chose de différent.
 
-Our `main.ts` script writes the freshly scraped data to `data.csv`, so we need to give the workflow permission to write and modify the files of the repository.
+Notre script `main.ts` écrit les données fraîchement collectées dans `data.csv`, donc nous devons donner au workflow la permission d’écrire et de modifier les fichiers du dépôt.
+
 
 
 ```yml showLineNumbers filename=".github/workflows/scrape.yml" {11-15}
@@ -215,10 +216,11 @@ jobs:
 
 ### Steps
 
-The only thing left to do is to tell GitHub the **steps** of this job. Each step has a name:
-- `Checking out the repo` tells the workflow to actually access the repository. We use the pre-coded `actions/checkout@v4` for that. There are a lot of actions available for you to use, especially for common tasks. It's nice not to have to code everything yourself! 🥳
-- `Set up Deno` installs Deno. We use an available action for that too. We specify that we want version 2 of Deno.
-- `Run main.ts` runs our script, just like we would locally.
+Il ne reste plus qu’à indiquer à GitHub les **étapes** de ce job. Chaque étape a un nom :
+- `Checking out the repo` indique au workflow d’accéder au dépôt. On utilise pour cela l’action prête à l’emploi `actions/checkout@v4`. Il existe beaucoup d’actions disponibles, notamment pour les tâches courantes. C’est agréable de ne pas avoir à tout coder soi-même ! 🥳
+- `Set up Deno` installe Deno. Là aussi, on utilise une action existante. On précise que l’on veut la version 2 de Deno.
+- `Run main.ts` exécute notre script, comme on le ferait localement.
+
 
 ```yml showLineNumbers filename=".github/workflows/scrape.yml" {16-26}
 name: Scrape Montreal temperature
@@ -247,13 +249,14 @@ jobs:
         run: deno -A main.ts
 ```
 
-### Saving the data
+### Sauvegarder les données
 
-Now, if you commit your workflow and push it to GitHub, it will fetch the data and write it to `data.csv`, but... it won't **actually save `data.csv`**!
+Maintenant, si vous validez votre workflow et que vous le poussez sur GitHub, il va récupérer les données et les écrire dans `data.csv`, mais... il ne va **pas vraiment sauvegarder `data.csv`** !
 
-Remember: this is running on a virtual machine. So it runs, writes a new row to `data.csv`, but then the machine is destroyed and removed. The data saved in memory disappears...
+Souvenez-vous : cela s’exécute sur une machine virtuelle. Donc le script s’exécute, ajoute une nouvelle ligne à `data.csv`, puis la machine est détruite et supprimée. Les données enregistrées en mémoire disparaissent...
 
-This is why we have a final step to **commit the changes**. We create a Git user named `Automated` that commits and pushes the changes to `data.csv`. Isn't that brilliant? 🙌
+C’est pourquoi on ajoute une dernière étape pour **committer les modifications**. On crée un utilisateur Git appelé `Automated` qui committe et pousse les changements dans le fichier `data.csv`. Génial, non ? 🙌
+
 
 ```yml showLineNumbers filename=".github/workflows/scrape.yml" {25-26}
 name: Scrape Montreal temperature
@@ -284,59 +287,60 @@ jobs:
         run: git config user.name "Automated" && git config user.email "actions@users.noreply.github.com" && git add data.csv && git commit -m "Automated update" && git push
 ```
 
-Save the file and push it to GitHub:
+Enregistrez le fichier et poussez-le sur GitHub :
 - `git add -A`
 - `git commit -m "Updating workflow"`
 - `git push`
 
-And now, if you refresh your repository’s Actions page, you'll see your workflow running properly!
+Et maintenant, si vous actualisez l’onglet Actions de votre dépôt, vous verrez que votre workflow s’exécute correctement !
 
-![Success workflow.](/assets/git-and-github/github-actions/success.png)
+![Workflow réussi.](/assets/git-and-github/github-actions/success.png)
 
-If you click on it, you’ll see the jobs. Here, there's just one: `scrape`.
+Si vous cliquez dessus, vous verrez les jobs. Ici, il n’y en a qu’un : `scrape`.
 
-![Success job.](/assets/git-and-github/github-actions/success-jobs.png)
+![Job réussi.](/assets/git-and-github/github-actions/success-jobs.png)
 
-And if you click on the job, you'll see its steps and can click on them. This is useful when something is failing — you'll be able to see the error messages here.
+Et si vous cliquez sur le job, vous verrez les étapes, et vous pouvez cliquer sur chacune. C’est utile quand quelque chose échoue — vous pourrez voir les messages d’erreur ici.
 
-![Success steps.](/assets/git-and-github/github-actions/success-steps.png)
+![Étapes du job réussi.](/assets/git-and-github/github-actions/success-steps.png)
 
-If you go back to the home page of the repository, you'll see that the latest commit has been made by the `Automated` Git user we set up in the workflow.
+Si vous retournez sur la page d’accueil du dépôt, vous verrez que le dernier commit a été fait par l’utilisateur Git `Automated` que nous avons configuré dans le workflow.
 
-![Automated commit.](/assets/git-and-github/github-actions/automated-commit.png)
+![Commit automatisé.](/assets/git-and-github/github-actions/automated-commit.png)
 
-And if you check the `data.csv` file, you'll see a second row has been added!
+Et si vous regardez le fichier `data.csv`, vous verrez qu’une deuxième ligne a été ajoutée !
 
-![The updated data.csv file.](/assets/git-and-github/github-actions/data.csv.png)
+![Le fichier data.csv mis à jour.](/assets/git-and-github/github-actions/data.csv.png)
 
-You can even go one step further and check the commit to see the actual change.
+Vous pouvez même aller plus loin et consulter le commit pour voir le changement exact.
 
-By the way, this is a really great way to check what changed in web pages, data files, and more. If you scrape entire files, GitHub will be able to tell you what changed and when. You'll have a full, detailed history thanks to commits.
+D’ailleurs, c’est une excellente façon de voir ce qui a changé dans des pages web, des fichiers de données, et plus encore. Si vous scrapez des fichiers complets, GitHub pourra vous dire ce qui a changé, et quand. Vous aurez un historique complet et détaillé grâce aux commits.
 
-![The detailed commit.](/assets/git-and-github/github-actions/commit.png)
+![Le commit détaillé.](/assets/git-and-github/github-actions/commit.png)
 
-This has run when we pushed to `main`. But now, it will update automatically every hour thanks to our cron job!
+Ce workflow s’est exécuté lorsqu’on a poussé sur `main`. Mais maintenant, il s’exécutera automatiquement chaque heure grâce à notre cron job !
 
-Before GitHub Actions, you would have needed to pay for and set up a server to scrape this information on a schedule. But now, you can do it for free with just one simple YAML file! 💃🕺
+Avant GitHub Actions, il aurait fallu payer pour héberger un serveur capable de faire ce scraping à intervalle régulier. Mais maintenant, vous pouvez le faire gratuitement avec un simple fichier YAML ! 💃🕺
 
-## Retrieving the data
+## Récupérer les données
 
-The committed data is on GitHub. To retrieve it in your local repo, just `pull` it:
+Les données validées sont sur GitHub. Pour les récupérer dans votre dépôt local, il suffit de faire un `pull` :
 - `git pull`
 
-Note that I went for lunch before taking this screenshot — so I have three lines! The scraper ran while I was away! 😄
+Note : je suis allé manger avant de prendre cette capture d’écran — j’ai donc trois lignes ! Le scraper a tourné pendant que j’étais parti ! 😄
 
-![The pulled data.](/assets/git-and-github/github-actions/pull.png)
+![Les données après un pull.](/assets/git-and-github/github-actions/pull.png)
 
-If your repository is public, you can also fetch the CSV data easily. This is useful when you want to work with up-to-date data in another project. Click on the `Raw` button to get a URL to the actual file.
+Si votre dépôt est public, vous pouvez aussi récupérer facilement le fichier CSV. C’est utile quand vous voulez utiliser des données à jour dans un autre projet. Cliquez sur le bouton `Raw` pour obtenir une URL directe vers le fichier.
 
-![The link to the raw CSV file.](/assets/git-and-github/github-actions/raw.png)
+![Lien vers le fichier CSV brut.](/assets/git-and-github/github-actions/raw.png)
 
-Now you can directly fetch this URL.
+Vous pouvez maintenant aller chercher directement cette URL.
 
-![The link to the raw data.](/assets/git-and-github/github-actions/url.png)
+![Lien vers les données brutes.](/assets/git-and-github/github-actions/url.png)
 
-You can use this URL to fetch the latest data and process it — for example, with the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis).
+Vous pouvez utiliser cette URL pour récupérer les dernières données et les traiter — par exemple avec la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis).
+
 
 
 ```ts showLineNumbers
@@ -352,37 +356,36 @@ await temperatures.logTable();
 
 await sdb.done();
 ```
-![Fetching the data with the Simple Data Analysis.](/assets/git-and-github/github-actions/fetch-test.png)
+![Récupérer les données avec la librairie Simple Data Analysis.](/assets/git-and-github/github-actions/fetch-test.png)
 
-## Manually triggering a workflow
+## Déclencher un workflow manuellement
 
-Right now, our scrape is triggered when we push new code to `main` and every hour, at the top of the hour.
+En ce moment, notre script de collecte est déclenché lorsqu’on pousse du nouveau code sur `main` et chaque heure, au début de l’heure.
 
-But since we added `workflow_dispatch` in our configuration, we can also trigger it manually by clicking on it from the Actions page.
+Mais comme nous avons ajouté `workflow_dispatch` dans notre configuration, on peut aussi le déclencher manuellement en cliquant dessus depuis la page Actions.
 
-![Manually triggering the workflow.](/assets/git-and-github/github-actions/manual.png)
+![Déclenchement manuel du workflow.](/assets/git-and-github/github-actions/manual.png)
 
-## Disabling a workflow
+## Désactiver un workflow
 
-To remove a workflow, you need to actually delete the YAML file from the repository and commit/push the change.
+Pour supprimer un workflow, il faut supprimer le fichier YAML du dépôt et valider/pousser ce changement.
 
-But sometimes, you just want to temporarily disable it — for example, while fixing something in the code, because you don't need the data at the moment, or because you've hit the limit of your free GitHub account! 😬
+Mais parfois, on veut simplement le désactiver temporairement — par exemple pendant qu’on corrige quelque chose dans le code, parce qu’on n’a pas besoin des données pour l’instant, ou parce qu’on a atteint la limite de son compte GitHub gratuit ! 😬
 
-To disable a workflow while keeping the configuration file in the repository, click on the workflow in the left sidebar, then on the `...` button in the top right corner, and finally on `Disable workflow`.
+Pour désactiver un workflow tout en gardant le fichier de configuration dans le dépôt, cliquez sur le workflow dans la barre latérale gauche, puis sur le bouton `...` en haut à droite, et enfin sur `Disable workflow`.
 
-Don't worry — you'll be able to enable it again later without any problem.
+Pas d’inquiétude — vous pourrez le réactiver plus tard sans aucun problème.
 
-
-![Disabling a workflow.](/assets/git-and-github/github-actions/disable.png)
+![Désactiver un workflow.](/assets/git-and-github/github-actions/disable.png)
 
 ## Conclusion
 
-Congratulations! You now know how to create simple workflows. I made [my repository public](https://github.com/nshiab/temperature-scraper), so feel free to fork it for your future projects.
+Félicitations ! Vous savez maintenant comment créer des workflows simples. J’ai rendu [mon dépôt public](https://github.com/nshiab/temperature-scraper), alors n’hésitez pas à le forker pour vos futurs projets.
 
-You can use this to scrape data — but also for so many other things! This is code, so the possibilities are endless! With what you learned in this lesson, you'll be able to understand and replicate more sophisticated workflows you find around.
+Vous pouvez utiliser ça pour faire du scraping de données — mais aussi pour plein d’autres choses ! C’est du code, donc les possibilités sont infinies ! Avec ce que vous avez appris dans cette leçon, vous serez capable de comprendre et reproduire des workflows plus sophistiqués que vous croiserez.
 
-I hope you found this lesson interesting. But we haven't explored everything GitHub has to offer... In the next lesson, we’ll discover GitHub Pages, which allows you to create websites for... wait for it... free! And since you now know about GitHub Actions, you'll be able to republish your web pages automatically each time you push code to the `main` branch. 🤓
+J’espère que vous avez trouvé cette leçon intéressante. Mais nous n’avons pas encore exploré tout ce que GitHub a à offrir... Dans la prochaine leçon, nous découvrirons GitHub Pages, qui permet de créer des sites web... tenez-vous bien... gratuitement ! Et puisque vous connaissez maintenant les GitHub Actions, vous pourrez republier vos pages automatiquement à chaque fois que vous poussez du code sur la branche `main`. 🤓
 
-See you in the next lesson!
+À la prochaine leçon !
 
 <NoticeEnd />
