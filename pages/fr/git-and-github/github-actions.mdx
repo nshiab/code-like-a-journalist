@@ -1,0 +1,391 @@
+---
+title: Extraire des données avec GitHub Actions
+description: Dans cette leçon, nous apprenons les bases de l'utilisation des GitHub Actions et des workflows, et nous les utilisons pour collecter des données.
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
+
+# Extraire des données avec GitHub Actions
+
+GitHub est une plateforme pour stocker votre code, organiser votre travail, collaborer avec d'autres codeurs... mais c'est aussi un endroit où vous pouvez **exécuter du code** ! 🤩
+
+Les GitHub Actions sont principalement utilisées pour exécuter automatiquement des tests et des déploiements pour des projets. Mais pour les amateurs de données comme nous, elles peuvent aussi servir à faire du *web scraping*.
+
+Dans cette leçon, nous réutilisons le code des leçons précédentes qui récupère et extrait la température la plus récente à Montréal. Mais cette fois, nous utiliserons les GitHub Actions pour le déclencher toutes les heures et accumuler les données — gratuitement !  
+Si vous voulez voir le projet final, [c’est par ici](https://github.com/nshiab/temperature-scraper).
+
+Si ce n'est pas déjà fait, je vous recommande fortement de suivre les deux leçons précédentes ([Qu’est-ce que Git ?](/git-and-github/git-basics) et [Qu’est-ce que GitHub ?](/git-and-github/github-basics)) avant de commencer celle-ci. Je pars du principe que vous avez un compte GitHub et que vous connaissez les commandes Git de base.
+
+<NoticeIntro lang="fr" />
+
+## Configuration
+
+Créez un nouveau dossier et ouvrez-le avec VS Code.
+
+À l’intérieur, créez un fichier `main.ts` avec le code ci-dessous. Voici ce qu’il fait :
+- Il récupère les dernières données météo à Montréal depuis l' [API du Service météorologique du Canada](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
+- Les données sont au format XML. On utilise la librairie [`fast-xml-parser`](https://www.npmjs.com/package/fast-xml-parser) pour les convertir en JSON.
+- Ensuite, on extrait la température et l’heure depuis le JSON imbriqué. On crée aussi une variable avec l’heure actuelle de la collecte.
+- Enfin, on ajoute les données extraites dans le fichier `data.csv`.
+
+Chaque fois que ce script s’exécute, une nouvelle ligne est ajoutée au CSV. Les données s’accumulent donc au fil du temps.
+
+```ts showLineNumbers filename="main.ts"
+import { XMLParser } from "fast-xml-parser";
+
+const response = await fetch(
+  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+);
+const xml = await response.text();
+const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
+
+const observation =
+  json["om:ObservationCollection"]["om:member"]["om:Observation"];
+
+const resultTime =
+  observation["om:resultTime"]["gml:TimeInstant"]["gml:timePosition"];
+console.log(resultTime);
+
+const elements = observation["om:result"]["elements"]["element"];
+type element = {
+  "@_name": string;
+  "@_value": string;
+};
+const temp = elements
+  .find((d: element) => d["@_name"] === "air_temp")["@_value"];
+console.log(temp);
+
+const scrapeTime = new Date().toISOString();
+console.log(scrapeTime);
+
+await Deno.writeTextFile(
+  "./data.csv",
+  `\n${scrapeTime},${resultTime},${temp}`,
+  {
+    append: true,
+  },
+);
+```
+
+`main.ts` a besoin d’un fichier `data.csv`, alors créons-en un dans le dossier du projet.
+
+```csv showLineNumbers filename="data.csv"
+scrapeTime,resultTime,temp
+```
+
+Nous allons pousser ce projet sur GitHub, alors ajoutons un fichier `README.md` pour le rendre plus présentable.
+
+```md showLineNumbers filename="README.md"
+# Montreal temperature scraper
+
+Every hour, this project retrieves the latest temperature in Montreal
+from the [Meteorological Service of Canada API](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/)
+and appends a new row to the `data.csv` file.
+```
+
+Testons ce code!
+
+D'abord, installez `fast-xml-parser` :
+- `deno add npm:fast-xml-parser`
+
+Puis exécutez `main.ts` :
+- `deno -A main.ts`
+
+Vous devriez voir la température s’afficher et une ligne ajoutée au fichier `data.csv` !
+
+![Le README.](/assets/git-and-github/github-actions/setup.png)
+
+## Créer un nouveau dépôt GitHub
+
+Initialisons un nouveau dépôt Git et poussons-le sur GitHub.
+
+D’abord, on l’initialise et on fait un premier commit :
+- `git init`
+- `git add -A`
+- `git commit -m "First commit"`
+
+Ensuite, créez un nouveau dépôt sur GitHub.
+
+![Nouveau dépôt sur GitHub.](/assets/git-and-github/github-actions/new-repo.png)
+
+Donnez-lui un nom et une description (facultatif). Vous pouvez le rendre privé ou public, comme vous le souhaitez.
+
+Vous n’avez pas besoin de `README`, car nous en avons déjà créé un. Pas besoin non plus de `.gitignore`, ni de licence pour le moment.
+
+Puis cliquez sur `Create repository`.
+
+![Paramètres pour un nouveau dépôt GitHub.](/assets/git-and-github/github-actions/repo-settings.png)
+
+Copiez les commandes *to push an existing repository from the command line*.
+
+![Commandes pour synchroniser avec le nouveau dépôt GitHub.](/assets/git-and-github/github-actions/commands.png)
+
+Et exécutez ces commandes dans le terminal de votre projet.
+
+![Dépôt synchronisé avec le nouveau dépôt GitHub.](/assets/git-and-github/github-actions/first-push.png)
+
+Maintenant, si vous actualisez la page de votre dépôt GitHub, vous verrez votre code et le fichier `README.md` juste en dessous.
+
+![Un dépôt fraîchement créé sur GitHub](/assets/git-and-github/github-actions/fresh-repo.png)
+
+## Ajouter un workflow
+
+Même si cela s’appelle *GitHub Actions*, vous ne créez pas des *actions*, mais des **workflows**. Et vous pouvez voir vos workflows dans l’onglet `Actions`.
+
+![L’onglet Actions dans un nouveau dépôt GitHub.](/assets/git-and-github/github-actions/actions.png)
+
+Pour l’instant, il n’y a aucun workflow dans notre dépôt. GitHub nous en suggère quelques-uns. N’hésitez pas à les explorer, mais nous allons en ajouter un manuellement.
+
+![Actions suggérées par GitHub.](/assets/git-and-github/github-actions/no-actions.png)
+
+Pour que GitHub détecte automatiquement les workflows dans le dépôt, nous devons créer des fichiers YAML dans `.github/workflows/`.
+
+YAML signifie *YAML Ain’t Markup Language* — mais pour moi, ça ressemble quand même un peu à du markup en plus strict. L’indentation, par exemple, est très importante. C’est un format très courant pour les fichiers de configuration. Ce n’est pas compliqué, et nous allons en écrire ensemble, donc ne vous en faites pas.
+
+Créons donc les dossiers nécessaires et un nouveau fichier `.github/workflows/scrape.yml`. Laissons-le vide pour l’instant.
+
+Validez-le et poussez-le sur GitHub :
+- `git add -A`
+- `git commit -m "Adding scrape.yml"`
+- `git push`
+
+![Un fichier .yml vide.](/assets/git-and-github/github-actions/YML.png)
+
+Après quelques secondes, si vous actualisez la page Actions de votre dépôt, vous verrez que GitHub a détecté automatiquement votre workflow ! Mais comme le fichier est vide, il échoue.
+
+![Workflow échoué.](/assets/git-and-github/github-actions/failed.png)
+
+## Écrire un workflow
+
+Faisons cela étape par étape.
+
+### Nom et événements
+
+Quand vous créez un workflow, vous devez d’abord lui donner un nom et définir quand il doit être déclenché.
+
+Ci-dessous, on indique à GitHub de déclencher ce workflow dans trois situations :
+- `push` signifie lorsqu’on pousse du nouveau code dans la branche `main`. Notez l’indentation — elle indique la hiérarchie et les regroupements.
+- `workflow_dispatch` signifie qu’on pourra cliquer sur un bouton pour déclencher manuellement le workflow. Toujours pratique.
+- `schedule` définit un **cron job**, c’est-à-dire une manière d’exécuter des scripts à intervalles réguliers. Ici, `0 * * * *` signifie que le workflow s’exécutera au début de chaque heure (minute `0`).
+
+
+
+```yml showLineNumbers filename=".github/workflows/scrape.yml" {1-9}
+name: Scrape Montreal temperature
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+```
+<Callout type="info" emoji="💡">
+   Les cron jobs sont largement utilisés, mais leur syntaxe n’est pas très intuitive. J’utilise souvent [crontab.guru](https://crontab.guru/) pour m’y retrouver. Il est aussi important de noter que les cron jobs dans les workflows GitHub ne sont pas parfaitement précis. Quand votre workflow doit s’exécuter, GitHub le place dans une file d’attente en attendant qu’une machine virtuelle soit disponible. Il peut donc se lancer avec quelques minutes de retard. Pour la plupart des tâches de web scraping, ce n’est pas un problème. Mais si vous avez besoin de lancer des scripts critiques à des horaires très précis, GitHub Actions n’est peut-être pas la meilleure solution.
+</Callout>
+
+### Jobs
+
+Nous devons maintenant décrire les **jobs** que nous voulons que le workflow accomplisse. Un workflow peut contenir plusieurs jobs. Ici, nous n’en avons qu’un seul, que nous appelons `scrape`.
+
+Nous indiquons à GitHub que nous voulons l’exécuter sur une machine virtuelle avec la dernière version d’Ubuntu. Cela signifie qu’il s’exécutera sur une machine virtuelle peu coûteuse, ce qui nous convient parfaitement. Mais vous avez [le choix](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#choosing-github-hosted-runners) si vous avez besoin de quelque chose de différent.
+
+Notre script `main.ts` écrit les données fraîchement collectées dans `data.csv`, donc nous devons donner au workflow la permission d’écrire et de modifier les fichiers du dépôt.
+
+
+
+```yml showLineNumbers filename=".github/workflows/scrape.yml" {11-15}
+name: Scrape Montreal temperature
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+```
+
+### Steps
+
+Il ne reste plus qu’à indiquer à GitHub les **étapes** de ce job. Chaque étape a un nom :
+- `Checking out the repo` indique au workflow d’accéder au dépôt. On utilise pour cela l’action prête à l’emploi `actions/checkout@v4`. Il existe beaucoup d’actions disponibles, notamment pour les tâches courantes. C’est agréable de ne pas avoir à tout coder soi-même ! 🥳
+- `Set up Deno` installe Deno. Là aussi, on utilise une action existante. On précise que l’on veut la version 2 de Deno.
+- `Run main.ts` exécute notre script, comme on le ferait localement.
+
+
+```yml showLineNumbers filename=".github/workflows/scrape.yml" {16-26}
+name: Scrape Montreal temperature
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checking out the repo
+        uses: actions/checkout@v4
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Run main.ts
+        run: deno -A main.ts
+```
+
+### Sauvegarder les données
+
+Maintenant, si vous validez votre workflow et que vous le poussez sur GitHub, il va récupérer les données et les écrire dans `data.csv`, mais... il ne va **pas vraiment sauvegarder `data.csv`** !
+
+Souvenez-vous : cela s’exécute sur une machine virtuelle. Donc le script s’exécute, ajoute une nouvelle ligne à `data.csv`, puis la machine est détruite et supprimée. Les données enregistrées en mémoire disparaissent...
+
+C’est pourquoi on ajoute une dernière étape pour **committer les modifications**. On crée un utilisateur Git appelé `Automated` qui committe et pousse les changements dans le fichier `data.csv`. Génial, non ? 🙌
+
+
+```yml showLineNumbers filename=".github/workflows/scrape.yml" {25-26}
+name: Scrape Montreal temperature
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checking out the repo
+        uses: actions/checkout@v4
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Run main.ts
+        run: deno -A main.ts
+      - name: Commit changes
+        run: git config user.name "Automated" && git config user.email "actions@users.noreply.github.com" && git add data.csv && git commit -m "Automated update" && git push
+```
+
+Enregistrez le fichier et poussez-le sur GitHub :
+- `git add -A`
+- `git commit -m "Updating workflow"`
+- `git push`
+
+Et maintenant, si vous actualisez l’onglet Actions de votre dépôt, vous verrez que votre workflow s’exécute correctement !
+
+![Workflow réussi.](/assets/git-and-github/github-actions/success.png)
+
+Si vous cliquez dessus, vous verrez les jobs. Ici, il n’y en a qu’un : `scrape`.
+
+![Job réussi.](/assets/git-and-github/github-actions/success-jobs.png)
+
+Et si vous cliquez sur le job, vous verrez les étapes, et vous pouvez cliquer sur chacune. C’est utile quand quelque chose échoue — vous pourrez voir les messages d’erreur ici.
+
+![Étapes du job réussi.](/assets/git-and-github/github-actions/success-steps.png)
+
+Si vous retournez sur la page d’accueil du dépôt, vous verrez que le dernier commit a été fait par l’utilisateur Git `Automated` que nous avons configuré dans le workflow.
+
+![Commit automatisé.](/assets/git-and-github/github-actions/automated-commit.png)
+
+Et si vous regardez le fichier `data.csv`, vous verrez qu’une deuxième ligne a été ajoutée !
+
+![Le fichier data.csv mis à jour.](/assets/git-and-github/github-actions/data.csv.png)
+
+Vous pouvez même aller plus loin et consulter le commit pour voir le changement exact.
+
+D’ailleurs, c’est une excellente façon de voir ce qui a changé dans des pages web, des fichiers de données, et plus encore. Si vous scrapez des fichiers complets, GitHub pourra vous dire ce qui a changé, et quand. Vous aurez un historique complet et détaillé grâce aux commits.
+
+![Le commit détaillé.](/assets/git-and-github/github-actions/commit.png)
+
+Ce workflow s’est exécuté lorsqu’on a poussé sur `main`. Mais maintenant, il s’exécutera automatiquement chaque heure grâce à notre cron job !
+
+Avant GitHub Actions, il aurait fallu payer pour héberger un serveur capable de faire ce scraping à intervalle régulier. Mais maintenant, vous pouvez le faire gratuitement avec un simple fichier YAML ! 💃🕺
+
+## Récupérer les données
+
+Les données validées sont sur GitHub. Pour les récupérer dans votre dépôt local, il suffit de faire un `pull` :
+- `git pull`
+
+Note : je suis allé manger avant de prendre cette capture d’écran — j’ai donc trois lignes ! Le scraper a tourné pendant que j’étais parti ! 😄
+
+![Les données après un pull.](/assets/git-and-github/github-actions/pull.png)
+
+Si votre dépôt est public, vous pouvez aussi récupérer facilement le fichier CSV. C’est utile quand vous voulez utiliser des données à jour dans un autre projet. Cliquez sur le bouton `Raw` pour obtenir une URL directe vers le fichier.
+
+![Lien vers le fichier CSV brut.](/assets/git-and-github/github-actions/raw.png)
+
+Vous pouvez maintenant aller chercher directement cette URL.
+
+![Lien vers les données brutes.](/assets/git-and-github/github-actions/url.png)
+
+Vous pouvez utiliser cette URL pour récupérer les dernières données et les traiter — par exemple avec la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis).
+
+
+
+```ts showLineNumbers
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const temperatures = sdb.newTable();
+await temperatures.loadData(
+  "https://raw.githubusercontent.com/nshiab/temperature-scraper/refs/heads/main/data.csv",
+);
+await temperatures.logTable();
+
+await sdb.done();
+```
+![Récupérer les données avec la librairie Simple Data Analysis.](/assets/git-and-github/github-actions/fetch-test.png)
+
+## Déclencher un workflow manuellement
+
+En ce moment, notre script de collecte est déclenché lorsqu’on pousse du nouveau code sur `main` et chaque heure, au début de l’heure.
+
+Mais comme nous avons ajouté `workflow_dispatch` dans notre configuration, on peut aussi le déclencher manuellement en cliquant dessus depuis la page Actions.
+
+![Déclenchement manuel du workflow.](/assets/git-and-github/github-actions/manual.png)
+
+## Désactiver un workflow
+
+Pour supprimer un workflow, il faut supprimer le fichier YAML du dépôt et valider/pousser ce changement.
+
+Mais parfois, on veut simplement le désactiver temporairement — par exemple pendant qu’on corrige quelque chose dans le code, parce qu’on n’a pas besoin des données pour l’instant, ou parce qu’on a atteint la limite de son compte GitHub gratuit ! 😬
+
+Pour désactiver un workflow tout en gardant le fichier de configuration dans le dépôt, cliquez sur le workflow dans la barre latérale gauche, puis sur le bouton `...` en haut à droite, et enfin sur `Disable workflow`.
+
+Pas d’inquiétude — vous pourrez le réactiver plus tard sans aucun problème.
+
+![Désactiver un workflow.](/assets/git-and-github/github-actions/disable.png)
+
+## Conclusion
+
+Félicitations ! Vous savez maintenant comment créer des workflows simples. J’ai rendu [mon dépôt public](https://github.com/nshiab/temperature-scraper), alors n’hésitez pas à le forker pour vos futurs projets.
+
+Vous pouvez utiliser ça pour faire du scraping de données — mais aussi pour plein d’autres choses ! C’est du code, donc les possibilités sont infinies ! Avec ce que vous avez appris dans cette leçon, vous serez capable de comprendre et reproduire des workflows plus sophistiqués que vous croiserez.
+
+J’espère que vous avez trouvé cette leçon intéressante. Mais nous n’avons pas encore exploré tout ce que GitHub a à offrir... Dans la prochaine leçon, nous découvrirons GitHub Pages, qui permet de créer des sites web... tenez-vous bien... gratuitement ! Et puisque vous connaissez maintenant les GitHub Actions, vous pourrez republier vos pages automatiquement à chaque fois que vous poussez du code sur la branche `main`. 🤓
+
+À la prochaine leçon !
+
+<NoticeEnd />
