@@ -1,118 +1,118 @@
 ---
-title: Publishing GitHub pages with Svelte
-description: In this lesson, we learn how to use GitHub pages and host a website built with Svelte on it.
+title: Publier sur GitHub Pages avec Svelte
+description: Dans cette leçon, on apprend à utiliser GitHub Pages pour héberger un site web créé avec Svelte.
 ---
 
 import { Callout } from "nextra/components";
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
 
-# Publishing GitHub Pages with Svelte
+# Publier sur GitHub Pages avec Svelte
 
-In previous lessons, we've learned how to use GitHub to run code with GitHub Actions. There is another amazing feature of GitHub I wanted to share with you: **Pages**.
+Dans les leçons précédentes, on a appris à utiliser GitHub pour exécuter du code avec GitHub Actions. Il y a une autre fonctionnalité géniale de GitHub que je voulais vous montrer : **Pages**.
 
-If you build your website as static files from a repository, GitHub can automatically create a website with them — for free! Pages are often used to host library documentation, but they can be anything you want!
+Si vous construisez votre site web sous forme de fichiers statiques à partir d’un dépôt, GitHub peut automatiquement créer un site avec eux — gratuitement ! Pages est souvent utilisé pour héberger la documentation de librairies, mais peut servir à tout ce que vous voulez.
 
-In this lesson, I am going to show you how to use the [setup-sda library](https://github.com/nshiab/setup-sda) we've been using in many previous projects to (very) quickly publish your data projects on GitHub.
+Dans cette leçon, je vais vous montrer comment utiliser la [librairie setup-sda](https://github.com/nshiab/setup-sda) qu’on a utilisée dans plusieurs projets précédents pour publier (très) rapidement vos projets de données sur GitHub.
 
-If you haven't done so, I suggest you check the **[Svelte lesson](/web-basics/svelte)**, since that's what we're going to use to build our website.
+Si ce n’est pas déjà fait, je vous conseille de consulter la **[leçon sur Svelte](/web-basics/svelte)**, puisque c’est ce qu’on va utiliser pour construire notre site.
 
-<NoticeIntro />
+<NoticeIntro lang="fr" />
 
-## Setup
+## Installation
 
-Create a new folder and open it in VS Code. Then run this command to install and set up everything we need with [setup-sda](https://github.com/nshiab/setup-sda):
+Créez un nouveau dossier et ouvrez-le dans VS Code. Ensuite, exécutez cette commande pour tout installer avec [setup-sda](https://github.com/nshiab/setup-sda) :
 - `deno -A jsr:@nshiab/setup-sda --svelte --example --pages --git`
 
-The library sets up a `sda` folder to work with the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis), as we saw in the section [**3. The SDA library 🤓**](simple-data-analysis/tabular-data). But the options add a few things:
-- `--svelte` will also set up a Svelte project
-- `--example` will add data and code to show a full project example
-- `--pages` will add a GitHub workflow (as we saw in the [previous lesson](/git-and-github/github-actions)) and tweak some configuration files
-- `--git` will initialize and make the first commit once all files are in.
+La librairie crée un dossier `sda` pour travailler avec la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis), comme on l’a vu dans la section [**3. La librairie SDA 🤓**](simple-data-analysis/tabular-data). Mais les options ajoutent quelques éléments :
+- `--svelte` installe aussi un projet Svelte
+- `--example` ajoute des données et du code pour montrer un exemple complet
+- `--pages` ajoute un workflow GitHub (comme on l’a vu dans la [leçon précédente](/git-and-github/github-actions)) et modifie quelques fichiers de configuration
+- `--git` initialise le dépôt et fait un premier commit une fois tous les fichiers créés.
 
-![Running setup-sda.](/assets/git-and-github/github-pages/setup.png)
+![Exécution de setup-sda.](/assets/git-and-github/github-pages/setup.png)
 
-Once the command has run, you can execute `deno task dev`, open the local URL, and you should see an example website! Feel free to explore the code and the page.
+Une fois la commande terminée, vous pouvez exécuter `deno task dev`, ouvrir l’URL locale, et vous devriez voir un exemple de site web ! N’hésitez pas à explorer le code et la page.
 
-![An example website.](/assets/git-and-github/github-pages/demo.png)
+![Un site web d'exemple.](/assets/git-and-github/github-pages/demo.png)
 
-## Creating a repository
+## Créer un dépôt
 
-It's now time to head over to GitHub and create a new repository. Give it a name (`my-website` for example), make it public, and there is no need for a `README` or `.gitignore` since `setup-sda` took care of all that.
+Il est maintenant temps d’aller sur GitHub et de créer un nouveau dépôt. Donnez-lui un nom (par exemple `my-website`), rendez-le public, et il n’est pas nécessaire d’ajouter un `README` ou un `.gitignore` puisque `setup-sda` s’en est déjà occupé.
 
-![Creating a new repository.](/assets/git-and-github/github-pages/new-repo.png)
+![Création d'un nouveau dépôt.](/assets/git-and-github/github-pages/new-repo.png)
 
-Now copy the commands to *push an existing repository from the command line*.
+Copiez maintenant les commandes pour *push an existing repository from the command line*.
 
-![Git commands.](/assets/git-and-github/github-pages/commands.png)
+![Commandes Git.](/assets/git-and-github/github-pages/commands.png)
 
-Then paste and run them in your terminal.
+Puis collez-les et exécutez-les dans votre terminal.
 
-![Running commands.](/assets/git-and-github/github-pages/run-commands.png)
+![Exécution des commandes.](/assets/git-and-github/github-pages/run-commands.png)
 
-Now, if you refresh your repository page, you'll see your code!
+Maintenant, si vous actualisez la page de votre dépôt, vous verrez votre code !
 
-![The page of the repo.](/assets/git-and-github/github-pages/repo-page.png)
+![La page du dépôt.](/assets/git-and-github/github-pages/repo-page.png)
 
-## Enabling GitHub Pages
+## Activer GitHub Pages
 
-Now it's time to enable GitHub Pages on the repository!
+C’est le moment d’activer GitHub Pages sur le dépôt !
 
-Click on your repository `Settings`, then on `Pages` in the left sidebar. Then select `GitHub Actions` for the `Build and deployment` source.
+Cliquez sur `Settings` dans votre dépôt, puis sur `Pages` dans la barre latérale gauche. Ensuite, sélectionnez `GitHub Actions` comme source pour `Build and deployment`.
 
-![Enabling GitHub pages.](/assets/git-and-github/github-pages/enabling-pages.png)
+![Activation de GitHub Pages.](/assets/git-and-github/github-pages/enabling-pages.png)
 
-Now, go check your Actions tab. We have one workflow to build and deploy our website. But it failed because GitHub Pages was not enabled when we did our first push. Click on it.
+Allez maintenant voir l’onglet `Actions`. Il y a un workflow qui construit et déploie notre site. Mais il a échoué parce que GitHub Pages n’était pas activé lors du premier push. Cliquez dessus.
 
-![Failed to deploy to GitHub pages.](/assets/git-and-github/github-pages/failed.png)
+![Échec du déploiement sur GitHub Pages.](/assets/git-and-github/github-pages/failed.png)
 
-Click on `Rerun jobs` and wait for a few seconds.
+Cliquez sur `Rerun jobs` et attendez quelques secondes.
 
-![Rerun the failed jobs.](/assets/git-and-github/github-pages/rerun.png)
+![Relancer les jobs échoués.](/assets/git-and-github/github-pages/rerun.png)
 
-And now it works! GitHub Actions successfully did the two jobs: building our website and then publishing it! You now have a link to your website!
+Et maintenant, ça fonctionne ! GitHub Actions a exécuté les deux tâches avec succès : construire notre site, puis le publier ! Vous avez maintenant un lien vers votre site web !
 
-![Successfully deployed to GitHub pages.](/assets/git-and-github/github-pages/success.png)
+![Déploiement réussi sur GitHub Pages.](/assets/git-and-github/github-pages/success.png)
 
-If you click on the link, you'll see your website live!
+Si vous cliquez sur le lien, vous verrez votre site en ligne !
 
-![The website.](/assets/git-and-github/github-pages/website.png)
+![Le site web.](/assets/git-and-github/github-pages/website.png)
 
-You can also retrieve the link to the website in your settings.
+Vous pouvez aussi retrouver le lien du site dans les paramètres de votre dépôt.
 
-![The url.](/assets/git-and-github/github-pages/url.png)
+![L'URL du site.](/assets/git-and-github/github-pages/url.png)
 
-## Updating `main`
+## Mettre à jour `main`
 
-Now, let's do something fun. Let's update the code on the `main` branch and push it to GitHub.
+Faisons maintenant quelque chose d’amusant. Mettons à jour le code sur la branche `main` et poussons-le sur GitHub.
 
-In `src/routes/+page.svelte`, I changed `<h2>Climate change</h2>` to `<h2>Climate change example</h2>`. I know, I'm going crazy.
+Dans `src/routes/+page.svelte`, j’ai changé `<h2>Climate change</h2>` en `<h2>Climate change example</h2>`. Je sais, je suis fou. 😄
 
-Let's commit and push this to GitHub:
+Faisons le commit et poussons les changements sur GitHub :
 - `git add -A`
 - `git commit -m "Update"`
 - `git push`
 
-![Making a change.](/assets/git-and-github/github-pages/change.png)
+![Faire une modification.](/assets/git-and-github/github-pages/change.png)
 
-If you check your Actions tab, you'll see the workflow being triggered again by your push. Every time you update the `main` branch, your site will be rebuilt and republished! Magic! 🧙
+Si vous regardez dans l’onglet `Actions`, vous verrez que le workflow est à nouveau déclenché par votre push. Chaque fois que vous mettez à jour la branche `main`, votre site sera reconstruit et republié ! Magique ! 🧙
 
-PS: I have two `Update` messages in the screenshot because I messed up. But you should have just one!
+PS : J’ai deux messages `Update` dans la capture parce que j’ai fait une erreur. Mais vous ne devriez en avoir qu’un seul !
 
-![The workflow being triggered.](/assets/git-and-github/github-pages/update-action.png)
+![Le workflow est déclenché.](/assets/git-and-github/github-pages/update-action.png)
 
-And after a few seconds, your website will be updated!
+Et après quelques secondes, votre site sera mis à jour !
 
-![The website being updated.](/assets/git-and-github/github-pages/update-website.png)
+![Mise à jour du site web.](/assets/git-and-github/github-pages/update-website.png)
 
-With this setup, you can focus on your code, work on branches, see your website locally as you work on it, and when happy, make a pull request to merge into `main`.
+Avec cette configuration, vous pouvez vous concentrer sur votre code, travailler sur des branches, voir votre site en local pendant que vous développez, et une fois satisfait, créer une pull request pour fusionner sur `main`.
 
-Once merged, your website will automatically be republished! 🤩
+Une fois la fusion faite, votre site sera automatiquement republié ! 🤩
 
-## But... how?
+## Mais… comment ?
 
-That was easy, wasn't it? 🥳 To make it work, there are a few things `setup-sda` did for us.
+C’était facile, non ? 🥳 Pour que tout cela fonctionne, `setup-sda` a fait quelques ajustements pour nous.
 
-In the `svelte.config.js` file, it set up a `paths.base` to make sure Svelte knows that the website address will start with something like `https://your-username.github.io/my-website/`. This information will be passed with an environment variable in the GitHub workflow.
+Dans le fichier `svelte.config.js`, il a défini un `paths.base` pour que Svelte sache que l’adresse du site commencera par quelque chose comme `https://votre-nom-utilisateur.github.io/my-website/`. Cette information est transmise grâce à une variable d’environnement dans le workflow GitHub.
 
 ```js showLineNumbers filename="svelte.config.js" {3, 10-12}
 import adapter from "@sveltejs/adapter-static";
@@ -133,13 +133,13 @@ const config = {
 export default config;
 ```
 
-The next big thing is the GitHub Actions workflow, of course.
+La prochaine grande étape, c’est bien sûr le workflow GitHub Actions.
 
-In `.github/workflows/deploy.yml`, many things are happening. If you want to fully understand them, check the [GitHub Actions lesson](/git-and-github/github-actions).
+Dans `.github/workflows/deploy.yml`, beaucoup de choses se passent. Si vous voulez tout comprendre en détail, consultez la [leçon sur GitHub Actions](/git-and-github/github-actions).
 
-But to summarize, there are two jobs here that are triggered when there’s a push on `main`:
-- `build_site`, which builds the website by passing an environment variable `github.event.repository.name` (used in our `svelte.config.js`, as covered just above)
-- `deploy`, which publishes the files created by `build_site`.
+Mais pour résumer, deux tâches sont déclenchées lorsqu’il y a un push sur `main` :
+- `build_site`, qui construit le site en passant une variable d’environnement `github.event.repository.name` (utilisée dans notre `svelte.config.js`, comme vu juste au-dessus)
+- `deploy`, qui publie les fichiers créés par `build_site`.
 
 
 ```yml showLineNumbers filename=".github/workflows/deploy.yml"
@@ -194,10 +194,10 @@ jobs:
 
 ## Conclusion
 
-I hope you'll find this setup useful. I created `setup-sda` to make my life easier. With it, I can crunch and analyze data with the `Simple Data Analysis` library in the `sda` folder and then work on interactive visualizations in the `src` folder with `Svelte`. It's the best of both worlds!
+J’espère que cette configuration vous sera utile. J’ai créé `setup-sda` pour me simplifier la vie. Grâce à elle, je peux analyser des données avec la librairie `Simple Data Analysis` dans le dossier `sda`, puis créer des visualisations interactives dans le dossier `src` avec `Svelte`. C’est le meilleur des deux mondes !
 
-And with GitHub Pages, I can easily share my findings with the world. Now that you've completed this lesson, you can too!
+Et avec GitHub Pages, je peux facilement partager mes découvertes avec tout le monde. Maintenant que vous avez terminé cette leçon, vous le pouvez aussi !
 
-Let me know if you use it! 🤗
+Faites-moi signe si vous l’utilisez ! 🤗
 
-<NoticeEnd />
+<NoticeEnd lang="fr" />
