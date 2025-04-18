@@ -1,6 +1,6 @@
 ---
-title: Classes in TypeScript
-description: Learn how to create and use classes in TypeScript.
+title: Classes en TypeScript
+description: Apprenez à créer et utiliser des classes en TypeScript.
 ---
 
 import { Callout } from 'nextra/components'
@@ -8,51 +8,51 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Classes
 
-Maybe you noticed that we use the keyword `new` from time to time. For example, to create a new date, we need to write `new Date()`. That's because `Date` is a `class`.
+Vous avez peut-être remarqué que nous utilisons parfois le mot-clé `new`. Par exemple, pour créer une nouvelle date, on écrit `new Date()`. C’est parce que `Date` est une `class`.
 
-Just like functions, classes are another staple of programming. They are very convenient for organizing your code, with their own properties and functions (called methods).
+Tout comme les fonctions, les classes sont un pilier de la programmation. Elles sont très pratiques pour organiser votre code, avec leurs propres propriétés et fonctions (appelées méthodes).
 
-To be honest, classes are a bit advanced, and you probably won't create classes right away. But you'll use pre-coded classes quite often (just like `new Date()`), so it's important to have a rough idea of how they work.
+Pour être honnête, les classes sont un peu avancées, et vous n’en créerez probablement pas tout de suite. Mais vous utiliserez très souvent des classes déjà codées (comme `new Date()`), donc il est important d’avoir une idée générale de leur fonctionnement.
 
-Note that I expect you to have completed the previous lessons, especially the one about **[Functions](/pushing-further/functions)**.
+Notez que je m’attends à ce que vous ayez complété les leçons précédentes, en particulier celle sur les **[Functions](/pushing-further/functions)**.
 
-Let's dive into it!
+Allons-y !
 
-<NoticeIntro />
+<NoticeIntro lang="fr" />
 
-## Setup
+## Configuration
 
-Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
 
-- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
-- `deno.json`, which lets VS Code know this is a Deno project and enables the Deno extension. You can tweak settings in this file, but we'll keep it empty for now.
+- `main.ts`, dans lequel nous allons écrire notre code. Pour commencer, vous pouvez y ajouter `console.log("Hello!");`.
+- `deno.json`, qui indique à VS Code qu’il s’agit d’un projet Deno et active l’extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous allons le laisser vide pour l’instant.
 
-Open the terminal and run the following command: `deno run --watch main.ts`
+Ouvrez le terminal et exécutez la commande suivante : `deno run --watch main.ts`
 
-This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+Cette commande efface le terminal et relance `main.ts` à chaque fois que vous l’enregistrez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
 
-You can use this setup to test the code provided in this lesson.
+Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
 
-![A screenshot showing VS Code running and watching a TypeScript file.](/assets/pushing-further/classes/setup.png)
+![Une capture d’écran montrant VS Code en train d’exécuter et de surveiller un fichier TypeScript.](/assets/pushing-further/classes/setup.png)
 
-## Creating a class
+## Créer une classe
 
-To create a class, you need to declare it with the `class` keyword, followed by its name and curly brackets `{}`. By convention, class names are capitalized.
+Pour créer une classe, vous devez la déclarer avec le mot-clé `class`, suivi de son nom et de crochets `{}`. Par convention, les noms de classes commencent par une majuscule.
 
-Let's create a class named `Person`.
+Créons une classe nommée `Person`.
 
 ```ts showLineNumbers filename="main.ts"
 class Person {
 }
 ```
 
-## Instantiating a class
+## Instancier une classe
 
-To use the class, we need to create an **instance** of it by calling it with the `new` operator, followed by the class name and `()`. You can create as many instances of a class as you want.
+Pour utiliser une classe, il faut créer une **instance** de celle-ci en l’appelant avec l’opérateur `new`, suivi du nom de la classe et de `()`. Vous pouvez créer autant d’instances d’une classe que vous le souhaitez.
 
-Below, we instantiate our class `Person` twice. We store the new instances in the variables `john` and `emily`.
+Ci-dessous, nous instancions notre classe `Person` deux fois. Nous stockons les nouvelles instances dans les variables `john` et `emily`.
 
-We now have two `Person` instances in our code.
+Nous avons maintenant deux instances de `Person` dans notre code.
 
 ```ts showLineNumbers filename="main.ts" {4, 5}
 class Person {
@@ -62,9 +62,9 @@ const john = new Person();
 const emily = new Person();
 ```
 
-## Properties and constructor
+## Propriétés et constructeur
 
-So far, our class `Person` is empty. We can give our `Person` instances `name` and `age` properties.
+Jusqu’à présent, notre classe `Person` est vide. Nous pouvons ajouter des propriétés `name` et `age` à nos instances de `Person`.
 
 
 ```ts showLineNumbers filename="main.ts" {2, 3}
@@ -76,16 +76,16 @@ class Person {
 const john = new Person();
 const emily = new Person();
 ```
-Now, the class `Person` has two properties, but they are not assigned. It would be great to give `john` and `emily` a `name` and `age` when instantiating them.
 
-To do that, you need to use the class `constructor`. The constructor looks like a function, but without the `function` keyword. It's called when you instantiate the class (and only then).
+La classe `Person` a maintenant deux propriétés, mais elles ne sont pas encore assignées. Ce serait pratique de pouvoir donner un `name` et un `age` à `john` et `emily` lors de leur instanciation.
 
-We can give the `constructor` parameters (here, `name` and `age`). By using the `this` keyword, we can assign the parameters to the properties.
+Pour faire cela, vous devez utiliser le `constructor` de la classe. Le constructeur ressemble à une fonction, mais sans le mot-clé `function`. Il est appelé lorsque vous instanciez la classe (et uniquement à ce moment-là).
 
-It's now possible to pass arguments when we instantiate the class. We created just one class, but `john` and `emily` now each have their own `name` and `age`. And of course, everything is typed, so the code editor will help you out with autocomplete and will make sure you're passing the right data types. Magic! 🪄✨
+On peut donner au `constructor` des paramètres (ici, `name` et `age`). En utilisant le mot-clé `this`, on peut assigner ces paramètres aux propriétés.
 
-You can access class instance properties just like you would with objects, using a `.`.
+Il est maintenant possible de passer des arguments lors de l’instanciation de la classe. Nous avons créé une seule classe, mais `john` et `emily` ont maintenant chacun leur propre `name` et `age`. Et bien sûr, tout est typé, donc l’éditeur de code vous aide avec l’autocomplétion et s’assure que vous passez les bons types de données. Magique ! 🪄✨
 
+Vous pouvez accéder aux propriétés d’une instance de classe comme vous le feriez avec des objets, en utilisant un `.`.
 
 ```ts showLineNumbers filename="main.ts" {5-8, 14-15} /"john", 30/ /"emily", 35/
 class Person {
@@ -105,21 +105,22 @@ console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
 
-![Logging properties.](/assets/pushing-further/classes/properties.png)
+![Affichage des propriétés.](/assets/pushing-further/classes/properties.png)
 
-## Methods
+## Méthodes
 
-Methods are functions specifically created for a class. They are very useful because they have direct access to the class properties. They also have access to other methods, so a method can call another method. But this is getting meta. 🥸
+Les méthodes sont des fonctions spécifiquement créées pour une classe. Elles sont très utiles car elles ont un accès direct aux propriétés de la classe. Elles ont aussi accès aux autres méthodes, donc une méthode peut en appeler une autre. Mais là, on entre dans la Matrix. 🥸
 
-Methods are written like functions, but without the `function` keyword. You have to declare them inside the class. A class can have as many methods as you want.
+Les méthodes s’écrivent comme des fonctions, mais sans le mot-clé `function`. Vous devez les déclarer à l’intérieur de la classe. Une classe peut avoir autant de méthodes que vous le souhaitez.
 
-For example, let's create a method called `makeOlder`. Each time it's called, it will add `1` to the `age` property.
+Par exemple, créons une méthode appelée `makeOlder`. Chaque fois qu’elle est appelée, elle ajoutera `1` à la propriété `age`.
 
-To call a method, use `.` right after an instance or a variable storing an instance, then type the name of the method followed by `()`.
+Pour appeler une méthode, utilisez un `.` juste après une instance ou une variable contenant une instance, puis tapez le nom de la méthode suivi de `()`.
 
-Below, we call the `makeOlder` method three times on `john`. We instantiated him with an `age` of `30`, but when we log his `age`, it's now `33`!
+Ci-dessous, nous appelons la méthode `makeOlder` trois fois sur `john`. Nous l’avons instancié avec un `age` de `30`, mais lorsqu’on affiche son `age`, il est maintenant de `33` !
 
-And since all instances are independent, `emily` is still `35`! Of course, `emily` also has the `makeOlder` method. Feel free to test it!
+Et comme toutes les instances sont indépendantes, `emily` a toujours `35` ! Bien sûr, `emily` possède aussi la méthode `makeOlder`. N’hésitez pas à la tester !
+
 
 
 ```ts showLineNumbers filename="main.ts" {10-12, 18-20}
@@ -147,11 +148,11 @@ john.makeOlder();
 console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
-![Using methods.](/assets/pushing-further/classes/method.png)
+![Utilisation des méthodes.](/assets/pushing-further/classes/method.png)
 
-Calling the method `makeOlder` three times is not very convenient. Just like functions, methods can have parameters. Let's update our code to pass a number of years to the method.
+Appeler la méthode `makeOlder` trois fois n’est pas très pratique. Comme les fonctions, les méthodes peuvent avoir des paramètres. Mettons à jour notre code pour passer un nombre d’années à la méthode.
 
-Just like function parameters, method parameters are typed, which is very convenient and helps you avoid typos and bugs.
+Tout comme les paramètres de fonction, les paramètres de méthode sont typés, ce qui est très pratique et vous aide à éviter les fautes de frappe et les bugs.
 
 
 ```ts showLineNumbers filename="main.ts" {18} /year: number/ /+ year/
@@ -177,11 +178,11 @@ john.makeOlder(3);
 console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
-![Using methods with parameters.](/assets/pushing-further/classes/method-parameter.png)
+![Utilisation des méthodes avec paramètres.](/assets/pushing-further/classes/method-parameter.png)
 
-Instead of using `console.log` and manually passing the instance properties, we could also create another method to log the ages.
+Au lieu d’utiliser `console.log` et de passer manuellement les propriétés de l’instance, on pourrait aussi créer une autre méthode pour afficher les âges.
 
-As you can see, classes — with their properties and methods — can be a great way to organize your code!
+Comme vous pouvez le voir, les classes — avec leurs propriétés et méthodes — peuvent être un excellent moyen d’organiser votre code !
 
 
 ```ts showLineNumbers filename="main.ts" {14-16, 24-25}
@@ -211,13 +212,13 @@ john.makeOlder(3);
 emily.log();
 john.log();
 ```
-![Using another method.](/assets/pushing-further/classes/log-method.png)
+![Utilisation d’une autre méthode.](/assets/pushing-further/classes/log-method.png)
 
-## Exporting and importing
+## Exporter et importer
 
-Just like functions, it's pretty common to keep classes in their own file and export/import them.
+Comme pour les fonctions, il est très courant de garder les classes dans leur propre fichier et de les exporter/importer.
 
-Create a new file called `Person.ts` and move your class into it. Don’t forget to add `export default` in front of it to make it available to the rest of your scripts.
+Créez un nouveau fichier nommé `Person.ts` et déplacez-y votre classe. N’oubliez pas d’ajouter `export default` devant celle-ci pour la rendre disponible dans le reste de vos scripts.
 
 
 ```ts showLineNumbers filename="Person.ts" /export default/
@@ -239,8 +240,7 @@ export default class Person {
   }
 }
 ```
-
-And now you can easily import it and use it in `main.ts`, which is now much simpler and easier to understand!
+Et maintenant, vous pouvez facilement l’importer et l’utiliser dans `main.ts`, qui est désormais beaucoup plus simple et facile à comprendre !
 
 
 ```ts showLineNumbers filename="main.ts" {1}
@@ -257,12 +257,12 @@ john.log();
 
 ## Documentation
 
-Just like functions, you can document your classes using the **JSDoc** syntax.
+Comme pour les fonctions, vous pouvez documenter vos classes en utilisant la syntaxe **JSDoc**.
 
-Below, I have documented the class as well as all its methods. For each one, I added an example. Now, the documentation will pop up in VS Code when you start typing their names or when hovering over them. Very convenient!
+Ci-dessous, j’ai documenté la classe ainsi que toutes ses méthodes. Pour chacune, j’ai ajouté un exemple. Ainsi, la documentation apparaîtra automatiquement dans VS Code lorsque vous commencerez à taper leurs noms ou en les survolant avec la souris. Très pratique !
 
 
-```ts showLineNumbers filename="People.ts"
+```ts showLineNumbers filename="People.ts" {1-8, 18-27, 32-39}
 /**
  * Represents a person with a name and age.
  *
@@ -307,15 +307,14 @@ export default class Person {
   }
 }
 ```
-![Using documentation.](/assets/pushing-further/classes/documentation.png)
+![Utilisation de la documentation.](/assets/pushing-further/classes/documentation.png)
 
 ## Conclusion
 
-Congratulations! You wrote your first class! While you might not create a lot of them for your analyses and future projects, you will use a looooooot of them! And as you just saw, using them is very easy. 🤗
+Félicitations ! Vous avez écrit votre première classe ! Même si vous n’en créerez peut-être pas beaucoup pour vos analyses et projets futurs, vous en utiliserez beaucoup ! Et comme vous venez de le voir, les utiliser est très simple. 🤗
 
-There’s a lot more to learn about classes — like inheritance, for example. But if you ever need to dive into that, it’ll mean you’ve become quite a good TypeScript coder! And by then, you’ll be able to read [more technical documentation](https://www.typescripttutorial.net/typescript-tutorial/typescript-inheritance/) and understand it.
+Il y a encore beaucoup de choses à apprendre sur les classes — comme l’héritage, par exemple. Mais si un jour vous avez besoin d’aller plus loin, c’est que vous serez devenu un très bon codeur TypeScript ! Et à ce moment-là, vous serez capable de lire de la [documentation plus technique](https://www.typescripttutorial.net/typescript-tutorial/typescript-inheritance/) et de la comprendre.
 
-And if not, well, you can always [reach out to me](/contact). I’ll be happy to write another lesson! 😁
+Et sinon, eh bien, vous pouvez toujours [me contacter](/contact). Je serai ravi d’écrire une autre leçon ! 😁
 
-
-<NoticeEnd />
+<NoticeEnd lang="fr" />
