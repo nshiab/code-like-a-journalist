@@ -1,0 +1,182 @@
+---
+title: Using tests in your projects
+description: In this lesson, we learn how to implements test in our code and use them.
+---
+
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Using tests in your projects
+
+Tests are widely used in programming to ensure classes, functions and methods are behaving as expected. When code is updated, tests garantee that the changes are not breaking all of the work done previously.
+
+But tests can also be very useful in data analysis and visualization projects. You can use them to make sure your calculations align with an indepedent reference. Or, once your have results, to make sure your code changes are not having unexpected impacts on your findings or visuals.
+
+Personally, I use tests to increase my confidence in my work. In can double-check something once and write a test for it. Going forward, I will know for sure that this thing is guaranted. And if the test fail, it will mean something very bad is happening and needs my attention!
+
+In this lesson, we will code a simple function to calculate percentages and we will create tests to make sure it works as expected.
+
+<NoticeIntro />
+
+## Setup
+
+We will use Deno and VS Code in this lesson. Let's create a common file structure.
+
+Create a new folder `helpers` and put the `getPercentage.ts` file with this code. It's the function we want to test. It expects two numbers and return the percentage as a string.
+
+```ts showLineNumbers filename="helpers/getPercentage.ts"
+export default function getPercentage(
+    current: number,
+    total: number,
+): string {
+    const percentage = (current / total) * 100;
+    return `${percentage}%`;
+}
+```
+
+Now create a `main.ts` file and use the function.
+
+```ts showLineNumbers filename="main.ts"
+import getPercentage from "./helpers/getPercentage.ts";
+
+console.log(getPercentage(50, 100));
+```
+
+From here, you can execute the script with `deno main.ts`.
+
+Everything looks fine! The function returns `50%` as expected.
+
+![A main script logging a value in the terminal.](/assets/ninja-moves/tests/setup.png)
+
+## Creating tests
+
+Is our function really working as expected? Let's check it!
+
+First, install the [@std/assert](https://jsr.io/@std/assert) standard library with: `deno add jsr:@std/assert`. We will use it to compare the returned values of our function with what we expect it to be.
+
+Now, let's create the test file. One way to keep tests organized in a project organized is to keep the same file structure for the tests as for the rest of the code.
+
+Here, we could create a new folder `tests` with a new file `getPercentage.test.ts` in it. Note that this file is a regular TypeScript file since it's ending with `.ts`. But because we added `.test` just before the extension, Deno now knows this is a test.
+
+Here's what the code below does:
+- `Deno.test` create a new test.
+- The first parameter is a description of the test.
+- The second parameter is a function. We run what we want in it (here `getPercentage`) and we check that the results is what we expect with `assertEquals`.
+- If the result is what is expected, the test will pass. Otherwise, it will fail!
+
+```ts showLineNumbers filename="tests/getPercentage.test.ts"
+import { assertEquals } from "@std/assert";
+import getPercentage from "../helpers/getPercentage.ts";
+
+Deno.test("should return 50% for 50 out of 100", () => {
+  const result = getPercentage(50, 100);
+  assertEquals(result, "50%");
+});
+```
+
+## Running tests
+
+To run tests with Deno, you can simple run `Deno test`. Deno will look for all `.test.ts` files in the project and run them.
+
+If you need to fetch something over the internet, or to read/write files, remember to pass the appropriate permissions. To authorize everything, you can use this command: `deno test -A`.
+
+![Running tests with Deno.](/assets/ninja-moves/tests/run-tests.png)
+
+However, it's not convenient to rerun this command everytime you update your code. Like we saw in other lessons, it would be better to watch files and rerun the tests automatically.
+
+To do so, you can use the watch option: `deno test --watch`. Run this command and keep it running for the rest of the lesson.
+
+There are a lot of other options as explained [in the documentation](https://docs.deno.com/runtime/fundamentals/testing/). Another one that I use a lot is `--fail-fast`, which stops running all the tests as soon as one fails.
+
+![Watching tests with Deno.](/assets/ninja-moves/tests/watch-tests.png)
+
+## Adding tests
+
+Depending on your context, the test we wrote just above might be sufficient. For example, maybe you just wanted to double-check the result of one step in your data analysis and you want it to stay this way going forward.
+
+But for the sake of this lesson, let's add more tests here. Let's test edge cases.
+
+For example, what is supposed to happen when the first number is `0`? And when the second is `0`? Maybe we want our function to return `0%` in both cases.
+
+Copy and paste the code below. When you'll save the modified file, the tests will be automatically rerun.
+
+```ts showLineNumbers filename="tests/getPercentage.test.ts" {9-17}
+import { assertEquals } from "@std/assert";
+import getPercentage from "../helpers/getPercentage.ts";
+
+Deno.test("should return 50% for 50 out of 100", () => {
+  const result = getPercentage(50, 100);
+  assertEquals(result, "50%");
+});
+
+Deno.test("should return 0% for 0 out of 100", () => {
+  const result = getPercentage(0, 100);
+  assertEquals(result, "0%");
+});
+
+Deno.test("should return 0% for 1 out of 0", () => {
+  const result = getPercentage(1, 0);
+  assertEquals(result, "0%");
+});
+```
+![A test failed.](/assets/ninja-moves/tests/fail.png)
+
+We can see that the second test passed but the third one failed!
+
+When the `total` is `0`, our function is returning `Infinity` instead of what we want, which is `0%`.
+
+Let's update our `getPercentage.ts` to fix that. Copy and paste the code below. When you'll save the file, the tests will rerun automatically.
+
+```ts showLineNumbers filename="helpers/getPercentage.ts" {5-7, 10}
+export default function getPercentage(
+  current: number,
+  total: number,
+): string {
+  if (total === 0) {
+    return "0%";
+  } else {
+    const percentage = (current / total) * 100;
+    return `${percentage}%`;
+  }
+}
+```
+
+And now, we can see that the third test passed.
+
+We also know that the previous behaviour is still there because the first two tests passed too!
+
+![All tests passed.](/assets/ninja-moves/tests/all-passed.png)
+
+## Automated tests
+
+You can always run tests locally, of course. You can even make a [task](/pushing-further/tasks) to make it easier to run them.
+
+But if you are using GitHub, you can setup automated tests in your projects. This is a common setup for open-source libraries, but you can use it for anything you want.
+
+For example, I have hundreds of tests in place for the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis). You can [explore them here](https://github.com/nshiab/simple-data-analysis/tree/main/test/unit/methods).
+
+I use GitHub Actions (check the [lesson about it](/git-and-github/github-actions)) to trigger them automatically when a pull request is made to merge new code to the main branch.
+
+If the tests pass, the merge is allowed and the version of the library can be published. But if one or more test fail, it means there is a breaking change or unexpected behavior, and the PR is rejected. More work is needed. You can check the [workflow here](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
+
+It's just a few lines of code but it guarantees that the library is working as expected. And it saved me many times from publishing a new broken version of the library! 😇
+
+## Testing dataviz
+
+Tests are easy to set up when your code **returns** something like a string, number, date, array or objects.
+
+But you can also use tests to compare web page elements, like charts, and more, with [Playwright](https://playwright.dev/). We used Playwright in the [web scraping lesson](/web-scraping), but it actually has been created for tests!
+
+The [docs](https://playwright.dev/docs/intro) are well done. There is even a section about automatically [comparing visuals with screenshots](https://playwright.dev/docs/test-snapshots).
+
+
+## Conclusion
+
+You don't always need tests, but when you start working on a long-term or complex project, taking the time to write simple tests each time your are creating a new method or function can become time well invested.
+
+You'll be more confident in your code and between type checking and tests, you'll be able to avoid a lot of nasty bugs and errors! 🐞
+
+And if you do have a bug to fix, adding a test to covert it will make sure it won't ever happen again!
+
+Happy testing! 👷
+
+<NoticeEnd />
