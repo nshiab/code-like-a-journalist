@@ -1,27 +1,27 @@
 ---
-title: Using tests in your projects
-description: In this lesson, we learn how to implement tests in our code and use them.
+title: Utiliser des tests dans vos projets
+description: Dans cette leçon, nous apprenons à implémenter et utiliser des tests dans notre code.
 ---
 
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
-# Using tests in your projects
+# Utiliser des tests dans vos projets
 
-Tests are widely used in programming to ensure that classes, functions, and methods behave as expected. When code is updated, tests guarantee that the changes are not breaking any of the work done previously.
+Les tests sont largement utilisés en programmation pour s’assurer que les classes, fonctions et méthodes se comportent comme prévu. Quand le code est mis à jour, les tests garantissent aussi que les changements n’ont pas touché tout le travail effectué auparavant.
 
-But tests can also be very useful in data analysis and visualization projects. You can use them to make sure your calculations align with an independent reference. Or, once you have results, to ensure your code changes are not having unexpected impacts on your findings or visuals.
+Mais les tests peuvent aussi être très utiles dans les projets d’analyse de données et de visualisation. Vous pouvez les utiliser pour vous assurer que vos calculs correspondent à une référence indépendante. Ou, une fois que vous avez des résultats, pour vérifier que vos modifications n’ont pas un impact inattendu sur vos conclusions ou vos visuels.
 
-Personally, I use tests to increase my confidence in my work. I can double-check something once and write a test for it. Going forward, I’ll know for sure that this thing is guaranteed. And if the test fails, it means something very bad is happening and needs my attention!
+Personnellement, j’utilise les tests pour renforcer ma confiance dans mon travail. Je peux vérifier quelque chose une fois et écrire un test pour le valider. Par la suite, je saurai avec certitude que ce résultat est garanti. Et si le test échoue, cela signifie qu’un problème sérieux s’est produit et nécessite mon attention !
 
-In this lesson, we will code a simple function to calculate percentages and we will create tests to make sure it works as expected.
+Dans cette leçon, nous allons coder une fonction simple pour calculer des pourcentages et créer des tests pour nous assurer qu’elle fonctionne comme prévu.
 
-<NoticeIntro />
+<NoticeIntro lang="fr" />
 
-## Setup
+## Configuration
 
-We will use Deno and VS Code in this lesson. Let's create a common file structure.
+Nous allons utiliser Deno et VS Code dans cette leçon. Créons une structure de fichiers simple.
 
-Create a new folder `helpers` and put the `getPercentage.ts` file inside it with this code. It's the function we want to test. It expects two numbers and returns the percentage as a string.
+Créez un nouveau dossier `helpers` et placez-y le fichier `getPercentage.ts` avec ce code. C’est la fonction que nous voulons tester. Elle s'attend à recevoir deux nombres et retourne le pourcentage sous forme de texte.
 
 
 ```ts showLineNumbers filename="helpers/getPercentage.ts"
@@ -34,7 +34,8 @@ export default function getPercentage(
 }
 ```
 
-Now create a `main.ts` file and use the function.
+Créez maintenant un fichier `main.ts` et utilisez la fonction.
+
 
 ```ts showLineNumbers filename="main.ts"
 import getPercentage from "./helpers/getPercentage.ts";
@@ -42,27 +43,28 @@ import getPercentage from "./helpers/getPercentage.ts";
 console.log(getPercentage(50, 100));
 ```
 
-From here, you can execute the script with `deno main.ts`.
+À partir de là, vous pouvez exécuter le script avec `deno main.ts`.
 
-Everything looks fine! The function returns `50%` as expected.
+Tout fonctionne comme prévu ! La fonction retourne `50%`.
 
-![A main script logging a value in the terminal.](/assets/ninja-moves/tests/setup.png)
+![Un script principal affichant une valeur dans le terminal.](/assets/ninja-moves/tests/setup.png)
 
-## Creating tests
+## Créer des tests
 
-Is our function really working as expected? Let's check!
+Est-ce que notre fonction fonctionne vraiment comme prévu ? Vérifions !
 
-First, install the [@std/assert](https://jsr.io/@std/assert) standard library with: `deno add jsr:@std/assert`. We will use it to compare the returned values of our function with what we expect them to be.
+D’abord, installez la librairie standard [@std/assert](https://jsr.io/@std/assert) avec la commande : `deno add jsr:@std/assert`. Nous allons l’utiliser pour comparer les valeurs retournées par notre fonction avec celles que nous attendons.
 
-Now, let's create the test file. One way to keep tests organized in a project is to keep the same file structure for the tests as for the rest of the code.
+Créons maintenant le fichier de test. Une bonne manière d’organiser les tests dans un projet est de garder la même structure de fichiers que le reste du code.
 
-Here, we could create a new folder `tests` with a new file `getPercentage.test.ts` in it. Note that this file is a regular TypeScript file since it ends with `.ts`. But because we added `.test` just before the extension, Deno now knows this is a test.
+Ici, on pourrait créer un nouveau dossier `tests` avec un fichier `getPercentage.test.ts` à l’intérieur. Remarquez que ce fichier est un fichier TypeScript classique puisqu’il se termine par `.ts`. Mais comme on a ajouté `.test` juste avant l’extension, Deno sait qu’il s’agit d’un test.
 
-Here's what the code below does:
-- `Deno.test` creates a new test.
-- The first parameter is a description of the test.
-- The second parameter is a function. We run what we want in it (here `getPercentage`) and we check that the result is what we expect with `assertEquals`.
-- If the result is what is expected, the test will pass. Otherwise, it will fail!
+Voici ce que fait le code ci-dessous :
+- `Deno.test` crée un nouveau test.
+- Le premier paramètre est une description du test.
+- Le second paramètre est une fonction. On y exécute ce que l’on veut tester (ici `getPercentage`) et on vérifie que le résultat est bien celui attendu avec `assertEquals`.
+- Si le résultat est celui attendu, le test réussira. Sinon, il échouera !
+
 
 ```ts showLineNumbers filename="tests/getPercentage.test.ts"
 import { assertEquals } from "@std/assert";
@@ -74,31 +76,34 @@ Deno.test("should return 50% for 50 out of 100", () => {
 });
 ```
 
-## Running tests
+## Exécuter les tests
 
-To run tests with Deno, you can simply run `deno test`. Deno will look for all `.test.ts` files in the project and run them.
+Pour lancer les tests avec Deno, il suffit d’exécuter `deno test`. Deno va chercher tous les fichiers `.test.ts` dans le projet et les exécuter.
 
-If you need to fetch something over the internet, or to read/write files, remember to pass the appropriate permissions. To authorize everything, you can use this command: `deno test -A`.
+Vous pouvez aussi exécuter un seul fichier de test si vous le souhaitez. Par exemple, ici ce serait `deno test tests/getPercentage.test.ts`.
 
-![Running tests with Deno.](/assets/ninja-moves/tests/run-tests.png)
+Si vous devez récupérer des données sur Internet, ou lire/écrire des fichiers, n’oubliez pas de passer les permissions appropriées. Pour tout autoriser, vous pouvez utiliser cette commande : `deno test -A`.
 
-However, it's not convenient to rerun this command every time you update your code. Like we saw in other lessons, it would be better to watch files and rerun the tests automatically.
+![Exécution des tests avec Deno.](/assets/ninja-moves/tests/run-tests.png)
 
-To do so, you can use the watch option: `deno test --watch`. Run this command and keep it running for the rest of the lesson.
+Cependant, ce n’est pas très pratique de relancer cette commande à chaque fois que vous mettez votre code à jour. Comme on l’a vu dans d’autres leçons, il vaut mieux surveiller les fichiers et relancer les tests automatiquement.
 
-There are a lot of other options as explained [in the documentation](https://docs.deno.com/runtime/fundamentals/testing/). Another one that I use a lot is `--fail-fast`, which stops running all the tests as soon as one fails.
+Pour cela, vous pouvez utiliser l’option *watch* : `deno test --watch`. Exécutez cette commande et laissez-la tourner pour le reste de la leçon.
 
-![Watching tests with Deno.](/assets/ninja-moves/tests/watch-tests.png)
+Il existe de nombreuses autres options, expliquées [dans la documentation](https://docs.deno.com/runtime/fundamentals/testing/). Une autre que j’utilise souvent est `--fail-fast`, qui arrête tous les tests dès qu’un seul échoue.
 
-## Adding tests
+![Surveillance des tests avec Deno.](/assets/ninja-moves/tests/watch-tests.png)
 
-Depending on your context, the test we wrote just above might be sufficient. For example, maybe you just wanted to double-check the result of one step in your data analysis and you want it to stay this way going forward.
+## Ajouter des tests
 
-But for the sake of this lesson, let's add more tests here. Let's test edge cases.
+Selon votre contexte, le test que nous venons d’écrire peut être suffisant. Par exemple, peut-être que vous vouliez simplement vérifier le résultat d’une étape dans votre analyse de données et que vous voulez que cela reste comme ça à l’avenir.
 
-For example, what is supposed to happen when the first number is `0`? And when the second is `0`? Maybe we want our function to return `0%` in both cases.
+Mais pour les besoins de cette leçon, ajoutons quelques tests supplémentaires. Testons des cas limites.
 
-Copy and paste the code below. When you save the modified file, the tests will be automatically rerun.
+Par exemple, que doit-il se passer si le premier nombre est `0` ? Et si le second est `0` ? Peut-être que nous voulons que notre fonction retourne `0%` dans les deux cas.
+
+Copiez-collez le code ci-dessous. Dès que vous enregistrerez le fichier modifié, les tests se relanceront automatiquement.
+
 
 ```ts showLineNumbers filename="tests/getPercentage.test.ts" {9-17}
 import { assertEquals } from "@std/assert";
@@ -119,13 +124,14 @@ Deno.test("should return 0% for 1 out of 0", () => {
   assertEquals(result, "0%");
 });
 ```
-![A test failed.](/assets/ninja-moves/tests/fail.png)
+![Un test a échoué.](/assets/ninja-moves/tests/fail.png)
 
-We can see that the second test passed but the third one failed!
+On peut voir que le deuxième test est passé, mais que le troisième a échoué !
 
-When the `total` is `0`, our function is returning `Infinity` instead of what we want, which is `0%`.
+Quand `total` vaut `0`, notre fonction retourne `Infinity` au lieu de ce que nous voulons, c’est-à-dire `0%`.
 
-Let's update our `getPercentage.ts` to fix that. Copy and paste the code below. When you save the file, the tests will rerun automatically.
+Mettons à jour notre fichier `getPercentage.ts` pour corriger cela. Copiez-collez le code ci-dessous. Dès que vous enregistrerez le fichier, les tests se relanceront automatiquement.
+
 
 ```ts showLineNumbers filename="helpers/getPercentage.ts" {5-7, 10}
 export default function getPercentage(
@@ -141,42 +147,42 @@ export default function getPercentage(
 }
 ```
 
-And now, we can see that the third test passed.
+Et maintenant, on peut voir que le troisième test est passé.
 
-We also know that the previous behavior is still there because the first two tests passed too!
+On sait aussi que le comportement précédent est toujours là puisque les deux premiers tests sont également passés !
 
-![All tests passed.](/assets/ninja-moves/tests/all-passed.png)
+![Tous les tests sont passés.](/assets/ninja-moves/tests/all-passed.png)
 
-## Automated tests
+## Tests automatisés
 
-You can always run tests locally, of course. You can even make a [task](/pushing-further/tasks) to make it easier to run them.
+Vous pouvez bien sûr toujours lancer les tests localement. Vous pouvez même créer une [tâche](/pushing-further/tasks) pour les exécuter plus facilement.
 
-But if you are using GitHub, you can set up automated tests in your projects. This is a common setup for open-source libraries, but you can use it for anything you want.
+Mais si vous utilisez GitHub, vous pouvez configurer des tests automatisés dans vos projets. C’est une configuration courante pour les librairies en code ouvert, mais vous pouvez l’utiliser pour n’importe quel projet.
 
-For example, I have hundreds of tests in place for the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis). You can [explore them here](https://github.com/nshiab/simple-data-analysis/tree/main/test/unit/methods).
+Par exemple, j’ai des centaines de tests en place pour la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Vous pouvez [les explorer ici](https://github.com/nshiab/simple-data-analysis/tree/main/test/unit/methods).
 
-I use GitHub Actions (check the [lesson about it](/git-and-github/github-actions)) to trigger them automatically when a pull request is made to merge new code to the main branch.
+J’utilise GitHub Actions (consultez [la leçon à ce sujet](/git-and-github/github-actions)) pour les déclencher automatiquement lorsqu’une *pull request* est créée pour fusionner du nouveau code dans la branche `main`.
 
-If the tests pass, the merge is allowed and the version of the library can be published. But if one or more tests fail, it means there is a breaking change or unexpected behavior, and the PR is rejected. More work is needed. You can check the [workflow here](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
+Si les tests passent, la fusion est autorisée et la nouvelle version de la librairie peut être publiée. Mais si un ou plusieurs tests échouent, cela signifie qu’il y a une modification incompatible ou un comportement inattendu, et la PR est rejetée. Du travail est encore nécessaire. Vous pouvez consulter [le *workflow* ici](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
 
-It's just a few lines of code, but it guarantees that the library is working as expected. And it has saved me many times from publishing a new broken version of the library! 😇
+Ce ne sont que quelques lignes de code, mais cela garantit que la librairie fonctionne comme prévu. Et ça m’a évité plusieurs fois de publier une nouvelle version cassée de la librairie ! 😇
 
-## Testing dataviz
+## Tester des visualisations
 
-Tests are easy to set up when your code **returns** something like a string, number, date, array, or object.
+Les tests sont faciles à mettre en place lorsque votre code **retourne** quelque chose comme un texte, un nombre, une date, une liste ou un objet.
 
-But you can also use tests to compare web page elements, like charts, and more, with [Playwright](https://playwright.dev/). We used Playwright in the [web scraping lesson](/web-scraping), but it was actually created for tests!
+Mais vous pouvez aussi utiliser des tests pour comparer des éléments d’une page web, comme des graphiques, et plus encore, avec [Playwright](https://playwright.dev/). Nous avons utilisé Playwright dans la [leçon sur le web scraping](/web-scraping), mais à la base, il a été créé pour faire des tests !
 
-The [docs](https://playwright.dev/docs/intro) are well done. There is even a section about automatically [comparing visuals with screenshots](https://playwright.dev/docs/test-snapshots).
+La [documentation](https://playwright.dev/docs/intro) est très bien faite. Il y a même une section sur la [comparaison automatique de visuels avec des captures d’écran](https://playwright.dev/docs/test-snapshots).
 
 ## Conclusion
 
-You don't always need tests, but when you start working on a long-term or complex project, taking the time to write simple tests each time you are creating a new method or function can become time well invested.
+Vous n’avez pas toujours besoin de tests, mais dès que vous travaillez sur un projet à long terme ou complexe, prendre le temps d’écrire de simples tests à chaque fois que vous créez une nouvelle méthode ou fonction peut s’avérer être un excellent investissement.
 
-You'll be more confident in your code and, between type checking and tests, you'll be able to avoid a lot of nasty bugs and errors! 🐞
+Vous aurez plus confiance en votre code et, entre le typage et les tests, vous éviterez beaucoup de vilains bugs et erreurs ! 🐞
 
-And if you do have a bug to fix, adding a test to cover it will make sure it won't ever happen again!
+Et si jamais vous avez un bug à corriger, ajouter un test pour le couvrir garantira qu’il ne reviendra jamais !
 
-Happy testing! 👷
+Bonnes séances de test ! 👷
 
-<NoticeEnd />
+<NoticeEnd lang="fr" />

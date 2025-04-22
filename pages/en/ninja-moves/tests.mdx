@@ -19,7 +19,7 @@ In this lesson, we will code a simple function to calculate percentages and we w
 
 ## Setup
 
-We will use Deno and VS Code in this lesson. Let's create a common file structure.
+We will use Deno and VS Code in this lesson. Let's create a simple file structure.
 
 Create a new folder `helpers` and put the `getPercentage.ts` file inside it with this code. It's the function we want to test. It expects two numbers and returns the percentage as a string.
 
@@ -77,6 +77,8 @@ Deno.test("should return 50% for 50 out of 100", () => {
 ## Running tests
 
 To run tests with Deno, you can simply run `deno test`. Deno will look for all `.test.ts` files in the project and run them.
+
+You can also run just one test file if you want. For example, here it would be `deno test tests/getPercentage.test.ts`.
 
 If you need to fetch something over the internet, or to read/write files, remember to pass the appropriate permissions. To authorize everything, you can use this command: `deno test -A`.
 
@@ -157,7 +159,7 @@ For example, I have hundreds of tests in place for the [Simple Data Analysis lib
 
 I use GitHub Actions (check the [lesson about it](/git-and-github/github-actions)) to trigger them automatically when a pull request is made to merge new code to the main branch.
 
-If the tests pass, the merge is allowed and the version of the library can be published. But if one or more tests fail, it means there is a breaking change or unexpected behavior, and the PR is rejected. More work is needed. You can check the [workflow here](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
+If the tests pass, the merge is allowed and the new version of the library can be published. But if one or more tests fail, it means there is a breaking change or unexpected behavior, and the PR is rejected. More work is needed. You can check the [workflow here](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
 
 It's just a few lines of code, but it guarantees that the library is working as expected. And it has saved me many times from publishing a new broken version of the library! 😇
 
