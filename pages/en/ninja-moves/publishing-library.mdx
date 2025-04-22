@@ -1,0 +1,116 @@
+---
+title: Publishing a TypeScript library
+description: In this lesson, we learn how to publish a TypeScript library with Deno and JSR
+---
+
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Publishing a TypeScript library
+
+Do you have some bits of code that you keep copying and pasting from one project to another? If so, it probably means you should create a library!
+
+In this lesson, I'll show you how to create an open-source library with Deno and JSR. It's incredibly easy since Deno and JSR can test, build, and publish both your code and documentation.
+
+Note that I am assuming you've completed the previous lessons, especially these:
+- [Using libraries](/pushing-further/libraries)
+- [Understanding library versions](/ninja-moves/semver)
+- [Using tests in your projects](/ninja-moves/tests)
+
+<NoticeIntro />
+
+## Creating a JSR account and package
+
+JSR is the TypeScript registry where we will publish our library. First, [create an account on the platform](https://jsr.io/). You can link your GitHub account to it for convenience.
+
+![JSR homepage.](/assets/ninja-moves/publishing-library/jsr.png)
+
+Next, click on `Publish a package`.
+
+![JSR publish button.](/assets/ninja-moves/publishing-library/publish-button.png)
+
+You can then choose a `scope` (by default it's your GitHub username) and a name for your library. Here I wrote `my-first-library`.
+
+Keep the next page open for now.
+
+![JSR library name.](/assets/ninja-moves/publishing-library/scope.png)
+
+## Coding the library
+
+It's time to write some code! In this project, we are going to reuse some of the code from the previous lesson `Using tests in your projects`.
+
+Create a new folder and open it in VS Code.
+
+Then create a folder `functions` and a `getPercentage.ts` file with the code and documentation below.
+
+```ts showLineNumbers filename="helpers/getPercentage.ts"
+/**
+ * Calculates a percentage and returns it as a string formatted with a percentage sign ("%").
+ *
+ * @example
+ * Basic usage
+ * ```ts
+ * getPercentage(50, 200); // "25%"
+ * getPercentage(0, 0);    // "0%"
+ * ```
+ *
+ * @param current - The current value to calculate the percentage for.
+ * @param total - The total value to calculate the percentage against.
+ * @returns A string representing the percentage. If `total` is 0, returns "0%".
+ */
+export default function getPercentage(
+    current: number,
+    total: number,
+): string {
+    if (total === 0) {
+        return "0%";
+    } else {
+        const percentage = (current / total) * 100;
+        return `${percentage}%`;
+    }
+}
+```
+
+Create also a `index.ts` file that will be our library entry point. When someone will want to use the library, this is the file they'll have access to.
+
+In this file, we are just going to import our `getPercentage` function and re-export it. This is convenient because if you have a lot of classes, functions, or other things to publish in your library, you can put them all together here.
+
+For example, here are all the [functions exported in my [journalism library](https://github.com/nshiab/journalism/blob/main/src/index.ts).
+
+
+```ts showLineNumbers filename="index.ts"
+import getPercentage from "./functions/getPercentage.ts";
+
+export { getPercentage };
+```
+
+And now create the `tests` folder and add `getPercentage.test.ts` in it.
+
+```ts showLineNumbers filename="tests/getPercentage.test.ts"
+import { assertEquals } from "jsr:@std/assert";
+import getPercentage from "../functions/getPercentage.ts";
+
+Deno.test("should return 50%", () => {
+    assertEquals(getPercentage(50, 100), "50%");
+});
+Deno.test("should return 33%", () => {
+    assertEquals(getPercentage(33.333, 100), "33%");
+});
+Deno.test("should return 0%", () => {
+    assertEquals(getPercentage(0, 100), "0%");
+});
+Deno.test("should return 0%", () => {
+    assertEquals(getPercentage(1, 0), "0%");
+});
+```
+
+Finally, install the [@std/assert](https://jsr.io/@std/assert) standard library with: `deno add jsr:@std/assert`.
+
+Now, if you run `deno test`, everything should run smoothly.
+
+![Running tests locally.](/assets/ninja-moves/publishing-library/running-tests.png)
+
+Since this lesson is focused on publishing the library, I won't push this code to GitHub. But in a real life scenario, **I strongly encourage you to save your code somewhere in the cloud**! Feel free to check the [GitHub lesson](/git-and-github/github-basics) for more.
+
+## Conclusion
+
+
