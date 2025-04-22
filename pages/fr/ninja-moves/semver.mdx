@@ -1,96 +1,94 @@
 ---
-title: Understanding library versions (SemVer)
-description: In this lesson, we learn what semantic versioning is and how to interpret it.
+title: Comprendre le versionnage de librairies (SemVer)
+description: Dans cette leçon, on apprend ce qu’est le versionnage sémantique et comment l’interpréter.
 ---
 
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
-# Understanding library versions
+# Comprendre le versionnage de librairies
 
-You may have noticed that library versions on NPM, JSR and in your `deno.json` (or `package.json`) have numbers attached to them.
+Vous avez peut-être remarqué que les versions de librairies sur NPM, JSR et dans votre fichier `deno.json` (ou `package.json`) sont accompagnées de numéros.
 
-For example, at the time of writing, the [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) library is at version 5.0.5. This is called **semantic versioning**, or **SemVer** for short.
+Par exemple, au moment d’écrire ces lignes, la librairie [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) est à la version 5.0.5. C’est ce qu’on appelle le **versionnage sémantique**, ou **SemVer** pour faire court.
 
-When library maintainers update these numbers, there is (usually 😅) a good reason why — and in this lesson, I’m going to explain what that reason is!
+Quand les responsables d’une librairie mettent à jour ces numéros, c’est (en général 😅) pour une bonne raison et, dans cette leçon, je vais vous expliquer laquelle !
 
-![A screenshot showing VS Code terminal with a table and strings logged.](/assets/ninja-moves/semver/sda-github.png)
+![Une capture d’écran montrant le terminal de VS Code avec une table et des textes affichés.](/assets/ninja-moves/semver/sda-github.png)
 
-<NoticeIntro />
+<NoticeIntro lang="fr" />
 
-## Major, minor, and patch
+## Majeure, mineure et patch
 
-### Major
+### Majeure
 
-The first number indicates major versions. When this number changes, it means that breaking changes were introduced. If you are using an older version and update the library, your code will probably need to be updated too. Some classes, methods, functions, and others may have been changed or even removed.
+Le premier chiffre correspond à la version majeure. Quand ce chiffre change, cela signifie que des changements importants et **incompatibles** ont été introduits. Si vous utilisez une ancienne version et que vous mettez à jour la librairie, vous devrez probablement modifier votre code. Certaines classes, méthodes, fonctions, etc. ont été modifiées ou supprimées.
 
-So if you plan on updating to a major version, always plan some extra time to adjust your project. And always ask yourself if it's actually worth it!
+Donc si vous prévoyez de mettre à jour vers une version majeure, prévoyez toujours un peu de temps pour ajuster votre projet. Et demandez-vous toujours si ça en vaut vraiment la peine !
 
-For example, if you are using `simple-data-analysis@5.0.0` and there is a new version `simple-data-analysis@6.0.0`, check the [release notes](https://github.com/nshiab/simple-data-analysis/releases) to weigh the pros and cons of updating your project with it.
+Par exemple, si vous utilisez `simple-data-analysis@5.0.0` et qu’une nouvelle version `simple-data-analysis@6.0.0` sort, consultez les [notes de version](https://github.com/nshiab/simple-data-analysis/releases) pour évaluer les avantages et les inconvénients d’une mise à jour dans votre projet.
 
-There’s also an extra thing to know about major versions: when it’s a `v0.x.x` version, it usually means that the library is not ready for production. The maintainers will probably introduce a lot of breaking changes before it reaches `v1.0.0`, as they’re trying to figure out the best way to build everything. A lot of bugs are to be expected too.
+Il y a aussi un point important à savoir sur les versions majeures : lorsqu’une librairie est en `v0.x.x`, cela signifie généralement qu’elle n’est pas encore prête. Les responsables vont probablement introduire beaucoup de changements importants avant d’atteindre une `v1.0.0`, le temps de trouver la meilleure manière de tout construire. Beaucoup de bugs sont aussi à prévoir.
 
-### Minor
+### Mineure
 
-Minor versions are usually used to notify about new features.
+Les versions mineures sont généralement utilisées pour annoncer de nouvelles fonctionnalités.
 
-For example, if you are using `simple-data-analysis@5.0.0` and there’s a new `simple-data-analysis@5.1.0`, it probably means that there is a new class, new methods, or new functions available. The old ones are still there and should still work as before.
+Par exemple, si vous utilisez `simple-data-analysis@5.0.0` et qu’une nouvelle version `simple-data-analysis@5.1.0` sort, cela signifie probablement qu’une nouvelle classe, de nouvelles méthodes ou fonctions sont disponibles. Les anciennes sont toujours là et devraient continuer à fonctionner.
 
-It's much safer to update to a minor version, since you shouldn't have to recode parts of your project. But this is code, and maintainers are humans, so there are always some surprises! 😬
+C’est beaucoup plus sûr de mettre à jour vers une version mineure, car vous ne devriez pas avoir à réécrire votre projet. Mais bon, c’est du code, et les mainteneurs sont humains (pour l'instant 🤖)… donc il peut toujours y avoir des surprises ! 😬
 
 ### Patch
 
-Patch versions are usually used to fix bugs and improve things under the hood. They usually don't bring anything new to the table — just make the library work better.
+Les versions patch sont utilisées pour corriger des bugs et améliorer le fonctionnement en coulisses. Elles n’apportent généralement rien de nouveau. Elles rendent juste la librairie plus stable.
 
-Patch versions are the safest versions to update to. You shouldn't have to recode anything in your project when updating to a patch version.
+Ce sont les versions les plus sûres à mettre à jour. Vous ne devriez pas avoir besoin de changer votre code pour une mise à jour patch.
 
-### Other versions
+### Autres versions
 
-Some maintainers also like to publish `alpha`, `beta`, and `rc` (release candidate) versions.
+Certains mainteneurs publient aussi des versions `alpha`, `beta` et `rc` (*release candidate*).
 
-These versions are available to anyone to use while the code changes — but at their own risk. A lot of bugs and breaking changes are to be expected.
+Ces versions sont disponibles à tous, mais à vos risques et périls. De nombreux bugs et changements incompatibles sont à prévoir.
 
-## `^` and `~`
+## `^` et `~`
 
-Because it could be annoying to update libraries all the time for `minor` and `patch` versions, some projects prefix the library versions in the `deno.json` or `package.json` with `^` or `~`.
+Comme ce serait agaçant de devoir mettre à jour tout le temps les librairies pour chaque nouvelle version `minor` ou `patch`, certains projets ajoutent un préfixe `^` ou `~` devant les versions dans les fichiers `deno.json` ou `package.json`.
 
-These symbols define a **range** of acceptable versions for a library.
+Ces symboles définissent une **plage** de versions acceptables pour une librairie.
 
-### `^` (Caret)
+### `^` (accent circonflexe)
 
-The `^` means that a project should stick to a major version, but can use any minor and patch version.
+Le `^` signifie que le projet doit rester sur une même version majeure, mais peut utiliser n’importe quelle version mineure ou patch.
 
-For example, `simple-data-analysis@^5.0.0` means that the project is allowed to use the latest version of `v5.x.x`. So `simple-data-analysis@5.1.0` and `simple-data-analysis@5.1.1` would be acceptable.
+Par exemple, `simple-data-analysis@^5.0.0` signifie que le projet peut utiliser n’importe quelle version de `v5.x.x`. Donc `simple-data-analysis@5.1.0` et `simple-data-analysis@5.1.1` sont valides.
 
-### `~` (Tilde)
+### `~` (tilde)
 
-The `~` is stricter, meaning that the project should stick to a major **and** minor version, but can use any patch version.
+Le `~` est plus strict : le projet doit rester sur une même version majeure **et** mineure, mais peut utiliser n’importe quel patch.
 
-For example, `simple-data-analysis@~5.1.0` means that the project is allowed to use the latest version of `v5.1.x`, like `simple-data-analysis@5.1.1`.
+Par exemple, `simple-data-analysis@~5.1.0` signifie que le projet peut utiliser n’importe quelle version de `v5.1.x`, comme `simple-data-analysis@5.1.1`.
 
-## Updating dependencies
+## Mettre à jour ses dépendances
 
-You can follow maintainers and projects on GitHub to stay up to date with your favorite libraries (check the [GitHub lesson](/git-and-github/github-basics)), but you can also use Deno and NPM directly to check if some of your libraries are outdated.
+Vous pouvez suivre des projets et des mainteneurs sur GitHub pour rester à jour avec vos librairies préférées (voyez la [leçon sur GitHub](/git-and-github/github-basics)), mais vous pouvez aussi utiliser directement Deno et NPM pour vérifier si certaines de vos librairies sont dépassées.
 
 ### Deno
 
-With Deno, you can run `deno outdated` in your terminal. Deno will automatically check JSR and NPM and let you know what’s available. You can then update the libraries of your choice.
+Avec Deno, vous pouvez exécuter la commande `deno outdated` dans votre terminal. Deno va automatiquement vérifier JSR et NPM et vous indiquer les mises à jour disponibles. Vous pouvez ensuite choisir les librairies à mettre à jour.
 
-There are also [different options](https://docs.deno.com/runtime/reference/cli/outdated/) available with this command.
+Il existe aussi [plusieurs options](https://docs.deno.com/runtime/reference/cli/outdated/) avec cette commande.
 
-Always double-check that your project is running as expected after updating and that the correct versions are written down in your `deno.json`.
+Vérifiez toujours que votre projet fonctionne correctement après une mise à jour, et que les bonnes versions sont bien écrites dans votre fichier `deno.json`.
 
 ### NPM
 
-NPM does the same thing with the `npm outdated` command.
+NPM propose la même chose avec la commande `npm outdated`. Pour mettre à jour les librairies, vous pouvez utiliser `npm update`.
 
-To update libraries, you can use `npm update`.
-
-Again, always double-check that your project is running as expected after updating and that the correct versions are written down in your `package.json`.
+Encore une fois, vérifiez toujours que votre projet fonctionne comme prévu après la mise à jour, et que les bonnes versions sont bien écrites dans votre fichier `package.json`.
 
 ## Conclusion
 
-SemVer is important to understand the potential consequences of updating a library. But remember that it's a convention — nothing forces anyone to follow it.
+Le SemVer est utile pour comprendre les conséquences possibles d’une mise à jour de librairie. Mais n’oubliez pas que ce n’est qu’une convention. Rien n’oblige quiconque à la suivre.
 
-In fact, some big open-source projects don’t follow SemVer, like... TypeScript! The team instead follows a calendar-based release schedule and sticks to it. Last time I checked, they released a new minor version every three months and a new major version when the minor version exceeds `9`. But they do a lot of extra work to avoid breaking changes, so updating is often seamless for coders like us!
+D’ailleurs, certains gros projets en code ouvert ne suivent pas le SemVer, comme... TypeScript ! L’équipe utilise plutôt un calendrier de publication fixe et s’y tient. La dernière fois que j’ai vérifié, ils publiaient une nouvelle version mineure tous les trois mois, et une version majeure quand la version mineure dépassait `9`. Mais ils font beaucoup d’efforts pour éviter les changements incompatibles, donc les mises à jour sont souvent invisibles pour des codeurs comme nous !
 
-<NoticeEnd />
+<NoticeEnd lang="fr" />
