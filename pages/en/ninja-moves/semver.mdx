@@ -1,0 +1,94 @@
+---
+title: Understanding libraries versions (SemVer)
+description: In this lesson, we learn what semantic versioning is and how to interpret it.
+---
+
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Understanding libraries versions
+
+You may have noticed that libraries version on NPM, JSR and in your `deno.json` (or `package.json`) have numbers attached to them.
+
+For example, at the time of writing, the [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) library is at version 5.0.5. This is called **semantic versionning**, or **SemVer** in short.
+
+When library maintainers update these numbers, there is (usually 😅) a good reason why and in this lesson, I am going to explain you what this reason is!
+
+![A screenshot showing VS Code terminal with a table and strings logged.](/assets/ninja-moves/semver/sda-github.png)
+
+<NoticeIntro />
+
+## Major, minor, and patch
+
+### Major
+
+The first number indicates major versions. When this number changes, it means that breaking changes were introduced. If you are using an older version and update the library, your code will probably need to be updated to. Some classes, methods, functions and others have been changed or even removed.
+
+So if you plan on updating to a major version, always plan some extra time to adjust your project. And always ask yourself if it's actually worth it!
+
+For example, if you are using `simple-data-analysis@5.0.0` and there is a new version `simple-data-analysis@6.0.0`, check the the [releases notes](https://github.com/nshiab/simple-data-analysis/releases) to weight the pros and cons of updating in your projects with it.
+
+Then is an extra thing to know about major version: when it's a `v0.x.x` version, it usually means that the library is not reading for production. The maintainers will probably introduce a lot of breaking changes before it reaches a `v1.0.0`, as they are trying to figure out the best way to build everything. A lot of bugs are to be expected too.
+
+### Minor
+
+Minor version are usually used for notify new features.
+
+For example, if you are using `simple-data-analysis@5.0.0` and there a new `simple-data-analysis@5.1.0`, it probably means that there is a new class, new methods, or new functions available now. The old ones are still there and should still work as before.
+
+It's much safer to update to a minor version, since you shouldn't have to recode part of your projects. But this is code, and maintainers are humans, so there is always some surprises! 😬
+
+### Patch
+
+Patch versions are usually used to fix bugs and improve things under the hood. They usually don't bring anything new to the table. They usually just make the library work better.
+
+Patch versions are the safest versions to update to. You shouldn't have to recode anything in your projects when updating to a patch version.
+
+### Other versions
+
+Some maintainers also like to publish `alpha`, `beta`, and `rc` (release candidate) versions.
+
+These version are available to anyone to use while the code changes, but at their own risks. A lot of bugs and breaking changes are to be expected.
+
+## `^` and `~`
+
+Because it could be annoying to update all the time the libraries for `minor` and `patch` versions, some projects prefix the library version in the `deno.json` or `package.json` with `^` and `~`.
+
+These symbols define a **range** of acceptable versions for a library.
+
+### `^` (Caret)
+
+The `^` means that a project should stick a major version, but could use any minor and patch version.
+
+For example, `simple-data-analysis@^5.0.0` means that the project is allowed to use the latest version of `v5.x.x`. So `simple-data-analysis@5.1.0` would be acceptable as `simple-data-analysis@5.1.1`.
+
+### `~` (Tilde) 
+
+The `~` is stricter, meaning that the project should stick a major **and** minor version, but could use any patch version.
+
+For example, `simple-data-analysis@~5.1.0` means that the project is allowed to use the latest version of `v5.1.x`. So `simple-data-analysis@5.1.1`.
+
+## Updating dependencies
+
+Wou can follow maintainers and projects on GitHub to stay up to date with your favorite libraries, but you can also use Deno and NPM directly to check if some of your libraries are outdated.
+
+### Deno
+
+With deno, you can run `deno outdated` in your terminal. Deno will automatically check JSR and NPM and let you know what's available. You can then update the libraries of your choice.
+
+There are also [different options](https://docs.deno.com/runtime/reference/cli/outdated/) available with this command.
+
+Also double-check that you project is running as expected after updating and double-check that the correct version are written down in your `deno.json`.
+
+### NPM
+
+NPM does the same thing with the `npm outdated` command.
+
+To update libraries, you can use `npm update`.
+
+Again, always double-check that you project is running as expected after updating and double-check that the correct versions are written down in your `package.json`. 
+
+## Conclusion
+
+Semantic versioning is a powerful system that helps developers understand the impact of updates to libraries and dependencies. By learning to interpret version numbers and symbols like `^` and `~`, you can make informed decisions about when and how to update your dependencies.
+
+<NoticeEnd />
