@@ -33,7 +33,6 @@ Pour les frontières des pays, je les ai téléchargées depuis [Natural Earth](
 En utilisant la librairie Simple Data Analysis dans le dossier `sda`, nous pouvons facilement les récupérer et les mettre en cache. Mettez à jour `sda/main.ts`, puis exécutez `deno task sda` pour lancer et surveiller le script.
 
 Pour les tremblements de terre :
-- Nous nous assurons de convertir les valeurs `time` en objets `Date`.
 - Nous gardons uniquement les lignes dont le `type` est `earthquake` et le `status` est `reviewed`.
 - Nous filtrons les séismes de magnitude inférieure à 5.
 - Comme nous allons dessiner des cercles sur notre carte, il est plus intéressant d’utiliser l’amplitude, que l’on peut facilement calculer à partir de la magnitude.
@@ -61,7 +60,6 @@ await earthquakes.cache(async () => {
   ]);
 });
 
-await earthquakes.convert({ time: "datetime" });
 await earthquakes.keep({
   "type": "earthquake",
   "status": "reviewed",
@@ -112,7 +110,7 @@ Voici une explication pas à pas du nouveau code ci-dessous :
 - Puis nous dessinons les tremblements de terre, en utilisant leurs valeurs `ampl`.
 
 
-```ts showLineNumbers filename="sda/main.ts" {2, 45-66}
+```ts showLineNumbers filename="sda/main.ts" {2, 44-65}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 import { geo, graticule, plot, sphere } from "@observablehq/plot";
 
@@ -126,7 +124,6 @@ await earthquakes.cache(async () => {
   ]);
 });
 
-await earthquakes.convert({ time: "datetime" });
 await earthquakes.keep({
   "type": "earthquake",
   "status": "reviewed",

@@ -55,7 +55,6 @@ await sdb.done();
 ![Une capture d’écran de VS Code après avoir exécuté la librairie Simple Data Analysis.](/assets/d3-chart/retrieve-earthquakes.png)
 
 Comme vous pouvez le voir, notre jeu de données contient plus de 28 000 tremblements de terre et de nombreuses colonnes. Nous pouvons le filtrer et ne garder que ce qui nous intéresse :
-- Nous nous assurons de convertir les valeurs `time` en objets `Date` et de les trier. Parfois, elles sont chargées comme des chaînes de caractères.
 - Nous ne voulons que `earthquake` dans la colonne `type` et `reviewed` dans la colonne `status`.
 - Nous filtrons pour ne garder que les tremblements de terre qui pourraient causer des dommages, avec une magnitude de 5 ou plus.
 - Nous renommons les colonnes `latitude` et `longitude` avec des noms plus courts.
@@ -67,7 +66,7 @@ Comme vous pouvez le voir, notre jeu de données contient plus de 28 000 tremble
 Nous obtenons environ 2 000 tremblements de terre.
 
 
-```ts showLineNumbers filename="sda/main.ts" {13-32}
+```ts showLineNumbers filename="sda/main.ts" {13-31}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
@@ -80,7 +79,6 @@ await earthquakes.cache(async () => {
   ]);
 });
 
-await earthquakes.convert({ time: "datetime" });
 await earthquakes.sort({ time: "asc" });
 await earthquakes.keep({
   "type": "earthquake",
@@ -114,7 +112,7 @@ Avant de plonger dans des visualisations personnalisées, il est important d’e
 - Avec `sda/output/earthquakes-time-mag.png`, on peut clairement voir les tremblements de terre les plus puissants. Les trois de magnitude supérieure à 8 correspondent à la [Liste des tremblements de terre en 2021](https://en.wikipedia.org/wiki/List_of_earthquakes_in_2021) sur Wikipédia.
 - `sda/output/earthquakes-mag-depth.png` suggère que la plupart des séismes se produisent à moins de 250 km de profondeur. Les quatre plus puissants étaient proches de la surface.
 
-```ts showLineNumbers filename="sda/main.ts" {2, 35-71}
+```ts showLineNumbers filename="sda/main.ts" {2, 34-70}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 import { dot, plot } from "@observablehq/plot";
 
@@ -128,7 +126,6 @@ await earthquakes.cache(async () => {
   ]);
 });
 
-await earthquakes.convert({ time: "datetime" });
 await earthquakes.sort({ time: "asc" });
 await earthquakes.keep({
   "type": "earthquake",
@@ -205,7 +202,7 @@ Notez que les fichiers JSON ne peuvent pas stocker d’objets `Date`, donc nos d
 
 
 
-```ts showLineNumbers filename="sda/main.ts" {72}
+```ts showLineNumbers filename="sda/main.ts" {71}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 import { dot, plot } from "@observablehq/plot";
 
@@ -219,7 +216,6 @@ await earthquakes.cache(async () => {
   ]);
 });
 
-await earthquakes.convert({ time: "datetime" });
 await earthquakes.sort({ time: "asc" });
 await earthquakes.keep({
   "type": "earthquake",

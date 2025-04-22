@@ -33,7 +33,6 @@ For the country boundaries, I downloaded them from [Natural Earth](https://www.n
 Using the Simple Data Analysis library in the `sda` folder, we can easily retrieve and cache them. Update `sda/main.ts`, then run `deno task sda` to execute and watch it.
 
 For the earthquakes:
-- We make sure to convert the `time` values to dates.
 - We keep only rows with a `type` of `earthquake` and a `status` of `reviewed`.
 - We filter out earthquakes with a magnitude less than 5.
 - Since we will be drawing circles on our map, it's more interesting to use the amplitude, which we can easily compute from the magnitude.
@@ -61,7 +60,6 @@ await earthquakes.cache(async () => {
   ]);
 });
 
-await earthquakes.convert({ time: "datetime" });
 await earthquakes.keep({
   "type": "earthquake",
   "status": "reviewed",
@@ -111,7 +109,7 @@ Here's a step-by-step explanation of the new code below:
 - We draw the countries first.
 - Then we draw the earthquakes, using their `ampl` values.
 
-```ts showLineNumbers filename="sda/main.ts" {2, 45-66}
+```ts showLineNumbers filename="sda/main.ts" {2, 44-65}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 import { geo, graticule, plot, sphere } from "@observablehq/plot";
 
@@ -125,7 +123,6 @@ await earthquakes.cache(async () => {
   ]);
 });
 
-await earthquakes.convert({ time: "datetime" });
 await earthquakes.keep({
   "type": "earthquake",
   "status": "reviewed",

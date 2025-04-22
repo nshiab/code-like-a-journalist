@@ -54,7 +54,6 @@ await sdb.done();
 ![A screenshot of VS Code after running the Simple Data Analysis library.](/assets/d3-chart/retrieve-earthquakes.png)
 
 As you can see, there are over 28,000 earthquakes in our data and many columns. We can filter it and keep only what we're interested in:
-- We make sure to convert `time` values to dates and sort them. Sometimes they are loaded as strings.
 - We only want `earthquake` in the `type` column and `reviewed` in the `status` column.
 - We filter to keep only earthquakes that could cause damage, with a magnitude of 5 or more.
 - We rename the `latitude` and `longitude` columns to shorter names.
@@ -65,7 +64,7 @@ As you can see, there are over 28,000 earthquakes in our data and many columns. 
 
 We end up with around 2,000 earthquakes.
 
-```ts showLineNumbers filename="sda/main.ts" {13-32}
+```ts showLineNumbers filename="sda/main.ts" {13-31}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
@@ -78,7 +77,6 @@ await earthquakes.cache(async () => {
   ]);
 });
 
-await earthquakes.convert({ time: "datetime" });
 await earthquakes.sort({ time: "asc" });
 await earthquakes.keep({
   "type": "earthquake",
@@ -112,7 +110,7 @@ Before diving into customized data visualizations, it's important to first explo
 - With `sda/output/earthquakes-time-mag.png`, we can clearly see the most powerful earthquakes. The three above magnitude 8 match the Wikipedia [List of earthquakes in 2021](https://en.wikipedia.org/wiki/List_of_earthquakes_in_2021).
 - `sda/output/earthquakes-mag-depth.png` suggests that most earthquakes occur above a depth of 250 km. The four most powerful ones were actually close to the surface.
 
-```ts showLineNumbers filename="sda/main.ts" {2, 35-71}
+```ts showLineNumbers filename="sda/main.ts" {2, 34-70}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 import { dot, plot } from "@observablehq/plot";
 
@@ -126,7 +124,6 @@ await earthquakes.cache(async () => {
   ]);
 });
 
-await earthquakes.convert({ time: "datetime" });
 await earthquakes.sort({ time: "asc" });
 await earthquakes.keep({
   "type": "earthquake",
@@ -202,7 +199,7 @@ If you remember the previous lessons, `writeData` creates an array of objects. T
 Note that JSON files can't store `Date` objects, so our dates have been serialized. They are saved as strings following the [ISO 8601 format](https://en.wikipedia.org/wiki/ISO_8601). They’ll be easy to convert back to dates.
 
 
-```ts showLineNumbers filename="sda/main.ts" {72}
+```ts showLineNumbers filename="sda/main.ts" {71}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 import { dot, plot } from "@observablehq/plot";
 
@@ -216,7 +213,6 @@ await earthquakes.cache(async () => {
   ]);
 });
 
-await earthquakes.convert({ time: "datetime" });
 await earthquakes.sort({ time: "asc" });
 await earthquakes.keep({
   "type": "earthquake",
