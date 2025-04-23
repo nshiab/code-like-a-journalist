@@ -1,0 +1,340 @@
+---
+title: Publier une librairie TypeScript
+description: Dans cette leçon, vous apprendrez à publier une librairie TypeScript avec Deno et JSR
+---
+
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Publier une librairie TypeScript
+
+Avez-vous des morceaux de code que vous copiez-collez d’un projet à un autre ? Si c’est le cas, cela signifie probablement que vous devriez créer une librairie.
+
+Dans cette leçon, je vais vous montrer comment créer une librairie en code ouvert avec [Deno](https://deno.com/) et [JSR](https://jsr.io/). C’est incroyablement simple, car Deno et JSR peuvent tester, compiler et publier à la fois votre code et votre documentation.
+
+Je pars du principe que vous avez suivi les leçons précédentes, en particulier celles-ci :
+- [Utiliser des librairies](/pushing-further/libraries)
+- [Comprendre les versions de librairies](/ninja-moves/semver)
+- [Utiliser des tests dans vos projets](/ninja-moves/tests)
+
+<NoticeIntro lang="fr" />
+
+## Créer un compte et un package JSR
+
+JSR est le registre TypeScript sur lequel nous allons publier notre librairie. C’est une plateforme [en code ouvert](https://github.com/jsr-io/jsr) et gratuite. Elle est maintenue par la même équipe que Deno.
+
+Commencez par [créer un compte sur la plateforme](https://jsr.io/). Vous pouvez y associer votre compte GitHub.
+
+![Page d’accueil de JSR.](/assets/ninja-moves/publishing-library/jsr.png)
+
+Ensuite, cliquez sur `Publish a package`.
+
+![Bouton publier un package sur JSR.](/assets/ninja-moves/publishing-library/publish-button.png)
+
+Vous pouvez ensuite choisir un `scope` (par défaut, il s’agit de votre nom d’utilisateur GitHub) et un nom pour votre librairie. Ici, j’ai écrit `my-first-library`.
+
+Cliquez sur `Create`.
+
+![Nom de la librairie sur JSR.](/assets/ninja-moves/publishing-library/scope.png)
+
+Gardez la page suivante ouverte pour l’instant.
+
+![Configuration de la librairie sur JSR.](/assets/ninja-moves/publishing-library/config.png)
+
+## Coder la librairie
+
+Il est temps d’écrire un peu de code ! Dans ce projet, nous allons réutiliser une partie du code de la leçon précédente [Utiliser des tests dans vos projets](/ninja-moves/tests).
+
+Créez un nouveau dossier et ouvrez-le dans VS Code.
+
+Ensuite, créez un dossier `functions` et un fichier `getPercentage.ts` avec le code et la documentation ci-dessous.
+
+```ts showLineNumbers filename="functions/getPercentage.ts"
+/**
+ * Calculates a percentage and returns it as a string formatted with a percentage sign ("%").
+ *
+ * @example
+ * Basic usage
+ * ```ts
+ * getPercentage(50, 200); // "25%"
+ * getPercentage(0, 0);    // "0%"
+ * ```
+ *
+ * @param current - The current value to calculate the percentage for.
+ * @param total - The total value to calculate the percentage against.
+ * @returns A string representing the percentage. If `total` is 0, returns "0%".
+ */
+export default function getPercentage(
+    current: number,
+    total: number,
+): string {
+    if (total === 0) {
+        return "0%";
+    } else {
+        const percentage = (current / total) * 100;
+        return `${percentage}%`;
+    }
+}
+```
+
+Créez également un fichier `index.ts`. Ce sera le point d’entrée de votre librairie. Lorsqu’une personne souhaitera utiliser votre librairie, c’est ce fichier qu’elle appellera.
+
+Dans ce fichier, nous allons simplement importer notre fonction `getPercentage` et la réexporter. C’est pratique, car si vous avez plusieurs classes, fonctions ou autres éléments à publier dans votre librairie, vous pouvez tous les centraliser et les exporter à partir d’ici.
+
+Par exemple, voici toutes les fonctions exportées dans ma [librairie journalism](https://github.com/nshiab/journalism/blob/main/src/index.ts).
+
+
+```ts showLineNumbers filename="index.ts"
+import getPercentage from "./functions/getPercentage.ts";
+
+export { getPercentage };
+```
+
+Il est essentiel de tester votre code avant de le publier. Reprenons le test de la leçon [Utiliser des tests dans vos projets](/ninja-moves/tests).
+
+Créez un dossier `tests` et ajoutez-y un fichier `getPercentage.test.ts`.
+
+
+```ts showLineNumbers filename="tests/getPercentage.test.ts"
+import { assertEquals } from "jsr:@std/assert";
+import getPercentage from "../functions/getPercentage.ts";
+
+Deno.test("should return 50%", () => {
+    assertEquals(getPercentage(50, 100), "50%");
+});
+Deno.test("should return 33%", () => {
+    assertEquals(getPercentage(33.333, 100), "33%");
+});
+Deno.test("should return 0%", () => {
+    assertEquals(getPercentage(0, 100), "0%");
+});
+Deno.test("should return 0%", () => {
+    assertEquals(getPercentage(1, 0), "0%");
+});
+```
+
+Enfin, installez la librairie standard [@std/assert](https://jsr.io/@std/assert) avec la commande suivante : `deno add jsr:@std/assert`.
+
+Maintenant, si vous exécutez `deno test`, tout devrait se dérouler sans problème.
+
+![Exécution des tests en local.](/assets/ninja-moves/publishing-library/running-tests.png)
+
+N’oublions pas d’ajouter les champs recommandés par JSR dans notre fichier `deno.json`. Je les ai copiés depuis la page web que je vous ai conseillé de garder ouverte plus tôt.
+
+Voici ce que nous allons ajouter :
+- Le nom de la librairie
+- Le numéro de version (consultez la leçon [Comprendre les versions de librairies](/ninja-moves/semver) pour en savoir plus)
+- La licence, qui est ici la licence [MIT](https://opensource.org/license/mit). C’est une licence courante pour les librairies en code ouvert, mais vous pouvez la modifier si vous le souhaitez.
+- Ce que la librairie doit exporter. Comme notre point d’entrée est `./index.ts`, j’ai simplement remplacé `./mod.ts` par celui-ci.
+
+
+```json showLineNumbers filename="deno.json" {2-5}
+{
+  "name": "@nshiab/my-first-library",
+  "version": "0.1.0",
+  "license": "MIT",
+  "exports": "./index.ts",
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.12"
+  }
+}
+```
+
+Comme cette leçon est centrée sur la publication de la librairie, je ne vais pas pousser ce code sur GitHub. Mais pour vos futures libraries, **je vous encourage fortement à sauvegarder votre code quelque part dans le cloud** ! N’hésitez pas à consulter la [leçon sur GitHub](/git-and-github/github-basics) pour en savoir plus.
+
+## Publier la librairie
+
+Lancez maintenant simplement la commande `deno publish` !
+
+Une page web devrait s’ouvrir automatiquement dans votre navigateur. Si ce n’est pas le cas, cliquez sur le lien affiché dans le terminal.
+
+![Publication de la librairie.](/assets/ninja-moves/publishing-library/deno-publish.png)
+
+JSR vous demandera d’autoriser la publication de la librairie. C’est aussi l’occasion de vérifier que la version est correcte.
+
+![Autorisation de publication de la librairie.](/assets/ninja-moves/publishing-library/authorization.png)
+
+Après quelques secondes, vous serez redirigé vers... la page de votre librairie ! Elle est maintenant en ligne !
+
+Si vous cliquez sur l’onglet `Docs`, vous verrez apparaître votre fonction `getPercentage`.
+
+![Documentation de la librairie.](/assets/ninja-moves/publishing-library/docs.png)
+
+Si vous cliquez sur la fonction, vous serez redirigé vers sa page, avec la JSDoc que nous avons écrite dans son fichier ! Désormais, n’importe qui peut utiliser votre code. Et JSR publie automatiquement le code ainsi que la documentation pour que le monde entier puisse les consulter. N’est-ce pas incroyable ? 🤩
+
+![Documentation de la fonction getPercentage.](/assets/ninja-moves/publishing-library/getPercentage.png)
+
+## Importer et utiliser la librairie
+
+Maintenant que la librairie est publiée, nous pouvons l’installer dans n’importe quel projet, comme nous l’avons fait avec d’autres dans les leçons précédentes.
+
+Créez un autre dossier et ouvrez-le dans VS Code.
+
+Ensuite, exécutez une commande similaire à `deno add jsr:@nshiab/my-first-library`, en remplaçant bien sûr par votre nom d’utilisateur et le nom de votre librairie, comme indiqué sur JSR. Vous verrez votre librairie apparaître dans le fichier `deno.json`.
+
+Créez un nouveau fichier `main.ts` avec le code ci-dessous. Là encore, remplacez `@nshiab/my-first-library` par le vôtre.
+
+Comme votre librairie exporte `getPercentage` dans son point d’entrée, elle peut être importée directement !
+
+
+```ts showLineNumbers filename="main.ts"
+import { getPercentage } from "@nshiab/my-first-library";
+
+const percentage = getPercentage(20, 100);
+console.log(percentage);
+```
+
+Et maintenant, si vous exécutez `deno run main.ts`, vous verrez votre fonction être appelée et retourner le bon résultat !
+
+Ne supprimez pas le dossier de ce projet pour l’instant. Nous y reviendrons plus tard.
+
+![Importation et utilisation de la librairie.](/assets/ninja-moves/publishing-library/importing.png)
+
+## Tester avant de publier
+
+Ce que nous avons accompli est déjà impressionnant : nous avons créé du code réutilisable et documenté.
+
+Mais il est très important d’exécuter vos tests **avant** de publier. Croyez-moi : il faut résister à l’envie de publier trop vite ! Il m’est arrivé trop souvent de me dire : « C’est juste un petit changement, je peux publier directement », pour ensuite me retrouver avec une version cassée de la librairie en ligne.
+
+Nous avons déjà mis en place des tests. Créons une tâche `test-publish` dans le fichier `deno.json` pour les exécuter avant la publication. Si vous ne savez pas ce que sont les tâches, consultez la leçon [Exécuter des tâches](/pushing-further/tasks).
+
+Tant qu’à faire, nous pouvons aussi enchaîner quelques commandes pour nous assurer que notre code est bien formaté (`deno fmt`) et que les types sont corrects (`deno check`).
+
+Désormais, au lieu d’exécuter directement `deno publish`, nous exécuterons `deno task test-publish`. Si un problème est détecté dans les types ou les tests, Deno s’arrêtera et n’autorisera pas la publication de la librairie.
+
+
+```json showLineNumbers filename="deno.json" {2-4}
+{
+  "tasks": {
+    "test-publish": "deno fmt && deno check index.ts && deno test && deno publish"
+  },
+  "name": "@nshiab/my-first-library",
+  "version": "0.1.0",
+  "license": "MIT",
+  "exports": "./index.ts",
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.12"
+  }
+}
+```
+
+## Publier une nouvelle version
+
+Mettons à jour notre projet et publions une nouvelle version.
+
+Pour l’instant, il n’y a rien sur la page principale de la librairie sur JSR. Il nous manque un fichier `README.md`. C’est simplement un texte pour expliquer à tout le monde à quoi sert la librairie.
+
+Créez un nouveau fichier `README.md` dans votre projet et ajoutez-y le texte suivant.
+
+
+```md showLineNumbers filename="README.md"
+This is my first library published on JSR, created as part of the
+[Code Like a Journalist](https://www.code-like-a-journalist.com/en) course.
+
+If you’d like to learn how to publish your own TypeScript library, check out the lesson:
+[Publishing a TypeScript Library](https://www.code-like-a-journalist.com/en/ninja-moves/publishing-library).
+```
+
+Dans notre fichier `deno.json`, mettons à jour la version. Comme il s’agit d’un petit changement, je vous suggère de passer à la version `0.1.1`.
+
+```json showLineNumbers filename="deno.json" /"0.1.1"/
+{
+  "tasks": {
+    "test-publish": "deno fmt && deno check index.ts && deno test && deno publish"
+  },
+  "name": "@nshiab/my-first-library",
+  "version": "0.1.1",
+  "license": "MIT",
+  "exports": "./index.ts",
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.12"
+  }
+}
+```
+
+Et maintenant, utilisons notre nouvelle tâche `test-publish` pour republier notre librairie : `deno task test-publish`.
+
+Vous pouvez constater que les vérifications et les tests sont désormais effectués avant la publication ! 🥳
+
+![Test et publication d’une nouvelle version.](/assets/ninja-moves/publishing-library/test-publish.png)
+
+Approuvez la publication comme précédemment, et après quelques secondes, vous verrez la page de votre librairie mise à jour avec le contenu de votre `README` !
+
+Vous pouvez également voir que la dernière version est maintenant la `0.1.1`.
+
+![Nouvelle version publiée.](/assets/ninja-moves/publishing-library/new-version.png)
+
+## Mettre à jour vers une nouvelle version dans un projet
+
+Une nouvelle version de notre librairie a été publiée ! Il est temps de mettre à jour le projet qui l’utilise.
+
+Pour être tout à fait honnête, cette mise à jour n'est pas très intéressante… seul le README a été ajouté ! Mais je souhaite vous montrer comment mettre à jour vos dépendances facilement. 🤓
+
+Dans le projet qui utilise la librairie, exécutez la commande `deno outdated`. Deno vérifiera toutes les versions des librairies JSR et NPM utilisées dans votre projet et vous indiquera si vous êtes en retard sur l’une d’elles.
+
+Voici la signification des colonnes :
+- `Current` correspond à la version actuellement installée dans votre projet
+- `Update` est la version que Deno vous propose d’installer. Ce n’est pas forcément la plus récente si vous avez utilisé `^` ou `~` pour définir la plage de versions acceptables dans votre `deno.json`. Consultez la leçon [Comprendre les versions de librairies](/ninja-moves/semver) pour en savoir plus.
+- `Latest` est la version la plus récente disponible.
+
+![Librairie obsolète.](/assets/ninja-moves/publishing-library/outdated.png)
+
+Si vous souhaitez mettre à jour votre librairie, vous pouvez le faire manuellement avec `deno add jsr:@nshiab/my-first-library@0.1.1`.
+
+Mais si vous avez beaucoup de librairies à mettre à jour, vous pouvez exécuter la commande Deno suggérée pour toutes les mettre à jour en une fois : `deno outdated --update`.
+
+Et voilà ! Nous venons de mettre à jour et utilisons désormais la nouvelle version !
+
+![Librairie mise à jour.](/assets/ninja-moves/publishing-library/deno-update.png)
+
+
+## Configuration avancée
+
+Nous avons utilisé les paramètres par défaut de JSR pour notre librairie, mais plusieurs options supplémentaires sont disponibles si vous cliquez sur l’onglet `Settings`.
+
+Dans les paramètres, vous pouvez ajouter davantage d’informations sur votre librairie, comme une brève description utile pour les personnes qui utilisent le moteur de recherche de JSR. Notez que vous pouvez également rendre la librairie non répertoriée, afin qu’elle ne soit pas accessible via la recherche. Vous pouvez aussi indiquer sur quel environnement d’exécution vous avez testé votre librairie (Deno, Node.js, Bun, etc.).
+
+Si votre librairie est obsolète, cassée ou si vous ne souhaitez plus la maintenir, vous pouvez l’archiver.
+
+![Paramètres de la librairie.](/assets/ninja-moves/publishing-library/settings.png)
+
+Il est également possible de lier votre librairie à un dépôt GitHub. Cela permet d’activer la publication automatique de votre librairie avec GitHub Actions.
+
+Cela demande un peu plus de configuration, mais cela peut être intéressant si vous prévoyez de mettre à jour souvent votre librairie et que vous souhaitez automatiser ce processus.
+
+Si vous souhaitez explorer cette voie, les leçons suivantes vous seront utiles :
+- [Comment utiliser GitHub ?](/git-and-github/github-basics)
+- [Comment utiliser GitHub Actions ?](/git-and-github/github-actions)
+
+Voici par exemple mon processus pour publier une nouvelle version de la librairie [Simple-Data-Analysis](https://github.com/nshiab/simple-data-analysis) :
+
+1. Je crée une [nouvelle issue](https://github.com/nshiab/simple-data-analysis/issues) lorsqu’il y a un bug à corriger ou une fonctionnalité à ajouter.
+
+2. À partir de cette issue, je crée une branche et je travaille dessus. Je m’assure d’ajouter de nouveaux [tests](https://github.com/nshiab/simple-data-analysis/tree/main/test/unit/methods) pour couvrir la correction ou la nouvelle fonctionnalité.
+
+3. Je crée une pull request pour fusionner la branche dans `main`. J’ai un [workflow GitHub Actions](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml) qui exécute les tests. Si toutes les vérifications et les tests passent, la pull request est acceptée et fusionnée.
+
+4. Lorsque je suis prêt à publier une nouvelle version (souvent après plusieurs pull requests), j’exécute localement l’une des tâches `patch`, `minor` ou `major`, définies dans le fichier [`deno.json`](https://github.com/nshiab/simple-data-analysis/blob/d3eb64f34fdc93c6cbbe0c65914f31ac8be1f36f/deno.json#L11-L13) du dépôt.
+
+5. Ces tâches lancent un script appelé [`incrementVersion.ts`](https://github.com/nshiab/simple-data-analysis/blob/main/src/incrementVersion.ts), qui met à jour la version dans `deno.json`, crée un [tag Git](https://git-scm.com/book/en/v2/Git-Basics-Tagging) et le pousse sur GitHub.
+
+6. Lorsqu’un nouveau tag est poussé sur GitHub, deux workflows sont déclenchés : [un pour publier](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/publish.yml) la librairie sur JSR, et un autre pour [créer une release](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/release.yml) sur GitHub avec un résumé de tous les changements issus des pull requests approuvées.
+
+J’aime ce flux de travail car il garde tout synchronisé, m’épargne beaucoup de saisies manuelles et de clics, et génère des releases claires et utiles. Voici par exemple la plus récente au moment où j’écris ces lignes :
+
+![Exemple de release GitHub.](/assets/ninja-moves/publishing-library/release.png)
+
+Publier sur JSR directement depuis GitHub permet également de certifier la provenance de la librairie, ce qui améliore son score.
+
+Pour être honnête, ce score n’est pas si important — il sert surtout à encourager les bonnes pratiques. Si vous êtes la seule personne à utiliser votre librairie, ne vous en souciez pas trop. Une publication manuelle suffit probablement !
+
+![Score de la librairie.](/assets/ninja-moves/publishing-library/score.png)
+
+## Conclusion
+
+Publier une librairie TypeScript n’a jamais été aussi simple. Avant de migrer toutes mes librairies vers JSR, je les publiais sur NPM.
+
+NPM est vraiment une plateforme incroyable, avec des millions de librairies en code ouvert accessibles à tous. Elle joue un rôle majeur dans le succès de JavaScript et TypeScript en tant que langages de programmation. Mais publier sur NPM est plus compliqué et alambiqué.
+
+Avec Deno et JSR, vous pouvez écrire, tester, documenter et publier des librairies grâce à une configuration minimale mais très efficace. Alors, arrêtez de copier-coller du code et publiez votre propre librairie ! 😎
+
+<NoticeEnd lang="fr" />
