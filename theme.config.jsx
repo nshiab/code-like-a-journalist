@@ -15,8 +15,8 @@ const DESCRIPTION = {
 };
 
 const BANNER = {
-    en: `<a href="{link}">Work in progress... 👨‍💻 Problems? Reach out →</a>`,
-    fr: `<a href="{link}">En construction... 👨‍💻 Problèmes? Contactez moi →</a>`,
+    en: `<a href="{link}">Enjoying this course? Tag me in a post and I’ll feature it! 🥳 →</a>`,
+    fr: `<a href="{link}">Vous aimez ce cours? Identifiez-moi dans une publication et je la mettrai en avant! 🥳 →</a>`,
 };
 
 const FEEDBACK = {
@@ -267,7 +267,7 @@ export default {
     },
     banner: {
         dismissible: false,
-        key: "wip",
+        key: "v1",
         content: function useText() {
             const { locale } = useRouter();
             return (
@@ -316,7 +316,7 @@ export default {
         },
     },
     sidebar: {
-        defaultMenuCollapseLevel: 1,
+        defaultMenuCollapseLevel: Infinity,
     },
     footer: {
         content: function useText() {
