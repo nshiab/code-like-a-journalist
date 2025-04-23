@@ -14,13 +14,9 @@ JavaScript/TypeScript. It's available in English and French.
 Thanks to the support of the
 [Michener Awards Foundation](https://www.michenerawards.ca/media-release/michener-awards-foundation-announces-its-2024-fellowships-winners/),
 I took several months off from my current job to fully focus on building the
-course. I can also count on the support of
+course. I could also count on the support of
 [Jean-Hugues Roy](https://github.com/jhroy), data journalist at La Presse and
 former journalism professor at UQAM.
-
-The lessons are tailored for journalists, but I think anyone interested in
-answering questions of public interest with data, code, and algorithms will find
-it helpful.
 
 To allow teachers and professors to reuse the course with their students, the
 content is released under the
@@ -37,7 +33,6 @@ You can also follow me on these platforms:
 - [Mastodon](https://vis.social/@naelshiab)
 - [Bluesky](https://bsky.app/profile/naelshiab.bsky.social)
 - [LinkedIn](https://www.linkedin.com/mynetwork/)
-- [Twitter](https://twitter.com/NaelShiab)
 
 And add a star to the GitHub
 [repository](https://github.com/nshiab/code-like-a-journalist) to keep me
