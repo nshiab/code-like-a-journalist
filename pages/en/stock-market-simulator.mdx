@@ -266,6 +266,10 @@ This code still logs correct first and last values, which means the API accepts 
 
 By the way, this data gathering technique is called *web scraping*. The web is an amazing source of data, and we'll have a full lesson on it later.
 
+<Callout type="info" emoji="💡">
+Since I occasionally use Yahoo Finance data in my projects, I published a function that handles all of the above in the [journalism library](https://jsr.io/@nshiab/journalism/doc/~/getYahooFinanceData). We could have used it directly, but I believe there’s a lot of value in understanding how everything works before using functions that feel like magic! 🧙
+</Callout>
+
 ## Caching
 
 Currently, every time we update `main.ts` and save it, the code is rerun, and the data is refetched.
