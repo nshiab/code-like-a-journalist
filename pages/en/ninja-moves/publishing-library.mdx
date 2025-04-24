@@ -328,6 +328,18 @@ To be honest, the score isn’t that important — it mainly promotes best pract
 
 ![The library score.](/assets/ninja-moves/publishing-library/score.png)
 
+## Svelte components library
+
+You can also create your own library of Svelte components, as detailed in the [SvelteKit documentation](https://svelte.dev/docs/kit/packaging). Their examples focus on building with Node.js and publishing to NPM, but it's very likely that the same can be done with Deno and JSR. I haven’t tested it yet — but it sounds like great material for a future lesson! 🔮
+
+## Private registries
+
+Sometimes, you don’t want all your code to be public — even though I’d argue that in most cases, you probably should. But within a company, creating a private library can be incredibly useful for sharing code among teammates and reusing tested classes, functions, and methods across multiple projects.
+
+With NPM, [you can pay to use private registries](https://docs.npmjs.com/creating-and-publishing-private-packages).
+
+With JSR, you can [unlist your library](https://jsr.io/docs/private-registries) so that it doesn’t appear in search results — though it remains publicly accessible. Fully private registries aren't available on JSR yet, but the team is actively working on it.
+
 ## Conclusion
 
 Publishing a TypeScript library has never been easier. Before moving all my libraries to JSR, I had them published on NPM.
