@@ -1,0 +1,119 @@
+---
+title: Data analysis with AI 🤖
+description: To do.
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+
+# Data analysis with AI 🤖
+
+Welcome to this new project in which we will use AI (more specifically large language models like ChatGPT, Gemini and Claude) to help us analyze data! These models are amazingly good at extracting, reformatting, cleaning and categorizing data.
+
+Back in March 2025, I attended a great session at [NICAR](https://www.ire.org/training/conferences/nicar-2025/) by [Ben Welsh](https://github.com/palewire) and [Derek Willis](https://thescoop.org/about/). They showed us how to categorize claim expenses with these fascinating tools.
+
+[Their project](https://palewi.re/docs/first-llm-classifier) (in Python) was eye opening. So I decided to implement new methods in the TypeScript library Simple Data Analysis (SDA) ([give it a ⭐](https://github.com/nshiab/simple-data-analysis)!) to make great use of LLMs. I'll show you how to use these methods with a Google AI Studio API key, but they work with Vertex AI and Ollama too.
+
+Ben nicely agreed to let me reproduce his tutorial, but this time in TypeScript! We will use Deno and VS Code. Check the [Setup](/first-steps/setup) lesson if needed. But you can do that with the JS/TS runtime and code editor of your choice! 
+
+If you get stuck at any point in this project, it might be helpful to review the previous lessons explaining the basics of SDA:
+- [Tabular data](/simple-data-analysis/tabular-data)
+- [Geospatial data](/simple-data-analysis/geospatial-data)
+- [Visualizing data](/simple-data-analysis/dataviz)
+
+Let's code!
+
+<NoticeIntro />
+
+## Setup
+
+To set up everything we need, let's use [setup-sda](https://jsr.io/@nshiab/setup-sda) as in previous lessons.
+
+Create a new folder, open it with VS Code, and run: `deno -A jsr:@nshiab/setup-sda`
+
+![A screenshot of VS Code after running setup-sda.](/assets/data-analysis-with-ai/setup.png)
+
+In this lesson, we are going to use the Google LLMs. To interact with them with our code, we need an API key. Go to [Google AI Studio](https://aistudio.google.com/), create an account if you don't already have one, and click on `Get API key`.
+
+![A screenshot of Google AI Studio.](/assets/data-analysis-with-ai/google-ai-studio.png)
+
+Then click on `Create an API key`. I don't know why my page is half in French but it should work anyway. 😅
+
+Follow the suggested steps. If asked about using a Google Cloud project, select Gemini if available otherwise create a new one.
+
+![A screenshot of Google AI Studio.](/assets/data-analysis-with-ai/create-key.png)
+
+Once you copied your new API key, create a new `.env` file in your project and paste it in it. Also add the model we will use, which is `gemini-2.0-flash-lite`.
+
+`.env` is a file we usually use for **environment variable**, which are often credentials that should not be shared. When you setup everything with `setup-sda`, this file is automatically added to `.gitignore`, so it won't be committed by Git and won't be pushed to GitHub.
+
+![Environment variables in VS Code.](/assets/data-analysis-with-ai/env.png)
+
+Now, we just need to load these variables in memory.
+
+Install the `@std/dotenv` library from the Deno team by running `deno add jsr:@std/dotenv`.
+
+Then add `import "@std/dotenv/load";` at the top of your `sda/main.ts` file. Now, everytime you run this code, Deno will automatically load the variables in your `.env` file!
+
+And we are ready to go! 🚀
+
+![A screenshot showing how to load environment variables.](/assets/data-analysis-with-ai/load-env.png)
+
+## About this API...
+
+Before we actually run some code, there is something I want to show you.
+
+In Google AI Studio, after clicking on `Get API key`, you have acces to your `API Plan Billing`. Select the model we are going to use: `Gemini 2.0 Flash Lite`.
+
+In there, you'll see that you have a free account that allow you to make 30 requests per minute with this model (maybe that changed since I wrote this).
+
+And you'll also notice that... the data you are going to send will be used by Google! So be extra careful: **don't send sensitive data throught this API!**
+
+As you might already know, nothing is really free in life... 🥲
+
+If you have a pro or enterprise account, they say they won't used your data to improve their products. But if you need total privacy, I'll show you at the end how to use Ollama to run models locally on your machine.
+
+![Google AI plan billing.](/assets/data-analysis-with-ai/plan-billing.png)
+
+## The data
+
+The goal of the project is to categorize claim expenses. We are going to use the CSV sample data from Ben's tutorial. [It's hosted on GitHub](https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv) and contains 250 rows.
+
+Ben already categorized the `payee` column. We will ask our model to do the same exercice and then we will compare the human and AI results.
+
+![The sample data.](/assets/data-analysis-with-ai/sample-data.png)
+
+In the code below, we create a new table `data` and we cache the results of `loadData`, which fetches the data from GitHub. Since the data won't change, caching it makes sense. It will be stored locally in the `.sda-cache` folder. When you set everything up with `setup-sda`, this hidden folder is added to your `.gitignore`.
+
+We also log the table to the terminal.
+
+```ts showLineNumbers filename="sda/main.ts" {6-13}
+import "@std/dotenv/load";
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const data = sdb.newTable("data");
+await data.cache(async () => {
+  await data.loadData(
+    "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
+  );
+});
+
+await data.logTable();
+
+await sdb.done();
+```
+
+![Loading data from GitHub.](/assets/data-analysis-with-ai/loading-data.png)
+
+## Asking the model to crunch data
+
+To send data and instructions to the model, we need to use the `aiRowByRow` method on our table. If curious, you'll find [the documentation here](https://jsr.io/@nshiab/simple-data-analysis/doc/~/SimpleTable.prototype.aiRowByRow).
+
+
+
+## Conclusion
+
+
+<NoticeEnd />
