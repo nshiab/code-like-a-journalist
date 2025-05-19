@@ -1,6 +1,6 @@
 ---
-title: Data analysis with AI 🤖
-description: To do.
+title: Simple Data Analysis and AI 🤖
+description: In this tutorial, we use AI (more specifically large language models like ChatGPT, Gemini, and Claude) to help us analyze data.
 ---
 
 import { Callout } from "nextra/components";
@@ -8,13 +8,13 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
 
 # Simple Data Analysis and AI 🤖
 
-Welcome to this new project in which we will use AI (more specifically large language models like ChatGPT, Gemini and Claude) to help us analyze data! These models are amazingly good at extracting, reformatting, cleaning and categorizing data.
+Welcome to this new project where we will use AI (more specifically, large language models like ChatGPT, Gemini, and Claude) to help us analyze data! These models are remarkably good at extracting, reformatting, cleaning, and categorizing data.
 
-Back in March 2025, I attended a great session at [NICAR](https://www.ire.org/training/conferences/nicar-2025/) by [Ben Welsh](https://github.com/palewire) and [Derek Willis](https://thescoop.org/about/). They showed us how to categorize claim expenses with these fascinating tools.
+Back in March 2025, I attended a great session at [NICAR](https://www.ire.org/training/conferences/nicar-2025/) by [Ben Welsh](https://github.com/palewire) and [Derek Willis](https://thescoop.org/about/). They showed us how to categorize claim expenses using these fascinating tools.
 
-[Their project](https://palewi.re/docs/first-llm-classifier) (in Python) was eye opening. So I decided to implement new methods in the TypeScript library Simple Data Analysis (SDA) ([give it a ⭐](https://github.com/nshiab/simple-data-analysis)!) to make great use of LLMs. I'll show you how to use these methods with a Google AI Studio API key, but they work with Vertex AI and Ollama too.
+[Their project](https://palewi.re/docs/first-llm-classifier/) (in Python) was eye-opening. So, I decided to implement new methods in the Simple Data Analysis (SDA) library ([give it a ⭐](https://github.com/nshiab/simple-data-analysis)!) to make great use of LLMs. I'll show you how to use these methods with a Google AI Studio API key, but they also work with Vertex AI and Ollama.
 
-Ben nicely agreed to let me reproduce his tutorial, but this time in TypeScript! We will use Deno and VS Code. Check the [Setup](/first-steps/setup) lesson if needed. But you can do that with the JS/TS runtime and code editor of your choice! 
+Ben kindly agreed to let me reproduce his tutorial, but this time in TypeScript! We will use Deno and VS Code. Check the [Setup](/first-steps/setup) lesson if needed. However, you can do this with the JS/TS runtime and code editor of your choice!
 
 If you get stuck at any point in this project, it might be helpful to review the previous lessons explaining the basics of SDA:
 - [Tabular data](/simple-data-analysis/tabular-data)
@@ -39,23 +39,23 @@ In this lesson, we are going to use the Google LLMs. To interact with them with 
 
 ![A screenshot of Google AI Studio.](/assets/simple-data-analysis/sda-and-ai/google-ai-studio.png)
 
-Then click on `Create an API key`. I don't know why my page is half in French but it should work anyway. 😅
+Then click on `Create an API key`. I don't know why my page is half in French, but it should work anyway. 😅
 
-Follow the suggested steps. If asked about using a Google Cloud project, select Gemini if available otherwise create a new one.
+Follow the suggested steps. If asked about using a Google Cloud project, select Gemini if available; otherwise, create a new one.
 
 ![A screenshot of Google AI Studio.](/assets/simple-data-analysis/sda-and-ai/create-key.png)
 
-Once you copied your new API key, create a new `.env` file in your project and paste it in it. Also add the model we will use, which is `gemini-2.0-flash-lite`.
+Once you have copied your new API key, create a new `.env` file in your project and paste it there. Also, add the model we will use, which is `gemini-2.0-flash-lite`.
 
-`.env` is a file we usually use for **environment variable**, which are often credentials that should not be shared. When you setup everything with `setup-sda`, this file is automatically added to `.gitignore`, so it won't be committed by Git and won't be pushed to GitHub.
+`.env` is a file we usually use for **environment variables**, which are often credentials that should not be shared. When you set everything up with `setup-sda`, this file is automatically added to `.gitignore`, so it won't be committed by Git and won't be pushed to GitHub.
 
 ![Environment variables in VS Code.](/assets/simple-data-analysis/sda-and-ai/env.png)
 
-Now, we just need to load these variables in memory.
+Now, we just need to load these variables into memory.
 
 Install the `@std/dotenv` library from the Deno team by running `deno add jsr:@std/dotenv`.
 
-Then add `import "@std/dotenv/load";` at the top of your `sda/main.ts` file. Now, everytime you run this code, Deno will automatically load the variables in your `.env` file!
+Then add `import "@std/dotenv/load";` at the top of your `sda/main.ts` file. Now, every time you run this code, Deno will automatically load the variables in your `.env` file!
 
 And we are ready to go! 🚀
 
@@ -65,15 +65,15 @@ And we are ready to go! 🚀
 
 Before we actually run some code, there is something I want to show you.
 
-In Google AI Studio, after clicking on `Get API key`, you have acces to your `API Plan Billing`. Select the model we are going to use: `Gemini 2.0 Flash Lite`.
+In Google AI Studio, after clicking on `Get API key`, you have access to your `API Plan Billing`. Select the model we are going to use: `Gemini 2.0 Flash Lite`.
 
-In there, you'll see that you have a free account that allow you to make 30 requests per minute with this model (maybe that changed since I wrote this).
+There, you'll see that you have a free account that allows you to make 30 requests per minute with this model (this might have changed since I wrote this).
 
-And you'll also notice that... the data you are going to send will be used by Google! So be extra careful: **don't send sensitive data throught this API!**
+And you'll also notice that... the data you are going to send will be used by Google! So, be extra careful: **don't send sensitive data through this API!**
 
-As you might already know, nothing is really free in life... 🥲
+As you might already know, nothing is truly free in life... 🥲
 
-If you have a pro or enterprise account, they say they won't used your data to improve their products. But if you need total privacy, I'll show you at the end how to use Ollama to run models locally on your machine.
+If you have a pro or enterprise account, they state that they won't use your data to improve their products. But if you need total privacy, I'll show you at the end how to use Ollama to run models locally on your machine.
 
 ![Google AI plan billing.](/assets/simple-data-analysis/sda-and-ai/plan-billing.png)
 
@@ -81,11 +81,11 @@ If you have a pro or enterprise account, they say they won't used your data to i
 
 The goal of the project is to categorize claim expenses. We are going to use the CSV sample data from Ben's tutorial. [It's hosted on GitHub](https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv) and contains 250 rows.
 
-Ben already categorized the `payee` column. We will ask our model to do the same exercice and then we will compare the human and AI results.
+Ben has Unexpected category the `payee` column. We will ask our model to do the same exercise, and then we will compare the human and AI results.
 
 ![The sample data.](/assets/simple-data-analysis/sda-and-ai/sample-data.png)
 
-In the code below, we create a new table `data` and we cache the results of `loadData`, which fetches the data from GitHub. Since the data won't change, caching it makes sense. It will be stored locally in the `.sda-cache` folder. When you set everything up with `setup-sda`, this hidden folder is added to your `.gitignore`.
+In the code below, we create a new table `data` and cache the results of `loadData`, which fetches the data from GitHub. Since the data won't change, caching it makes sense. It will be stored locally in the `.sda-cache` folder. When you set everything up with `setup-sda`, this hidden folder is added to your `.gitignore`.
 
 We also log the table to the terminal.
 
@@ -111,16 +111,16 @@ await sdb.done();
 
 ## Sending data to the model
 
-To send data and instructions to the model, we need to use the `aiRowByRow` method on our table. If curious, you'll find [the documentation here](https://jsr.io/@nshiab/simple-data-analysis/doc/~/SimpleTable.prototype.aiRowByRow).
+To send data and instructions to the model, we need to use the `aiRowByRow` method on our table. If you're curious, you'll find [the documentation here](https://jsr.io/@nshiab/simple-data-analysis/doc/~/SimpleTable.prototype.aiRowByRow).
 
-It's usage is pretty simple:
-- First, pass the column containing the data you want to clean, format, or extract data from (here it's `payee`)
-- Then give the name of the new column that will be created to store the AI results (here we name it `categoryAI`)
-- And finally type in your prompt. Here, we ask the LLM to categorize the `payee`.
+Its usage is quite simple:
+- First, pass the column containing the data you want to clean, format, or extract data from (here, it's `payee`).
+- Then, provide the name of the new column that will be created to store the AI results (here, we name it `categoryAI`).
+- And finally, type in your prompt. Here, we ask the LLM to categorize the `payee`.
 
 The fourth argument is optional. It's an object with a few options:
-- `rateLimitPerMinute` will ensure we respect our API quota. If we send requests too fast, the method will wait the necessary duration to avoid request being rejected
-- `verbose` will log extra information while processing the data
+- `rateLimitPerMinute` will ensure we respect our API quota. If we send requests too fast, the method will wait the necessary duration to avoid requests being rejected.
+- `verbose` will log extra information while processing the data.
 
 ```ts showLineNumbers filename="sda/main.ts" {13-21}
 import "@std/dotenv/load";
@@ -150,11 +150,11 @@ await data.logTable();
 await sdb.done();
 ```
 
-If you run this code, you'll see your prompt plus extra instruction added by the method.
+If you run this code, you'll see your prompt plus extra instructions added by the method.
 
-The `verbose` option is adding useful extra information. The tokens represent the amount information sent to and received from the AI. Based on it, the method gives you an estimated cost for the request if you have a pay-as-go account.
+The `verbose` option adds useful extra information. The tokens represent the amount of information sent to and received from the AI. Based on this, the method gives you an estimated cost for the request if you have a pay-as-you-go account.
 
-Righ now, the data is being classified by the AI model, but... it's a bit slow.
+Right now, the data is being classified by the AI model, but... it's a bit slow.
 
 Because we have 250 rows of data, and we can send only 30 requests per minute, classifying the whole dataset will take... over 8 minutes!
 
@@ -166,25 +166,54 @@ We can surely speed this up!
 
 ### Batches
 
-Instead of sending one row at the time, we could send a batch of them!
+Instead of sending one row at a time, we could send a batch of them!
 
-In the code below, we use the option `batchSize` to send 10 rows at the time. Now, processing the whole dataset takes less than a minute!
+In the code below, we use the `batchSize` option to send 10 rows at a time. Now, processing the whole dataset takes less than a minute!
 
-But we can push this a bit further...
+This is great, but we can push this a bit further...
 
-![Sending batchs of data.](/assets/simple-data-analysis/sda-and-ai/batches.png)
+```ts showLineNumbers filename="sda/main.ts" {18}
+import "@std/dotenv/load";
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const data = sdb.newTable("data");
+await data.cache(async () => {
+  await data.loadData(
+    "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
+  );
+});
+
+await data.aiRowByRow(
+  "payee",
+  "categoryAI",
+  `Categorize the payee into one of the following categories: Restaurant, Bar, Hotel or Other. `,
+  {
+    batchSize: 10,
+    rateLimitPerMinute: 30,
+    verbose: true,
+  },
+);
+
+await data.logTable();
+
+await sdb.done();
+```
+
+![Sending batches of data.](/assets/simple-data-analysis/sda-and-ai/batches.png)
 
 ### Concurrency
 
-One of the many amazing features of TypeScript and JavaScript is **concurrency**. Instead of making one request to the API at the time, you send a lot them at the same time and then wait for the results in parallel.
+One of the many amazing features of TypeScript and JavaScript is **concurrency**. Instead of making one request to the API at a time, you send many of them simultaneously and then wait for the results in parallel.
 
-And taking advantage of this feature of the language can provide an incredible speed boost to our code!
+Taking advantage of this feature of the language can provide an incredible speed boost to our code!
 
 Since we have 250 rows of data, we could send batches of 17 rows with 15 concurrent requests to process all of our data in less than... 2 seconds!
 
-These 15 requests are keeping us below the quota limit of 30, which is important.
+These 15 requests keep us below the quota limit of 30, which is important.
 
-One advice: to run this code, make sure you haven't sent request for at least a minute, otherwise you might it the quota limit of the free plan.
+One piece of advice: to run this code, make sure you haven't sent requests for at least a minute; otherwise, you might hit the quota limit of the free plan.
 
 ```ts showLineNumbers filename="sda/main.ts" /{ logDuration: true }/ {18-19}
 import "@std/dotenv/load";
@@ -220,11 +249,11 @@ await sdb.done();
 
 ### Caching
 
-There is one last trick we can use to make our more efficient: **caching**.
+There is one last trick we can use to make our code more efficient: **caching**.
 
-We could store the result sent by the AI in files locally. If we rerun our code and if the prompt/data have not changed, we could use what we stored on our machine instead of waiting again for the AI model.
+We could store the results sent by the AI in files locally. If we rerun our code and if the prompt/data have not changed, we could use what we stored on our machine instead of waiting again for the AI model.
 
-This is exactly what the `cache` option allow you to do.
+This is exactly what the `cache` option allows you to do.
 
 ```ts showLineNumbers filename="sda/main.ts" {20}
 import "@std/dotenv/load";
@@ -257,15 +286,15 @@ await data.logTable();
 await sdb.done();
 ```
 
-If you run this code, you'll notice a new hidden folder `.journalism-cache`. The files in it are JSON files storing the AI responses. It works like the previous `.sda-cache` folder, but is created by the function [`askAI`](https://jsr.io/@nshiab/journalism/doc/~/askAI) from the [`journalism`](https://jsr.io/@nshiab/journalism) library, which this method `aiRowByRow` is using to interact with the AI model.
+If you run this code, you'll notice a new hidden folder `.journalism-cache`. The files in it are JSON files storing the AI responses. It works like the previous `.sda-cache` folder but is created by the function [`askAI`](https://jsr.io/@nshiab/journalism/doc/~/askAI) from the [`journalism`](https://jsr.io/@nshiab/journalism) library, which the `aiRowByRow` method uses to interact with the AI model.
 
-On the first run, the requests are made and the script takes the same time to run as before.
+On the first run, the requests are made, and the script takes the same time to run as before.
 
 ![Caching the data.](/assets/simple-data-analysis/sda-and-ai/caching.png)
 
-But if you rerun this script, it's now way faster! It takes only a few milliseconds! Instead of making the requests, the code retrieves the stored data on your machine.
+But if you rerun this script, it's now much faster! It takes only a few milliseconds! Instead of making the requests, the code retrieves the stored data on your machine.
 
-Of course, if you change the prompt or the data sent to the model, the method will know it has to make new requests and store new results. But if you don't touch the `aiRowByRow` arguments, you can safely work on other things without burning your API quotas and at full speed!
+Of course, if you change the prompt or the data sent to the model, the method will know it has to make new requests and store new results. But if you don't touch the `aiRowByRow` arguments modifying the requests, you can safely work on other things without burning your API quotas and at full speed!
 
 ![Retrieving from the cache.](/assets/simple-data-analysis/sda-and-ai/retrieving-from-cache.png)
 
@@ -273,13 +302,13 @@ Of course, if you change the prompt or the data sent to the model, the method wi
 
 ### Tests
 
-While they getting better at an incredible pace, LLMs don't always understand properly your instructions. And when you are making dozens, hundreds or thousands of requests, there is always a chance they could return something unexpected.
+While they are getting better at an incredible pace, LLMs don't always understand your instructions properly. And when you are making dozens, hundreds, or thousands of requests, there is always a chance they could return something unexpected.
 
 This is why testing is important.
 
-In the code below, we use a `test` (a simple function), to check if the returned category for each falls into the expected categories.
+In the code below, we use a `test` (a simple function) to check if the returned category for each entry falls into the expected categories.
 
-If there is an unexpected category, we throw an error and with option `retry`, we specify that we want to retry five times before giving up and stopping everything.
+If there is an unexpected category, we throw an error, and with the `retry` option, we specify that we want to retry five times before giving up and stopping everything.
 
 ```ts showLineNumbers filename="sda/main.ts" {21-29}
 import "@std/dotenv/load";
@@ -307,7 +336,7 @@ await data.aiRowByRow(
         throw new Error("Not a string");
       }
       if (!["Restaurant", "Bar", "Hotel", "Other"].includes(dataPoint)) {
-        throw new Error("Already categorized");
+        throw new Error("Unexpected category");
       }
     },
     retry: 5,
@@ -331,13 +360,13 @@ Since we tested the results, we know we have the proper categories, but have the
 
 It's time to check the accuracy of the model!
 
-Since Ben already classified the payee in the column `category` and we put the AI results in the column `categoryAI`, let's use a few SDA methods to do that!
+Since Ben already classified the payee in the `category` column and we put the AI results in the `categoryAI` column, let's use a few SDA methods to do that!
 
 First, let's create a new column to check if the AI returned the correct answer, assuming Ben was right.
 
-Using this column, we can then log all occurences of different answers betwen Ben and the AI.
+Using this column, we can then log all occurrences of different answers between Ben and the AI.
 
-We can also calculate the proportion of correct answer from the AI.
+We can also calculate the proportion of correct answers from the AI.
 
 ```ts showLineNumbers filename="sda/main.ts" {35-45}
 import "@std/dotenv/load";
@@ -365,7 +394,7 @@ await data.aiRowByRow(
         throw new Error("Not a string");
       }
       if (!["Restaurant", "Bar", "Hotel", "Other"].includes(dataPoint)) {
-        throw new Error("Already categorized");
+        throw new Error("Unexpected category");
       }
     },
     retry: 5,
@@ -393,39 +422,39 @@ And... here's the result!
 
 If we check the rows with different answers between Ben and the AI, we can notice that... Ben made a few mistakes!
 
-For example, *El POLLO INKA* and *ELLA DINNING ROOM* should be restaurants. And *FAIRMONT BATTERY WHARF* should be an hotel.
+For example, *El POLLO INKA* and *ELLA DINNING ROOM* should be restaurants. And *FAIRMONT BATTERY WHARF* should be a hotel.
 
-For the rest, since we don't have the adresses, we'll give Ben the benefit of the doubt.
+For the rest, since we don't have the addresses, we'll give Ben the benefit of the doubt.
 
-This means that the model got a accuracy rate greater than 94%! Not bad considering how simple our instructions were and how fast it got processed.
+This means that the model achieved an accuracy rate greater than 94%! Not bad considering how simple our instructions were and how fast it was processed.
 
-Depending on what you are working, maybe this is level of accuracy is enough if you provide it in your publication. One sure is certain though: doing it by hand would have been way slower (or just impossible it were millions of rows) and you would have made mistakes too!
+Depending on what you are working on, maybe this level of accuracy is enough if you disclose it in your publication. One thing is certain, though: doing it by hand would have been much slower (or just impossible if there were millions of rows), and you would have made mistakes too!
 
-If you are not satistied with the accuracy, you can tweak your prompt, give examples in your instructions, preprocess the data, or just switch to another model. But at least, with the accuracy, you won't be making changes blindly! You'll know when things get better and when they get worse.
+If you are not satisfied with the accuracy, you can tweak your prompt, give examples in your instructions, preprocess the data, or just switch to another model. But at least, by checking the accuracy, you won't be making changes blindly! You'll know when things get better and when they get worse.
 
 ![Testing the results.](/assets/simple-data-analysis/sda-and-ai/testing.png)
 
 ## Conclusion
 
-Here, we classified data with a Gemini model. But you can do much more than that like cleaning, formatting and extracting data with LLMs!
+Here, we classified data with a Gemini model. But you can do much more than that, like cleaning, formatting, and extracting data with LLMs!
 
 And by using the SDA `aiRowByRow` method, you can do this easily, in a few lines of code, at scale!
 
-If you have sensitive data that you don't want to send to Google or another AI provider, you can also use [Ollama](https://ollama.com/). Just start it and pass the following variables in your `.env` file. SDA will automatically switch to use the local model installed on your machine to crunch the data.
-
-Sometimes, open-source models have more difficulties to directly return arrays (which is the expected returned response for `aiRowByRow`). If it's the case, I implemented the `clean` option that allow you to directly modify the LLM response, like restructuring it to an array.
+If you have sensitive data that you don't want to send to Google or another AI provider, you can also use [Ollama](https://ollama.com/). Just start it and pass the following variables in your `.env` file. SDA will automatically switch to using the local model installed on your machine to process the data.
 
 ```txt showLineNumbers filename="sda/main.ts"
 OLLAMA=true
 AI_MODEL=gemma3:4b
 ```
 
-While amazing technology, remember that results are not guaranteed with LLMs. And, in my projects, the bigger the batches, the worst the results...
+Sometimes, lightweight open-source models have more difficulty directly returning arrays (which is the expected returned response for `aiRowByRow`). If that's the case, I implemented the `clean` option that allows you to directly modify the LLM response, like restructuring it into an array.
 
-But still, they can boost you research and analysis. They are incredibly fast and easy to use.
+While an amazing technology, remember that results are not guaranteed with LLMs. And, in my projects, the larger the batches, the worse the results tend to be...
 
-So if you try them in one of your projects, [let me know](/contact)!
+But still, they can significantly boost your research and analysis. They are incredibly fast and easy to use.
 
-And thank you again to [Ben Welsh](https://github.com/palewire) and [Derek Willis](https://thescoop.org/about/) who created the Python version of this tutorial.
+So, if you try them in one of your projects, [let me know](https://www.google.com/search?q=/contact)\!
+
+And thank you again to [Ben Welsh](https://github.com/palewire) and [Derek Willis](https://thescoop.org/about/) who created the initial version of this tutorial.
 
 <NoticeEnd />
