@@ -150,7 +150,11 @@ await data.logTable();
 await sdb.done();
 ```
 
-If you run this method, you'll the data being classified by the AI model, but... it's a bit slow.
+If you run this code, you'll see your prompt plus extra instruction added by the method.
+
+The `verbose` option is adding useful extra information. The tokens represent the amount information sent to and received from the AI. Based on it, the method gives you an estimated cost for the request if you have a pay-as-go account.
+
+Righ now, the data is being classified by the AI model, but... it's a bit slow.
 
 Because we have 250 rows of data, and we can send only 30 requests per minute, classifying the whole dataset will take... over 8 minutes!
 
@@ -158,7 +162,7 @@ We can surely speed this up!
 
 ![Sending one row at the time.](/assets/simple-data-analysis/sda-and-ai/one-row-at-the-time.png)
 
-## Sending concurrent batches
+## Speeding up the process
 
 ### Batches
 
@@ -178,7 +182,7 @@ And taking advantage of this feature of the language can provide an incredible s
 
 Since we have 250 rows of data, we could send batches of 17 rows with 15 concurrent requests to process all of our data in less than... 2 seconds!
 
-These 15 requests are keeping us way below the quote limit of 30.
+These 15 requests are keeping us below the quota limit of 30, which is important.
 
 One advice: to run this code, make sure you haven't sent request for at least a minute, otherwise you might it the quota limit of the free plan.
 
@@ -216,16 +220,210 @@ await sdb.done();
 
 ### Caching
 
-One last trick...
+There is one last trick we can use to make our more efficient: **caching**.
 
-## Test and retries
+We could store the result sent by the AI in files locally. If we rerun our code and if the prompt/data have not changed, we could use what we stored on our machine instead of waiting again for the AI model.
 
-## Checking the accuracy
+This is exactly what the `cache` option allow you to do.
+
+```ts showLineNumbers filename="sda/main.ts" {20}
+import "@std/dotenv/load";
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ logDuration: true });
+
+const data = sdb.newTable("data");
+await data.cache(async () => {
+  await data.loadData(
+    "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
+  );
+});
+
+await data.aiRowByRow(
+  "payee",
+  "categoryAI",
+  `Categorize the payee into one of the following categories: Restaurant, Bar, Hotel or Other. `,
+  {
+    batchSize: 17,
+    concurrent: 15,
+    cache: true,
+    rateLimitPerMinute: 30,
+    verbose: true,
+  },
+);
+
+await data.logTable();
+
+await sdb.done();
+```
+
+If you run this code, you'll notice a new hidden folder `.journalism-cache`. The files in it are JSON files storing the AI responses. It works like the previous `.sda-cache` folder, but is created by the function [`askAI`](https://jsr.io/@nshiab/journalism/doc/~/askAI) from the [`journalism`](https://jsr.io/@nshiab/journalism) library, which this method `aiRowByRow` is using to interact with the AI model.
+
+On the first run, the requests are made and the script takes the same time to run as before.
+
+![Caching the data.](/assets/simple-data-analysis/sda-and-ai/caching.png)
+
+But if you rerun this script, it's now way faster! It takes only a few milliseconds! Instead of making the requests, the code retrieves the stored data on your machine.
+
+Of course, if you change the prompt or the data sent to the model, the method will know it has to make new requests and store new results. But if you don't touch the `aiRowByRow` arguments, you can safely work on other things without burning your API quotas and at full speed!
+
+![Retrieving from the cache.](/assets/simple-data-analysis/sda-and-ai/retrieving-from-cache.png)
+
+## Testing the output
+
+### Tests
+
+While they getting better at an incredible pace, LLMs don't always understand properly your instructions. And when you are making dozens, hundreds or thousands of requests, there is always a chance they could return something unexpected.
+
+This is why testing is important.
+
+In the code below, we use a `test` (a simple function), to check if the returned category for each falls into the expected categories.
+
+If there is an unexpected category, we throw an error and with option `retry`, we specify that we want to retry five times before giving up and stopping everything.
+
+```ts showLineNumbers filename="sda/main.ts" {21-29}
+import "@std/dotenv/load";
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ logDuration: true });
+
+const data = sdb.newTable("data");
+await data.cache(async () => {
+  await data.loadData(
+    "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
+  );
+});
+
+await data.aiRowByRow(
+  "payee",
+  "categoryAI",
+  `Categorize the payee into one of the following categories: Restaurant, Bar, Hotel or Other. `,
+  {
+    batchSize: 17,
+    concurrent: 15,
+    cache: true,
+    test: (dataPoint) => {
+      if (typeof dataPoint !== "string") {
+        throw new Error("Not a string");
+      }
+      if (!["Restaurant", "Bar", "Hotel", "Other"].includes(dataPoint)) {
+        throw new Error("Already categorized");
+      }
+    },
+    retry: 5,
+    rateLimitPerMinute: 30,
+    verbose: true,
+  },
+);
+
+await data.logTable();
+
+await sdb.done();
+```
+
+On my end, no errors have been thrown. This is looking good!
+
+![Testing the results.](/assets/simple-data-analysis/sda-and-ai/testing.png)
+
+### Accuracy
+
+Since we tested the results, we know we have the proper categories, but have they been properly attributed?
+
+It's time to check the accuracy of the model!
+
+Since Ben already classified the payee in the column `category` and we put the AI results in the column `categoryAI`, let's use a few SDA methods to do that!
+
+First, let's create a new column to check if the AI returned the correct answer, assuming Ben was right.
+
+Using this column, we can then log all occurences of different answers betwen Ben and the AI.
+
+We can also calculate the proportion of correct answer from the AI.
+
+```ts showLineNumbers filename="sda/main.ts" {35-45}
+import "@std/dotenv/load";
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ logDuration: true });
+
+const data = sdb.newTable("data");
+await data.cache(async () => {
+  await data.loadData(
+    "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
+  );
+});
+
+await data.aiRowByRow(
+  "payee",
+  "categoryAI",
+  `Categorize the payee into one of the following categories: Restaurant, Bar, Hotel or Other. `,
+  {
+    batchSize: 17,
+    concurrent: 15,
+    cache: true,
+    test: (dataPoint) => {
+      if (typeof dataPoint !== "string") {
+        throw new Error("Not a string");
+      }
+      if (!["Restaurant", "Bar", "Hotel", "Other"].includes(dataPoint)) {
+        throw new Error("Already categorized");
+      }
+    },
+    retry: 5,
+    rateLimitPerMinute: 30,
+    verbose: true,
+  },
+);
+
+await data.addColumn("correctCategory", "boolean", `category === categoryAI`);
+await data.logTable({
+  conditions: `correctCategory === false`,
+  nbRowsToLog: "all",
+});
+
+await data.summarize({
+  categories: "correctCategory",
+});
+await data.proportionsVertical("count", "perc");
+await data.logTable();
+
+await sdb.done();
+```
+
+And... here's the result!
+
+If we check the rows with different answers between Ben and the AI, we can notice that... Ben made a few mistakes!
+
+For example, *El POLLO INKA* and *ELLA DINNING ROOM* should be restaurants. And *FAIRMONT BATTERY WHARF* should be an hotel.
+
+For the rest, since we don't have the adresses, we'll give Ben the benefit of the doubt.
+
+This means that the model got a accuracy rate greater than 94%! Not bad considering how simple our instructions were and how fast it got processed.
+
+Depending on what you are working, maybe this is level of accuracy is enough if you provide it in your publication. One sure is certain though: doing it by hand would have been way slower (or just impossible it were millions of rows) and you would have made mistakes too!
+
+![Testing the results.](/assets/simple-data-analysis/sda-and-ai/testing.png)
 
 ## Conclusion
 
-Results not guaranteed. Temperature to 0 but...
+Here, we classified data with a Gemini model. But you can do much more than that like cleaning, formatting and extracting data with LLMs!
 
-Big batches...
+And by using the SDA `aiRowByRow` method, you can do this easily, in a few lines of code, at scale!
+
+If you have sensitive data that you don't want to send to Google or another AI provider, you can also use [Ollama](https://ollama.com/). Just start it and pass the following variables in your `.env` file. SDA will automatically switch to use the local model installed on your machine to crunch the data.
+
+Sometimes, open-source models have more difficulties to directly return arrays (which is the expected returned response for `aiRowByRow`). If it's the case, I implemented the `clean` option that allow you to directly modify the LLM response, like restructuring it to an array.
+
+```txt showLineNumbers filename="sda/main.ts"
+OLLAMA=true
+AI_MODEL=gemma3:4b
+```
+
+While amazing technology, remember that results are not guaranteed with LLMs. And, in my projects, the bigger the batches, the worst the results...
+
+But still, they can boost you research and analysis. They are incredibly fast and easy to use.
+
+So if you try them in one of your projects, [let me know](/contact)!
+
+And thank you again to [Ben Welsh](https://github.com/palewire) and [Derek Willis](https://thescoop.org/about/) who created the Python version of this tutorial.
 
 <NoticeEnd />
