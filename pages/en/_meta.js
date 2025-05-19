@@ -8,7 +8,6 @@ export default {
     "simple-data-analysis": "3. The SDA library 🤓",
     "stats-can-census": "Wrangling Census data 🇨🇦",
     "one-billion-row-challenge": "One billion row challenge 😱",
-    "data-analysis-with-ai": "Data analysis with AI 🤖",
     "web-basics": "4. Web basics 🌐",
     "d3-chart": "Animated charts with D3 🧑‍🎨",
     "d3-map": "Animated maps with D3 🗺️",
