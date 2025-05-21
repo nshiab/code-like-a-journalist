@@ -47,6 +47,11 @@ Follow the suggested steps. If asked about using a Google Cloud project, select 
 
 Once you have copied your new API key, create a new `.env` file in your project and paste it there. Also, add the model we will use, which is `gemini-2.0-flash-lite`.
 
+```txt filename=".env" showLineNumbers
+AI_KEY=your_api_key_here
+AI_MODEL=gemini-2.0-flash-lite
+```
+
 `.env` is a file we usually use for **environment variables**, which are often credentials that should not be shared. When you set everything up with `setup-sda`, this file is automatically added to `.gitignore`, so it won't be committed by Git and won't be pushed to GitHub.
 
 ![Environment variables in VS Code.](/assets/simple-data-analysis/sda-and-ai/env.png)
@@ -81,13 +86,15 @@ If you have a pro or enterprise account, they state that they won't use your dat
 
 The goal of the project is to categorize claim expenses. We are going to use the CSV sample data from Ben's tutorial. [It's hosted on GitHub](https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv) and contains 250 rows.
 
-Ben has Unexpected category the `payee` column. We will ask our model to do the same exercise, and then we will compare the human and AI results.
+Ben has manually categorized the `payee` column. We will ask our model to do the same exercise, and then we will compare the human and AI results.
 
 ![The sample data.](/assets/simple-data-analysis/sda-and-ai/sample-data.png)
 
-In the code below, we create a new table `data` and cache the results of `loadData`, which fetches the data from GitHub. Since the data won't change, caching it makes sense. It will be stored locally in the `.sda-cache` folder. When you set everything up with `setup-sda`, this hidden folder is added to your `.gitignore`.
+To retrieve the data, we create a new table `data` and cache the results of `loadData`, which fetches the data from GitHub. Since the data won't change, caching it makes sense. It will be stored locally in the `.sda-cache` folder. When you set everything up with `setup-sda`, this hidden folder is added to your `.gitignore`.
 
 We also log the table to the terminal.
+
+Run `deno task sda` in your terminal to execute and watch this code. Each time we modify and save the code, it will automatically run. Handy!
 
 ```ts showLineNumbers filename="sda/main.ts" {6-13}
 import "@std/dotenv/load";
@@ -108,13 +115,16 @@ await sdb.done();
 ```
 
 ![Loading data from GitHub.](/assets/simple-data-analysis/sda-and-ai/loading-data.png)
+<Callout type="info" emoji="💡">
+If you want to delete the cache, you can manually remove `.sda-cache` or run `deno task clean` in your terminal.
+</Callout>
 
 ## Sending data to the model
 
 To send data and instructions to the model, we need to use the `aiRowByRow` method on our table. If you're curious, you'll find [the documentation here](https://jsr.io/@nshiab/simple-data-analysis/doc/~/SimpleTable.prototype.aiRowByRow).
 
 Its usage is quite simple:
-- First, pass the column containing the data you want to clean, format, or extract data from (here, it's `payee`).
+- First, pass the column containing the data you want to send to the AI (here, it's `payee`).
 - Then, provide the name of the new column that will be created to store the AI results (here, we name it `categoryAI`).
 - And finally, type in your prompt. Here, we ask the LLM to categorize the `payee`.
 
@@ -286,17 +296,20 @@ await data.logTable();
 await sdb.done();
 ```
 
-If you run this code, you'll notice a new hidden folder `.journalism-cache`. The files in it are JSON files storing the AI responses. It works like the previous `.sda-cache` folder but is created by the function [`askAI`](https://jsr.io/@nshiab/journalism/doc/~/askAI) from the [`journalism`](https://jsr.io/@nshiab/journalism) library, which the `aiRowByRow` method uses to interact with the AI model.
+If you run this code, you'll notice a new hidden folder `.journalism-cache`. The files in it are JSON files storing the AI responses. It works like the previous `.sda-cache` folder but is created by the function [`askAI`](https://jsr.io/@nshiab/journalism/doc/~/askAI) from my [`journalism`](https://jsr.io/@nshiab/journalism) library, which the `aiRowByRow` method uses to interact with the AI model.
 
 On the first run, the requests are made, and the script takes the same time to run as before.
 
 ![Caching the data.](/assets/simple-data-analysis/sda-and-ai/caching.png)
 
-But if you rerun this script, it's now much faster! It takes only a few milliseconds! Instead of making the requests, the code retrieves the stored data on your machine.
+But if you rerun this script (`CTRL` + `S` in `main.ts` should do the trick), it's now much faster! It takes only a few milliseconds! Instead of making the requests, the code retrieves the stored data on your machine.
 
 Of course, if you change the prompt or the data sent to the model, the method will know it has to make new requests and store new results. But if you don't touch the `aiRowByRow` arguments modifying the requests, you can safely work on other things without burning your API quotas and at full speed!
 
 ![Retrieving from the cache.](/assets/simple-data-analysis/sda-and-ai/retrieving-from-cache.png)
+<Callout type="info" emoji="💡">
+If you want to delete the cache, you can manually remove `.journalism-cache` or run `deno task clean` in your terminal.
+</Callout>
 
 ## Testing the output
 
@@ -422,7 +435,7 @@ And... here's the result!
 
 If we check the rows with different answers between Ben and the AI, we can notice that... Ben made a few mistakes!
 
-For example, *El POLLO INKA* and *ELLA DINNING ROOM* should be restaurants. And *FAIRMONT BATTERY WHARF* should be a hotel.
+For example, *El POLLO INKA* and *ELLA DINNING ROOM* should be restaurants. And *FAIRMONT BATTERY WHARF* should be a hotel. (If you don't see these errors, it might be because Ben has corrected them!)
 
 For the rest, since we don't have the addresses, we'll give Ben the benefit of the doubt.
 
@@ -453,7 +466,7 @@ While an amazing technology, remember that results are not guaranteed with LLMs.
 
 But still, they can significantly boost your research and analysis. They are incredibly fast and easy to use.
 
-So, if you try them in one of your projects, [let me know](https://www.google.com/search?q=/contact)\!
+So, if you try them in one of your projects, [let me know](/contact)!
 
 And thank you again to [Ben Welsh](https://github.com/palewire) and [Derek Willis](https://thescoop.org/about/) who created the initial version of this tutorial.
 
