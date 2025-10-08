@@ -36,7 +36,7 @@ Each time this script runs, a new row is added to the CSV. So the data is accumu
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
-  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+  "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
 const xml = await response.text();
 const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
@@ -96,6 +96,9 @@ Then run `main.ts`:
 And you should see the temperature being logged and a row added to the `data.csv` file!
 
 ![The README.](/assets/git-and-github/github-actions/setup.png)
+<Callout type="warning" emoji="⚠️">
+  Since this screenshot was taken, the URL for the Meteorological Service of Canada API has changed. Make sure to use the URL provided in the code block at the beginning of the lesson.
+</Callout>
 
 ## Creating a new GitHub repository
 
@@ -125,6 +128,9 @@ Copy the commands *to push an existing repository from the command line*.
 And run these commands in your project terminal.
 
 ![Repository synced with the new GitHub repository.](/assets/git-and-github/github-actions/first-push.png)
+<Callout type="warning" emoji="⚠️">
+  Since this screenshot was taken, the URL for the Meteorological Service of Canada API has changed. Make sure to use the URL provided in the code block at the beginning of the lesson.
+</Callout>
 
 Now, if you refresh your GitHub repository page, you'll see your code and the `README.md` below it.
 

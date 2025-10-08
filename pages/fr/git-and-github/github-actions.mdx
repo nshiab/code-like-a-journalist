@@ -34,7 +34,7 @@ Chaque fois que ce script s’exécute, une nouvelle ligne est ajoutée au CSV. 
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
-  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+  "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
 const xml = await response.text();
 const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
@@ -94,6 +94,9 @@ Puis exécutez `main.ts` :
 Vous devriez voir la température s’afficher et une ligne ajoutée au fichier `data.csv` !
 
 ![Le README.](/assets/git-and-github/github-actions/setup.png)
+<Callout type="warning" emoji="⚠️">
+  Depuis la prise de cette capture d'écran, l'URL de l'API du Service météorologique du Canada a changé. Assurez-vous de prendre l'URL indiquée dans le bloc de code donné au début de la leçon.
+</Callout>
 
 ## Créer un nouveau dépôt GitHub
 
@@ -123,6 +126,9 @@ Copiez les commandes *to push an existing repository from the command line*.
 Et exécutez ces commandes dans le terminal de votre projet.
 
 ![Dépôt synchronisé avec le nouveau dépôt GitHub.](/assets/git-and-github/github-actions/first-push.png)
+<Callout type="warning" emoji="⚠️">
+  Depuis la prise de cette capture d'écran, l'URL de l'API du Service météorologique du Canada a changé. Assurez-vous de prendre l'URL indiquée dans le bloc de code donné au début de la leçon.
+</Callout>
 
 Maintenant, si vous actualisez la page de votre dépôt GitHub, vous verrez votre code et le fichier `README.md` juste en dessous.
 
@@ -387,4 +393,4 @@ J’espère que vous avez trouvé cette leçon intéressante. Mais nous n’avon
 
 À la prochaine leçon !
 
-<NoticeEnd />
+<NoticeEnd lang="fr" />
