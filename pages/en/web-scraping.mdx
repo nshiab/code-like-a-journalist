@@ -4,7 +4,7 @@ description: Learn how to extract data from web sites and web pages with TypeScr
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../components/Notices.jsx";
 
 # Web scraping 🔍
 
@@ -22,7 +22,9 @@ Note that I am expecting you to have completed the previous sessions of this cou
 
 To set up, we can use [setup-sda](https://github.com/nshiab/setup-sda), like we did for most of this course, but with the option `--scrape` to install some extra and handy libraries.
 
-Create a new folder, open it with VS Code and run `deno -A jsr:@nshiab/setup-sda --scrape`.
+Create a new folder, open it with VS Code and run `deno -A jsr:@nshiab/setup-sda --scrape --course`.
+
+<NoticeLibraryVersions />
 
 ![A VS Code screenshot showing a script simulating the stock market](/assets/web-scraping/setup.png)
 

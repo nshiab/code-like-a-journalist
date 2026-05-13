@@ -4,7 +4,7 @@ description: Dans cette leçon, on apprend à utiliser GitHub Pages pour héberg
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../../components/Notices.jsx";
 
 # Publier sur GitHub Pages avec Svelte
 
@@ -21,7 +21,8 @@ Si ce n’est pas déjà fait, je vous conseille de consulter la **[leçon sur S
 ## Installation
 
 Créez un nouveau dossier et ouvrez-le dans VS Code. Ensuite, exécutez cette commande pour tout installer avec [setup-sda](https://github.com/nshiab/setup-sda) :
-- `deno -A jsr:@nshiab/setup-sda --svelte --example --pages --git`
+- `deno -A jsr:@nshiab/setup-sda --svelte --example --pages --git --course`
+<NoticeLibraryVersions lang="fr" />
 
 La librairie crée un dossier `sda` pour travailler avec la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis), comme on l’a vu dans la section [**3. La librairie SDA 🤓**](simple-data-analysis/tabular-data). Mais les options ajoutent quelques éléments :
 - `--svelte` installe aussi un projet Svelte

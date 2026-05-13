@@ -4,7 +4,7 @@ description: Dans ce projet, nous utilisons des données sismiques pour créer u
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../components/Notices.jsx";
 
 # Cartes animées avec D3.js 🗺️
 
@@ -20,7 +20,8 @@ Dans ce projet, nous allons utiliser des données sismiques pour créer une cart
 
 Nous allons utiliser [setup-sda](https://github.com/nshiab/setup-sda) pour configurer et installer tout ce dont nous avons besoin.
 
-Ouvrez un nouveau dossier avec VS Code et lancez `deno -A jsr:@nshiab/setup-sda --svelte`.
+Ouvrez un nouveau dossier avec VS Code et lancez `deno -A jsr:@nshiab/setup-sda --svelte --course`.
+<NoticeLibraryVersions lang="fr" />
 
 ![Capture d’écran de VS Code après l’exécution de la librairie setup-sda.](/assets/d3-map/setup.png)
 

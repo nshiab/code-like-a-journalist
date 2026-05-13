@@ -4,7 +4,7 @@ description: Learn how to crunch and visualize massive datasets from Statistics 
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../components/Notices.jsx";
 
 # Wrangling Census data 🇨🇦
 
@@ -46,7 +46,9 @@ Let's code!
 
 To set up everything we need, let's use [setup-sda](https://jsr.io/@nshiab/setup-sda) like in previous lessons.
 
-Create a new folder, open it with VS Code, and run: `deno -A jsr:@nshiab/setup-sda`
+Create a new folder, open it with VS Code, and run: `deno -A jsr:@nshiab/setup-sda --course`
+
+<NoticeLibraryVersions />
 
 Then run `deno task sda` to watch `main.ts` and its dependencies.
 

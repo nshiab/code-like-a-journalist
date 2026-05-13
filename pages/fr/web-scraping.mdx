@@ -4,7 +4,7 @@ description: Apprenez à extraire des données depuis des sites et des pages web
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../components/Notices.jsx";
 
 # Extraction de données web 🔍
 
@@ -22,7 +22,8 @@ Notez que je pars du principe que vous avez complété les sessions précédente
 
 Pour configurer notre projet, utilisons [setup-sda](https://github.com/nshiab/setup-sda), comme nous l'avons fait dans les leçons précédentes, mais avec l’option `--scrape` pour installer quelques librairies supplémentaires.
 
-Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez `deno -A jsr:@nshiab/setup-sda --scrape`.
+Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez `deno -A jsr:@nshiab/setup-sda --scrape --course`.
+<NoticeLibraryVersions lang="fr" />
 
 ![Une capture d'écran de VS Code montrant un script simulant la bourse](/assets/web-scraping/setup.png)
 

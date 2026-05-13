@@ -4,7 +4,7 @@ description: Apprenez à traiter et à visualiser des ensembles de données mass
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../components/Notices.jsx";
 
 # Exploiter les données du recensement 🇨🇦
 
@@ -46,7 +46,8 @@ C'est parti pour le code !
 
 Pour tout configurer, utilisons [setup-sda](https://jsr.io/@nshiab/setup-sda) comme dans les leçons précédentes.
 
-Créez un nouveau dossier, ouvrez-le avec VS Code, et exécutez : `deno -A jsr:@nshiab/setup-sda`
+Créez un nouveau dossier, ouvrez-le avec VS Code, et exécutez : `deno -A jsr:@nshiab/setup-sda --course`
+<NoticeLibraryVersions lang="fr" />
 
 Ensuite, exécutez `deno task sda` pour surveiller `main.ts` et ses dépendances.
 

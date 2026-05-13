@@ -4,7 +4,7 @@ description: Dans cette leçon, vous allez apprendre ce qu’est Svelte et comme
 ---
 
 import { Callout } from 'nextra/components'
-import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../../components/Notices.jsx"
 
 # Comment utiliser Svelte
 
@@ -22,7 +22,8 @@ Avant de commencer, assurez-vous d’avoir complété les sections précédentes
 
 Pour installer Svelte, vous pouvez utiliser la librarie [`sv`](https://svelte.dev/docs/cli/overview), mais nous allons plutôt utiliser une fois de plus [setup-sda](https://github.com/nshiab/setup-sda) avec l’option `--svelte`. Cela installera SDA (comme vu dans **3. La librairie SDA**) et Svelte ensemble, afin de profiter du meilleur des deux !
 
-Créez un nouveau dossier, ouvrez-le dans VS Code, puis exécutez `deno -A jsr:@nshiab/setup-sda --svelte`. Cela configurera tout pour vous.
+Créez un nouveau dossier, ouvrez-le dans VS Code, puis exécutez `deno -A jsr:@nshiab/setup-sda --svelte --course`. Cela configurera tout pour vous.
+<NoticeLibraryVersions lang="fr" />
 
 ![A screenshot showing VS Code with SDA and Svelte installed.](/assets/web-basics/svelte/setup.png)
 
@@ -934,7 +935,7 @@ Il y avait beaucoup de contenu dans cette leçon. Coder pour le Web n’est pas 
 
 Si vous souhaitez aller plus loin avec Svelte, je vous recommande de suivre leur excellent [tutoriel](https://svelte.dev/tutorial/svelte/welcome-to-svelte). Il est un peu technique, et vous ne comprendrez peut-être pas tout du premier coup, mais c’est une excellente ressource.
 
-Vous pouvez aussi explorer l’exemple fourni avec `setup-sda`. Dans un nouveau dossier, exécutez `deno -A jsr:@nshiab/setup-sda --svelte --example`, puis lancez `deno task dev`. Vous verrez un exemple complet dans votre navigateur, qui utilise tous les composants préconfigurés disponibles dans `src/components`, et vous pourrez explorer le code pour en apprendre davantage.
+Vous pouvez aussi explorer l’exemple fourni avec `setup-sda`. Dans un nouveau dossier, exécutez `deno -A jsr:@nshiab/setup-sda --svelte --example --course`, puis lancez `deno task dev`. Vous verrez un exemple complet dans votre navigateur, qui utilise tous les composants préconfigurés disponibles dans `src/components`, et vous pourrez explorer le code pour en apprendre davantage.
 
 À très bientôt pour la prochaine leçon ! 😊
 
