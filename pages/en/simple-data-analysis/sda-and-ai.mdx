@@ -298,7 +298,7 @@ await data.logTable();
 await sdb.done();
 ```
 
-If you run this code, you'll notice a new hidden folder `.journalism-cache`. The files in it are JSON files storing the AI responses. It works like the previous `.sda-cache` folder but is created by the function [`askAI`](https://jsr.io/@nshiab/journalism/doc/~/askAI) from my [`journalism`](https://jsr.io/@nshiab/journalism) library, which the `aiRowByRow` method uses to interact with the AI model.
+If you run this code, you'll notice a new hidden folder `.journalism-cache`. The files in it are JSON files storing the AI responses. It works like the previous `.sda-cache` folder but is created by the function [`askAI`](https://jsr.io/@nshiab/journalism-ai/doc/~/askAI) from my [`journalism-ai`](https://jsr.io/@nshiab/journalism-ai) library, which the `aiRowByRow` method uses to interact with the AI model.
 
 On the first run, the requests are made, and the script takes the same time to run as before.
 

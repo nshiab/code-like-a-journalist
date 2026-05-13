@@ -786,7 +786,7 @@ Et voilà ! Nous avons animé nos tremblements de terre ! Mais ce serait encore 
 
 Ajoutons donc une autre transition : après avoir grossi, les cercles reviendront à un `r` de `0`.
 
-On peut également mettre à jour le paragraphe que nous avions créé plus tôt pour y afficher la date actuelle de l’animation. Pour cela, on utilise la fonction globale `setInterval`, qui exécute une fonction à intervalle régulier. Ici, toutes les 100 ms, on utilise la méthode `.invert()` de notre `delayScale` pour obtenir une valeur de temps correspondante. On formate ensuite cette valeur avec la fonction `formatDate` de la [librairie journalism](https://jsr.io/@nshiab/journalism), que je maintiens. Enfin, on insère cette date formatée dans le paragraphe.
+On peut également mettre à jour le paragraphe que nous avions créé plus tôt pour y afficher la date actuelle de l’animation. Pour cela, on utilise la fonction globale `setInterval`, qui exécute une fonction à intervalle régulier. Ici, toutes les 100 ms, on utilise la méthode `.invert()` de notre `delayScale` pour obtenir une valeur de temps correspondante. On formate ensuite cette valeur avec la fonction `formatDate` de la [librairie journalism](https://jsr.io/@nshiab/journalism-format/doc/~/formatDate), que je maintiens. Enfin, on insère cette date formatée dans le paragraphe.
 
 Pour éviter que le `setInterval` ne tourne indéfiniment, on stocke son `intervalId`. Une fois que l’animation a duré plus longtemps que sa durée totale, on l’arrête avec `clearInterval(intervalId)`. On retourne aussi le `intervalId` pour pouvoir l’utiliser dans notre composant `<Map />`. On y reviendra dans un instant.
 

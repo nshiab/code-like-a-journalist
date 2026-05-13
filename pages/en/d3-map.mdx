@@ -784,7 +784,7 @@ And just like that, we animated our earthquakes! But it would be even better if 
 
 Let’s add another transition so that after growing, the circles return to an `r` of `0`.
 
-We can also update the paragraph we created earlier to show the current date. We’ll use the globally available `setInterval` function, which runs a function at a specified interval. Here, every 100ms, we use the `.invert()` method of our `delayScale` to retrieve a corresponding time value. We then format this time using the `formatDate` function from the [journalism library](https://jsr.io/@nshiab/journalism), which I maintain. Finally, we insert the formatted date into the paragraph.
+We can also update the paragraph we created earlier to show the current date. We’ll use the globally available `setInterval` function, which runs a function at a specified interval. Here, every 100ms, we use the `.invert()` method of our `delayScale` to retrieve a corresponding time value. We then format this time using the `formatDate` function from the [journalism library](https://jsr.io/@nshiab/journalism-format/doc/~/formatDate), which I maintain. Finally, we insert the formatted date into the paragraph.
 
 To stop the `setInterval` from running indefinitely, we store its `intervalId`. Once the animation has been running longer than the total duration, we stop it using `clearInterval(intervalId)`. We also return the `intervalId` so it can be used in our `<Map />` component. More on that in a moment.
 
