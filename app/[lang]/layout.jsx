@@ -10,6 +10,7 @@ import {
     Navbar,
 } from "nextra-theme-docs";
 import "nextra-theme-docs/style.css";
+import "../nextra-3-callouts.css";
 
 import {
     COPY,
