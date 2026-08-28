@@ -6,7 +6,6 @@ const withNextra = nextra({
 });
 
 export default withNextra({
-    agentRules: false,
     i18n: {
         locales: ["en", "fr"],
         defaultLocale: "en",
