@@ -7,7 +7,7 @@ export const COPY = {
     en: {
         title: "Code Like a Journalist",
         description:
-            "A free online data analysis and data visualization course using TypeScript by computational journalist Nael Shiab.",
+            "A free online course on TypeScript fundamentals and data analysis with SDA by computational journalist Nael Shiab.",
         banner:
             "Enjoying this course? Tag me in a post and I’ll feature it! 🥳 →",
         feedback: "Questions? Comments? Start a new discussion →",
@@ -30,7 +30,7 @@ export const COPY = {
     fr: {
         title: "Codez comme un journaliste",
         description:
-            "Un cours gratuit sur l'analyse et la visualisation de données avec TypeScript par le journaliste computationnel Nael Shiab.",
+            "Un cours gratuit sur les fondamentaux de TypeScript et l'analyse de données avec SDA par le journaliste computationnel Nael Shiab.",
         banner:
             "Vous aimez ce cours? Identifiez-moi dans une publication et je la mettrai en avant! 🥳 →",
         feedback:

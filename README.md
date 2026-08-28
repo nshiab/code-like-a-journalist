@@ -8,8 +8,8 @@ for CBC News as a Senior Data Producer.
 
 This repository stores the code for
 [code-like-a-journalist](https://www.code-like-a-journalist.com/), a free,
-open-source online data analysis and visualization course using
-JavaScript/TypeScript. It's available in English and French.
+open-source online course on TypeScript fundamentals and acquiring, analyzing,
+visualizing, and automating data with SDA. It's available in English and French.
 
 Thanks to the support of the
 [Michener Awards Foundation](https://www.michenerawards.ca/media-release/michener-awards-foundation-announces-its-2024-fellowships-winners/),
