@@ -9,8 +9,8 @@ const routes = files.map(toRoute).sort();
 const englishRoutes = routes.filter((route) => route.startsWith("/en"));
 const frenchRoutes = routes.filter((route) => route.startsWith("/fr"));
 
-assert(englishRoutes.length === 41, `Expected 41 English routes, found ${englishRoutes.length}.`);
-assert(frenchRoutes.length === 41, `Expected 41 French routes, found ${frenchRoutes.length}.`);
+assert(englishRoutes.length === 34, `Expected 34 English routes, found ${englishRoutes.length}.`);
+assert(frenchRoutes.length === 34, `Expected 34 French routes, found ${frenchRoutes.length}.`);
 
 const englishPaths = englishRoutes.map((route) => route.slice(3));
 const frenchPaths = frenchRoutes.map((route) => route.slice(3));
@@ -43,6 +43,23 @@ await expectResponse("/more", 307, "/fr/more", {
 });
 await expectResponse("/en/does-not-exist", 404);
 await expectResponse("/de/does-not-exist", 404);
+
+const removedPaths = [
+    "web-basics/html",
+    "web-basics/css",
+    "web-basics/javascript",
+    "web-basics/svelte",
+    "d3-chart",
+    "d3-map",
+    "git-and-github/github-pages",
+];
+await Promise.all(
+    ["en", "fr"].flatMap((language) =>
+        removedPaths.map((route) =>
+            expectResponse(`/${language}/${route}`, 404),
+        ),
+    ),
+);
 
 if (failures.length) {
     throw new Error(`Route smoke test failures:\n${failures.join("\n")}`);
