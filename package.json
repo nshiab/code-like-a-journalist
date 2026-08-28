@@ -3,9 +3,11 @@
   "version": "0.29.0",
   "description": "A free and open-source online course for anyone interested in data analysis and data visualization with JavaScript/TypeScript",
   "scripts": {
-    "dev": "next dev",
-    "build": "VERCEL_DEEP_CLONE=true next build",
+    "dev": "next dev --webpack",
+    "build": "VERCEL_DEEP_CLONE=true next build --webpack",
+    "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind",
     "start": "next start",
+    "smoke": "node scripts/smoke-routes.mjs",
     "patch": "node incrementVersion.js patch",
     "minor": "node incrementVersion.js minor",
     "major": "node incrementVersion.js major"
@@ -20,13 +22,21 @@
     "url": "https://github.com/nshiab/code-like-a-journalist/issues"
   },
   "homepage": "https://www.code-like-a-journalist.com/",
+  "engines": {
+    "node": "24.x"
+  },
   "dependencies": {
-    "@nshiab/journalism": "npm:@jsr/nshiab__journalism@^1.21.9",
     "@vercel/analytics": "^1.4.1",
-    "next": "^15.1.2",
-    "nextra": "^3.3.1",
-    "nextra-theme-docs": "^3.3.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "next": "16.3.3",
+    "nextra": "4.6.1",
+    "nextra-theme-docs": "4.6.1",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "pagefind": "1.5.2"
+  },
+  "overrides": {
+    "zod": "4.1.13"
   }
 }

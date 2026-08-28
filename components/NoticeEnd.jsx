@@ -30,7 +30,7 @@ function pickLanguage(lang) {
                 pour me garder motivé !{" "}
                 <a
                     style={{ textDecoration: "underline", fontWeight: "bold" }}
-                    href="/contact"
+                    href="/fr/contact"
                 >
                     Contactez-moi
                 </a>{" "}
@@ -58,7 +58,7 @@ function pickLanguage(lang) {
                 to keep me motivated!{" "}
                 <a
                     style={{ textDecoration: "underline", fontWeight: "bold" }}
-                    href="/contact"
+                    href="/en/contact"
                 >
                     Get in touch
                 </a>{" "}
