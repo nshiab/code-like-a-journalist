@@ -101,6 +101,7 @@ export default async function RootLayout({ children, params }) {
             <body>
                 <Layout
                     banner={banner}
+                    copyPageButton={false}
                     docsRepositoryBase={DOCS_REPOSITORY_BASE}
                     editLink={copy.edit}
                     feedback={{
