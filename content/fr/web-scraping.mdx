@@ -4,7 +4,7 @@ description: Apprenez à extraire des données depuis des sites et des pages web
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
 
 # Extraction de données web 🔍
 
@@ -20,10 +20,13 @@ Je pars du principe que vous avez terminé les sections précédentes de ce cour
 
 ## Configuration
 
-Pour configurer notre projet, utilisons [setup-sda](https://github.com/nshiab/setup-sda), comme nous l'avons fait dans les leçons précédentes, mais avec l’option `--scrape` pour installer quelques librairies supplémentaires.
+Pour configurer notre projet, utilisons [setup-data-project](https://github.com/nshiab/setup-data-project), comme dans les leçons précédentes.
 
-Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez `deno -A jsr:@nshiab/setup-sda --scrape --course`.
-<NoticeLibraryVersions lang="fr" />
+Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez `deno run -A jsr:@nshiab/setup-data-project`.
+
+Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`, `journalism-web-scraping` et `journalism-extras`, puis appuyez sur `Entrée`.
+
+Nous utiliserons aussi Playwright et une fonction de la librairie de fichiers de Deno plus tard dans la leçon. Installez-les en exécutant `deno add npm:playwright-chromium jsr:@std/fs`. Autorisez ensuite le script d'installation de Playwright à télécharger Chromium en exécutant `deno install --allow-scripts=npm:playwright-chromium --node-modules-dir=auto`.
 
 ![Une capture d'écran de VS Code montrant un script simulant la bourse](/assets/web-scraping/setup.png)
 
@@ -37,7 +40,7 @@ Si vous inspectez celui nommé *European population dynamics, years 1000–1500*
 
 ![Inspection d’une page HTML avec Chrome.](/assets/web-scraping/wikipedia-table.png)
 
-Comme ces structures HTML sont toujours les mêmes, j’ai publié une fonction pour extraire les données intégrées dans des tableaux comme celui-ci dans la [librairie journalism](https://github.com/nshiab/journalism/). La librairie est installée automatiquement lorsque vous installez tout avec `setup-sda`.
+Comme ces structures HTML sont toujours les mêmes, j’ai publié une fonction pour extraire les données intégrées dans des tableaux comme celui-ci dans la librairie [journalism-web-scraping](https://github.com/nshiab/journalism-web-scraping), sélectionnée pendant la configuration.
 
 ### Avec un `index`
 
@@ -48,7 +51,7 @@ Copiez-collez le code ci-dessous dans `sda/main.ts` et exécutez `deno task sda`
 
 ```ts showLineNumbers filename="sda/main.ts" {2, 6-11}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
-import { getHtmlTable } from "@nshiab/journalism";
+import { getHtmlTable } from "@nshiab/journalism-web-scraping";
 
 const sdb = new SimpleDB();
 
@@ -72,7 +75,7 @@ Les données retournées par `getHtmlTable` sont une liste d’objets, ce qui si
 
 ```ts showLineNumbers filename="sda/main.ts" {2, 6, 8, 13-14, 16-24}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
-import { getHtmlTable } from "@nshiab/journalism";
+import { getHtmlTable } from "@nshiab/journalism-web-scraping";
 
 const sdb = new SimpleDB();
 
@@ -113,7 +116,7 @@ PS : Notez que vous pouvez télécharger les données directement au format CSV.
 
 ```ts showLineNumbers filename="sda/main.ts" {6-9, 11}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
-import { getHtmlTable } from "@nshiab/journalism";
+import { getHtmlTable } from "@nshiab/journalism-web-scraping";
 
 const sdb = new SimpleDB();
 
@@ -132,7 +135,7 @@ Comme nous l’avons fait avec le tableau Wikipédia, nous pouvons mettre en cac
 
 ```ts showLineNumbers filename="sda/main.ts" {6-7, 12-13, 15-32}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
-import { getHtmlTable } from "@nshiab/journalism";
+import { getHtmlTable } from "@nshiab/journalism-web-scraping";
 
 const sdb = new SimpleDB();
 
@@ -188,7 +191,7 @@ Quand les données sont réparties sur plusieurs pages, la première étape cons
 
 Pour récupérer toutes les URLs, on peut utiliser [Playwright](https://github.com/microsoft/playwright). C’est un projet en code ouvert de Microsoft. Il a été créé pour automatiser les tests de sites web, mais c’est aussi un excellent outil pour l'extraction de données. Playwright permet de prendre le contrôle d’un navigateur web avec du code et d’extraire ce que vous voulez des pages visitées par votre script.
 
-Playwright est installé automatiquement quand vous installez tout avec `setup-sda`.
+Nous avons installé Playwright pendant la configuration.
 
 Si on inspecte les cartes sur le site web, on peut voir que la balise `a` contient le lien vers la page personnelle du député. Toutes les balises ont la classe `ce-mip-mp-tile`.
 
@@ -282,7 +285,7 @@ Quand j’extrais des données sur des pages comme celle-ci, j’aime générale
 ```ts showLineNumbers filename="sda/main.ts" {2-3, 14, 16-19, 21, 23-26, 37-38,  41-42}
 import { chromium } from "playwright-chromium";
 import { exists } from "@std/fs";
-import { DurationTracker } from "@nshiab/journalism";
+import { DurationTracker } from "@nshiab/journalism-extras";
 
 const browser = await chromium.launch();
 const context = await browser.newContext();
@@ -339,7 +342,7 @@ Par défaut, Playwright fonctionne en mode `headless`, ce qui signifie que le na
 ```ts showLineNumbers filename="sda/main.ts" {5}
 import { chromium } from "playwright-chromium";
 import { exists } from "@std/fs";
-import { DurationTracker } from "@nshiab/journalism";
+import { DurationTracker } from "@nshiab/journalism-extras";
 
 const browser = await chromium.launch({ headless: false });
 const context = await browser.newContext();
@@ -395,7 +398,7 @@ Enfin, vous pouvez charger tous ces fichiers JSON avec SDA et traiter vos donné
 ```ts showLineNumbers filename="sda/main.ts" {4, 50-60}
 import { chromium } from "playwright-chromium";
 import { exists } from "@std/fs";
-import { DurationTracker } from "@nshiab/journalism";
+import { DurationTracker } from "@nshiab/journalism-extras";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const browser = await chromium.launch();
@@ -534,7 +537,7 @@ Pour éviter les problèmes, assurez-vous de vider votre dossier `sda/data` avan
 ```ts showLineNumbers filename="sda/main.ts" {2-3, 24, 27, 31, 33-36, 40-69, 72-73}
 import { chromium } from "playwright-chromium";
 import { exists } from "@std/fs";
-import { DurationTracker } from "@nshiab/journalism";
+import { DurationTracker } from "@nshiab/journalism-extras";
 
 const browser = await chromium.launch({ headless: false });
 const context = await browser.newContext();
@@ -619,7 +622,7 @@ Et enfin, comme d’habitude, on peut utiliser SDA pour charger toutes les donn�
 ```ts showLineNumbers filename="sda/main.ts" {4, 81-92}
 import { chromium } from "playwright-chromium";
 import { exists } from "@std/fs";
-import { DurationTracker } from "@nshiab/journalism";
+import { DurationTracker } from "@nshiab/journalism-extras";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const browser = await chromium.launch({ headless: false });

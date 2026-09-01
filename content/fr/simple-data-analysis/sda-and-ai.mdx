@@ -4,7 +4,7 @@ description: Dans ce tutoriel, nous utilisons l'IA (plus précisément les grand
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
 
 # Analyse de données et intelligence artificielle 🤖
 
@@ -27,12 +27,13 @@ C'est parti pour le code !
 
 ## Configuration
 
-Pour configurer tout ce dont nous avons besoin, utilisons [setup-sda](https://jsr.io/@nshiab/setup-sda) comme dans les leçons précédentes.
+Pour configurer tout ce dont nous avons besoin, utilisons [setup-data-project](https://jsr.io/@nshiab/setup-data-project) comme dans les leçons précédentes.
 
-Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez : `deno -A jsr:@nshiab/setup-sda --course`
-<NoticeLibraryVersions lang="fr" />
+Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez : `deno run -A jsr:@nshiab/setup-data-project`
 
-![Une capture d'écran de VS Code après l'exécution de setup-sda.](/assets/simple-data-analysis/sda-and-ai/setup.png)
+Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`, puis appuyez sur `Entrée`.
+
+![Une capture d'écran de VS Code après l'exécution de setup-data-project.](/assets/simple-data-analysis/sda-and-ai/setup.png)
 
 ## Obtenir une clé API
 
@@ -46,22 +47,18 @@ Suivez les étapes suggérées. Si on vous demande d'utiliser un projet Google C
 
 ![Une capture d'écran de Google AI Studio.](/assets/simple-data-analysis/sda-and-ai/create-key.png)
 
-Une fois que vous avez copié votre nouvelle clé API, créez un nouveau fichier `.env` dans votre projet et collez-la-y. Ajoutez également le modèle que nous utiliserons, qui est `gemini-2.0-flash-lite`.
+Une fois que vous avez copié votre nouvelle clé API, ouvrez le fichier `.env` créé par `setup-data-project` et collez-la-y. Ajoutez également le modèle que nous utiliserons, qui est `gemini-2.0-flash-lite`.
 
 ```txt filename=".env" showLineNumbers
 AI_KEY=your_api_key_here
 AI_MODEL=gemini-2.0-flash-lite
 ```
 
-`.env` est un fichier que nous utilisons habituellement pour les **variables d'environnement**, qui sont souvent des identifiants qui ne doivent pas être partagés. Lorsque vous configurez tout avec `setup-sda`, ce fichier est automatiquement ajouté à `.gitignore`, il ne sera donc pas commité par Git et ne sera pas poussé sur GitHub.
+`.env` est un fichier que nous utilisons habituellement pour les **variables d'environnement**, qui sont souvent des identifiants qui ne doivent pas être partagés. `setup-data-project` ajoute automatiquement ce fichier à `.gitignore`, il ne sera donc pas commité par Git et ne sera pas poussé sur GitHub.
 
 ![Variables d'environnement dans VS Code.](/assets/simple-data-analysis/sda-and-ai/env.png)
 
-Maintenant, il nous suffit de charger ces variables en mémoire.
-
-Installez la bibliothèque `@std/dotenv` de l'équipe Deno en exécutant `deno add jsr:@std/dotenv`.
-
-Ensuite, ajoutez `import "@std/dotenv/load";` en haut de votre fichier `sda/main.ts`. Maintenant, chaque fois que vous exécuterez ce code, Deno chargera automatiquement les variables de votre fichier `.env` !
+La tâche `sda` créée par `setup-data-project` utilise l'option `--env` de Deno. Ces variables sont donc chargées automatiquement chaque fois que vous exécutez `deno task sda`.
 
 Et nous sommes prêts à décoller ! 🚀
 
@@ -91,7 +88,7 @@ Ben a manuellement catégorisé la colonne `payee`. Nous demanderons à notre mo
 
 ![Les données d'exemple.](/assets/simple-data-analysis/sda-and-ai/sample-data.png)
 
-Pour récupérer les données, nous créons une nouvelle table `data` et mettons en cache les résultats de `loadData`, qui récupère les données de GitHub. Comme les données ne changeront pas, la mise en cache est logique. Elles seront stockées localement dans le dossier `.sda-cache`. Lorsque vous configurez tout avec `setup-sda`, ce dossier caché est ajouté à votre `.gitignore`.
+Pour récupérer les données, nous créons une nouvelle table `data` et mettons en cache les résultats de `loadData`, qui récupère les données de GitHub. Comme les données ne changeront pas, la mise en cache est logique. Elles seront stockées localement dans le dossier `.sda-cache`. Lorsque vous configurez tout avec `setup-data-project`, ce dossier caché est ajouté à votre `.gitignore`.
 
 Nous affichons également la table dans le terminal.
 

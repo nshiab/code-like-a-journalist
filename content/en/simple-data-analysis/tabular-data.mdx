@@ -4,7 +4,7 @@ description: In this lesson, we learn how to use SDA by crunching daily temperat
 ---
 
 import { Callout } from 'nextra/components'
-import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../../components/Notices.jsx"
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # The Simple Data Analysis library
 
@@ -26,35 +26,32 @@ The library is published on [JSR](https://jsr.io/@nshiab/simple-data-analysis), 
 
 But there's a better way. 😏
 
-Create a new folder on your computer and run this instead: `deno -A jsr:@nshiab/setup-sda --course`
+Create a new folder on your computer and run this instead: `deno run -A jsr:@nshiab/setup-data-project`
 
-<NoticeLibraryVersions />
-
-This tells Deno to run another library called [setup-sda](https://jsr.io/@nshiab/setup-sda), which I also created to easily install and set up everything needed when starting a new data analysis.
+This tells Deno to run [setup-data-project](https://jsr.io/@nshiab/setup-data-project), which I created to install and configure everything needed when starting a new data analysis. When prompted, use the space bar to select `simple-data-analysis`, then press `Enter`.
 
 After running the command, your terminal will display a description of the created files and installed libraries.
 
-![A screenshot showing VS Code after running setup-sda.](/assets/simple-data-analysis/tabular-data/setup.png)
-
-<Callout type="info" emoji="💡">
- For SDA to work properly, it's best to have at least version 2.1.9 of Deno. To check your version, you can run `deno --version` in your terminal. To upgrade it, simply run `deno upgrade`.
-</Callout>
+![A screenshot showing VS Code after running setup-data-project.](/assets/simple-data-analysis/tabular-data/setup.png)
 
 ### Files created
 
-- `deno.json`: If you click on it, you'll see two tasks. We will use `sda` to watch, check, and run `sda/main.ts`. You can also see three libraries listed. More about them below.
+- `deno.json`: If you click on it, you'll see the `sda`, `all-tests`, and `clean` tasks, along with the installed libraries. We will use `sda` to watch, check, and run `sda/main.ts`.
 - `.gitignore`: An important file when using `git` to save our code. Don't worry about it for now; there will be a full lesson about it.
+- `.env`: A file for environment variables, such as API keys. It is ignored by Git.
 - `sda/main.ts`: The main file of our script. We will write our code here.
 - `sda/helpers`: An empty folder for now, but you can use it to store your functions.
 - `sda/data`: An empty folder for now, but this is where we will store our data for analysis.
 - `sda/output`: An empty folder for now. This is where we will write our results into files.
+- `sda/tests`: An empty folder where you can put tests.
+- `docs`: Documentation for the libraries selected during setup.
 - `README.md`: A text file containing some information about the project. You can modify it as you wish.
+- `AGENTS.md`: Instructions that help coding agents work with the project and its installed libraries.
 
 ### Libraries installed
 
 - [`simple-data-analysis`](https://github.com/nshiab/simple-data-analysis): The library we will use to process the data.
-- [`journalism`](https://github.com/nshiab/journalism): Another library I created. It contains useful functions for various tasks, like formatting dates or pushing data to Google Sheets.
-- [`@observablehq/plot`](https://github.com/observablehq/plot): A library created by Mike Bostock (creator of d3.js) that we will use to create charts and maps.
+- [`@observablehq/plot`](https://github.com/observablehq/plot): A library created by Mike Bostock (creator of d3.js) that we will use to create charts and maps. It is installed automatically with SDA.
 
 Now that you know what's in your folder, let's start working. Run the suggested task to run and watch our code: `deno task sda`
 
@@ -651,7 +648,7 @@ await sdb.done();
 
 ### Visualization with Plot
 
-Visualizations in the terminal are quite limited. If you want to create fancier charts, you can use [Observable Plot](https://github.com/observablehq/plot), which was installed when setting up with [setup-sda](https://jsr.io/@nshiab/setup-sda).
+Visualizations in the terminal are quite limited. If you want to create fancier charts, you can use [Observable Plot](https://github.com/observablehq/plot), which was installed when setting up with [setup-data-project](https://jsr.io/@nshiab/setup-data-project).
 
 We will do a full lesson on Plot later. It might seem complicated right now, but once you get the basics, it's an amazing data visualization library.
 

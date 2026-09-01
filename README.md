@@ -11,6 +11,19 @@ This repository stores the code for
 open-source online course on TypeScript fundamentals and acquiring, analyzing,
 visualizing, and automating data with SDA. It's available in English and French.
 
+## Tested data-project toolchain
+
+The data-project setup and generated starter were last verified on September 1,
+2026, with:
+
+- Deno 2.9.6
+- @nshiab/setup-data-project 2.0.0
+- @nshiab/simple-data-analysis 6.0.0
+
+Keep this list as the single source of truth when the course's tested toolchain
+changes. Lessons should use unversioned setup commands so learners receive the
+current compatible packages selected by `setup-data-project`.
+
 Thanks to the support of the
 [Michener Awards Foundation](https://www.michenerawards.ca/media-release/michener-awards-foundation-announces-its-2024-fellowships-winners/),
 I took several months off from my current job to fully focus on building the

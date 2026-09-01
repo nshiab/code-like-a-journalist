@@ -4,7 +4,7 @@ description: In this lesson, we learn how to open, process, join, and visualize 
 ---
 
 import { Callout } from 'nextra/components'
-import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../../components/Notices.jsx"
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Geospatial analysis with the Simple Data Analysis library
 
@@ -22,19 +22,15 @@ Note that you should have already completed the **First steps 🧑‍🎓** and 
 
 ## Setup
 
-As we did in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `deno -A jsr:@nshiab/setup-sda --course`
+As we did in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `deno run -A jsr:@nshiab/setup-data-project`
 
-<NoticeLibraryVersions />
+When prompted, use the space bar to select `simple-data-analysis`, then press `Enter`. Plot is installed automatically with SDA.
 
 After running this command, your terminal will display a description of the created files and installed libraries.
 
 Next, run the suggested task to start and watch `sda/main.ts`: `deno task sda`
 
-![A screenshot showing VS Code after running setup-sda.](/assets/simple-data-analysis/geospatial-data/setup.png)
-
-<Callout type="info" emoji="💡">
- For SDA to work properly, it's best to have at least version 2.1.9 of Deno. To check your version, you can run `deno --version` in your terminal. To upgrade it, simply run `deno upgrade`.
-</Callout>
+![A screenshot showing VS Code after running setup-data-project.](/assets/simple-data-analysis/geospatial-data/setup.png)
 
 ## Loading and caching data
 
@@ -406,7 +402,7 @@ await sdb.done();
 
 ### Saving a chart
 
-We can also save a chart using [Plot](https://github.com/observablehq/plot), which has been pre-installed as part of the `setup-sda` setup.
+We can also save a chart using [Plot](https://github.com/observablehq/plot), which was installed automatically with SDA by `setup-data-project`.
 
 Don't worry about the syntax for now—we'll cover Plot in detail in a future lesson.
 

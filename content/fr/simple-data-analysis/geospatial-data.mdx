@@ -4,7 +4,7 @@ description: Dans cette leçon, nous apprenons à ouvrir, traiter, joindre et vi
 ---
 
 import { Callout } from 'nextra/components'
-import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../../components/Notices.jsx"
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Analyse géospatiale avec la bibliothèque Simple Data Analysis
 
@@ -22,17 +22,15 @@ Notez que vous devriez déjà avoir complété les sections **Premiers pas 🧑�
 
 ## Configuration
 
-Comme dans la leçon précédente, créez un nouveau dossier sur votre ordinateur, ouvrez-le avec VS Code et exécutez la commande suivante dans le terminal : `deno -A jsr:@nshiab/setup-sda --course`
-<NoticeLibraryVersions lang="fr" />
+Comme dans la leçon précédente, créez un nouveau dossier sur votre ordinateur, ouvrez-le avec VS Code et exécutez la commande suivante dans le terminal : `deno run -A jsr:@nshiab/setup-data-project`
+
+Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`, puis appuyez sur `Entrée`. Plot est installée automatiquement avec SDA.
 
 Après avoir exécuté cette commande, votre terminal affichera une description des fichiers créés et des bibliothèques installées.
 
 Ensuite, exécutez la tâche suggérée pour lancer et surveiller `sda/main.ts` : `deno task sda`
 
-![Une capture d'écran montrant VS Code après l'exécution de setup-sda.](/assets/simple-data-analysis/geospatial-data/setup.png)
-<Callout type="info" emoji="💡">
-  Pour que SDA fonctionne correctement, il est recommandé d'avoir au moins la version 2.1.9 de Deno. Pour vérifier votre version, vous pouvez exécuter `deno --version` dans votre terminal. Pour la mettre à jour, il suffit d'exécuter `deno upgrade`.
-</Callout>
+![Une capture d'écran montrant VS Code après l'exécution de setup-data-project.](/assets/simple-data-analysis/geospatial-data/setup.png)
 
 ## Téléchargement et mise en cache des données
 
@@ -407,7 +405,7 @@ await sdb.done();
 
 ### Enregistrement d'un graphique
 
-Nous pouvons également enregistrer un graphique en utilisant [Plot](https://github.com/observablehq/plot), qui a été préinstallé lors de la configuration avec `setup-sda`.
+Nous pouvons également enregistrer un graphique en utilisant [Plot](https://github.com/observablehq/plot), qui a été installée automatiquement avec SDA par `setup-data-project`.
 
 Ne vous inquiétez pas pour la syntaxe pour l’instant. Nous aborderons Plot en détail dans une leçon future.
 

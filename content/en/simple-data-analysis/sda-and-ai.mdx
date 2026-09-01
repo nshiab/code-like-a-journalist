@@ -4,7 +4,7 @@ description: In this tutorial, we use AI (more specifically large language model
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
 
 # Simple Data Analysis and Artificial Intelligence 🤖
 
@@ -27,13 +27,13 @@ Let's code!
 
 ## Setup
 
-To set up everything we need, let's use [setup-sda](https://jsr.io/@nshiab/setup-sda) as in previous lessons.
+To set up everything we need, let's use [setup-data-project](https://jsr.io/@nshiab/setup-data-project) as in previous lessons.
 
-Create a new folder, open it with VS Code, and run: `deno -A jsr:@nshiab/setup-sda --course`
+Create a new folder, open it with VS Code, and run: `deno run -A jsr:@nshiab/setup-data-project`
 
-<NoticeLibraryVersions />
+When prompted, use the space bar to select `simple-data-analysis`, then press `Enter`.
 
-![A screenshot of VS Code after running setup-sda.](/assets/simple-data-analysis/sda-and-ai/setup.png)
+![A screenshot of VS Code after running setup-data-project.](/assets/simple-data-analysis/sda-and-ai/setup.png)
 
 ## Getting an API key
 
@@ -47,22 +47,18 @@ Follow the suggested steps. If asked about using a Google Cloud project, select 
 
 ![A screenshot of Google AI Studio.](/assets/simple-data-analysis/sda-and-ai/create-key.png)
 
-Once you have copied your new API key, create a new `.env` file in your project and paste it there. Also, add the model we will use, which is `gemini-2.0-flash-lite`.
+Once you have copied your new API key, open the `.env` file created by `setup-data-project` and paste it there. Also, add the model we will use, which is `gemini-2.0-flash-lite`.
 
 ```txt filename=".env" showLineNumbers
 AI_KEY=your_api_key_here
 AI_MODEL=gemini-2.0-flash-lite
 ```
 
-`.env` is a file we usually use for **environment variables**, which are often credentials that should not be shared. When you set everything up with `setup-sda`, this file is automatically added to `.gitignore`, so it won't be committed by Git and won't be pushed to GitHub.
+`.env` is a file we usually use for **environment variables**, which are often credentials that should not be shared. `setup-data-project` automatically adds this file to `.gitignore`, so it won't be committed by Git and won't be pushed to GitHub.
 
 ![Environment variables in VS Code.](/assets/simple-data-analysis/sda-and-ai/env.png)
 
-Now, we just need to load these variables into memory.
-
-Install the `@std/dotenv` library from the Deno team by running `deno add jsr:@std/dotenv`.
-
-Then add `import "@std/dotenv/load";` at the top of your `sda/main.ts` file. Now, every time you run this code, Deno will automatically load the variables in your `.env` file!
+The `sda` task created by `setup-data-project` uses Deno's `--env` option, so these variables are loaded automatically whenever you run `deno task sda`.
 
 And we are ready to go! 🚀
 
@@ -92,7 +88,7 @@ Ben has manually categorized the `payee` column. We will ask our model to do the
 
 ![The sample data.](/assets/simple-data-analysis/sda-and-ai/sample-data.png)
 
-To retrieve the data, we create a new table `data` and cache the results of `loadData`, which fetches the data from GitHub. Since the data won't change, caching it makes sense. It will be stored locally in the `.sda-cache` folder. When you set everything up with `setup-sda`, this hidden folder is added to your `.gitignore`.
+To retrieve the data, we create a new table `data` and cache the results of `loadData`, which fetches the data from GitHub. Since the data won't change, caching it makes sense. It will be stored locally in the `.sda-cache` folder. When you set everything up with `setup-data-project`, this hidden folder is added to your `.gitignore`.
 
 We also log the table to the terminal.
 

@@ -4,7 +4,7 @@ description: Apprenez à traiter et à visualiser des ensembles de données mass
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
 
 # Exploiter les données du recensement 🇨🇦
 
@@ -44,17 +44,15 @@ C'est parti pour le code !
 
 ## Configuration
 
-Pour tout configurer, utilisons [setup-sda](https://jsr.io/@nshiab/setup-sda) comme dans les leçons précédentes.
+Pour tout configurer, utilisons [setup-data-project](https://jsr.io/@nshiab/setup-data-project) comme dans les leçons précédentes.
 
-Créez un nouveau dossier, ouvrez-le avec VS Code, et exécutez : `deno -A jsr:@nshiab/setup-sda --course`
-<NoticeLibraryVersions lang="fr" />
+Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez : `deno run -A jsr:@nshiab/setup-data-project`
+
+Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis` et `journalism-extras`, puis appuyez sur `Entrée`. Plot est installée automatiquement avec SDA.
 
 Ensuite, exécutez `deno task sda` pour surveiller `main.ts` et ses dépendances.
 
-![Capture d'écran de VS Code après avoir exécuté setup-sda.](/assets/stats-can-census/setup.png)
-<Callout type="info" emoji="💡">
- Pour que SDA fonctionne correctement, il est recommandé d'avoir au moins la version 2.1.9 de Deno. Pour vérifier votre version, exécutez `deno --version` dans votre terminal. Pour la mettre à jour, exécutez simplement `deno upgrade`.
-</Callout>
+![Capture d'écran de VS Code après avoir exécuté setup-data-project.](/assets/stats-can-census/setup.png)
 
 ## Téléchargement des données
 
@@ -111,7 +109,7 @@ Et oui, les projets de données dans la vraie vie sont toujours aussi amusants !
 
 ### Réencodage des données
 
-Comme le réencodage de données est une tâche courante, j'ai créé la fonction [`reencode`](https://jsr.io/@nshiab/journalism-extras/doc/~/reencode) et je l'ai publiée dans la librairie *[journalism](https://github.com/nshiab/journalism)*. Lorsque vous configurez votre projet avec `setup-sda`, *journalism* est automatiquement installé. Cette étape sera donc très facile !
+Comme le réencodage de données est une tâche courante, j'ai créé la fonction [`reencode`](https://jsr.io/@nshiab/journalism-extras/doc/~/reencode) et je l'ai publiée dans la librairie [journalism-extras](https://github.com/nshiab/journalism-extras), sélectionnée pendant la configuration. Cette étape sera donc très facile !
 
 Créons un nouveau fichier `toUTF8.ts` dans le dossier `helpers` avec le code ci-dessous. Comme nous n'avons besoin de réencoder les données qu'une seule fois, nous n'exportons pas de fonction. C'est simplement un script que nous allons exécuter une seule fois.
 
@@ -125,7 +123,7 @@ La fonction `reencode` nécessite quatre arguments :
 
 
 ```ts showLineNumbers filename="toUTF8.ts"
-import { reencode } from "@nshiab/journalism";
+import { reencode } from "@nshiab/journalism-extras";
 
 const regions = [
   "Atlantic",
@@ -150,19 +148,19 @@ for (const r of regions) {
 }
 ```
 
-Pour exécuter ce script, nous pouvons créer une nouvelle tâche `toUTF8` dans notre `deno.json`. Ne vous inquiétez pas si vous n'avez pas la même version que moi dans les *imports*. Tout va bien aller ! 
+Pour exécuter ce script, nous pouvons ajouter une tâche `toUTF8` aux tâches déjà créées dans notre `deno.json` :
 
 ```ts showLineNumbers filename="deno.json" {5}
 {
   "tasks": {
-    "sda": "deno run --node-modules-dir=auto -A --watch --check sda/main.ts",
-    "clean": "rm -rf .sda-cache && rm -rf .tmp",
+    "sda": "deno run -A --env --watch --check sda/main.ts",
+    "all-tests": "deno fmt --check sda && deno lint && deno check sda/main.ts && deno test -A --permit-no-files",
+    "clean": "rm -rf .sda-cache .journalism-cache .tmp",
     "toUTF8": "deno run -A sda/helpers/toUTF8.ts"
   },
-  "nodeModulesDir": "auto",
   "imports": {
-    "@nshiab/journalism": "jsr:@nshiab/journalism@^1.22.0",
-    "@nshiab/simple-data-analysis": "jsr:@nshiab/simple-data-analysis@^4.2.0",
+    "@nshiab/journalism-extras": "jsr:@nshiab/journalism-extras@^1.0.10",
+    "@nshiab/simple-data-analysis": "jsr:@nshiab/simple-data-analysis@^6.0.0",
     "@observablehq/plot": "npm:@observablehq/plot@^0.6.17"
   }
 }
@@ -441,7 +439,7 @@ Nous connaissons cette erreur ! C'est encore un problème d'encodage !
 Mettons à jour `toUTF8.ts` pour convertir également ce fichier CSV. Nous commentons le code précédent car nous n'avons pas besoin de reconvertir les fichiers du recensement.
 
 ```ts showLineNumbers filename="toUTF8.ts" {25-32}
-import { reencode } from "@nshiab/journalism";
+import { reencode } from "@nshiab/journalism-extras";
 
 // const regions = [
 //   "Atlantic",
@@ -1018,12 +1016,12 @@ export default async function visualizeData(census: SimpleTable) {
   }
 }
 ```
-![Capture d'écran de VS Code après avoir exécuté setup-sda.](/assets/stats-can-census/clone.png)
+![Capture d'écran de la table clonée dans VS Code.](/assets/stats-can-census/clone.png)
 <Callout type="info" emoji="💡">
  Comme la table `census` possède une colonne `CMA` et que la boucle utilise également la variable `CMA`, nous pouvons écrire `{ CMA }` comme raccourci pour `{ CMA: CMA }`.
 </Callout>
 
-Nous pouvons maintenant créer une fonction pour dessiner nos cartes. Lorsque nous avons tout configuré avec `setup-sda`, nous avons automatiquement installé [Plot](https://github.com/observablehq/plot). Cette puissante librairie de visualisation de données fonctionne très bien avec SDA et c'est ce que nous allons utiliser pour dessiner nos cartes.
+Nous pouvons maintenant créer une fonction pour dessiner nos cartes. Lorsque nous avons sélectionné SDA dans `setup-data-project`, [Plot](https://github.com/observablehq/plot) a été installée automatiquement. Cette puissante librairie de visualisation de données fonctionne très bien avec SDA et c'est ce que nous allons utiliser pour dessiner nos cartes.
 
 Comme c'est la même fonction pour dessiner toutes les cartes, nous pouvons la créer en dehors de la boucle. Cette fonction attendra les données au format GeoJSON, avec une liste de *features* contenant des propriétés. Pour commencer, dessinons les polygones des aires de diffusion avec le marqueur `geo` et colorons le `fill` et le `stroke` avec les valeurs calculées dans la colonne `varPerc`.
 

@@ -4,7 +4,7 @@ description: Learn how to crunch and visualize massive datasets from Statistics 
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
 
 # Wrangling Census data 🇨🇦
 
@@ -44,18 +44,15 @@ Let's code!
 
 ## Setup
 
-To set up everything we need, let's use [setup-sda](https://jsr.io/@nshiab/setup-sda) like in previous lessons.
+To set up everything we need, let's use [setup-data-project](https://jsr.io/@nshiab/setup-data-project) like in previous lessons.
 
-Create a new folder, open it with VS Code, and run: `deno -A jsr:@nshiab/setup-sda --course`
+Create a new folder, open it with VS Code, and run: `deno run -A jsr:@nshiab/setup-data-project`
 
-<NoticeLibraryVersions />
+When prompted, use the space bar to select `simple-data-analysis` and `journalism-extras`, then press `Enter`. Plot is installed automatically with SDA.
 
 Then run `deno task sda` to watch `main.ts` and its dependencies.
 
-![A screenshot of VS Code after running setup-sda.](/assets/stats-can-census/setup.png)
-<Callout type="info" emoji="💡">
- For SDA to work properly, it's best to have at least version 2.1.9 of Deno. To check your version, you can run `deno --version` in your terminal. To upgrade it, simply run `deno upgrade`.
-</Callout>
+![A screenshot of VS Code after running setup-data-project.](/assets/stats-can-census/setup.png)
 
 ## Downloading the data
 
@@ -121,7 +118,7 @@ Yes, real-world data projects are always this fun! 😬
 
 ### Re-encoding the data
 
-Since re-encoding data is a common task, I created the function [`reencode`](https://jsr.io/@nshiab/journalism-extras/doc/~/reencode) and published it in the *[journalism](https://github.com/nshiab/journalism)* library. When you set up your project with `setup-sda`, *journalism* is automatically installed. So this step will be very easy!
+Since re-encoding data is a common task, I created the function [`reencode`](https://jsr.io/@nshiab/journalism-extras/doc/~/reencode) and published it in the [journalism-extras](https://github.com/nshiab/journalism-extras) library selected during setup. So this step will be very easy!
 
 Let's create a new file `toUTF8.ts` in `helpers` with the code below. Since we need to re-encode the data just once, we are not exporting a function. It's just a regular script we will run once.
 
@@ -135,7 +132,7 @@ The `reencode` function needs four arguments:
 
 
 ```ts showLineNumbers filename="toUTF8.ts"
-import { reencode } from "@nshiab/journalism";
+import { reencode } from "@nshiab/journalism-extras";
 
 const regions = [
   "Atlantic",
@@ -160,19 +157,19 @@ for (const r of regions) {
 }
 ```
 
-To run this script, we could create a new task `toUTF8` in our `deno.json`. Don't worry if you don't have the same version as me in the imports. You're fine!
+To run this script, we can add a `toUTF8` task to the `tasks` already created in our `deno.json`:
 
 ```ts showLineNumbers filename="deno.json" {5}
 {
   "tasks": {
-    "sda": "deno run --node-modules-dir=auto -A --watch --check sda/main.ts",
-    "clean": "rm -rf .sda-cache && rm -rf .tmp",
+    "sda": "deno run -A --env --watch --check sda/main.ts",
+    "all-tests": "deno fmt --check sda && deno lint && deno check sda/main.ts && deno test -A --permit-no-files",
+    "clean": "rm -rf .sda-cache .journalism-cache .tmp",
     "toUTF8": "deno run -A sda/helpers/toUTF8.ts"
   },
-  "nodeModulesDir": "auto",
   "imports": {
-    "@nshiab/journalism": "jsr:@nshiab/journalism@^1.22.0",
-    "@nshiab/simple-data-analysis": "jsr:@nshiab/simple-data-analysis@^4.2.0",
+    "@nshiab/journalism-extras": "jsr:@nshiab/journalism-extras@^1.0.10",
+    "@nshiab/simple-data-analysis": "jsr:@nshiab/simple-data-analysis@^6.0.0",
     "@observablehq/plot": "npm:@observablehq/plot@^0.6.17"
   }
 }
@@ -448,7 +445,7 @@ We know this error! It's the encoding again!
 Let's update `toUTF8.ts` to convert this CSV file too. We comment out the previous code because we don't need to reconvert the census files.
 
 ```ts showLineNumbers filename="toUTF8.ts" {25-32}
-import { reencode } from "@nshiab/journalism";
+import { reencode } from "@nshiab/journalism-extras";
 
 // const regions = [
 //   "Atlantic",
@@ -1024,12 +1021,12 @@ export default async function visualizeData(census: SimpleTable) {
   }
 }
 ```
-![A screenshot of VS Code after running setup-sda.](/assets/stats-can-census/clone.png)
+![A screenshot of the cloned table in VS Code.](/assets/stats-can-census/clone.png)
 <Callout type="info" emoji="💡">
  Because the `census` table has a column `CMA` and the loop is using the `CMA` variable too, we can write `{ CMA }` as a shortcut for `{ CMA: CMA }`.
 </Callout>
 
-We can now create a function to draw our maps. When we set up everything with `setup-sda`, we automatically installed [Plot](https://github.com/observablehq/plot). This very powerful data visualization library works very well with SDA and this is what we are going to use to draw our map.
+We can now create a function to draw our maps. When we selected SDA in `setup-data-project`, it automatically installed [Plot](https://github.com/observablehq/plot). This very powerful data visualization library works very well with SDA and this is what we are going to use to draw our map.
 
 Since it's the same function to draw all of the maps, we can create it outside of the loop. This function will expect the data as a GeoJSON, with an array of features with properties. To start, let's draw the dissemination area polygons with the `geo` mark and let's color the `fill` and `stroke` with the values we computed in the `varPerc` column.
 

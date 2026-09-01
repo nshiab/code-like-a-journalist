@@ -4,7 +4,7 @@ description: A project to tackle the one billion row challenge using TypeScript 
 ---
 
 import { Callout } from "nextra/components";
-import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../components/Notices.jsx";
+import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
 
 # The one billion row challenge 😱
 
@@ -29,18 +29,15 @@ Let's code!
 
 ## Setup
 
-To set up everything we need, let's use [setup-sda](https://jsr.io/@nshiab/setup-sda) as in previous lessons.
+To set up everything we need, let's use [setup-data-project](https://jsr.io/@nshiab/setup-data-project) as in previous lessons.
 
-Create a new folder, open it with VS Code, and run: `deno -A jsr:@nshiab/setup-sda --course`
+Create a new folder, open it with VS Code, and run: `deno run -A jsr:@nshiab/setup-data-project`
 
-<NoticeLibraryVersions />
+When prompted, use the space bar to select `simple-data-analysis`, then press `Enter`.
 
 Then run `deno task sda` to watch `main.ts` and its dependencies.
 
-![A screenshot of VS Code after running setup-sda.](/assets/one-billion-row-challenge/setup.png)
-<Callout type="info" emoji="💡">
- For SDA to work properly, it's best to have at least version 2.1.9 of Deno. To check your version, you can run `deno --version` in your terminal. To upgrade it, simply run `deno upgrade`.
-</Callout>
+![A screenshot of VS Code after running setup-data-project.](/assets/one-billion-row-challenge/setup.png)
 
 ## The data
 

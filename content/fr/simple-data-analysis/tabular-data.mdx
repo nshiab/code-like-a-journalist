@@ -4,7 +4,7 @@ description: Dans cette leçon, nous apprenons à utiliser SDA en traitant des d
 ---
 
 import { Callout } from 'nextra/components'
-import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../../components/Notices.jsx"
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # La librairie Simple Data Analysis
 
@@ -27,33 +27,32 @@ La librairie est publiée sur [JSR](https://jsr.io/@nshiab/simple-data-analysis)
 
 Mais il y a une meilleure façon. 😏
 
-Créez un nouveau dossier sur votre ordinateur et exécutez plutôt cette commande : `deno -A jsr:@nshiab/setup-sda --course`
-<NoticeLibraryVersions lang="fr" />
+Créez un nouveau dossier sur votre ordinateur et exécutez plutôt cette commande : `deno run -A jsr:@nshiab/setup-data-project`
 
-Cela indique à Deno d'exécuter une autre librairie appelée [setup-sda](https://jsr.io/@nshiab/setup-sda), que j'ai également créée pour installer et configurer facilement tout ce dont vous avez besoin pour démarrer une nouvelle analyse de données.
+Cela indique à Deno d'exécuter l'outil [setup-data-project](https://jsr.io/@nshiab/setup-data-project), que j'ai créé pour installer et configurer facilement tout ce dont vous avez besoin pour démarrer une nouvelle analyse de données. Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`, puis appuyez sur `Entrée`.
 
 Après avoir exécuté la commande, votre terminal affichera une description des fichiers créés et des librairies installées.
 
-![Capture d'écran montrant VS Code après l'exécution de setup-sda.](/assets/simple-data-analysis/tabular-data/setup.png)
-<Callout type="info" emoji="💡">
-  Pour que SDA fonctionne correctement, il est recommandé d'avoir au moins la version 2.1.9 de Deno. Pour vérifier votre version, vous pouvez exécuter `deno --version` dans votre terminal. Pour la mettre à jour, il suffit d'exécuter `deno upgrade`.
-</Callout>
+![Capture d'écran montrant VS Code après l'exécution de setup-data-project.](/assets/simple-data-analysis/tabular-data/setup.png)
 
 ### Fichiers créés
 
-- `deno.json` : Si vous l'ouvrez, vous verrez deux tâches. Nous utiliserons `sda` pour surveiller, vérifier et exécuter `sda/main.ts`. Vous verrez également trois librairies listées. Plus d’informations ci-dessous.
+- `deno.json` : Si vous l'ouvrez, vous verrez les tâches `sda`, `all-tests` et `clean`, ainsi que les librairies installées. Nous utiliserons `sda` pour surveiller, vérifier et exécuter `sda/main.ts`.
 - `.gitignore` : Un fichier important lors de l'utilisation de `git` pour sauvegarder notre code. Ne vous en souciez pas pour l’instant ; il y aura une leçon complète à ce sujet.
+- `.env` : Un fichier pour les variables d'environnement, comme les clés API. Il est ignoré par Git.
 - `sda/main.ts` : Le fichier principal de notre script. C'est ici que nous écrirons notre code.
 - `sda/helpers` : Un dossier vide pour le moment, mais vous pourrez l’utiliser pour vos fonctions.
 - `sda/data` : Un dossier vide pour le moment, mais c’est ici que nous stockerons nos données pour l’analyse.
 - `sda/output` : Un dossier vide pour le moment. C'est ici que nous écrirons nos résultats dans des fichiers.
+- `sda/tests` : Un dossier vide dans lequel vous pouvez mettre des tests.
+- `docs` : La documentation des librairies sélectionnées pendant la configuration.
 - `README.md` : Un fichier texte contenant quelques informations sur le projet, que vous pouvez modifier comme bon vous semble.
+- `AGENTS.md` : Des instructions qui aident les agents de code à travailler avec le projet et les librairies installées.
 
 ### Librairies installées
 
 - [`simple-data-analysis`](https://github.com/nshiab/simple-data-analysis) : La librairie que nous utiliserons pour traiter les données.
-- [`journalism`](https://github.com/nshiab/journalism) : Une autre librairie que j’ai créée. Elle contient des fonctions utiles pour diverses tâches, comme le formatage des dates ou l'envoi de données vers Google Sheets.
-- [`@observablehq/plot`](https://github.com/observablehq/plot) : Une librairie créée par Mike Bostock (créateur de d3.js) que nous utiliserons pour créer des graphiques et des cartes.
+- [`@observablehq/plot`](https://github.com/observablehq/plot) : Une librairie créée par Mike Bostock (créateur de d3.js) que nous utiliserons pour créer des graphiques et des cartes. Elle est installée automatiquement avec SDA.
 
 Maintenant que vous savez ce qu’il y a dans votre dossier, passons au travail. Exécutez la tâche suggérée pour exécuter et surveiller notre code : `deno task sda`
 
@@ -660,7 +659,7 @@ await sdb.done();
 
 ### Visualisation avec Plot
 
-Les visualisations dans le terminal sont assez limitées. Si vous voulez créer des graphiques plus élaborés, vous pouvez utiliser [Observable Plot](https://github.com/observablehq/plot), qui a été installé lors de la configuration avec [setup-sda](https://jsr.io/@nshiab/setup-sda).
+Les visualisations dans le terminal sont assez limitées. Si vous voulez créer des graphiques plus élaborés, vous pouvez utiliser [Observable Plot](https://github.com/observablehq/plot), qui a été installé lors de la configuration avec [setup-data-project](https://jsr.io/@nshiab/setup-data-project).
 
 Nous ferons une leçon complète sur Plot plus tard. Cela peut sembler compliqué pour l’instant, mais une fois que vous aurez assimilé les bases, vous verrez que c'est une librairie de visualisation de données exceptionnelle.
 

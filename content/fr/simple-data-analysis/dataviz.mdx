@@ -4,7 +4,7 @@ description: Dans cette leçon, nous apprenons à visualiser des données tabula
 ---
 
 import { Callout } from 'nextra/components'
-import { NoticeIntro, NoticeEnd, NoticeLibraryVersions } from "../../../components/Notices.jsx"
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Visualiser des données avec Simple Data Analysis et Plot
 
@@ -18,17 +18,15 @@ Cette leçon suppose que vous avez déjà complété les leçons sur les [Donné
 
 ## Configuration
 
-Comme dans la leçon précédente, créez un nouveau dossier sur votre ordinateur, ouvrez-le avec VS Code et exécutez la commande suivante dans le terminal : `deno -A jsr:@nshiab/setup-sda --course`
-<NoticeLibraryVersions lang="fr" />
+Comme dans la leçon précédente, créez un nouveau dossier sur votre ordinateur, ouvrez-le avec VS Code et exécutez la commande suivante dans le terminal : `deno run -A jsr:@nshiab/setup-data-project`
+
+Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis` et `journalism-format`, puis appuyez sur `Entrée`. Plot est installée automatiquement avec SDA.
 
 Après l'exécution de cette commande, votre terminal affichera une description des fichiers créés et des librairies installées.
 
 Ensuite, exécutez la tâche suggérée pour démarrer et surveiller `sda/main.ts` : `deno task sda`
 
-![Une capture d'écran montrant VS Code après l'exécution de setup-sda.](/assets/simple-data-analysis/dataviz/setup.png)
-<Callout type="info" emoji="💡">
-  Pour que SDA fonctionne correctement, il est recommandé d'avoir au moins la version 2.1.9 de Deno. Pour vérifier votre version, vous pouvez exécuter `deno --version` dans votre terminal. Pour la mettre à jour, il suffit d'exécuter `deno upgrade`.
-</Callout>
+![Une capture d'écran montrant VS Code après l'exécution de setup-data-project.](/assets/simple-data-analysis/dataviz/setup.png)
 
 Pour organiser notre code de manière claire, nous allons créer deux fonctions :
 - `crunchData`, où nous allons récupérer et nettoyer les données sur les feux de forêt.
@@ -142,11 +140,11 @@ Dans l'exemple ci-dessous, nous utilisons la méthode `logDotChart` avec :
 J'ai également ajouté quelques options :
 - Nous utilisons la valeur `province` pour créer des graphiques multiples (un graphique par province).
 - Nous appliquons la même échelle à tous les graphiques, ce qui facilite la comparaison entre les provinces.
-- Nous formatons les libellés de l'axe des y avec la fonction `formatNumber` de la librairie [journalism](https://github.com/nshiab/journalism). J'ai créé cette librairie pour fournir des fonctions utilitaires générales. Elle est automatiquement installée avec `setup-sda`.
+- Nous formatons les libellés de l'axe des y avec la fonction `formatNumber` de la librairie [journalism-format](https://github.com/nshiab/journalism-format), sélectionnée pendant la configuration.
 
 ```ts showLineNumbers filename="visualizeData.ts" {6-14}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
-import { formatNumber } from "@nshiab/journalism/web";
+import { formatNumber } from "@nshiab/journalism-format";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.logTable();
@@ -173,7 +171,7 @@ Cependant, bien que ces méthodes soient très pratiques, elles restent assez li
 
 [Plot](https://github.com/observablehq/plot) est une librairie fantastique pour créer des graphiques. Elle est basée sur la célèbre librairie [d3](https://github.com/d3/d3) (développée par la même équipe, dont [Mike Bostock](https://github.com/mbostock) et [Philippe Rivière](https://github.com/Fil)). Cependant, elle est bien plus facile à utiliser, car de nombreux éléments qui doivent être gérés manuellement avec d3 (échelles, axes, etc.) sont pris en charge automatiquement par Plot.
 
-SDA intègre Plot de manière transparente et l'installe automatiquement lorsque vous configurez votre projet avec `setup-sda`.
+SDA intègre Plot de manière transparente, et `setup-data-project` l'installe automatiquement lorsque vous sélectionnez SDA.
 
 Pour créer un graphique et l'enregistrer sous forme de fichier (`.jpeg`, `.png` ou `.svg` si vous souhaitez le retravailler dans Illustrator), vous pouvez utiliser la méthode `writeChart`.
 
