@@ -60,7 +60,7 @@ Maintenant que vous savez ce qu’il y a dans votre dossier, passons au travail.
 
 Laissez-moi vous expliquer le code actuel dans `./sda/main.ts`.
 
-Lorsque vous utilisez SDA, vous créez une **base de données en mémoire**. C'est ce qui se passe à la ligne 3 avec `const sdb = new SimpleDB()`. Une fois nos calculs terminés, nous fermons la base de données à la ligne 7 avec `await sdb.done()`.
+Lorsque vous utilisez SDA, vous créez une **base de données en mémoire**. C'est ce qui se passe à la ligne 3 avec `const sdb = new SimpleDB()`. Une fois nos calculs terminés, nous fermons la base de données à la ligne 7 avec `await sdb.close()`. La fermeture exécute aussi les transformations encore en attente et nettoie les fichiers temporaires et les fichiers de cache.
 
 
 ```ts showLineNumbers filename="main.ts"
@@ -70,7 +70,7 @@ const sdb = new SimpleDB();
 
 // Do your magic here!
 
-await sdb.done();
+await sdb.close();
 ```
 
 Comme dans une base de données classique, avec SimpleDB, les données sont stockées dans des **tables**. Si vous êtes plus familier avec Excel ou Google Sheets, les tables peuvent être comprises comme des onglets.
@@ -87,10 +87,10 @@ const sdb = new SimpleDB();
 
 const temperatures = sdb.newTable("temperatures");
 
-await sdb.done();
+await sdb.close();
 ```
 
-Maintenant que nous avons une table, nous pouvons utiliser les méthodes de la table ! Sur une nouvelle ligne, tapez la variable `temperature` (qui fait maintenant référence à la table) et ajoutez un `.` immédiatement après pour voir toutes les méthodes disponibles. Vous pouvez utiliser les flèches haut et bas de votre clavier pour consulter leur documentation et leurs exemples. Il y en a beaucoup !
+Maintenant que nous avons une table, nous pouvons utiliser les méthodes de la table ! Sur une nouvelle ligne, tapez la variable `temperatures` (qui fait maintenant référence à la table) et ajoutez un `.` immédiatement après pour voir toutes les méthodes disponibles. Vous pouvez utiliser les flèches haut et bas de votre clavier pour consulter leur documentation et leurs exemples. Il y en a beaucoup !
 
 Toutes les méthodes documentées avec des exemples sont également [disponibles sur JSR](https://jsr.io/@nshiab/simple-data-analysis/doc).
 
@@ -104,9 +104,14 @@ J’ai téléversé les températures quotidiennes historiques de trois villes c
 
 Utilisons la méthode `loadData` pour le récupérer. Notez que cette méthode peut aussi bien récupérer des fichiers distants que lire des fichiers locaux. Elle peut charger des fichiers CSV, JSON, Excel et Parquet. Plutôt pratique !
 
-Ce serait intéressant de voir les données une fois chargées. Nous pouvons le faire en appelant la méthode `logTable`.
+Ce serait intéressant de voir les données une fois chargées. Nous pouvons le faire en appelant la méthode `log`.
 
-Toutes les méthodes des tables sont `async`, nous devons donc spécifier `await` devant elles.
+SDA 6 distingue deux types de méthodes :
+
+- Les **transformations et chargeurs** comme `loadData()`, `join()`, `filter()` et `summarize()` sont synchrones. Ils placent du travail dans une file d'attente et renvoient immédiatement la table, ce qui permet de les chaîner avec `.`.
+- Les **observateurs et opérations externes** comme `log()`, `getData()`, `writeData()`, `writeChart()` et `writeMap()` sont asynchrones. Lorsque vous en appelez un avec `await`, SDA exécute d'abord le travail en attente dans l'ordre du programme, puis produit le résultat.
+
+La même règle vaut pour les transformations d'IA : `aiRowByRow()` met les requêtes en attente, puis un observateur les exécute. Pour exécuter un pipeline qui se termine par des transformations sans encore fermer la base de données, utilisez `await table.run()` ou `await sdb.run()`. À la fin du script, `await sdb.close()` exécute tout travail encore en attente, enregistre les métadonnées nécessaires et nettoie les ressources de la base de données.
 
 
 ```ts showLineNumbers filename="main.ts" {7-9, 11}
@@ -114,15 +119,14 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
 
-const temperatures = sdb.newTable("temperatures");
+const temperatures = await sdb
+  .newTable("temperatures")
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+  )
+  .log();
 
-await temperatures.loadData(
-  "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-);
-
-await temperatures.logTable();
-
-await sdb.done();
+await sdb.close();
 ```
 
 Et voici le résultat ! Nous pouvons voir que les données du fichier CSV ont été intégrées dans la table `temperature`, qui contient désormais trois colonnes et 131 192 lignes.
@@ -142,18 +146,18 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB();
 
 const temperatures = sdb.newTable("temperatures");
-await temperatures.loadData(
+temperatures.loadData(
   "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
 );
-await temperatures.logTable();
+await temperatures.log();
 
 const cities = sdb.newTable("cities");
-await cities.loadData(
+cities.loadData(
   "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
 );
-await cities.logTable();
+await cities.log();
 
-await sdb.done();
+await sdb.close();
 ```
 
 ![Capture d’écran montrant les noms des villes dans le terminal.](/assets/simple-data-analysis/tabular-data/cities-loaded.png)
@@ -162,9 +166,9 @@ Maintenant, nous voulons intégrer les noms des villes dans la table `temperatur
 
 Par défaut, cette méthode recherche une colonne commune dans deux tables et associe les lignes en fonction des valeurs de cette colonne.
 
-Ainsi, lorsque nous écrivons `await temperature.join(cities)`, nous demandons à SDA de trouver une colonne commune (qui est `id`) dans `temperature` et `cities`, puis d'ajouter les valeurs de `cities` correspondant au même `id` aux lignes correspondantes dans `temperature`.
+Ainsi, lorsque nous écrivons `temperature.join(cities)`, nous demandons à SDA de trouver une colonne commune (qui est `id`) dans `temperature` et `cities`, puis d'ajouter les valeurs de `cities` correspondant au même `id` aux lignes correspondantes dans `temperature`.
 
-Notez que j’ai mis en commentaire les appels précédents à `logTable` aux lignes 9 et 15 pour éviter de surcharger le terminal.
+Notez que j’ai mis en commentaire les appels précédents à `log` aux lignes 9 et 15 pour éviter de surcharger le terminal.
 
 
 ```ts showLineNumbers filename="main.ts" {17-18}
@@ -173,21 +177,21 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB();
 
 const temperatures = sdb.newTable("temperatures");
-await temperatures.loadData(
+temperatures.loadData(
   "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
 );
-// await temperatures.logTable();
+// await temperatures.log();
 
 const cities = sdb.newTable("cities");
-await cities.loadData(
+cities.loadData(
   "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
 );
-// await cities.logTable();
+// await cities.log();
 
-await temperatures.join(cities);
-await temperatures.logTable();
+temperatures.join(cities);
+await temperatures.log();
 
-await sdb.done();
+await sdb.close();
 ```
 
 Et maintenant, nous avons les noms des villes dans la table `temperature` !
@@ -200,7 +204,7 @@ Actuellement, à chaque fois que nous enregistrons `main.ts`, les deux fichiers 
 
 Mettons tout ce que nous avons fait jusqu’à présent en cache avec la méthode `.cache()`.
 
-Vous pouvez encapsuler votre code dans une fonction `async` et la passer à `.cache()`. La première fois que ce code s’exécute, SDA récupérera les données et effectuera les calculs nécessaires avant d’écrire les résultats dans le dossier `.sda-cache`.
+Passez à `.cache()` une fonction qui reçoit la table mise en cache. Dans cette fonction, placez les transformations en attente sur ce paramètre. La première fois, SDA exécute le travail et conserve le résultat dans `.sda-cache`. Les exécutions suivantes le réutilisent jusqu'à ce que la fonction, les opérations précédentes de la table ou une autre table lue par la fonction change. Les autres valeurs qui influencent le résultat peuvent être indiquées avec l'option `inputs`.
 
 Ici, j’ai défini l’option `cacheVerbose` à `true` lors de l’instanciation de `SimpleDB` afin d'afficher les informations liées au cache dans le terminal.
 
@@ -210,26 +214,25 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
 });
 
-await temperatures.logTable();
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities);
+});
 
-await sdb.done();
+await temperatures.log();
+
+await sdb.close();
 ```
 
 Voici le résultat lors de la première exécution.
@@ -249,7 +252,7 @@ Ici, la majeure partie du temps gagné provient de la récupération des donnée
 ![Capture d’écran montrant les données récupérées depuis le cache.](/assets/simple-data-analysis/tabular-data/in-cache.png)
 
 <Callout type="info" emoji="💡">
-    Lorsque vous utilisez la méthode `.cache()`, il est très important d’appeler `await sdb.done()` à la fin de votre script. Entre autres, cette méthode supprime les données en cache non utilisées à chaque exécution. Sans cela, le cache pourrait devenir très volumineux. Et si vous voulez nettoyer votre cache manuellement, exécutez simplement `deno task clean`.
+    Appelez toujours `await sdb.close()` à la fin du script. Cette méthode exécute le travail restant, libère la base de données et supprime les données en cache inutilisées. Pour vider complètement le cache, exécutez `deno task clean`.
 </Callout>
 
 ## Explorer les données
@@ -263,30 +266,29 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
 });
 
-await temperatures.summarize({
-  values: "time",
-  categories: "city"
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities);
 });
-await temperatures.logTable();
 
-await sdb.done();
+temperatures.summarize({
+  columns: "time",
+  by: "city",
+});
+await temperatures.log();
+
+await sdb.close();
 ```
 
 Les valeurs `min` et `max` montrent que nous avons plus d’un siècle de températures quotidiennes pour nos trois villes. C’est plutôt bien pour analyser les tendances !
@@ -315,32 +317,30 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
-
-  await temperatures.removeMissing();
 });
 
-await temperatures.summarize({
-  values: "time",
-  categories: "city",
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities)
+    .removeMissing();
 });
-await temperatures.logTable();
 
-await sdb.done();
+temperatures.summarize({
+  columns: "time",
+  by: "city",
+});
+await temperatures.log();
+
+await sdb.close();
 ```
 
 Et voilà ! Plus aucune température `null`.
@@ -366,29 +366,27 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
-
-  await temperatures.removeMissing();
 });
 
-await temperatures.addColumn("year", "number", `YEAR(time)`);
-await temperatures.logTable();
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities)
+    .removeMissing();
+});
 
-await sdb.done();
+temperatures.addColumn("year", "number", `YEAR(time)`);
+await temperatures.log();
+
+await sdb.close();
 ```
 <Callout type="info" emoji="💡">
     `YEAR(time)` est une expression SQL. Le [*Structured Query Language*](https://fr.wikipedia.org/wiki/Structured_Query_Language) est un langage très répandu lorsqu'on travaille avec des bases de données. En interne, SDA fonctionne avec SQL. Mais ne vous inquiétez pas, vous n’avez pas besoin d’être un expert en SQL pour utiliser SDA. Lorsque nous en aurons besoin, il s'agira d'expressions très simples, comme dans l'exemple ci-dessus, et nous apprendrons les bases au fur et à mesure des leçons et projets.
@@ -403,7 +401,7 @@ Cette méthode nécessite trois arguments :
 - L’intervalle des groupes
 - Le nom de la nouvelle colonne contenant les groupes
 
-Pour vérifier que tout a été fait correctement, nous pouvons afficher le résultat de `await temperature.getUniques("bin")`, qui retournera toutes les valeurs uniques dans la nouvelle colonne `bin`.
+Pour vérifier que tout a été fait correctement, nous pouvons afficher le résultat de `await temperatures.getUniques("bin")`, qui retournera toutes les valeurs uniques dans la nouvelle colonne `bin`.
 
 
 ```ts showLineNumbers filename="main.ts" {25, 28}
@@ -411,32 +409,30 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
-
-  await temperatures.removeMissing();
 });
 
-await temperatures.addColumn("year", "number", `YEAR(time)`);
-await temperatures.bins("year", 30, "bin");
-await temperatures.logTable();
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities)
+    .removeMissing();
+});
+
+temperatures.addColumn("year", "number", `YEAR(time)`);
+temperatures.bins("year", 30, "bin");
+await temperatures.log();
 
 console.log(await temperatures.getUniques("bin"));
 
-await sdb.done();
+await sdb.close();
 ```
 
 C'est parfait !
@@ -453,44 +449,42 @@ Utilisons à nouveau la méthode `.summarize()`. Mais cette fois, nous allons ut
 - Nous voulons calculer la moyenne et compter le nombre de valeurs pour chaque ville et chaque intervalle.
 - Nous arrondissons les valeurs à deux décimales.
 
-De plus, la table contient maintenant 15 lignes, mais `.logTable()` n'affiche que les 10 premières. Nous allons donc lui demander d'en afficher 15 pour mieux voir le résultat.
+De plus, la table contient maintenant 15 lignes, mais `.log()` n'affiche que les 10 premières. Nous allons donc lui demander d'en afficher 15 pour mieux voir le résultat.
 
 
-```ts showLineNumbers filename="main.ts" {26-31} /{ nbRowsToLog: 15 }/
+```ts showLineNumbers filename="main.ts" {26-31} /{ count: 15 }/
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
-
-  await temperatures.removeMissing();
 });
 
-await temperatures.addColumn("year", "number", `YEAR(time)`);
-await temperatures.bins("year", 30, "bin");
-await temperatures.summarize({
-  values: "t",
-  categories: ["city", "bin"],
-  summaries: ["mean", "count"],
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities)
+    .removeMissing();
+});
+
+temperatures.addColumn("year", "number", `YEAR(time)`);
+temperatures.bins("year", 30, "bin");
+temperatures.summarize({
+  columns: "t",
+  by: ["city", "bin"],
+  stats: ["mean", "count"],
   decimals: 2,
 });
-await temperatures.logTable({ nbRowsToLog: 15 });
+await temperatures.log({ count: 15 });
 
-await sdb.done();
+await sdb.close();
 ```
 
 Voilà qui est intéressant... Grâce à la colonne `count`, nous pouvons clairement voir où il manque des données.
@@ -509,37 +503,35 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
-
-  await temperatures.removeMissing();
 });
 
-await temperatures.addColumn("year", "number", `YEAR(time)`);
-await temperatures.bins("year", 30, "bin");
-await temperatures.summarize({
-  values: "t",
-  categories: ["city", "bin"],
-  summaries: ["mean", "count"],
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities)
+    .removeMissing();
+});
+
+temperatures.addColumn("year", "number", `YEAR(time)`);
+temperatures.bins("year", 30, "bin");
+temperatures.summarize({
+  columns: "t",
+  by: ["city", "bin"],
+  stats: ["mean", "count"],
   decimals: 2,
 });
-await temperatures.filter(`count >= 9861`);
-await temperatures.logTable({ nbRowsToLog: 15 });
+temperatures.filter(`count >= 9861`);
+await temperatures.log({ count: 15 });
 
-await sdb.done();
+await sdb.close();
 ```
 <Callout type="info" emoji="💡">
     Vous n'êtes pas obligé d'utiliser des *backticks* pour les expressions SQL, comme je l’ai fait aux lignes 24 et 32. Les méthodes attendent simplement du texte. J’ai pris cette habitude parce que les *template literals* sont pratiques pour injecter des variables dans du texte, et c’est quelque chose que nous ferons souvent avec les expressions SQL, comme nous le verrons dans les prochaines leçons et projets.
@@ -569,40 +561,38 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
-
-  await temperatures.removeMissing();
 });
 
-await temperatures.addColumn("year", "number", `YEAR(time)`);
-await temperatures.bins("year", 30, "bin");
-await temperatures.summarize({
-  values: "t",
-  categories: ["city", "bin"],
-  summaries: ["mean", "count"],
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities)
+    .removeMissing();
+});
+
+temperatures.addColumn("year", "number", `YEAR(time)`);
+temperatures.bins("year", 30, "bin");
+temperatures.summarize({
+  columns: "t",
+  by: ["city", "bin"],
+  stats: ["mean", "count"],
   decimals: 2,
 });
-await temperatures.filter(`count >= 9861`);
-await temperatures.splitExtract("bin", "-", 0, "startYear");
-await temperatures.trim("startYear", { character: "[" });
-await temperatures.convert({ startYear: "number" });
-await temperatures.logTable({ nbRowsToLog: 15 });
+temperatures.filter(`count >= 9861`);
+temperatures.splitExtract("bin", "-", 0, "startYear");
+temperatures.trim("startYear", { character: "[" });
+temperatures.convert({ startYear: "number" });
+await temperatures.log({ count: 15 });
 
-await sdb.done();
+await sdb.close();
 ```
 ![Capture d’écran montrant comment nettoyer les chaînes de caractères.](/assets/simple-data-analysis/tabular-data/cleaning.png)
 
@@ -618,42 +608,40 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
-
-  await temperatures.removeMissing();
 });
 
-await temperatures.addColumn("year", "number", `YEAR(time)`);
-await temperatures.bins("year", 30, "bin");
-await temperatures.summarize({
-  values: "t",
-  categories: ["city", "bin"],
-  summaries: ["mean", "count"],
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities)
+    .removeMissing();
+});
+
+temperatures.addColumn("year", "number", `YEAR(time)`);
+temperatures.bins("year", 30, "bin");
+temperatures.summarize({
+  columns: "t",
+  by: ["city", "bin"],
+  stats: ["mean", "count"],
   decimals: 2,
 });
-await temperatures.filter(`count >= 9861`);
-await temperatures.splitExtract("bin", "-", 0, "startYear");
-await temperatures.trim("startYear", { character: "[" });
-await temperatures.convert({ startYear: "number" });
-await temperatures.logTable({ nbRowsToLog: 15 });
+temperatures.filter(`count >= 9861`);
+temperatures.splitExtract("bin", "-", 0, "startYear");
+temperatures.trim("startYear", { character: "[" });
+temperatures.convert({ startYear: "number" });
+await temperatures.log({ count: 15 });
 
 await temperatures.logDotChart("startYear", "mean", { smallMultiples: "city" });
 
-await sdb.done();
+await sdb.close();
 ```
 ![Capture d’écran montrant comment afficher des graphiques dans le terminal.](/assets/simple-data-analysis/tabular-data/dot-charts.png)
 
@@ -672,38 +660,36 @@ import { dot, line, plot } from "@observablehq/plot";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
-
-  await temperatures.removeMissing();
 });
 
-await temperatures.addColumn("year", "number", `YEAR(time)`);
-await temperatures.bins("year", 30, "bin");
-await temperatures.summarize({
-  values: "t",
-  categories: ["city", "bin"],
-  summaries: ["mean", "count"],
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities)
+    .removeMissing();
+});
+
+temperatures.addColumn("year", "number", `YEAR(time)`);
+temperatures.bins("year", 30, "bin");
+temperatures.summarize({
+  columns: "t",
+  by: ["city", "bin"],
+  stats: ["mean", "count"],
   decimals: 2,
 });
-await temperatures.filter(`count >= 9861`);
-await temperatures.splitExtract("bin", "-", 0, "startYear");
-await temperatures.trim("startYear", { character: "[" });
-await temperatures.convert({ startYear: "number" });
-await temperatures.logTable({ nbRowsToLog: 15 });
+temperatures.filter(`count >= 9861`);
+temperatures.splitExtract("bin", "-", 0, "startYear");
+temperatures.trim("startYear", { character: "[" });
+temperatures.convert({ startYear: "number" });
+await temperatures.log({ count: 15 });
 
 const chart = (data: unknown[]) =>
   plot({
@@ -740,7 +726,7 @@ await temperatures.writeChart(
   "./sda/output/temperatures.png",
 );
 
-await sdb.done();
+await sdb.close();
 ```
 ![Capture d’écran montrant comment générer des graphiques avec Plot.](/assets/simple-data-analysis/tabular-data/plot.png)
 
@@ -763,46 +749,44 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
-
-  await temperatures.removeMissing();
 });
 
-await temperatures.addColumn("year", "number", `YEAR(time)`);
-await temperatures.bins("year", 30, "bin");
-await temperatures.summarize({
-  values: "t",
-  categories: ["city", "bin"],
-  summaries: ["mean", "count"],
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities)
+    .removeMissing();
+});
+
+temperatures.addColumn("year", "number", `YEAR(time)`);
+temperatures.bins("year", 30, "bin");
+temperatures.summarize({
+  columns: "t",
+  by: ["city", "bin"],
+  stats: ["mean", "count"],
   decimals: 2,
 });
-await temperatures.filter(`count >= 9861`);
-await temperatures.splitExtract("bin", "-", 0, "startYear");
-await temperatures.trim("startYear", { character: "[" });
-await temperatures.convert({ startYear: "number" });
+temperatures.filter(`count >= 9861`);
+temperatures.splitExtract("bin", "-", 0, "startYear");
+temperatures.trim("startYear", { character: "[" });
+temperatures.convert({ startYear: "number" });
 
-await temperatures.correlations({
+temperatures.correlations({
   x: "startYear",
   y: "mean",
-  categories: "city",
+  by: "city",
 });
-await temperatures.logTable({ nbRowsToLog: 15 });
+await temperatures.log({ count: 15 });
 
-await sdb.done();
+await sdb.close();
 ```
 
 Comme nous pouvons le voir, les corrélations sont proches de 1, ce qui signifie qu'il existe une forte relation entre les années et la température. Quand l'une augmente, l'autre aussi.
@@ -827,49 +811,47 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const temperatures = sdb.newTable("temperatures");
-
-await temperatures.cache(async () => {
-  await temperatures.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-  );
-  // await temperatures.logTable();
-
-  const cities = sdb.newTable("cities");
-  await cities.loadData(
+const cities = sdb.newTable("cities");
+await cities.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
   );
-  // await cities.logTable();
-
-  await temperatures.join(cities);
-
-  await temperatures.removeMissing();
 });
 
-await temperatures.addColumn("year", "number", `YEAR(time)`);
-await temperatures.bins("year", 30, "bin");
-await temperatures.summarize({
-  values: "t",
-  categories: ["city", "bin"],
-  summaries: ["mean", "count"],
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache((table) => {
+  table
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .join(cities)
+    .removeMissing();
+});
+
+temperatures.addColumn("year", "number", `YEAR(time)`);
+temperatures.bins("year", 30, "bin");
+temperatures.summarize({
+  columns: "t",
+  by: ["city", "bin"],
+  stats: ["mean", "count"],
   decimals: 2,
 });
-await temperatures.filter(`count >= 9861`);
-await temperatures.splitExtract("bin", "-", 0, "startYear");
-await temperatures.trim("startYear", { character: "[" });
-await temperatures.convert({ startYear: "number" });
+temperatures.filter(`count >= 9861`);
+temperatures.splitExtract("bin", "-", 0, "startYear");
+temperatures.trim("startYear", { character: "[" });
+temperatures.convert({ startYear: "number" });
 
-await temperatures.linearRegressions({
+temperatures.linearRegressions({
   x: "startYear",
   y: "mean",
-  categories: "city",
+  by: "city",
   decimals: 2,
 });
-await temperatures.logTable({ nbRowsToLog: 15 });
+await temperatures.log({ count: 15 });
 
 await temperatures.writeData("./sda/output/temperatures.csv");
 
-await sdb.done();
+await sdb.close();
 ```
 
 ## Conclusion

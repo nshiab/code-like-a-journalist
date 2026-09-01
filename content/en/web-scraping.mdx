@@ -62,7 +62,7 @@ const medievalData = await getHtmlTable(
 
 console.table(medievalData);
 
-await sdb.done();
+await sdb.close();
 ```
 ![A Wikipedia table scraped.](/assets/web-scraping/medieval.png)
 
@@ -93,13 +93,13 @@ await medievalDemography.convert({
   Year: "number",
   "Total European population,millions": "number",
 });
-await medievalDemography.logTable();
+await medievalDemography.log();
 await medievalDemography.logLineChart(
   "Year",
   "Total European population,millions",
 );
 
-await sdb.done();
+await sdb.close();
 ```
 ![A Wikipedia table cached.](/assets/web-scraping/medieval-cache.png)
 <Callout type="info" emoji="💡">
@@ -127,7 +127,7 @@ const expensesData = await getHtmlTable(
 
 console.table(expensesData);
 
-await sdb.done();
+await sdb.close();
 ```
 ![MPs expenses extracted from a web table.](/assets/web-scraping/MPS-expenses.png)
 
@@ -160,15 +160,15 @@ await MPs.convert({
   Contracts: "number",
 }, { try: true });
 await MPs.summarize({
-  values: ["Salaries", "Travel", "Hospitality", "Contracts"],
-  categories: "Caucus",
-  summaries: "mean",
+  columns: ["Salaries", "Travel", "Hospitality", "Contracts"],
+  by: "Caucus",
+  stats: "mean",
   decimals: 0,
 });
 await MPs.wider("Caucus", "mean");
-await MPs.logTable();
+await MPs.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![MPs expenses extracted and summarized with SDA.](/assets/web-scraping/MPS-summary.png)
 
@@ -450,12 +450,12 @@ const sdb = new SimpleDB();
 const MPs = sdb.newTable("MPs");
 await MPs.loadData("sda/data/*.json");
 await MPs.summarize({
-  categories: ["party", "language"],
+  by: ["party", "language"],
 });
 await MPs.wider("party", "count");
-await MPs.logTable();
+await MPs.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![Loading and summarizing the scraped data about MPs.](/assets/web-scraping/mps-sda.png)
 
@@ -707,13 +707,13 @@ const returns = sdb.newTable("returns");
 await returns.loadData("sda/data/*.json");
 await returns.convert({ expenses: "number" }, { try: true });
 await returns.summarize({
-  values: "expenses",
-  categories: "party",
-  summaries: ["mean", "count"],
+  columns: "expenses",
+  by: "party",
+  stats: ["mean", "count"],
   decimals: 0,
 });
 await returns.sort({ mean: "desc" });
-await returns.logTable(13);
+await returns.log({ count: 13 });
 ```
 ![Summarizing candidates expenses with SDA.](/assets/web-scraping/sda-EC.png)
 

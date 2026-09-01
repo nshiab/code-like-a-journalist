@@ -103,9 +103,9 @@ const census = sdb.newTable("census");
 await census.loadData(
   "sda/data/98-401-X2021006_eng_CSV/98-401-X2021006_English_CSV_data_Atlantic.csv",
 );
-await census.logTable()
+await census.log()
 
-await sdb.done();
+await sdb.close();
 ```
 
 Hmmm... We have a problem. This error means that the data is not using the `UTF-8` encoding, which is the standard nowadays and needed by SDA.
@@ -198,9 +198,9 @@ const census = sdb.newTable("census");
 await census.loadData(
   "sda/data/98-401-X2021006_eng_CSV/98-401-X2021006_English_CSV_data_Atlantic_utf8.csv",
 );
-await census.logTable();
+await census.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot of VS Code showing the Atlantic provinces data.](/assets/stats-can-census/atlantic-data.png)
 <Callout type="info" emoji="💡">
@@ -220,9 +220,9 @@ const census = sdb.newTable("census");
 await census.loadData(
   "sda/data/98-401-X2021006_eng_CSV/98-401-X2021006_English_CSV_data_Prairies_utf8.csv",
 );
-await census.logTable();
+await census.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot of VS Code showing an error due to a badly formatted CSV.](/assets/stats-can-census/prairies-error.png)
 
@@ -240,9 +240,9 @@ await census.loadData(
   "sda/data/98-401-X2021006_eng_CSV/98-401-X2021006_English_CSV_data_Prairies_utf8.csv",
   { strict: false },
 );
-await census.logTable();
+await census.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot of VS Code showing the Prairies data.](/assets/stats-can-census/prairies-working.png)
 
@@ -280,9 +280,9 @@ import crunchData from "./helpers/crunchData.ts";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const census = await crunchData(sdb);
-await census.logTable();
+await census.log();
 
-await sdb.done();
+await sdb.close();
 ```
 
 Depending on the RAM available on your computer, you might see a `.tmp` folder appearing. If the data is bigger than your RAM, this folder will be used to process all of it by putting processed chunks in it.
@@ -430,7 +430,7 @@ export default async function crunchData(sdb: SimpleDB) {
 
     const names = sdb.newTable("names");
     await names.loadData("sda/data/2021_92-151_X.csv");
-    await names.logTable();
+    await names.log();
   });
 
   return census;
@@ -508,7 +508,7 @@ export default async function crunchData(sdb: SimpleDB) {
 
     const names = sdb.newTable("names");
     await names.loadData("sda/data/2021_92-151_X_utf8.csv");
-    await names.logTable();
+    await names.log();
   });
 
   return census;
@@ -542,7 +542,7 @@ export default async function crunchData(sdb: SimpleDB) {
 
     const names = sdb.newTable("names");
     await names.loadData("sda/data/2021_92-151_X_utf8.csv", { strict: false });
-    await names.logTable();
+    await names.log();
   });
 
   return census;
@@ -690,7 +690,7 @@ export default async function crunchData(sdb: SimpleDB) {
       "sda/data/lda_000b21a_e_simplified.shp.zip",
     );
     await disseminationAreas.logProjections()
-    await disseminationAreas.logTable();
+    await disseminationAreas.log();
   });
 
   return census;
@@ -885,12 +885,12 @@ export default async function crunchData(sdb: SimpleDB) {
   });
 
   const medians = await census.summarize({
-    values: "medianIncome",
-    categories: "CMA",
-    summaries: "median",
+    columns: "medianIncome",
+    by: "CMA",
+    stats: "median",
     outputTable: "medians",
   });
-  await medians.logTable();
+  await medians.log();
 
   return census;
 }
@@ -947,9 +947,9 @@ export default async function crunchData(sdb: SimpleDB) {
   });
 
   const medians = await census.summarize({
-    values: "medianIncome",
-    categories: "CMA",
-    summaries: "median",
+    columns: "medianIncome",
+    by: "CMA",
+    stats: "median",
     outputTable: "medians",
   });
   await medians.removeColumns("value");
@@ -981,7 +981,7 @@ The new function will need the `census` table and will just log it for now.
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function visualizeData(census: SimpleTable) {
-  await census.logTable();
+  await census.log();
 }
 ```
 
@@ -997,7 +997,7 @@ const sdb = new SimpleDB({ cacheVerbose: true });
 const census = await crunchData(sdb);
 await visualizeData(census);
 
-await sdb.done();
+await sdb.close();
 ```
 
 We want to draw a map for each metropolitan area, so first, let's retrieve all unique metropolitan areas in our data.
@@ -1015,9 +1015,9 @@ export default async function visualizeData(census: SimpleTable) {
   const allCMAs = await census.getUniques("CMA");
 
   for (const CMA of allCMAs) {
-    const tableCMA = await census.cloneTable();
+    const tableCMA = await census.clone();
     await tableCMA.keep({ CMA });
-    await tableCMA.logTable();
+    await tableCMA.log();
   }
 }
 ```
@@ -1053,7 +1053,7 @@ export default async function visualizeData(census: SimpleTable) {
   }
 
   for (const CMA of allCMAs) {
-    const tableCMA = await census.cloneTable();
+    const tableCMA = await census.clone();
     await tableCMA.keep({ CMA });
     await tableCMA.writeMap(drawMap, `./sda/output/${CMA}.png`);
     break;
@@ -1110,7 +1110,7 @@ export default async function visualizeData(census: SimpleTable) {
   }
 
   for (const CMA of allCMAs) {
-    const tableCMA = await census.cloneTable();
+    const tableCMA = await census.clone();
     await tableCMA.keep({ CMA });
     await tableCMA.writeMap(drawMap, `./sda/output/${CMA}.png`);
     break;
@@ -1176,10 +1176,10 @@ export default async function visualizeData(census: SimpleTable) {
   }
 
   for (const CMA of allCMAs) {
-    const tableCMA = await census.cloneTable();
+    const tableCMA = await census.clone();
     await tableCMA.keep({ CMA });
 
-    const outline = await tableCMA.cloneTable();
+    const outline = await tableCMA.clone();
     await outline.cache(async () => {
       await outline.aggregateGeo("union");
     });
@@ -1251,10 +1251,10 @@ export default async function visualizeData(census: SimpleTable) {
   }
 
   for (const CMA of allCMAs) {
-    const tableCMA = await census.cloneTable();
+    const tableCMA = await census.clone();
     await tableCMA.keep({ CMA });
 
-    const outline = await tableCMA.cloneTable();
+    const outline = await tableCMA.clone();
     await outline.cache(async () => {
       await outline.aggregateGeo("union");
     });
@@ -1319,9 +1319,9 @@ export default async function crunchData(sdb: SimpleDB) {
   });
 
   const medians = await census.summarize({
-    values: "medianIncome",
-    categories: "CMA",
-    summaries: "median",
+    columns: "medianIncome",
+    by: "CMA",
+    stats: "median",
     outputTable: "medians",
   });
   await medians.removeColumns("value");

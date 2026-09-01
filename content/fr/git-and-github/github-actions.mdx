@@ -357,9 +357,9 @@ const temperatures = sdb.newTable();
 await temperatures.loadData(
   "https://raw.githubusercontent.com/nshiab/temperature-scraper/refs/heads/main/data.csv",
 );
-await temperatures.logTable();
+await temperatures.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![Récupérer les données avec la librairie Simple Data Analysis.](/assets/git-and-github/github-actions/fetch-test.png)
 

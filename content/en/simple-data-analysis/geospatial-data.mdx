@@ -38,7 +38,7 @@ Next, run the suggested task to start and watch `sda/main.ts`: `deno task sda`
 
 Let's start by fetching the 2023 Canadian wildfire data. 🔥 I uploaded the dataset to [GitHub](https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv). This CSV file comes from Natural Resources Canada.
 
-First, we create a new table and use the `loadData` method to load the data. Then, we use `logTable` to display it in the terminal.
+First, we create a new table and use the `loadData` method to load the data. Then, we use `log` to display it in the terminal.
 
 ```ts showLineNumbers filename="main.ts" {5-9}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -46,16 +46,16 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB();
 
 const fires = sdb.newTable("fires");
-await fires.loadData(
+fires.loadData(
   "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
 );
-await fires.logTable();
+await fires.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot showing the 2023 Canadian wildfires data in VS Code terminal.](/assets/simple-data-analysis/geospatial-data/log-fires.png)
 
-As we can see, we have around 7,000 wildfires. The latitude and longitude values are stored in two separate columns. To convert these into geometries that allow us to use geospatial methods, we can use the `points` method.
+As we can see, we have around 7,000 wildfires. The latitude and longitude values are stored in two separate columns. To convert these into geometries that allow us to use geospatial methods, we can use the `createPoints` method.
 
 This method requires three arguments: the name of the column storing latitude, the name of the column storing longitude, and the name of the new column where the point geometries will be stored, which I usually name `geom`.
 
@@ -66,13 +66,13 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB();
 
 const fires = sdb.newTable("fires");
-await fires.loadData(
+fires.loadData(
   "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
 );
-await fires.points("lat", "lon", "geom");
-await fires.logTable();
+fires.createPoints("lat", "lon", "geom");
+await fires.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot showing the 2023 Canadian wildfires as point geometries.](/assets/simple-data-analysis/geospatial-data/log-fires-points.png)
 
@@ -88,15 +88,15 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache(async () => {
-  await fires.loadData(
+await fires.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
   );
-  await fires.points("lat", "lon", "geom");
+  table.createPoints("lat", "lon", "geom");
 });
-await fires.logTable();
+await fires.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot showing the 2023 Canadian wildfires being cached.](/assets/simple-data-analysis/geospatial-data/fires-cache.png)
 
@@ -148,21 +148,21 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache(async () => {
-  await fires.loadData(
+await fires.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
   );
-  await fires.points("lat", "lon", "geom");
+  table.createPoints("lat", "lon", "geom");
 });
-await fires.logTable();
+await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.loadGeoData(
+provinces.loadGeoData(
   "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
 );
-await provinces.logTable();
+await provinces.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot showing the Canadian provinces data in VS Code terminal.](/assets/simple-data-analysis/geospatial-data/log-provinces.png)
 
@@ -177,23 +177,23 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache(async () => {
-  await fires.loadData(
+await fires.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
   );
-  await fires.points("lat", "lon", "geom");
+  table.createPoints("lat", "lon", "geom");
 });
-await fires.logTable();
+await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache(async () => {
-  await provinces.loadGeoData(
+await provinces.cache((table) => {
+  table.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
-await provinces.logTable();
+await provinces.log();
 
-await sdb.done();
+await sdb.close();
 ```
 
 Using the cache makes the code run 11 times faster on my machine! And I'm sure it's speeding things up on your end too. 😁
@@ -218,28 +218,28 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache(async () => {
-  await fires.loadData(
+await fires.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
   );
-  await fires.points("lat", "lon", "geom");
+  table.createPoints("lat", "lon", "geom");
 });
-await fires.logTable();
+await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache(async () => {
-  await provinces.loadGeoData(
+await provinces.cache((table) => {
+  table.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
-await provinces.logTable();
+await provinces.log();
 
-const firesInsideProvinces = await fires.joinGeo(provinces, "inside", {
+const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
   outputTable: "firesInsideProvinces",
 });
-await firesInsideProvinces.logTable();
+await firesInsideProvinces.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot showing the result joining fires and provinces.](/assets/simple-data-analysis/geospatial-data/join.png)
 
@@ -270,34 +270,34 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache(async () => {
-  await fires.loadData(
+await fires.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
   );
-  await fires.points("lat", "lon", "geom");
+  table.createPoints("lat", "lon", "geom");
 });
-await fires.logTable();
+await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache(async () => {
-  await provinces.loadGeoData(
+await provinces.cache((table) => {
+  table.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
-await provinces.logTable();
+await provinces.log();
 
-const firesInsideProvinces = await fires.joinGeo(provinces, "inside", {
+const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
   outputTable: "firesInsideProvinces",
 });
-await firesInsideProvinces.summarize({
-  values: "hectares",
-  categories: "nameEnglish",
-  summaries: ["count", "sum"],
+firesInsideProvinces.summarize({
+  columns: "hectares",
+  by: "nameEnglish",
+  stats: ["count", "sum"],
   decimals: 0,
 });
-await firesInsideProvinces.logTable();
+await firesInsideProvinces.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot showing the number of fires in each Canadian province.](/assets/simple-data-analysis/geospatial-data/summary.png)
 
@@ -314,39 +314,39 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache(async () => {
-  await fires.loadData(
+await fires.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
   );
-  await fires.points("lat", "lon", "geom");
+  table.createPoints("lat", "lon", "geom");
 });
-await fires.logTable();
+await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache(async () => {
-  await provinces.loadGeoData(
+await provinces.cache((table) => {
+  table.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
-await provinces.logTable();
+await provinces.log();
 
-const firesInsideProvinces = await fires.joinGeo(provinces, "inside", {
+const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
   outputTable: "firesInsideProvinces",
 });
-await firesInsideProvinces.summarize({
-  values: "hectares",
-  categories: "nameEnglish",
-  summaries: ["count", "sum"],
+firesInsideProvinces.summarize({
+  columns: "hectares",
+  by: "nameEnglish",
+  stats: ["count", "sum"],
   decimals: 0,
 });
-await firesInsideProvinces.renameColumns({
+firesInsideProvinces.renameColumns({
   count: "nbFires",
   sum: "burntArea",
 });
-await firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.logTable();
+firesInsideProvinces.sort({ burntArea: "desc" });
+await firesInsideProvinces.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot showing new column names.](/assets/simple-data-analysis/geospatial-data/renamed.png)
 
@@ -362,41 +362,41 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache(async () => {
-  await fires.loadData(
+await fires.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
   );
-  await fires.points("lat", "lon", "geom");
+  table.createPoints("lat", "lon", "geom");
 });
-await fires.logTable();
+await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache(async () => {
-  await provinces.loadGeoData(
+await provinces.cache((table) => {
+  table.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
-await provinces.logTable();
+await provinces.log();
 
-const firesInsideProvinces = await fires.joinGeo(provinces, "inside", {
+const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
   outputTable: "firesInsideProvinces",
 });
-await firesInsideProvinces.summarize({
-  values: "hectares",
-  categories: "nameEnglish",
-  summaries: ["count", "sum"],
+firesInsideProvinces.summarize({
+  columns: "hectares",
+  by: "nameEnglish",
+  stats: ["count", "sum"],
   decimals: 0,
 });
-await firesInsideProvinces.renameColumns({
+firesInsideProvinces.renameColumns({
   count: "nbFires",
   sum: "burntArea",
 });
-await firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.logTable();
+firesInsideProvinces.sort({ burntArea: "desc" });
+await firesInsideProvinces.log();
 
 await firesInsideProvinces.logBarChart("nameEnglish", "burntArea");
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot showing a bar chart in the terminal.](/assets/simple-data-analysis/geospatial-data/bar-chart.png)
 
@@ -414,37 +414,37 @@ import { barX, plot } from "@observablehq/plot";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache(async () => {
-  await fires.loadData(
+await fires.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
   );
-  await fires.points("lat", "lon", "geom");
+  table.createPoints("lat", "lon", "geom");
 });
-await fires.logTable();
+await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache(async () => {
-  await provinces.loadGeoData(
+await provinces.cache((table) => {
+  table.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
-await provinces.logTable();
+await provinces.log();
 
-const firesInsideProvinces = await fires.joinGeo(provinces, "inside", {
+const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
   outputTable: "firesInsideProvinces",
 });
-await firesInsideProvinces.summarize({
-  values: "hectares",
-  categories: "nameEnglish",
-  summaries: ["count", "sum"],
+firesInsideProvinces.summarize({
+  columns: "hectares",
+  by: "nameEnglish",
+  stats: ["count", "sum"],
   decimals: 0,
 });
-await firesInsideProvinces.renameColumns({
+firesInsideProvinces.renameColumns({
   count: "nbFires",
   sum: "burntArea",
 });
-await firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.logTable();
+firesInsideProvinces.sort({ burntArea: "desc" });
+await firesInsideProvinces.log();
 
 const chart = (data: unknown[]) =>
   plot({
@@ -464,7 +464,7 @@ const chart = (data: unknown[]) =>
   });
 await firesInsideProvinces.writeChart(chart, "./sda/output/chart.png");
 
-await sdb.done();
+await sdb.close();
 ```
 
 You can click on the screenshot below to zoom in.
@@ -489,44 +489,44 @@ import { geo, plot } from "@observablehq/plot";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache(async () => {
-  await fires.loadData(
+await fires.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
   );
-  await fires.points("lat", "lon", "geom");
+  table.createPoints("lat", "lon", "geom");
 });
-await fires.logTable();
+await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache(async () => {
-  await provinces.loadGeoData(
+await provinces.cache((table) => {
+  table.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
-await provinces.logTable();
+await provinces.log();
 
-const firesInsideProvinces = await fires.joinGeo(provinces, "inside", {
+const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
   outputTable: "firesInsideProvinces",
 });
-await firesInsideProvinces.summarize({
-  values: "hectares",
-  categories: "nameEnglish",
-  summaries: ["count", "sum"],
+firesInsideProvinces.summarize({
+  columns: "hectares",
+  by: "nameEnglish",
+  stats: ["count", "sum"],
   decimals: 0,
 });
-await firesInsideProvinces.renameColumns({
+firesInsideProvinces.renameColumns({
   count: "nbFires",
   sum: "burntArea",
 });
-await firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.logTable();
+firesInsideProvinces.sort({ burntArea: "desc" });
+await firesInsideProvinces.log();
 
-const provincesAndFires = await provinces.cloneTable({
-  outputTable: "firesAndProvinces",
+const provincesAndFires = provinces.clone({
+  name: "firesAndProvinces",
 });
-await provincesAndFires.insertTables(fires, { unifyColumns: true });
-await provincesAndFires.addColumn("isFire", "boolean", `hectares > 0`);
-await provincesAndFires.replace("cause", {
+provincesAndFires.insertTables(fires, { unifyColumns: true });
+provincesAndFires.addColumn("isFire", "boolean", `hectares > 0`);
+provincesAndFires.replace("cause", {
   "H": "Human",
   "N": "Natural",
   "U": "Unknown",
@@ -568,7 +568,7 @@ await provincesAndFires.writeMap(makeMap, "./sda/output/map.png", {
   rewind: true,
 });
 
-await sdb.done();
+await sdb.close();
 ```
 
 You can click on the screenshot below to zoom in.
@@ -592,41 +592,41 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache(async () => {
-  await fires.loadData(
+await fires.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
   );
-  await fires.points("lat", "lon", "geom");
+  table.createPoints("lat", "lon", "geom");
 });
-await fires.logTable();
+await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache(async () => {
-  await provinces.loadGeoData(
+await provinces.cache((table) => {
+  table.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
-await provinces.logTable();
+await provinces.log();
 
-const firesInsideProvinces = await fires.joinGeo(provinces, "inside", {
+const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
   outputTable: "firesInsideProvinces",
 });
-await firesInsideProvinces.summarize({
-  values: "hectares",
-  categories: "nameEnglish",
-  summaries: ["count", "sum"],
+firesInsideProvinces.summarize({
+  columns: "hectares",
+  by: "nameEnglish",
+  stats: ["count", "sum"],
   decimals: 0,
 });
-await firesInsideProvinces.renameColumns({
+firesInsideProvinces.renameColumns({
   count: "nbFires",
   sum: "burntArea",
 });
-await firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.logTable();
+firesInsideProvinces.sort({ burntArea: "desc" });
+await firesInsideProvinces.log();
 
 await firesInsideProvinces.writeData("./sda/output/firesInsideProvinces.csv");
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot showing a CSV file.](/assets/simple-data-analysis/geospatial-data/write.png)
 
@@ -640,42 +640,42 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache(async () => {
-  await fires.loadData(
+await fires.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
   );
-  await fires.points("lat", "lon", "geom");
+  table.createPoints("lat", "lon", "geom");
 });
-await fires.logTable();
+await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache(async () => {
-  await provinces.loadGeoData(
+await provinces.cache((table) => {
+  table.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
-await provinces.logTable();
+await provinces.log();
 
-const firesInsideProvinces = await fires.joinGeo(provinces, "inside", {
+const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
   outputTable: "firesInsideProvinces",
 });
-await firesInsideProvinces.summarize({
-  values: "hectares",
-  categories: "nameEnglish",
-  summaries: ["count", "sum"],
+firesInsideProvinces.summarize({
+  columns: "hectares",
+  by: "nameEnglish",
+  stats: ["count", "sum"],
   decimals: 0,
 });
-await firesInsideProvinces.renameColumns({
+firesInsideProvinces.renameColumns({
   count: "nbFires",
   sum: "burntArea",
 });
-await firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.logTable();
+firesInsideProvinces.sort({ burntArea: "desc" });
+await firesInsideProvinces.log();
 
 await fires.writeGeoData("./sda/output/fires.geojson");
 await provinces.writeGeoData("./sda/output/provinces.geojson");
 
-await sdb.done();
+await sdb.close();
 ```
 
 If you saved them as GeoJSON files, you can visualize them directly in VS Code after installing the [Geo Data Viewer extension](https://marketplace.visualstudio.com/items?itemName=RandomFractalsInc.geo-data-viewer).

@@ -57,9 +57,9 @@ const sdb = new SimpleDB({ logDuration: true });
 const table = sdb.newTable();
 
 await table.loadData("sda/data/measurements.csv");
-await table.logTable();
+await table.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot of VS Code after loading one billion rows of data.](/assets/one-billion-row-challenge/load-data.png)
 
@@ -89,13 +89,13 @@ const sdb = new SimpleDB({ logDuration: true });
 const table = sdb.newTable();
 await table.loadData("sda/data/measurements.csv");
 await table.summarize({
-  values: "temp",
-  categories: "city",
-  summaries: ["min", "mean", "max"],
+  columns: "temp",
+  by: "city",
+  stats: ["min", "mean", "max"],
 });
-await table.logTable();
+await table.log();
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot of VS Code after aggregating one billion rows of data.](/assets/one-billion-row-challenge/summarize.png)
 
@@ -132,7 +132,7 @@ LIMIT 10;
 
 console.table(result);
 
-await sdb.done();
+await sdb.close();
 ```
 ![A screenshot of VS Code after aggregating one billion rows of data.](/assets/one-billion-row-challenge/sql.png)
 

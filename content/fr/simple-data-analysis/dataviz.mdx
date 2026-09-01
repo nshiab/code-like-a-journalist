@@ -40,8 +40,8 @@ Commençons par `crunchData`. Créez un fichier `crunchData.ts` dans `./sda/help
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(fires: SimpleTable) {
-  await fires.cache(async () => {
-    await fires.loadData(
+  await fires.cache((table) => {
+    table.loadData(
       "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
     );
   });
@@ -54,7 +54,7 @@ Nous pouvons maintenant nous occuper de `visualizeData`. Créez un fichier `visu
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
 }
 ```
 
@@ -71,7 +71,7 @@ const fires = sdb.newTable("fires");
 await crunchData(fires);
 await visualizeData(fires);
 
-await sdb.done();
+await sdb.close();
 ```
 ![Une capture d'écran montrant VS Code après l'exécution des fonctions d'aide.](/assets/simple-data-analysis/dataviz/helpers.png)
 
@@ -85,16 +85,16 @@ Dans `crunchData.ts`, additionnons les superficies brûlées par date et par pro
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(fires: SimpleTable) {
-  await fires.cache(async () => {
-    await fires.loadData(
+  await fires.cache((table) => {
+    table.loadData(
       "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
     );
   });
 
-  await fires.summarize({
-    values: "hectares",
-    categories: ["province", "startdate"],
-    summaries: "sum",
+  fires.summarize({
+    columns: "hectares",
+    by: ["province", "startdate"],
+    stats: "sum",
     decimals: 1,
   });
 }
@@ -107,22 +107,22 @@ Nous pouvons maintenant calculer la somme cumulative par province avec la métho
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(fires: SimpleTable) {
-  await fires.cache(async () => {
-    await fires.loadData(
+  await fires.cache((table) => {
+    table.loadData(
       "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
     );
   });
 
-  await fires.summarize({
-    values: "hectares",
-    categories: ["province", "startdate"],
-    summaries: "sum",
+  fires.summarize({
+    columns: "hectares",
+    by: ["province", "startdate"],
+    stats: "sum",
     decimals: 1,
   });
-  await fires.accumulate("sum", "cumulativeHectares", {
-    categories: "province",
+  fires.accumulate("sum", "cumulativeHectares", {
+    by: "province",
   });
-  await fires.round("cumulativeHectares", { decimals: 1 });
+  fires.round("cumulativeHectares", { decimals: 1 });
 }
 ```
 ![Une capture d'écran montrant une nouvelle colonne cumulativeHectares dans une table de données.](/assets/simple-data-analysis/dataviz/cumulative.png)
@@ -147,7 +147,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { formatNumber } from "@nshiab/journalism-format";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   await fires.logDotChart(
     "startdate",
     "cumulativeHectares",
@@ -187,7 +187,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { line, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       marks: [
@@ -221,7 +221,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { line, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       inset: 10,
@@ -261,7 +261,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { line, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       inset: 10,
@@ -303,7 +303,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dot, line, plot, selectLast } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       inset: 10,
@@ -351,7 +351,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dot, line, plot, selectLast, text } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       inset: 10,
@@ -409,40 +409,40 @@ Nous constatons également qu'il ne se passe pas grand-chose avant la mi-avril e
 
 Revenons à `crunchData.ts` pour corriger cela :
 - À la ligne 10, nous filtrons les feux pour ne conserver que ceux ayant un `startDate` entre le 15 avril 2023 et le 1er octobre 2023.
-- Aux lignes 21-30, nous récupérons la valeur maximale de `cumulativeHectares` pour chaque province et stockons les résultats dans une nouvelle table, `maxValuesPerProvince`. Ensuite, nous supprimons et renommons certaines colonnes pour correspondre à celles de la table `fires`. Nous ajoutons également une nouvelle colonne avec la date finale de nos données (1er octobre 2023). Enfin, nous insérons les lignes de cette nouvelle table dans `fires`.
+- Après avoir calculé les valeurs cumulées, nous supprimons la colonne `sum`, devenue inutile. Nous récupérons ensuite la valeur maximale de `cumulativeHectares` pour chaque province et stockons les résultats dans une nouvelle table, `maxValuesPerProvince`. Nous renommons sa colonne de résultat pour qu'elle corresponde à celle de `fires`, ajoutons la date finale de nos données (le 1er octobre 2023), puis insérons ces lignes dans `fires`.
 
 
 ```ts showLineNumbers filename="crunchData.ts" {10, 21-30}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(fires: SimpleTable) {
-  await fires.cache(async () => {
-    await fires.loadData(
+  await fires.cache((table) => {
+    table.loadData(
       "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
     );
   });
 
-  await fires.filter(`startdate >= '2023-04-15' && startdate <= '2023-10-01'`);
-  await fires.summarize({
-    values: "hectares",
-    categories: ["province", "startdate"],
-    summaries: "sum",
+  fires.filter(`startdate >= '2023-04-15' && startdate <= '2023-10-01'`);
+  fires.summarize({
+    columns: "hectares",
+    by: ["province", "startdate"],
+    stats: "sum",
     decimals: 1,
   });
-  await fires.accumulate("sum", "cumulativeHectares", {
-    categories: "province",
+  fires.accumulate("sum", "cumulativeHectares", {
+    by: "province",
   });
-  await fires.round("cumulativeHectares", { decimals: 1 });
-  const maxValuesPerProvince = await fires.summarize({
-    values: "cumulativeHectares",
-    categories: "province",
-    summaries: "max",
+  fires.round("cumulativeHectares", { decimals: 1 });
+  fires.removeColumns("sum");
+  const maxValuesPerProvince = fires.summarize({
+    columns: "cumulativeHectares",
+    by: "province",
+    stats: "max",
     outputTable: "maxValuesPerProvince",
   });
-  await maxValuesPerProvince.removeColumns("value");
-  await maxValuesPerProvince.renameColumns({ max: "cumulativeHectares" });
-  await maxValuesPerProvince.addColumn("startdate", "date", `'2023-10-01'`);
-  await fires.insertTables(maxValuesPerProvince);
+  maxValuesPerProvince.renameColumns({ max: "cumulativeHectares" });
+  maxValuesPerProvince.addColumn("startdate", "date", `'2023-10-01'`);
+  fires.insertTables(maxValuesPerProvince);
 }
 ```
 ![Une capture d'écran montrant un graphique en ligne avec des étiquettes alignées.](/assets/simple-data-analysis/dataviz/labels-aligned.png)
@@ -526,12 +526,12 @@ Nous pouvons mettre à jour `crunchData.ts` pour revenir à nos données brutes.
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(fires: SimpleTable) {
-  await fires.cache(async () => {
-    await fires.loadData(
+  await fires.cache((table) => {
+    table.loadData(
       "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
     );
   });
-  await fires.filter(`hectares > 1`);
+  fires.filter(`hectares > 1`);
 }
 ```
 
@@ -542,7 +542,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       marks: [
@@ -565,7 +565,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       marks: [
@@ -586,7 +586,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       y: {
@@ -610,7 +610,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       y: {
@@ -637,7 +637,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       y: {
@@ -670,7 +670,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       width: 800,
@@ -709,7 +709,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawChart = (data: unknown[]) =>
     plot({
       width: 800,
@@ -754,7 +754,7 @@ Avec SDA, vous pouvez travailler à la fois avec des données tabulaires et des 
 
 Cartographions nos feux en y ajoutant les limites des provinces canadiennes.
 
-Tout d'abord, nous devons stocker les géométries des feux dans la même table que les limites des provinces.
+Tout d'abord, nous devons stocker les géométries des feux dans la même table que les limites des provinces. Les deux jeux de données utilisent la longitude et la latitude : nous les chargeons donc en `EPSG:4326`. Avant d'insérer les lignes, nous convertissons explicitement les deux colonnes vers `GEOMETRY('EPSG:4326')`. Elles restent ainsi compatibles même si une table en cache conserve une annotation de SCR différente. Les deux appels à `run()` avec `await` exécutent ces changements de type en attente avant que l'insertion entre les tables soit mise en file.
 
 Réutilisons ce que nous avons fait dans la leçon précédente et mettons à jour `crunchData.ts`. Nous allons le modifier pour qu'il prenne un deuxième paramètre, `provinces`. Nous récupérons et mettons en cache les limites des provinces, puis nous les insérons dans la table `fires`. Avant de les insérer, nous ajoutons une colonne `isFire` à la table `fires` pour pouvoir les différencier facilement par la suite.
 
@@ -765,31 +765,36 @@ export default async function crunchData(
   fires: SimpleTable,
   provinces: SimpleTable,
 ) {
-  await fires.cache(async () => {
-    await fires.loadData(
+  await fires.cache((table) => {
+    table.loadData(
       "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
     );
-    await fires.points("lat", "lon", "geom");
-    await fires.addColumn("isFire", "boolean", `TRUE`);
+    table.createPoints("lat", "lon", "geom", { projection: "EPSG:4326" });
+    table.addColumn("isFire", "boolean", `TRUE`);
   });
 
-  await provinces.cache(async () => {
-    await provinces.loadGeoData(
+  await provinces.cache((table) => {
+    table.loadGeoData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
+      { toEPSG4326: true },
     );
   });
 
-  await fires.insertTables(provinces, { unifyColumns: true });
+  fires.updateColumn("geom", `geom::GEOMETRY('EPSG:4326')`);
+  provinces.updateColumn("geom", `geom::GEOMETRY('EPSG:4326')`);
+  await provinces.run();
+  await fires.run();
+  fires.insertTables(provinces, { unifyColumns: true });
 }
 ```
 
-Retirons tout sauf le `logTable` dans `visualizeData.ts` pour le moment.
+Retirons tout sauf le `log` dans `visualizeData.ts` pour le moment.
 
 ```ts showLineNumbers filename="visualizeData.ts"
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
 }
 ```
 
@@ -807,7 +812,7 @@ const provinces = sdb.newTable("provinces");
 await crunchData(fires, provinces);
 await visualizeData(fires);
 
-await sdb.done();
+await sdb.close();
 ```
 
 Voici ce que vous devriez voir pour partir du bon pied.
@@ -825,7 +830,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawMap = (
     data: { features: { properties: { [key: string]: unknown } }[] },
   ) => {
@@ -860,7 +865,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawMap = (
     data: { features: { properties: { [key: string]: unknown } }[] },
   ) => {
@@ -895,7 +900,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawMap = (
     data: { features: { properties: { [key: string]: unknown } }[] },
   ) => {
@@ -937,7 +942,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot, spike } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawMap = (
     data: { features: { properties: { [key: string]: unknown } }[] },
   ) => {
@@ -982,7 +987,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot, spike } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawMap = (
     data: { features: { properties: { [key: string]: unknown } }[] },
   ) => {
@@ -1037,22 +1042,27 @@ export default async function crunchData(
   fires: SimpleTable,
   provinces: SimpleTable,
 ) {
-  await fires.cache(async () => {
-    await fires.loadData(
+  await fires.cache((table) => {
+    table.loadData(
       "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
     );
-    await fires.points("lat", "lon", "geom");
-    await fires.addColumn("isFire", "boolean", `TRUE`);
-    await fires.sort({ lat: "asc" });
+    table.createPoints("lat", "lon", "geom", { projection: "EPSG:4326" });
+    table.addColumn("isFire", "boolean", `TRUE`);
+    table.sort({ lat: "desc" });
   });
 
-  await provinces.cache(async () => {
-    await provinces.loadGeoData(
+  await provinces.cache((table) => {
+    table.loadGeoData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
+      { toEPSG4326: true },
     );
   });
 
-  await fires.insertTables(provinces, { unifyColumns: true });
+  fires.updateColumn("geom", `geom::GEOMETRY('EPSG:4326')`);
+  provinces.updateColumn("geom", `geom::GEOMETRY('EPSG:4326')`);
+  await provinces.run();
+  await fires.run();
+  fires.insertTables(provinces, { unifyColumns: true });
 }
 ```
 
@@ -1065,7 +1075,7 @@ import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot, spike } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  await fires.logTable();
+  await fires.log();
   const drawMap = (
     data: { features: { properties: { [key: string]: unknown } }[] },
   ) => {

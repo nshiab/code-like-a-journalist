@@ -45,13 +45,14 @@ Cliquez ensuite sur `Créer une clé API`.
 
 Suivez les étapes suggérées. Si on vous demande d'utiliser un projet Google Cloud, sélectionnez Gemini si disponible ; sinon, créez-en un nouveau.
 
-![Une capture d'écran de Google AI Studio.](/assets/simple-data-analysis/sda-and-ai/create-key.png)
+![Les réglages du fournisseur Gemini utilisés dans cette leçon.](/assets/simple-data-analysis/sda-and-ai/create-key.png)
 
-Une fois que vous avez copié votre nouvelle clé API, ouvrez le fichier `.env` créé par `setup-data-project` et collez-la-y. Ajoutez également le modèle que nous utiliserons, qui est `gemini-2.0-flash-lite`.
+Une fois que vous avez copié votre nouvelle clé API, ouvrez le fichier `.env` créé par `setup-data-project` et collez-la-y. Ajoutez également le modèle que nous utiliserons, qui est `gemini-3.5-flash-lite`.
 
 ```txt filename=".env" showLineNumbers
+AI_PROVIDER=gemini
 AI_KEY=your_api_key_here
-AI_MODEL=gemini-2.0-flash-lite
+AI_MODEL=gemini-3.5-flash-lite
 ```
 
 `.env` est un fichier que nous utilisons habituellement pour les **variables d'environnement**, qui sont souvent des identifiants qui ne doivent pas être partagés. `setup-data-project` ajoute automatiquement ce fichier à `.gitignore`, il ne sera donc pas commité par Git et ne sera pas poussé sur GitHub.
@@ -68,9 +69,9 @@ Et nous sommes prêts à décoller ! 🚀
 
 Avant d'exécuter du code, il y a quelque chose que je veux vous montrer.
 
-Dans Google AI Studio, après avoir cliqué sur `Obtenir une clé API`, vous avez accès à votre `Facturation de votre plan API`. Sélectionnez le modèle que nous allons utiliser : `Gemini 2.0 Flash Lite`.
+Dans Google AI Studio, après avoir cliqué sur `Obtenir une clé API`, ouvrez `Facturation de votre plan API` et sélectionnez le modèle que nous allons utiliser : `Gemini 3.5 Flash-Lite`.
 
-Là, vous verrez que vous avez un compte gratuit qui vous permet de faire 30 requêtes par minute avec ce modèle (cela a peut-être changé depuis que j'ai écrit ceci).
+Vérifiez la limite de requêtes actuellement affichée pour votre compte et ce modèle. Les quotas peuvent varier selon le forfait et évoluer avec le temps. Les exemples ci-dessous utilisent `rateLimitPerMinute: 30` ; réduisez cette valeur si AI Studio indique une limite plus basse pour votre compte.
 
 Et vous remarquerez également que... les données que vous allez envoyer seront utilisées par Google ! Alors, soyez très prudent : **n'envoyez pas de données sensibles via cette API !**
 
@@ -78,7 +79,7 @@ Comme vous le savez peut-être déjà, rien n'est vraiment gratuit dans la vie..
 
 Si vous avez un compte pro ou entreprise, ils déclarent qu'ils n'utiliseront pas vos données pour améliorer leurs produits. Mais si vous avez besoin d'une confidentialité totale, je vous montrerai à la fin comment utiliser Ollama pour exécuter des modèles localement sur votre machine.
 
-![Facturation du plan Google AI.](/assets/simple-data-analysis/sda-and-ai/plan-billing.png)
+![Un rappel de vérifier le quota actuel dans Google AI Studio.](/assets/simple-data-analysis/sda-and-ai/plan-billing.png)
 
 ## Les données
 
@@ -95,21 +96,20 @@ Nous affichons également la table dans le terminal.
 Pour exécuter ce code et le surveiller, exécutez `deno task sda` dans votre terminal. À chaque fois que nous allons modifier le code et le sauvegarder, il sera automatiquement exécuté. Pratique!
 
 ```ts showLineNumbers filename="sda/main.ts" {6-13}
-import "@std/dotenv/load";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
 
 const data = sdb.newTable("data");
-await data.cache(async () => {
-  await data.loadData(
+await data.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
   );
 });
 
-await data.logTable();
+await data.log();
 
-await sdb.done();
+await sdb.close();
 ```
 
 ![Chargement des données depuis GitHub.](/assets/simple-data-analysis/sda-and-ai/loading-data.png)
@@ -127,44 +127,47 @@ Son utilisation est assez simple :
 - Et enfin, tapez votre prompt. Ici, nous demandons au LLM de catégoriser le `payee`.
 
 Le quatrième argument est facultatif. C'est un objet avec quelques options :
+- `generation` sélectionne le fournisseur et ses réglages. Ici, `provider: "gemini"` rend le fournisseur explicite. Les valeurs de cet objet remplacent les valeurs correspondantes de `.env`.
 - `rateLimitPerMinute` garantira que nous respectons notre quota d'API. Si nous envoyons des requêtes trop rapidement, la méthode attendra la durée nécessaire pour éviter que les requêtes ne soient rejetées.
 - `verbose` affichera des informations supplémentaires dans le terminal pendant le traitement des données.
 
 ```ts showLineNumbers filename="sda/main.ts" {13-21}
-import "@std/dotenv/load";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
 
 const data = sdb.newTable("data");
-await data.cache(async () => {
-  await data.loadData(
+await data.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
   );
 });
 
-await data.aiRowByRow(
+data.aiRowByRow(
   "payee",
   "categoryAI",
   `Categorize the payee into one of the following categories: Restaurant, Bar, Hotel or Other. `,
   {
+    generation: { provider: "gemini" },
     rateLimitPerMinute: 30,
     verbose: true,
   },
 );
 
-await data.logTable();
+await data.log();
 
-await sdb.done();
+await sdb.close();
 ```
 
 Si vous exécutez ce code, vous verrez votre prompt ainsi que des instructions supplémentaires ajoutées par la méthode.
+
+Comme les autres transformations de SDA, `aiRowByRow()` est synchrone et met son travail en attente. Les requêtes sont envoyées lorsque l'observateur `log()` appelé avec `await` exécute le pipeline.
 
 L'option `verbose` ajoute des informations supplémentaires utiles. Les **tokens** représentent la quantité d'informations envoyées et reçues par l'IA. Sur cette base, la méthode vous donne une estimation du coût de la requête si vous avez un compte avec paiement à l'utilisation.
 
 Actuellement, les données sont classifiées par le modèle d'IA, mais... c'est un peu lent.
 
-Parce que nous avons 250 lignes de données, et que nous ne pouvons envoyer que 30 requêtes par minute, classer l'ensemble des données prendra... plus de 8 minutes !
+Avec une ligne par requête, classifier 250 lignes demande 250 requêtes. La limite de débit espace volontairement ces requêtes, ce qui peut prendre plusieurs minutes.
 
 Nous pouvons sûrement accélérer cela !
 
@@ -176,37 +179,37 @@ Nous pouvons sûrement accélérer cela !
 
 Au lieu d'envoyer une ligne à la fois, nous pourrions en envoyer un lot !
 
-Dans le code ci-dessous, nous utilisons l'option `batchSize` pour envoyer 10 lignes à la fois. Maintenant, le traitement de l'ensemble des données prend moins d'une minute !
+Dans le code ci-dessous, nous utilisons l'option `batchSize` pour envoyer 10 lignes à la fois. Cela réduit le travail de 250 requêtes à environ 25, même si la durée exacte dépend encore du fournisseur et de votre quota.
 
 C'est génial, mais nous pouvons pousser cela un peu plus loin...
 
 ```ts showLineNumbers filename="sda/main.ts" {18}
-import "@std/dotenv/load";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
 
 const data = sdb.newTable("data");
-await data.cache(async () => {
-  await data.loadData(
+await data.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
   );
 });
 
-await data.aiRowByRow(
+data.aiRowByRow(
   "payee",
   "categoryAI",
   `Categorize the payee into one of the following categories: Restaurant, Bar, Hotel or Other. `,
   {
+    generation: { provider: "gemini" },
     batchSize: 10,
     rateLimitPerMinute: 30,
     verbose: true,
   },
 );
 
-await data.logTable();
+await data.log();
 
-await sdb.done();
+await sdb.close();
 ```
 
 ![Envoi de lots de données.](/assets/simple-data-analysis/sda-and-ai/batches.png)
@@ -217,81 +220,76 @@ L'une des nombreuses fonctionnalités formidables de TypeScript et JavaScript es
 
 Tirer parti de cette fonctionnalité du langage peut accélérer l'exécution de notre code !
 
-Puisque nous avons 250 lignes de données, nous pourrions envoyer des lots de 17 lignes avec 15 requêtes concurrentes pour traiter toutes nos données en moins de... 2 secondes !
-
-Ces 15 requêtes nous maintiennent en dessous de la limite de quota de 30, ce qui est important.
-
-Un conseil : pour exécuter ce code, assurez-vous de n'avoir pas envoyé de requêtes depuis au moins une minute ; sinon, vous pourriez atteindre la limite de quota du plan gratuit.
+Puisque nous avons 250 lignes de données, des lots de 17 produisent 15 requêtes. Le réglage `concurrency: 15` permet à ces requêtes d'être en cours simultanément, tandis que `rateLimitPerMinute` contrôle toujours leur rythme de démarrage. La durée exacte dépend du modèle, de la charge actuelle du service et du quota de votre compte.
 
 ```ts showLineNumbers filename="sda/main.ts" /{ logDuration: true }/ {18-19}
-import "@std/dotenv/load";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ logDuration: true });
 
 const data = sdb.newTable("data");
-await data.cache(async () => {
-  await data.loadData(
+await data.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
   );
 });
 
-await data.aiRowByRow(
+data.aiRowByRow(
   "payee",
   "categoryAI",
   `Categorize the payee into one of the following categories: Restaurant, Bar, Hotel or Other. `,
   {
+    generation: { provider: "gemini" },
     batchSize: 17,
-    concurrent: 15,
+    concurrency: 15,
     rateLimitPerMinute: 30,
     verbose: true,
   },
 );
 
-await data.logTable();
+await data.log();
 
-await sdb.done();
+await sdb.close();
 ```
 
 ![Envoi de requêtes concurrentes.](/assets/simple-data-analysis/sda-and-ai/concurrency.png)
 
 ### Mise en cache
 
-Il y a une dernière astuce que nous pouvons utiliser pour rendre notre code plus efficace : le **mise en cache**.
+Il reste une dernière optimisation à comprendre : la **mise en cache des requêtes d'IA**.
 
-Nous pourrions stocker les résultats envoyés par l'IA dans des fichiers localement. Si nous réexécutons notre code et que le prompt/les données n'ont pas changé, nous pourrions utiliser ce que nous avons stocké sur notre machine au lieu d'attendre à nouveau le modèle d'IA.
+SDA 6 met les réponses de l'IA en cache dans des fichiers locaux par défaut. Si nous réexécutons notre code et que le fournisseur, le modèle, le prompt et les données n'ont pas changé, SDA peut utiliser la réponse stockée au lieu de contacter à nouveau le modèle.
 
-C'est exactement ce que l'option `cache` vous permet de faire.
+Nous réglons `generation.cache` à `true` ci-dessous pour rendre ce comportement par défaut explicite. Réglez-le à `false` lorsque vous souhaitez délibérément obtenir une nouvelle réponse à chaque exécution.
 
 ```ts showLineNumbers filename="sda/main.ts" {20}
-import "@std/dotenv/load";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ logDuration: true });
 
 const data = sdb.newTable("data");
-await data.cache(async () => {
-  await data.loadData(
+await data.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
   );
 });
 
-await data.aiRowByRow(
+data.aiRowByRow(
   "payee",
   "categoryAI",
   `Categorize the payee into one of the following categories: Restaurant, Bar, Hotel or Other. `,
   {
+    generation: { provider: "gemini", cache: true },
     batchSize: 17,
-    concurrent: 15,
-    cache: true,
+    concurrency: 15,
     rateLimitPerMinute: 30,
     verbose: true,
   },
 );
 
-await data.logTable();
+await data.log();
 
-await sdb.done();
+await sdb.close();
 ```
 
 Si vous exécutez ce code, vous remarquerez un nouveau dossier caché `.journalism-cache`. Les fichiers qu'il contient sont des fichiers JSON stockant les réponses de l'IA. Il fonctionne comme le dossier `.sda-cache` précédent, mais il est créé par la fonction [`askAI`](https://jsr.io/@nshiab/journalism-ai/doc/~/askAI) de ma bibliothèque [`journalism-ai`](https://jsr.io/@nshiab/journalism-ai), que la méthode `aiRowByRow` utilise pour interagir avec le modèle d'IA.
@@ -322,31 +320,31 @@ Dans le code ci-dessous, nous utilisons un `test` (une simple fonction) pour vé
 S'il y a une catégorie inattendue, nous lançons une erreur, et avec l'option `retry`, nous spécifions que nous voulons réessayer cinq fois avant d'abandonner et de tout arrêter.
 
 ```ts showLineNumbers filename="sda/main.ts" {21-29}
-import "@std/dotenv/load";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ logDuration: true });
 
 const data = sdb.newTable("data");
-await data.cache(async () => {
-  await data.loadData(
+await data.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
   );
 });
 
-await data.aiRowByRow(
+data.aiRowByRow(
   "payee",
   "categoryAI",
   `Categorize the payee into one of the following categories: Restaurant, Bar, Hotel or Other. `,
   {
+    generation: { provider: "gemini", cache: true },
     batchSize: 17,
-    concurrent: 15,
-    cache: true,
-    test: (dataPoint) => {
-      if (typeof dataPoint !== "string") {
-        throw new Error("Not a string");
-      }
-      if (!["Restaurant", "Bar", "Hotel", "Other"].includes(dataPoint)) {
+    concurrency: 15,
+    test: (result) => {
+      const category = result.categoryAI;
+      if (
+        typeof category !== "string" ||
+        !["Restaurant", "Bar", "Hotel", "Other"].includes(category)
+      ) {
         throw new Error("Unexpected category");
       }
     },
@@ -356,9 +354,9 @@ await data.aiRowByRow(
   },
 );
 
-await data.logTable();
+await data.log();
 
-await sdb.done();
+await sdb.close();
 ```
 
 De mon côté, aucune erreur n'a été générée. Ça a l'air bon !
@@ -380,31 +378,31 @@ En utilisant cette colonne, nous pouvons ensuite enregistrer toutes les occurren
 Nous pouvons également calculer la proportion de réponses correctes de l'IA.
 
 ```ts showLineNumbers filename="sda/main.ts" {35-45}
-import "@std/dotenv/load";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ logDuration: true });
 
 const data = sdb.newTable("data");
-await data.cache(async () => {
-  await data.loadData(
+await data.cache((table) => {
+  table.loadData(
     "https://raw.githubusercontent.com/palewire/first-llm-classifier/refs/heads/main/_notebooks/sample.csv",
   );
 });
 
-await data.aiRowByRow(
+data.aiRowByRow(
   "payee",
   "categoryAI",
   `Categorize the payee into one of the following categories: Restaurant, Bar, Hotel or Other. `,
   {
+    generation: { provider: "gemini", cache: true },
     batchSize: 17,
-    concurrent: 15,
-    cache: true,
-    test: (dataPoint) => {
-      if (typeof dataPoint !== "string") {
-        throw new Error("Not a string");
-      }
-      if (!["Restaurant", "Bar", "Hotel", "Other"].includes(dataPoint)) {
+    concurrency: 15,
+    test: (result) => {
+      const category = result.categoryAI;
+      if (
+        typeof category !== "string" ||
+        !["Restaurant", "Bar", "Hotel", "Other"].includes(category)
+      ) {
         throw new Error("Unexpected category");
       }
     },
@@ -414,19 +412,19 @@ await data.aiRowByRow(
   },
 );
 
-await data.addColumn("correctCategory", "boolean", `category === categoryAI`);
-await data.logTable({
+data.addColumn("correctCategory", "boolean", `category === categoryAI`);
+await data.log({
   conditions: `correctCategory === false`,
-  nbRowsToLog: "all",
+  count: "all",
 });
 
-await data.summarize({
-  categories: "correctCategory",
+data.summarize({
+  by: "correctCategory",
 });
-await data.proportionsVertical("count", "perc");
-await data.logTable();
+data.columnProportions("count", "perc");
+await data.log();
 
-await sdb.done();
+await sdb.close();
 ```
 
 Et... voici le résultat !
@@ -451,12 +449,14 @@ Ici, nous avons classifié des données avec un modèle Gemini. Mais vous pouvez
 
 Et en utilisant la méthode `aiRowByRow` de SDA, vous pouvez le faire facilement, en quelques lignes de code, à grande échelle !
 
-Si vous avez des données sensibles que vous ne voulez pas envoyer à Google ou à un autre fournisseur d'IA, vous pouvez également utiliser [Ollama](https://ollama.com/). Il suffit de le démarrer et de passer les variables suivantes dans votre fichier `.env`. SDA basculera automatiquement vers l'utilisation du modèle local installé sur votre machine pour traiter les données.
+Si vous avez des données sensibles que vous ne voulez pas envoyer à Google ou à un autre fournisseur d'IA, vous pouvez également utiliser [Ollama](https://ollama.com/). Démarrez Ollama, changez le fournisseur et le modèle dans `.env`, puis supprimez `AI_KEY` :
 
-```txt showLineNumbers filename="sda/main.ts"
-OLLAMA=true
+```txt showLineNumbers filename=".env"
+AI_PROVIDER=ollama
 AI_MODEL=gemma3:4b
 ```
+
+L'objet `generation` de cette leçon remplace explicitement le fournisseur défini dans l'environnement. Lorsque vous utilisez Ollama, remplacez-le par `generation: { provider: "ollama", cache: true }` dans chaque appel à `aiRowByRow()`.
 
 Parfois, les modèles open-source légers ont plus de difficulté à renvoyer directement des listes (ce qui est la réponse attendue pour `aiRowByRow`). Si c'est le cas, j'ai implémenté l'option `clean` qui vous permet de modifier directement la réponse du LLM, par exemple en la restructurant en une liste.
 
