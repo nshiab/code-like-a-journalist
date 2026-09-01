@@ -19,7 +19,9 @@ Let's set things up for this lesson.
 Make a new folder somewhere on your computer, open it with VS Code, and create two files:
 
 - `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
-- `deno.json`, which lets VS Code know this is a Deno project and enables the Deno extension. You can tweak settings in this file, but we'll keep it empty for now.
+- `deno.json`, Deno's project configuration file. It can define tasks, dependencies, permissions, and tool settings, but we'll keep it empty for now.
+
+Open the Command Palette and run `Deno: Initialize Workspace Configuration` to enable the Deno extension for this new folder.
 
 Open the terminal and run the following command: `deno run --watch --check main.ts`
 
@@ -56,13 +58,15 @@ By default, Deno blocks any script from connecting to the web, which is a great 
 
 ![A screenshot showing Deno warning about a network connection.](/assets/pushing-further/fetch/allow-net.png)
 
-To allow your code to connect to the internet, you need to pass the `--allow-net` flag in the terminal command.
+To allow your code to connect to the internet, you need to pass the `--allow-net` flag in the terminal command. You can limit it to the host you need with `--allow-net=raw.githubusercontent.com`.
 
-So instead of running your script with `deno run --watch --check main.ts` as instructed at the beginning of this lesson, you must use `deno run --watch --check --allow-net main.ts`.
+So instead of running your script with `deno run --watch --check main.ts` as instructed at the beginning of this lesson, use `deno run --watch --check --allow-net=raw.githubusercontent.com main.ts`.
 
-However, since we’ll also write data to our computer later, let’s use the `-A` flag instead, which allows our script to do anything it needs.
+Since we'll also write data to our project folder later, grant that specific access too.
 
-Click on your terminal and press `CTRL + C` to stop the script from running (this works on both Mac and PC). Then run: `deno run --watch --check -A main.ts`
+Click on your terminal and press `CTRL + C` to stop the script from running (this works on both Mac and PC). Then run: `deno run --watch --check --allow-net=raw.githubusercontent.com --allow-write=. main.ts`
+
+Unlike `-A` (`--allow-all`), these scoped flags keep the rest of Deno's permission sandbox in place.
 
 Now it works!
 

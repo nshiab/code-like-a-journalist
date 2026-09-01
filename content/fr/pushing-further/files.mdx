@@ -21,7 +21,9 @@ Préparons notre environnement de travail pour cette leçon.
 Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
 
 - `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
-- `deno.json`, qui permet à VS Code de savoir qu'il s'agit d'un projet Deno et active l'extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+- `deno.json`, le fichier de configuration du projet Deno. Il peut définir les tâches, les dépendances, les permissions et les paramètres des outils, mais nous le laisserons vide pour l'instant.
+
+Ouvrez la palette de commandes et exécutez `Deno: Initialize Workspace Configuration` pour activer l'extension Deno dans ce nouveau dossier.
 
 Ouvrez le terminal et exécutez la commande suivante : `deno run --watch --check main.ts`
 
@@ -49,13 +51,13 @@ Oh ! Quelque chose est apparu dans le terminal. 🧐
 
 Deno est très strict en matière de sécurité. Par défaut, il n'autorise pas un script à écrire des fichiers sur votre ordinateur. Imaginez exécuter du code provenant d'une source inconnue qui écrit des fichiers dangereux sur votre système... Ce serait terrible ! 💣
 
-Pour permettre au script d'écrire un fichier, vous devez explicitement accorder l'autorisation en ajoutant l'option `--allow-write` à la commande du terminal.
+Pour permettre au script d'écrire un fichier, vous devez explicitement accorder l'autorisation en ajoutant l'option `--allow-write` à la commande du terminal. Les permissions peuvent être limitées : `--allow-write=.` restreint l'écriture au dossier du projet actuel plutôt qu'à tout l'ordinateur.
 
 Au début de cette leçon, nous avons exécuté le script avec : `deno run --watch --check main.ts`
 
 Arrêtez-le en cliquant dans votre terminal et en appuyant sur `CTRL + C` (cela fonctionne sur Mac et PC).
 
-Ensuite, relancez-le avec : `deno run --watch --check --allow-write main.ts`
+Ensuite, relancez-le avec : `deno run --watch --check --allow-write=. main.ts`
 
 Et maintenant, ça fonctionne ! Un nouveau fichier texte a été créé avec son contenu. Vous savez désormais comment stocker des données de façon permanente sur votre ordinateur !
 
@@ -80,27 +82,27 @@ Par défaut, Deno n'autorise pas un script à lire des fichiers sur votre ordina
 
 ![Une capture d'écran montrant VS Code affichant un avertissement Deno concernant la lecture dans le terminal.](/assets/pushing-further/files/allow-read.png)
 
-Pour permettre au script de lire un fichier, vous devez explicitement accorder l'autorisation en ajoutant l'option `--allow-read` à la commande du terminal.
+Pour permettre au script de lire un fichier, vous devez explicitement accorder l'autorisation en ajoutant l'option `--allow-read` à la commande du terminal. Nous pouvons encore limiter l'accès au dossier du projet actuel.
 
 Arrêtez votre script en cliquant dans votre terminal et en appuyant sur `CTRL + C` (cela fonctionne sur Mac et PC).
 
-Ensuite, relancez-le avec : `deno run --watch --check --allow-read main.ts`
+Ensuite, relancez-le avec : `deno run --watch --check --allow-read=. main.ts`
 
 Et maintenant, ça fonctionne. Vous avez réussi à récupérer le contenu texte du fichier `hello.txt` !
 
 ![Une capture d'écran montrant VS Code lisant un fichier texte avec Deno.](/assets/pushing-further/files/read-working.png)
 
-## Permissions accordées 👮
+## Lire et écrire dans le dossier du projet 👮
 
-Bien que les permissions explicites de Deno soient une excellente fonctionnalité de sécurité lors de l'exécution de code inconnu, ce n'est pas très pratique pendant le développement.
+Bien que les permissions explicites de Deno soient une excellente fonctionnalité de sécurité, saisir plusieurs options peut devenir répétitif pendant le développement.
 
-Si vous faites confiance au code que vous exécutez (et à toutes ses dépendances !), vous pouvez utiliser l'option `-A` pour permettre au script de faire tout ce qu'il veut.
+Puisque nous allons lire et écrire des fichiers dans cette leçon, nous pouvons accorder les deux permissions en les limitant au dossier du projet actuel.
 
-Ici, c'est acceptable, car nous exécutons uniquement notre propre code.
+Cliquez dans votre terminal, appuyez sur `CTRL + C` pour l'arrêter, puis exécutez : `deno run --watch --check --allow-read=. --allow-write=. main.ts`
 
-Cliquez dans votre terminal, appuyez sur `CTRL + C` pour l'arrêter, puis exécutez : `deno run --watch --check -A main.ts`
+Votre script peut maintenant lire et écrire des fichiers dans ce projet sans accéder aux fichiers situés ailleurs. Nous utiliserons ces permissions limitées pour le reste de cette leçon.
 
-Votre script peut maintenant écrire, lire et bien plus encore ! Nous allons utiliser cette commande pour le reste de cette leçon, tout comme pour les prochaines leçons.
+Vous verrez peut-être ailleurs des exemples utilisant `-A`, la forme courte de `--allow-all`. Cette option désactive complètement le bac à sable de Deno. Il est donc plus sûr d'accorder uniquement les accès nécessaires à votre script.
 
 ## JSON
 

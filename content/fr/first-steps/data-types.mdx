@@ -18,7 +18,9 @@ D'abord, configurons notre environnement.
 
 Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code et créez deux fichiers :
 - `main.ts` où nous coderons. Vous pouvez y ajouter `console.log("Hello!");`.
-- `deno.json` pour indiquer à VS Code qu'il s'agit d'un projet Deno et activer l'extension Deno. Vous pouvez modifier vos paramètres dedans, mais nous le laisserons vide pour l'instant.
+- `deno.json`, le fichier de configuration du projet Deno. Il peut définir les tâches, les dépendances, les permissions et les paramètres des outils, mais nous le laisserons vide pour l'instant.
+
+Ouvrez la palette de commandes et exécutez `Deno: Initialize Workspace Configuration` pour activer l'extension Deno dans ce nouveau dossier.
 
 Ouvrez le terminal et exécutez `deno run --watch --check main.ts`. Deno effacera le terminal et relancera `main.ts` à chaque fois que vous l'enregistrez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
 

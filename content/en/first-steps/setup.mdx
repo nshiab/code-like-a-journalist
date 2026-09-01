@@ -35,28 +35,23 @@ For your computer to understand TypeScript and execute it, you need a runtime.
 
 Again, you have many great open-source options out there, but I find [Deno](https://deno.com/) particularly easy to use. Deno is maintained by [Deno Land Inc.](https://deno.com/company), with Ryan Dahl as the CEO. Dahl also created [Node.js](https://nodejs.org/), another open-source runtime that is very popular.
 
-To install it, visit the [website](https://deno.com/) and copy the relevant command for your operating system.
+Use Deno's official installer for your operating system:
 
-Don't worry if you have a different version. As long as it's v2.x.x, you will be fine.
+- On macOS or Linux, run `curl -fsSL https://deno.land/install.sh | sh`.
+- On Windows, open a PowerShell terminal and run `irm https://deno.land/install.ps1 | iex`.
+
+You can always confirm the current commands in the [official installation guide](https://docs.deno.com/runtime/getting_started/installation/). This course is tested with the Deno version listed in the repository's [tested toolchain](https://github.com/nshiab/code-like-a-journalist#tested-course-toolchain). A newer Deno 2 release should also work. If you already have Deno, run `deno upgrade` to update it.
 
 ![A screenshot of Deno's website.](/assets/first-steps/setup/deno.png)
 
 Then, follow these steps:
 
 1. Open a new terminal in VS Code.
-2. Paste the command you copied just before and press enter to run it.
+2. Paste the command for your operating system and press enter to run it.
 
 The command will download and install Deno on your computer.
 
 ![A screenshot showing how to install Deno from VS Code terminal.](/assets/first-steps/setup/deno-install.png)
-
-If you are asked to add Deno to your path, type `Y` and press enter. This ensures Deno is easily accessible from your terminal. If you're not asked, it's okay.
-
-![A screenshot showing an option when installing Deno.](/assets/first-steps/setup/deno-path.png)
-
-And if you are asked to set up completions, choose bash or zsh depending on your operating system by using the up and down keys and pressing the space bar. Then press enter. This provides a handy auto-completion helper in the terminal. Again, if you're not asked, it's okay.
-
-![A screenshot showing how to set up completions when installing Deno.](/assets/first-steps/setup/deno-completions.png)
 
 Now, everything should be properly installed.
 
@@ -72,7 +67,7 @@ Follow these steps to install it:
 
 1. Click on the Extensions tab on the left side of VS Code.
 2. Search for the Deno extension.
-3. Install the Deno extension. Make sure `Auto update` is checked.
+3. Install the extension published by **Denoland**. Make sure `Auto update` is checked.
 
 ![A screenshot showing how to install Deno extension.](/assets/first-steps/setup/deno-extension.png)
 
@@ -93,6 +88,8 @@ Search for `Format On Save` and check the box to enable it.
 
 The settings are saved automatically, so you can now close the `Settings` tab. You're all set!
 
+The extension is disabled by default because not every TypeScript project uses Deno. You will enable it for each Deno project in the next section. This makes VS Code use the same Deno language server as the command line for type checking, IntelliSense, linting, and formatting.
+
 ## Let's run a script
 
 To double-check that everything is working as expected, we are going to write a little script and run it.
@@ -102,6 +99,9 @@ To start a new project in VS Code, follow these steps:
 1. Create a new folder somewhere handy on your computer.
 2. In VS Code, click on the Explorer tab.
 3. Click on `Open Folder` and select the folder you just created. If you are asked whether you trust the authors of the files, say "Yes" to proceed.
+4. Open the Command Palette (`CMD` + `SHIFT` + `P` on Mac or `CTRL` + `SHIFT` + `P` on PC), then run `Deno: Initialize Workspace Configuration`.
+
+The last command creates `.vscode/settings.json` with `"deno.enable": true`, enabling the Deno extension only for this folder. Repeat it whenever you start a Deno project in a new folder.
 
 ![A screenshot showing how to open a new folder in VS Code.](/assets/first-steps/setup/deno-open-folder.png)
 

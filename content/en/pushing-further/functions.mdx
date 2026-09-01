@@ -17,7 +17,9 @@ Let's set things up for this lesson.
 Make a new folder somewhere on your computer, open it with VS Code, and create two files:
 
 - `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
-- `deno.json`, which lets VS Code know this is a Deno project and enables the Deno extension. You can tweak settings in this file, but we'll keep it empty for now.
+- `deno.json`, Deno's project configuration file. It can define tasks, dependencies, permissions, and tool settings, but we'll keep it empty for now.
+
+Open the Command Palette and run `Deno: Initialize Workspace Configuration` to enable the Deno extension for this new folder.
 
 Open the terminal and run the following command:  `deno run --watch --check main.ts`
 
@@ -243,7 +245,7 @@ In our case, we want to use it in `main.ts`. To do this, add the following line 
 
 IntelliSense recognizes that the function is available. If you start typing, it will suggest it to you. Pretty neat! Press `Enter` to accept the suggestion.
 
-If you're on a PC with Windows, you might see `\` instead of `/` in the file path.
+Import specifiers use forward slashes (`/`) on every operating system, including Windows.
 
 ![A screenshot showing VS Code import suggestion.](/assets/pushing-further/functions/intellisense.png)
 
@@ -258,7 +260,7 @@ const euros = convertDollarsToEuros(dollars);
 console.log(`${dollars} Canadian dollars is ${euros} euros`);
 ```
 <Callout type="info" emoji="💡">
-    When you import a file, you need to tell your computer where to find it with a **path**. Here, `./helpers/convertDollarsToEuros.ts` is a **relative path** because it starts with `./`. The `.` tells the computer to start where the current file is. In this case, since we are updating `main.ts`, it starts in the folder where `main.ts` is. Then `/helpers` tells the computer to go inside the `helpers` folder. Finally, `/convertDollarsToEuros.ts` tells it to import the content of this file. On PC with Windows, the path might use `\` instead of `/`.
+    When you import a file, you need to tell your computer where to find it with a **path**. Here, `./helpers/convertDollarsToEuros.ts` is a **relative path** because it starts with `./`. The `.` tells the computer to start where the current file is. In this case, since we are updating `main.ts`, it starts in the folder where `main.ts` is. Then `/helpers` tells the computer to go inside the `helpers` folder. Finally, `/convertDollarsToEuros.ts` tells it to import the content of this file.
 </Callout>
 
 And now, everything works! If we had multiple files where `convertDollarsToEuros` was needed, we could easily import the function and reuse it in multiple places!

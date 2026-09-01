@@ -14,7 +14,9 @@ Commençons votre première leçon de TypeScript avec les variables ! En chemin,
 
 Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
 - `main.ts` où nous coderons. Vous pouvez y ajouter `console.log(2 + 3);`.
-- `deno.json` pour indiquer à VS Code qu'il s'agit d'un projet Deno et activer l'extension Deno. Vous pouvez ajuster vos paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+- `deno.json`, le fichier de configuration du projet Deno. Il peut définir les tâches, les dépendances, les permissions et les paramètres des outils, mais nous le laisserons vide pour l'instant.
+
+L'extension Deno est activée séparément pour chaque espace de travail VS Code. Ouvrez la palette de commandes (`CMD` + `SHIFT` + `P` sur Mac ou `CTRL` + `SHIFT` + `P` sur PC), puis exécutez `Deno: Initialize Workspace Configuration`. Cette commande crée `.vscode/settings.json` avec `"deno.enable": true`. Répétez cette étape chaque fois que vous démarrez un projet dans un nouveau dossier.
 
 Ouvrez le terminal et exécutez `deno run main.ts`.
 
@@ -23,7 +25,7 @@ Ouvrez le terminal et exécutez `deno run main.ts`.
 ![Une capture d'écran montrant VS Code avec les fichiers main.ts et deno.json.](/assets/first-steps/variables/run.png)
 
 <Callout type="info" emoji="💡">
-    Vous avez peut-être remarqué que votre code s'affiche avec plusieurs couleurs. Cela s'appelle *code highlighting*. Dans le code, chaque mot a un rôle différent et se voit attribuer une couleur. Par exemple, ici `console` est une classe, et `log` est une méthode. De plus, en tapant, vous pouvez voir des suggestions d'auto-complétion et des infobulles. Cela s'appelle l'*IntelliSense*. C'est votre éditeur qui essaie de deviner ce que vous pourriez vouloir écrire et fournit une documentation. Pour l'instant, vous pouvez ignorer tout cela, mais nous l'utiliserons plus tard.
+    Vous avez peut-être remarqué que votre code s'affiche avec plusieurs couleurs. Cela s'appelle *code highlighting*. Dans le code, chaque mot a un rôle différent et se voit attribuer une couleur. Par exemple, ici `console` est un objet, et `log` est l'une de ses méthodes. De plus, en tapant, vous pouvez voir des suggestions d'auto-complétion et des infobulles. Cela s'appelle l'*IntelliSense*. C'est votre éditeur qui essaie de deviner ce que vous pourriez vouloir écrire et fournit une documentation. Pour l'instant, vous pouvez ignorer tout cela, mais nous l'utiliserons plus tard.
 </Callout>
 
 ## `watch` et `check`

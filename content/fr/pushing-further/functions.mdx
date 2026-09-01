@@ -17,7 +17,9 @@ Préparons notre environnement de travail pour cette leçon.
 Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
 
 - `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
-- `deno.json`, qui permet à VS Code de savoir qu'il s'agit d'un projet Deno et active l'extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+- `deno.json`, le fichier de configuration du projet Deno. Il peut définir les tâches, les dépendances, les permissions et les paramètres des outils, mais nous le laisserons vide pour l'instant.
+
+Ouvrez la palette de commandes et exécutez `Deno: Initialize Workspace Configuration` pour activer l'extension Deno dans ce nouveau dossier.
 
 Ouvrez le terminal et exécutez la commande suivante :  
 `deno run --watch --check main.ts`
@@ -245,7 +247,7 @@ Dans notre cas, nous voulons l’utiliser dans `main.ts`. Pour ce faire, ajoutez
 
 IntelliSense reconnaît que la fonction est disponible. Si vous commencez à taper, il vous la suggérera. Pratique, non ? Appuyez sur `Entrée` pour accepter la suggestion.
 
-Si vous êtes sur un PC sous Windows, vous pourriez voir `\` au lieu de `/` dans le chemin d'accès du fichier.
+Les chemins dans les imports utilisent des barres obliques (`/`) sur tous les systèmes d'exploitation, y compris Windows.
 
 ![Une capture d'écran montrant la suggestion d'importation dans VS Code.](/assets/pushing-further/functions/intellisense.png)
 
@@ -260,7 +262,7 @@ const euros = convertDollarsToEuros(dollars);
 console.log(`${dollars} Canadian dollars is ${euros} euros`);
 ```
 <Callout type="info" emoji="💡">
-    Lorsque vous importez un fichier, vous devez indiquer à votre ordinateur où le trouver avec un **chemin d'accès**. Ici, `./helpers/convertDollarsToEuros.ts` est un **chemin d'accès relatif** car il commence par `./`. Le `.` indique à l’ordinateur de commencer là où le fichier se trouve. Dans ce cas, puisque nous sommes dans `main.ts`, il commence dans le dossier où se trouve `main.ts`. Ensuite, `/helpers` indique à l’ordinateur d’aller dans le dossier `helpers`. Enfin, `/convertDollarsToEuros.ts` lui indique d’importer le contenu de ce fichier. Sur un PC sous Windows, le chemin d'accès peut utiliser `\` au lieu de `/`.
+    Lorsque vous importez un fichier, vous devez indiquer à votre ordinateur où le trouver avec un **chemin d'accès**. Ici, `./helpers/convertDollarsToEuros.ts` est un **chemin d'accès relatif** car il commence par `./`. Le `.` indique à l’ordinateur de commencer là où le fichier se trouve. Dans ce cas, puisque nous sommes dans `main.ts`, il commence dans le dossier où se trouve `main.ts`. Ensuite, `/helpers` indique à l’ordinateur d’aller dans le dossier `helpers`. Enfin, `/convertDollarsToEuros.ts` lui indique d’importer le contenu de ce fichier.
 </Callout>
 
 Et maintenant, tout fonctionne ! Si nous avions plusieurs fichiers où `convertDollarsToEuros` était nécessaire, nous pourrions facilement importer la fonction et la réutiliser à plusieurs endroits !

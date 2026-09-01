@@ -14,7 +14,9 @@ Let's start your first TypeScript lesson with variables! Along the way, I'll sho
 
 Make a new folder somewhere on your computer, open it with VS Code, and create two files:
 - `main.ts` where we will code. You can add `console.log(2 + 3);` to it.
-- `deno.json` to let VS Code know this is a Deno project and enable the Deno extension. You can tweak your settings in it, but we will keep it empty for now.
+- `deno.json`, Deno's project configuration file. It can define tasks, dependencies, permissions, and tool settings, but we will keep it empty for now.
+
+The Deno extension is enabled separately for each VS Code workspace. Open the Command Palette (`CMD` + `SHIFT` + `P` on Mac or `CTRL` + `SHIFT` + `P` on PC), then run `Deno: Initialize Workspace Configuration`. This creates `.vscode/settings.json` with `"deno.enable": true`. Repeat this step whenever you start a project in a new folder.
 
 Toggle the terminal and run `deno run main.ts`.
 
@@ -23,7 +25,7 @@ Toggle the terminal and run `deno run main.ts`.
 ![A screenshot showing VS Code with main.ts and deno.json files.](/assets/first-steps/variables/run.png)
 
 <Callout type="info" emoji="💡">
-    You may have noticed that your code is written with multiple colors. This is called *code highlighting*. In code, each word has a different role and is assigned a color. For example, here `console` is a class, and `log` is a method. Also, while typing, you may see auto-complete suggestions and pop-ups. This is called *IntelliSense*. It's your editor trying to guess what you might want to write and providing documentation for you. For now, you can ignore this, but we will make great use of it later.
+    You may have noticed that your code is written with multiple colors. This is called *code highlighting*. In code, each word has a different role and is assigned a color. For example, here `console` is an object, and `log` is one of its methods. Also, while typing, you may see auto-complete suggestions and pop-ups. This is called *IntelliSense*. It's your editor trying to guess what you might want to write and providing documentation for you. For now, you can ignore this, but we will make great use of it later.
 </Callout>
 
 ## `watch` and `check`

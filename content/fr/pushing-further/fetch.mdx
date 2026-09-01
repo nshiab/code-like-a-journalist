@@ -19,7 +19,9 @@ Préparons notre environnement de travail pour cette leçon.
 Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
 
 - `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
-- `deno.json`, qui permet à VS Code de savoir qu'il s'agit d'un projet Deno et active l'extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+- `deno.json`, le fichier de configuration du projet Deno. Il peut définir les tâches, les dépendances, les permissions et les paramètres des outils, mais nous le laisserons vide pour l'instant.
+
+Ouvrez la palette de commandes et exécutez `Deno: Initialize Workspace Configuration` pour activer l'extension Deno dans ce nouveau dossier.
 
 Ouvrez le terminal et exécutez la commande suivante : `deno run --watch --check main.ts`
 
@@ -56,13 +58,15 @@ Par défaut, Deno bloque tout script qui tente de se connecter au Web, ce qui es
 
 ![Une capture d'écran montrant Deno avertissant d'une connexion réseau.](/assets/pushing-further/fetch/allow-net.png)
 
-Pour permettre à votre code de se connecter à Internet, vous devez ajouter l'option `--allow-net` dans la commande du terminal.
+Pour permettre à votre code de se connecter à Internet, vous devez ajouter l'option `--allow-net` dans la commande du terminal. Vous pouvez la limiter à l'hôte requis avec `--allow-net=raw.githubusercontent.com`.
 
-Ainsi, au lieu d’exécuter votre script avec `deno run --watch --check main.ts` comme indiqué au début de cette leçon, vous devez utiliser `deno run --watch --check --allow-net main.ts`.
+Ainsi, au lieu d’exécuter votre script avec `deno run --watch --check main.ts` comme indiqué au début de cette leçon, utilisez `deno run --watch --check --allow-net=raw.githubusercontent.com main.ts`.
 
-Cependant, comme nous allons également écrire des données sur notre ordinateur plus tard, utilisons plutôt l'option `-A`, qui permet à notre script de faire tout ce dont il a besoin.
+Puisque nous allons également écrire des données dans le dossier de notre projet plus tard, accordons aussi cet accès précis.
 
-Cliquez sur votre terminal et appuyez sur `CTRL + C` pour arrêter l'exécution du script (cela fonctionne sur Mac et PC). Ensuite, exécutez : `deno run --watch --check -A main.ts`
+Cliquez sur votre terminal et appuyez sur `CTRL + C` pour arrêter l'exécution du script (cela fonctionne sur Mac et PC). Ensuite, exécutez : `deno run --watch --check --allow-net=raw.githubusercontent.com --allow-write=. main.ts`
+
+Contrairement à `-A` (`--allow-all`), ces options limitées conservent le reste du bac à sable de Deno.
 
 Et maintenant, ça fonctionne !
 

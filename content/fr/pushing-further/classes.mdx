@@ -25,9 +25,11 @@ Allons-y !
 Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
 
 - `main.ts`, dans lequel nous allons écrire notre code. Pour commencer, vous pouvez y ajouter `console.log("Hello!");`.
-- `deno.json`, qui indique à VS Code qu’il s’agit d’un projet Deno et active l’extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous allons le laisser vide pour l’instant.
+- `deno.json`, le fichier de configuration du projet Deno. Il peut définir les tâches, les dépendances, les permissions et les paramètres des outils, mais nous allons le laisser vide pour l’instant.
 
-Ouvrez le terminal et exécutez la commande suivante : `deno run --watch main.ts`
+Ouvrez la palette de commandes et exécutez `Deno: Initialize Workspace Configuration` pour activer l'extension Deno dans ce nouveau dossier.
+
+Ouvrez le terminal et exécutez la commande suivante : `deno run --watch --check main.ts`
 
 Cette commande efface le terminal et relance `main.ts` à chaque fois que vous l’enregistrez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
 
@@ -262,14 +264,14 @@ Comme pour les fonctions, vous pouvez documenter vos classes en utilisant la syn
 Ci-dessous, j’ai documenté la classe ainsi que toutes ses méthodes. Pour chacune, j’ai ajouté un exemple. Ainsi, la documentation apparaîtra automatiquement dans VS Code lorsque vous commencerez à taper leurs noms ou en les survolant avec la souris. Très pratique !
 
 
-```ts showLineNumbers filename="People.ts" {1-8, 18-27, 32-39}
+```ts showLineNumbers filename="Person.ts" {1-8, 18-27, 32-39}
 /**
  * Represents a person with a name and age.
  *
  * @example
  * ```ts
  * const person = new Person('John', 30);
- * ````
+ * ```
  */
 export default class Person {
   name: string;

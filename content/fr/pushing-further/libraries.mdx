@@ -21,7 +21,9 @@ Préparons maintenant notre environnement de travail avant de plonger dans cette
 Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code et créez deux fichiers :
 
 - `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
-- `deno.json`, qui permet à VS Code de savoir qu'il s'agit d'un projet Deno et active l'extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+- `deno.json`, le fichier de configuration du projet Deno. Il peut définir les tâches, les dépendances, les permissions et les paramètres des outils, mais nous le laisserons vide pour l'instant.
+
+Ouvrez la palette de commandes et exécutez `Deno: Initialize Workspace Configuration` pour activer l'extension Deno dans ce nouveau dossier.
 
 Ouvrez le terminal et exécutez la commande suivante : `deno run --watch --check main.ts`
 
@@ -39,9 +41,7 @@ Certaines bibliothèques sont disponibles sur les deux, tandis que d'autres exis
 
 ### NPM
 
-NPM a été créé en 2014 et a été acquis par GitHub (une filiale de Microsoft) en 2020.
-
-Au moment d'écrire ces lignes (2025-01-29), NPM héberge plus de **3,4 millions** de bibliothèques téléchargées environ **8 milliards de fois par jour** ! Vous pouvez publier des bibliothèques en code ouvert gratuitement, tandis que les bibliothèques privées nécessitent un abonnement payant.
+NPM est le registre historique de l'écosystème JavaScript et est exploité par GitHub. Ses pages de paquets affichent des signaux utiles comme la documentation, les responsables, les versions et les téléchargements hebdomadaires.
 
 Prenons un exemple et recherchons `d3`, une bibliothèque bien connue pour la visualisation de données que nous utiliserons fréquemment.
 
@@ -63,9 +63,11 @@ Cette page fournit de nombreuses informations utiles :
 
 Ces détails (ainsi que ceux sur la page GitHub) nous aident à déterminer si une bibliothèque est fiable. Soyez toujours prudent avant d'exécuter du code inconnu ! 🦠
 
-Installer `d3` dans un projet Deno est très simple. Cliquez sur votre terminal, arrêtez `main.ts` (`CTRL` + `C`), puis exécutez la commande suivante : `deno add npm:d3`
+Installer `d3` dans un projet Deno est très simple. Cliquez sur votre terminal, arrêtez `main.ts` (`CTRL` + `C`), puis exécutez la commande suivante : `deno add npm:d3`. Le préfixe `npm:` indique clairement le registre. `deno add` est aussi un alias de `deno install` suivi du nom d'un paquet.
 
 Si vous ouvrez votre `deno.json`, vous verrez quelque chose de nouveau : **imports** ! Ces imports indiquent à Deno quelles bibliothèques (et quelles versions) vous souhaitez utiliser dans ce projet.
+
+Deno crée ou met aussi à jour `deno.lock`. L'import dans `deno.json` peut utiliser une plage de versions compatibles, tandis que le fichier de verrouillage enregistre les versions exactes et leurs empreintes d'intégrité. Ajoutez les deux fichiers à Git afin que le projet résolve les mêmes versions de dépendances sur un autre ordinateur.
 
 ![Une capture d'écran montrant les imports dans deno.json.](/assets/pushing-further/libraries/d3-add.png)
 <Callout type="info" emoji="💡">
@@ -78,9 +80,9 @@ Reprenons le [fichier CSV des températures de Montréal](https://raw.githubuser
 
 Si vous récupérez ces données, vous remarquerez que c'est juste du texte. CSV signifie **Comma-Separated Values** (valeurs séparées par des virgules) et vous ne pouvez pas travailler avec directement. Il serait bien mieux de le convertir en une liste d'objets.
 
-Copiez-collez le code ci-dessous dans `main.ts`, puis exécutez la commande suivante : `deno run --watch --check -A main.ts`
+Copiez-collez le code ci-dessous dans `main.ts`, puis exécutez la commande suivante : `deno run --watch --check --allow-net=raw.githubusercontent.com main.ts`
 
-N'oubliez pas `-A`, sinon votre code ne sera pas autorisé à récupérer des données !
+N'oubliez pas la permission réseau, sinon votre code ne sera pas autorisé à récupérer des données. La limiter à `raw.githubusercontent.com` bloque les autres hôtes réseau.
 
 ```ts showLineNumbers filename="main.ts"
 const response = await fetch(
@@ -139,7 +141,7 @@ Vous trouverez de nombreuses informations utiles sur cette page :
 - La documentation et des exemples.
 - La date de publication de la dernière version.
 
-Au moment d'écrire ces lignes, une différence par rapport à NPM est l’absence du nombre de téléchargements. Cette fonctionnalité a été demandée et devrait être ajoutée prochainement. Cependant, vous pouvez toujours consulter le nombre d'étoiles sur la page GitHub de la bibliothèque afin d’avoir une idée de sa popularité. La [bibliothèque standard de Deno](https://github.com/denoland/std) a plus de 3 000 étoiles, ce qui est considérable. 🌟
+Les pages de paquets JSR affichent maintenant les téléchargements hebdomadaires et un score JSR, en plus du dépôt source, de la documentation, des environnements compatibles, des versions et des dates de publication. Ce sont des signaux utiles, mais vous devriez tout de même examiner un paquet et son code source avant de lui faire confiance.
 
 Pour installer la bibliothèque, arrêtez l’exécution de `main.ts` (`CTRL` + `C`) et exécutez la commande suivante : `deno add jsr:@std/csv`
 
@@ -150,7 +152,7 @@ Comme vous l’avez peut-être remarqué, nous avons utilisé `jsr:` au lieu de 
 ![Une capture d'écran montrant un module JSR ajouté.](/assets/pushing-further/libraries/jsr-add.png)
 
 <Callout type="info" emoji="💡">
-    Tout comme les modules NPM, les modules JSR sont mis en cache. Si vous devez vider votre cache, exécutez `deno clean`. Et pour installer toutes les bibliothèques listées dans un fichier `deno.json`, vous pouvez exécuter `deno install`.
+    Tout comme les modules NPM, les modules JSR sont mis en cache. Si vous devez vider votre cache, exécutez `deno clean`. Pour installer toutes les bibliothèques listées dans `deno.json` et les vérifier avec `deno.lock`, exécutez `deno install`. En intégration continue, `deno ci` exige en plus un fichier de verrouillage à jour.
 </Callout>
 
 Mettons maintenant à jour notre code dans `main.ts` pour utiliser `@std` au lieu de `d3`. Une différence clé est que nous devons définir l'option `skipFirstRow` sur `true` pour ignorer la première ligne qui contient les en-têtes des colonnes CSV.

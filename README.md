@@ -11,10 +11,10 @@ This repository stores the code for
 open-source online course on TypeScript fundamentals and acquiring, analyzing,
 visualizing, and automating data with SDA. It's available in English and French.
 
-## Tested data-project toolchain
+## Tested course toolchain
 
-The data-project setup and generated starter were last verified on September 1,
-2026, with:
+The TypeScript lessons, data-project setup, and generated starter were last
+verified on September 1, 2026, with:
 
 - Deno 2.9.6
 - @nshiab/setup-data-project 2.0.0

@@ -35,28 +35,23 @@ Pour que votre ordinateur comprenne TypeScript et l'exécute, vous avez besoin d
 
 Encore une fois, vous avez de nombreuses excellentes options en code ouvert, mais je trouve [Deno](https://deno.com/) particulièrement facile à utiliser. Deno est maintenu par [Deno Land Inc.](https://deno.com/company), avec Ryan Dahl comme PDG. Dahl a également créé [Node.js](https://nodejs.org/), un autre moteur très populaire.
 
-Pour l'installer, visitez le [site web](https://deno.com/) et copiez la commande appropriée pour votre système d'exploitation.
+Utilisez l'installateur officiel de Deno pour votre système d'exploitation :
 
-Ne vous inquiétez pas si vous avez une version différente. Tant que c'est une v2.x.x, tout ira bien.
+- Sur macOS ou Linux, exécutez `curl -fsSL https://deno.land/install.sh | sh`.
+- Sous Windows, ouvrez un terminal PowerShell et exécutez `irm https://deno.land/install.ps1 | iex`.
+
+Vous pouvez toujours confirmer les commandes actuelles dans le [guide d'installation officiel](https://docs.deno.com/runtime/getting_started/installation/). Ce cours est testé avec la version de Deno indiquée dans la section [outils testés](https://github.com/nshiab/code-like-a-journalist#tested-course-toolchain) du dépôt. Une version plus récente de Deno 2 devrait également fonctionner. Si Deno est déjà installé, exécutez `deno upgrade` pour le mettre à jour.
 
 ![Une capture d'écran du site web de Deno.](/assets/first-steps/setup/deno.png)
 
 Ensuite, suivez ces étapes :
 
 1. Ouvrez un nouveau terminal dans VS Code.
-2. Collez la commande que vous avez copiée juste avant et appuyez sur la touche Entrée pour l'exécuter.
+2. Collez la commande correspondant à votre système d'exploitation et appuyez sur la touche Entrée pour l'exécuter.
 
 La commande téléchargera et installera Deno sur votre ordinateur.
 
 ![Une capture d'écran montrant comment installer Deno depuis le terminal de VS Code.](/assets/first-steps/setup/deno-install.png)
-
-Si on vous demande d'ajouter Deno à votre chemin d'accès (path), tapez `Y` et appuyez sur Entrée. Cela garantit que Deno est facilement accessible depuis votre terminal. Si on ne vous le demande pas, ce n'est pas un problème.
-
-![Une capture d'écran montrant une option lors de l'installation de Deno.](/assets/first-steps/setup/deno-path.png)
-
-Et si on vous demande de configurer les suggestions automatiques (completions), choisissez bash ou zsh en fonction de votre système d'exploitation en utilisant les touches haut et bas et en appuyant sur la barre d'espace. Ensuite, appuyez sur Entrée. Encore une fois, si on ne vous le demande pas, ce n'est pas un problème.
-
-![Une capture d'écran montrant comment configurer les complétions lors de l'installation de Deno.](/assets/first-steps/setup/deno-completions.png)
 
 Maintenant, tout devrait être correctement installé.
 
@@ -72,7 +67,7 @@ Suivez ces étapes pour l'installer :
 
 1. Cliquez sur l'onglet Extensions sur le côté gauche de VS Code.
 2. Recherchez l'extension Deno.
-3. Installez l'extension Deno. Assurez-vous que `Mise à jour automatique` est cochée.
+3. Installez l'extension publiée par **Denoland**. Assurez-vous que `Mise à jour automatique` est cochée.
 
 ![Une capture d'écran montrant comment installer l'extension Deno.](/assets/first-steps/setup/deno-extension.png)
 
@@ -93,6 +88,8 @@ Recherchez `Format On Save` et cochez la case pour l'activer.
 
 Les paramètres sont enregistrés automatiquement, vous pouvez donc fermer l'onglet `Settings`. Tout est prêt !
 
+L'extension est désactivée par défaut, car les projets TypeScript n'utilisent pas tous Deno. Vous l'activerez pour chaque projet Deno dans la prochaine section. VS Code utilisera alors le même serveur de langage Deno que la ligne de commande pour la vérification des types, IntelliSense, la vérification du code et le formatage.
+
 ## Exécutons un script
 
 Pour vérifier que tout fonctionne comme prévu, nous allons écrire un petit script et l'exécuter.
@@ -102,6 +99,9 @@ Pour démarrer un nouveau projet dans VS Code, suivez ces étapes :
 1. Créez un nouveau dossier quelque part sur votre ordinateur.
 2. Dans VS Code, cliquez sur l'onglet Explorer.
 3. Cliquez sur `Open Folder` et sélectionnez le dossier que vous venez de créer. Si on vous demande si vous faites confiance aux auteurs des fichiers, répondez "Oui" pour continuer.
+4. Ouvrez la palette de commandes (`CMD` + `SHIFT` + `P` sur Mac ou `CTRL` + `SHIFT` + `P` sur PC), puis exécutez `Deno: Initialize Workspace Configuration`.
+
+Cette dernière commande crée `.vscode/settings.json` avec `"deno.enable": true`, ce qui active l'extension Deno uniquement pour ce dossier. Répétez-la chaque fois que vous démarrez un projet Deno dans un nouveau dossier.
 
 ![Une capture d'écran montrant comment ouvrir un nouveau dossier dans VS Code.](/assets/first-steps/setup/deno-open-folder.png)
 
@@ -125,7 +125,7 @@ Une fois le fichier enregistré, nous pouvons exécuter le script.
 1. Affichez le terminal.
 2. Tapez `deno run main.ts` dans le terminal et appuyez sur Entrée.
 
-Cela demande à votre ordinateur d'utiliser Deno pour exécuter le script `main.ts`. Par conséquent, vous devriez voir *Ça va être amusant !* dans votre terminal.
+Cela demande à votre ordinateur d'utiliser Deno pour exécuter le script `main.ts`. Par conséquent, vous devriez voir *This is going to be fun!* dans votre terminal.
 
 Félicitations ! Vous êtes maintenant prêt à coder. On va bien s'amuser ! 🤩
 
