@@ -34,7 +34,7 @@ We will also use Playwright and a Deno file-system helper later in the lesson. I
 
 [HTML tables](https://www.w3schools.com/html/html_tables.asp) are a very common way to display data on websites.
 
-For example, on [this Wikipedia page](https://en.wikipedia.org/wiki/Medieval_demography#Demographic_tables_of_Europe's_population) about medieval demography in Europe, you can see multiple tables.
+For example, on [this pinned revision of a Wikipedia page](https://en.wikipedia.org/w/index.php?title=Medieval_demography&oldid=1372349632#Demographic_tables_of_Europe's_population) about medieval demography in Europe, you can see multiple tables. Pinning the revision keeps the lesson reproducible even when Wikipedia changes.
 
 If you inspect the one named *European population dynamics, years 1000–1500* in a web browser (right-click on the table and then *Inspect* in the opening menu), you can see the table HTML element. If you explore its code, you'll see the various elements building that table with the data in it.
 
@@ -44,7 +44,7 @@ Since these HTML structures are always the same, I published a function to extra
 
 ### With an `index`
 
-You can pass `getHtmlTable` the URL you want to scrape. By default, it will return the data from the first table on the page. But on the Wikipedia page, the table we want is actually the fourth in the HTML code. So we can pass the option `{ index: 3 }`.
+You can pass `getHtmlTable` the URL you want to scrape. Here, we match tables with the `.wikitable` CSS class and use `index: 0` to retrieve the first match. This is more reliable than counting every layout table on the page.
 
 Copy and paste the code below into `sda/main.ts` and run `deno task sda` in your terminal to start running and watching it.
 
@@ -56,8 +56,8 @@ import { getHtmlTable } from "@nshiab/journalism-web-scraping";
 const sdb = new SimpleDB();
 
 const medievalData = await getHtmlTable(
-  "https://en.wikipedia.org/wiki/Medieval_demography",
-  { index: 3 },
+  "https://en.wikipedia.org/w/index.php?title=Medieval_demography&oldid=1372349632",
+  { selector: ".wikitable", index: 0 },
 );
 
 console.table(medievalData);
@@ -81,15 +81,15 @@ const sdb = new SimpleDB();
 
 const medievalDemography = sdb.newTable("mediavalDemography");
 
-await medievalDemography.cache(async () => {
+await medievalDemography.cache(async (table) => {
   const medievalData = await getHtmlTable(
-    "https://en.wikipedia.org/wiki/Medieval_demography",
-    { index: 3 },
+    "https://en.wikipedia.org/w/index.php?title=Medieval_demography&oldid=1372349632",
+    { selector: ".wikitable", index: 0 },
   );
-  await medievalDemography.loadArray(medievalData);
+  table.loadArray(medievalData);
 });
 
-await medievalDemography.convert({
+medievalDemography.convert({
   Year: "number",
   "Total European population,millions": "number",
 });
@@ -141,31 +141,31 @@ import { getHtmlTable } from "@nshiab/journalism-web-scraping";
 const sdb = new SimpleDB();
 
 const MPs = sdb.newTable("MPs");
-await MPs.cache(async () => {
+await MPs.cache(async (table) => {
   const expensesData = await getHtmlTable(
     "https://www.ourcommons.ca/proactivedisclosure/en/members/2024/1",
     { selector: "#data-table" },
   );
-  await MPs.loadArray(expensesData);
+  table.loadArray(expensesData);
 });
 
-await MPs.replace(["Salaries", "Travel", "Hospitality", "Contracts"], {
+MPs.replace(["Salaries", "Travel", "Hospitality", "Contracts"], {
   "$": "",
   ",": "",
 });
-await MPs.convert({
+MPs.convert({
   Salaries: "number",
   Travel: "number",
   Hospitality: "number",
   Contracts: "number",
-}, { try: true });
-await MPs.summarize({
+}, { strict: false });
+MPs.summarize({
   columns: ["Salaries", "Travel", "Hospitality", "Contracts"],
   by: "Caucus",
   stats: "mean",
   decimals: 0,
 });
-await MPs.wider("Caucus", "mean");
+MPs.wider("Caucus", "mean");
 await MPs.log();
 
 await sdb.close();
@@ -178,7 +178,7 @@ await sdb.close();
 
 Data is not always neat and tidy in tables. Sometimes, it's just wandering around in the webpage code.
 
-For example, here's the [list of all currently sitting Canadian Members of Parliament](https://www.ourcommons.ca/Members/en/search?parliament). This list changes over time, so you might not have exactly the same as I have, which is okay for the purpose of this lesson.
+For example, here's the [list of all currently sitting Canadian Members of Parliament](https://www.ourcommons.ca/Members/en/search?parliament). This list intentionally changes over time, so you might not have exactly the same results as the screenshots. The page and selectors below were last verified on September 1, 2026.
 
 ![All currently sitting MPs.](/assets/web-scraping/all-MPS.png)
 
@@ -194,14 +194,14 @@ To retrieve all the URLs, we can use [Playwright](https://github.com/microsoft/p
 
 We installed Playwright during setup.
 
-If we inspect the cards, we can see the `a` tag containing the link to the personal MP page. There's the same `ce-mip-mp-tile` class for all the tags.
+If we inspect the cards, we can see the `a` tag containing the link to the personal MP page. All of these links have the `ce-mip-mp-tile-link` class.
 
 ![Inspecting the personal page of a MP.](/assets/web-scraping/link-MP.png)
 
 Let's start by visiting the page and extracting the URLs. Here's what the code below is doing, step by step:
 - First, we import the [`chromium` browser](https://www.chromium.org/chromium-projects/) from Playwright, which is an open-source project powering Google Chrome. We create a new `browser`, then a new `context`, and finally a `newPage` (lines 1–5).
 - Then we instruct this page to visit the MPs page (line 7). 
-- We retrieve all elements with the `ce-mip-mp-tile` class (line 9).
+- We retrieve all elements with the `ce-mip-mp-tile-link` class (line 9).
 - Then we use the `evaluateAll` method, which allows you to run code in the browser — very handy when web scraping. Here, we use it to easily extract the `href` attributes to retrieve the URLs (line 10).
 - We log the URLs (line 12).
 - Finally, we close everything related to `chromium` (lines 14-16).
@@ -217,7 +217,7 @@ const page = await context.newPage();
 
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
-const urls = await page.locator(".ce-mip-mp-tile")
+const urls = await page.locator(".ce-mip-mp-tile-link")
   .evaluateAll((elements) => elements.map((a) => a.href));
 
 console.log(urls);
@@ -252,7 +252,7 @@ const page = await context.newPage();
 
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
-const urls = await page.locator(".ce-mip-mp-tile")
+const urls = await page.locator(".ce-mip-mp-tile-link")
   .evaluateAll((elements) => elements.map((a) => a.href));
 
 for (const url of urls) {
@@ -260,9 +260,10 @@ for (const url of urls) {
   await page.goto(url);
   const name = await page.locator("h1").textContent();
   const party = await page.locator(".mip-mp-profile-caucus").textContent();
-  const district = await page.locator("dd > a").textContent();
-  const province = await page.locator("dl > dd:nth-child(6)").textContent();
-  const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+  const details = await page.locator("dl > dd").allTextContents();
+  const district = details[1];
+  const province = details[2];
+  const language = details[3];
 
   const data = { name, party, district, province, language };
   console.log(data);
@@ -293,7 +294,7 @@ const page = await context.newPage();
 
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
-const urls = await page.locator(".ce-mip-mp-tile")
+const urls = await page.locator(".ce-mip-mp-tile-link")
   .evaluateAll((elements) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
@@ -313,9 +314,10 @@ for (let i = 0; i < urls.length; i++) {
     await page.goto(url);
     const name = await page.locator("h1").textContent();
     const party = await page.locator(".mip-mp-profile-caucus").textContent();
-    const district = await page.locator("dd > a").textContent();
-    const province = await page.locator("dl > dd:nth-child(6)").textContent();
-    const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+    const details = await page.locator("dl > dd").allTextContents();
+    const district = details[1];
+    const province = details[2];
+    const language = details[3];
 
     const data = { name, party, district, province, language };
 
@@ -350,7 +352,7 @@ const page = await context.newPage();
 
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
-const urls = await page.locator(".ce-mip-mp-tile")
+const urls = await page.locator(".ce-mip-mp-tile-link")
   .evaluateAll((elements) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
@@ -370,9 +372,10 @@ for (let i = 0; i < urls.length; i++) {
     await page.goto(url);
     const name = await page.locator("h1").textContent();
     const party = await page.locator(".mip-mp-profile-caucus").textContent();
-    const district = await page.locator("dd > a").textContent();
-    const province = await page.locator("dl > dd:nth-child(6)").textContent();
-    const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+    const details = await page.locator("dl > dd").allTextContents();
+    const district = details[1];
+    const province = details[2];
+    const language = details[3];
 
     const data = { name, party, district, province, language };
 
@@ -407,7 +410,7 @@ const page = await context.newPage();
 
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
-const urls = await page.locator(".ce-mip-mp-tile")
+const urls = await page.locator(".ce-mip-mp-tile-link")
   .evaluateAll((elements) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
@@ -427,9 +430,10 @@ for (let i = 0; i < urls.length; i++) {
     await page.goto(url);
     const name = await page.locator("h1").textContent();
     const party = await page.locator(".mip-mp-profile-caucus").textContent();
-    const district = await page.locator("dd > a").textContent();
-    const province = await page.locator("dl > dd:nth-child(6)").textContent();
-    const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+    const details = await page.locator("dl > dd").allTextContents();
+    const district = details[1];
+    const province = details[2];
+    const language = details[3];
 
     const data = { name, party, district, province, language };
 
@@ -448,11 +452,11 @@ await browser.close();
 const sdb = new SimpleDB();
 
 const MPs = sdb.newTable("MPs");
-await MPs.loadData("sda/data/*.json");
-await MPs.summarize({
+MPs.loadData("sda/data/*.json");
+MPs.summarize({
   by: ["party", "language"],
 });
-await MPs.wider("party", "count");
+MPs.wider("party", "count");
 await MPs.log();
 
 await sdb.close();
@@ -467,7 +471,7 @@ Some websites are more complicated to scrape. Retrieving a list of URLs is not a
 
 In the example below, we'll explore the Elections Canada website. You could download all of the data fairly easily, but this public website interface is a great way to learn how to scrape more complex webpages.
 
-Let's say we want to retrieve the declared expenses of candidates in Canadian federal general elections. We need to click on multiple options on [the home page](https://www.elections.ca/WPAPPS/WPF/EN/Home/Index).
+Let's say we want to retrieve the declared expenses of candidates in the 44th Canadian federal general election. We need to click on multiple options on [the home page](https://www.elections.ca/WPAPPS/WPF/EN/Home/Index). The examples use event value `53`, which identifies that completed election, and the full selector sequence was verified on September 1, 2026.
 
 ![Selecting multiple options on Elections Canada website.](/assets/web-scraping/EC-home.png)
 
@@ -704,16 +708,18 @@ await browser.close();
 
 const sdb = new SimpleDB();
 const returns = sdb.newTable("returns");
-await returns.loadData("sda/data/*.json");
-await returns.convert({ expenses: "number" }, { try: true });
-await returns.summarize({
+returns.loadData("sda/data/*.json");
+returns.convert({ expenses: "number" }, { strict: false });
+returns.summarize({
   columns: "expenses",
   by: "party",
   stats: ["mean", "count"],
   decimals: 0,
 });
-await returns.sort({ mean: "desc" });
+returns.sort({ mean: "desc" });
 await returns.log({ count: 13 });
+
+await sdb.close();
 ```
 ![Summarizing candidates expenses with SDA.](/assets/web-scraping/sda-EC.png)
 
@@ -755,7 +761,7 @@ You'll notice one or more fetch requests starting with `AAPL`. This looks very p
 
 Right-click on one of them and open it in a new tab. Wow! Do you recognize this syntax? It's JSON! And it contains a lot of data. 😏
 
-Here's [the link](https://query1.finance.yahoo.com/v8/finance/chart/AAPL?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=AAPL&userYfid=true&lang=en-CA&region=CA) in case you need it.
+Here's [the link](https://query1.finance.yahoo.com/v8/finance/chart/AAPL?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=AAPL&userYfid=true&lang=en-CA&region=CA) in case you need it. This is an undocumented endpoint: Yahoo can change it or temporarily return `429 Too Many Requests`, so treat it as a network-inspection example rather than a stable public API.
 
 ![A screenshot showing the Yahoo Finance API endpoint.](/assets/web-scraping/raw-data.png)
 

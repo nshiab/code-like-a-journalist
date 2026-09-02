@@ -34,7 +34,7 @@ Nous utiliserons aussi Playwright et une fonction de la librairie de fichiers de
 
 [Les tableaux HTML](https://www.w3schools.com/html/html_tables.asp) sont communs pour afficher des données sur les sites web.
 
-Par exemple, sur [cette page Wikipédia](https://en.wikipedia.org/wiki/Medieval_demography#Demographic_tables_of_Europe's_population) sur la démographie médiévale en Europe, vous pouvez voir plusieurs tableaux.
+Par exemple, sur [cette révision figée d'une page Wikipédia](https://en.wikipedia.org/w/index.php?title=Medieval_demography&oldid=1372349632#Demographic_tables_of_Europe's_population) sur la démographie médiévale en Europe, vous pouvez voir plusieurs tableaux. La révision figée rend la leçon reproductible même lorsque Wikipédia change.
 
 Si vous inspectez celui nommé *European population dynamics, years 1000–1500* dans un navigateur (clic droit sur le tableau puis *Inspecter* dans le menu qui s'ouvre), vous verrez l’élément HTML du tableau. Si vous explorez son code, vous verrez les différents éléments qui composent ce tableau avec les données qu’il contient.
 
@@ -44,7 +44,7 @@ Comme ces structures HTML sont toujours les mêmes, j’ai publié une fonction 
 
 ### Avec un `index`
 
-Vous pouvez passer à `getHtmlTable` l’URL que vous souhaitez utiliser. Par défaut, elle renverra les données du premier tableau de la page. Mais sur la page Wikipédia, le tableau que nous voulons est en réalité le quatrième dans le code HTML. Nous pouvons donc passer l’option `{ index: 3 }`.
+Vous pouvez passer à `getHtmlTable` l’URL que vous souhaitez utiliser. Ici, nous ciblons les tableaux ayant la classe CSS `.wikitable` et utilisons `index: 0` pour récupérer le premier résultat. Cette approche est plus fiable que de compter tous les tableaux de mise en page.
 
 Copiez-collez le code ci-dessous dans `sda/main.ts` et exécutez `deno task sda` dans votre terminal pour lancer et surveiller l’exécution.
 
@@ -56,8 +56,8 @@ import { getHtmlTable } from "@nshiab/journalism-web-scraping";
 const sdb = new SimpleDB();
 
 const medievalData = await getHtmlTable(
-  "https://en.wikipedia.org/wiki/Medieval_demography",
-  { index: 3 },
+  "https://en.wikipedia.org/w/index.php?title=Medieval_demography&oldid=1372349632",
+  { selector: ".wikitable", index: 0 },
 );
 
 console.table(medievalData);
@@ -81,15 +81,15 @@ const sdb = new SimpleDB();
 
 const medievalDemography = sdb.newTable("mediavalDemography");
 
-await medievalDemography.cache(async () => {
+await medievalDemography.cache(async (table) => {
   const medievalData = await getHtmlTable(
-    "https://en.wikipedia.org/wiki/Medieval_demography",
-    { index: 3 },
+    "https://en.wikipedia.org/w/index.php?title=Medieval_demography&oldid=1372349632",
+    { selector: ".wikitable", index: 0 },
   );
-  await medievalDemography.loadArray(medievalData);
+  table.loadArray(medievalData);
 });
 
-await medievalDemography.convert({
+medievalDemography.convert({
   Year: "number",
   "Total European population,millions": "number",
 });
@@ -140,31 +140,31 @@ import { getHtmlTable } from "@nshiab/journalism-web-scraping";
 const sdb = new SimpleDB();
 
 const MPs = sdb.newTable("MPs");
-await MPs.cache(async () => {
+await MPs.cache(async (table) => {
   const expensesData = await getHtmlTable(
     "https://www.ourcommons.ca/proactivedisclosure/en/members/2024/1",
     { selector: "#data-table" },
   );
-  await MPs.loadArray(expensesData);
+  table.loadArray(expensesData);
 });
 
-await MPs.replace(["Salaries", "Travel", "Hospitality", "Contracts"], {
+MPs.replace(["Salaries", "Travel", "Hospitality", "Contracts"], {
   "$": "",
   ",": "",
 });
-await MPs.convert({
+MPs.convert({
   Salaries: "number",
   Travel: "number",
   Hospitality: "number",
   Contracts: "number",
-}, { try: true });
-await MPs.summarize({
+}, { strict: false });
+MPs.summarize({
   columns: ["Salaries", "Travel", "Hospitality", "Contracts"],
   by: "Caucus",
   stats: "mean",
   decimals: 0,
 });
-await MPs.wider("Caucus", "mean");
+MPs.wider("Caucus", "mean");
 await MPs.log();
 
 await sdb.close();
@@ -177,7 +177,7 @@ await sdb.close();
 
 Les données ne sont pas toujours bien rangées dans des tableaux. Parfois, elles traînent un peu partout dans le code des pages web.
 
-Par exemple, voici la [liste de tous les députés canadiens actuellement en fonction](https://www.ourcommons.ca/Members/en/search?parliament). Cette liste change avec le temps, donc vous n’aurez peut-être pas exactement les mêmes que moi, mais ce n’est pas grave pour cette leçon.
+Par exemple, voici la [liste de tous les députés canadiens actuellement en fonction](https://www.ourcommons.ca/Members/en/search?parliament). Cette liste change volontairement avec le temps, donc vos résultats peuvent différer des captures d'écran. La page et les sélecteurs ci-dessous ont été vérifiés le 1er septembre 2026.
 
 ![Tous les députés actuellement en fonction.](/assets/web-scraping/all-MPS.png)
 
@@ -193,14 +193,14 @@ Pour récupérer toutes les URLs, on peut utiliser [Playwright](https://github.c
 
 Nous avons installé Playwright pendant la configuration.
 
-Si on inspecte les cartes sur le site web, on peut voir que la balise `a` contient le lien vers la page personnelle du député. Toutes les balises ont la classe `ce-mip-mp-tile`.
+Si on inspecte les cartes sur le site web, on peut voir que la balise `a` contient le lien vers la page personnelle du député. Tous ces liens ont la classe `ce-mip-mp-tile-link`.
 
 ![Inspection de la page personnelle d’un député.](/assets/web-scraping/link-MP.png)
 
 Commençons par visiter la page et extraire les URLs. Voici ce que fait le code ci-dessous, étape par étape :
 - D'abord, on importe le navigateur [`chromium`](https://www.chromium.org/chromium-projects/) depuis Playwright. Chromium est un projet en code ouvert à la base de Google Chrome. On crée un nouveau `browser`, puis un nouveau `context`, et enfin une `newPage` (lignes 1–5).
 - Ensuite, on demande à cette page d’aller sur la page des députés (ligne 7).
-- On récupère tous les éléments avec la classe `ce-mip-mp-tile` (ligne 9).
+- On récupère tous les éléments avec la classe `ce-mip-mp-tile-link` (ligne 9).
 - Puis on utilise la méthode `evaluateAll`, qui permet d’exécuter du code dans le navigateur — très pratique pour le scraping. Ici, on l’utilise pour extraire facilement les attributs `href` et récupérer les URLs (ligne 10).
 - On affiche les URLs dans le terminal (ligne 12).
 - Enfin, on ferme tout ce qui est lié à `chromium` (lignes 14–16).
@@ -217,7 +217,7 @@ const page = await context.newPage();
 
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
-const urls = await page.locator(".ce-mip-mp-tile")
+const urls = await page.locator(".ce-mip-mp-tile-link")
   .evaluateAll((elements) => elements.map((a) => a.href));
 
 console.log(urls);
@@ -252,7 +252,7 @@ const page = await context.newPage();
 
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
-const urls = await page.locator(".ce-mip-mp-tile")
+const urls = await page.locator(".ce-mip-mp-tile-link")
   .evaluateAll((elements) => elements.map((a) => a.href));
 
 for (const url of urls) {
@@ -260,9 +260,10 @@ for (const url of urls) {
   await page.goto(url);
   const name = await page.locator("h1").textContent();
   const party = await page.locator(".mip-mp-profile-caucus").textContent();
-  const district = await page.locator("dd > a").textContent();
-  const province = await page.locator("dl > dd:nth-child(6)").textContent();
-  const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+  const details = await page.locator("dl > dd").allTextContents();
+  const district = details[1];
+  const province = details[2];
+  const language = details[3];
 
   const data = { name, party, district, province, language };
   console.log(data);
@@ -293,7 +294,7 @@ const page = await context.newPage();
 
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
-const urls = await page.locator(".ce-mip-mp-tile")
+const urls = await page.locator(".ce-mip-mp-tile-link")
   .evaluateAll((elements) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
@@ -313,9 +314,10 @@ for (let i = 0; i < urls.length; i++) {
     await page.goto(url);
     const name = await page.locator("h1").textContent();
     const party = await page.locator(".mip-mp-profile-caucus").textContent();
-    const district = await page.locator("dd > a").textContent();
-    const province = await page.locator("dl > dd:nth-child(6)").textContent();
-    const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+    const details = await page.locator("dl > dd").allTextContents();
+    const district = details[1];
+    const province = details[2];
+    const language = details[3];
 
     const data = { name, party, district, province, language };
 
@@ -350,7 +352,7 @@ const page = await context.newPage();
 
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
-const urls = await page.locator(".ce-mip-mp-tile")
+const urls = await page.locator(".ce-mip-mp-tile-link")
   .evaluateAll((elements) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
@@ -370,9 +372,10 @@ for (let i = 0; i < urls.length; i++) {
     await page.goto(url);
     const name = await page.locator("h1").textContent();
     const party = await page.locator(".mip-mp-profile-caucus").textContent();
-    const district = await page.locator("dd > a").textContent();
-    const province = await page.locator("dl > dd:nth-child(6)").textContent();
-    const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+    const details = await page.locator("dl > dd").allTextContents();
+    const district = details[1];
+    const province = details[2];
+    const language = details[3];
 
     const data = { name, party, district, province, language };
 
@@ -407,7 +410,7 @@ const page = await context.newPage();
 
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
-const urls = await page.locator(".ce-mip-mp-tile")
+const urls = await page.locator(".ce-mip-mp-tile-link")
   .evaluateAll((elements) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
@@ -427,9 +430,10 @@ for (let i = 0; i < urls.length; i++) {
     await page.goto(url);
     const name = await page.locator("h1").textContent();
     const party = await page.locator(".mip-mp-profile-caucus").textContent();
-    const district = await page.locator("dd > a").textContent();
-    const province = await page.locator("dl > dd:nth-child(6)").textContent();
-    const language = await page.locator("dl > dd:nth-of-type(4)").textContent();
+    const details = await page.locator("dl > dd").allTextContents();
+    const district = details[1];
+    const province = details[2];
+    const language = details[3];
 
     const data = { name, party, district, province, language };
 
@@ -448,11 +452,11 @@ await browser.close();
 const sdb = new SimpleDB();
 
 const MPs = sdb.newTable("MPs");
-await MPs.loadData("sda/data/*.json");
-await MPs.summarize({
+MPs.loadData("sda/data/*.json");
+MPs.summarize({
   by: ["party", "language"],
 });
-await MPs.wider("party", "count");
+MPs.wider("party", "count");
 await MPs.log();
 
 await sdb.close();
@@ -467,7 +471,7 @@ Certains sites web sont plus compliqués à extraire. Il n’est pas toujours po
 
 Dans l’exemple ci-dessous, nous allons explorer le site d’Élections Canada. Vous pourriez télécharger toutes les données assez facilement, mais cette interface publique est une excellente occasion d’apprendre à extraire des données depuis des pages web plus complexes.
 
-Disons que nous voulons récupérer les dépenses déclarées des candidats aux élections fédérales canadiennes. Il faut cliquer sur plusieurs options sur la [page d’accueil](https://www.elections.ca/WPAPPS/WPF/EN/Home/Index).
+Disons que nous voulons récupérer les dépenses déclarées des candidats à la 44e élection générale fédérale canadienne. Il faut cliquer sur plusieurs options sur la [page d’accueil](https://www.elections.ca/WPAPPS/WPF/EN/Home/Index). Les exemples utilisent la valeur d'évènement `53`, qui désigne cette élection terminée, et toute la séquence de sélecteurs a été vérifiée le 1er septembre 2026.
 
 ![Sélection de plusieurs options sur le site d’Élections Canada.](/assets/web-scraping/EC-home.png)
 
@@ -702,16 +706,18 @@ await browser.close();
 
 const sdb = new SimpleDB();
 const returns = sdb.newTable("returns");
-await returns.loadData("sda/data/*.json");
-await returns.convert({ expenses: "number" }, { try: true });
-await returns.summarize({
+returns.loadData("sda/data/*.json");
+returns.convert({ expenses: "number" }, { strict: false });
+returns.summarize({
   columns: "expenses",
   by: "party",
   stats: ["mean", "count"],
   decimals: 0,
 });
-await returns.sort({ mean: "desc" });
+returns.sort({ mean: "desc" });
 await returns.log({ count: 13 });
+
+await sdb.close();
 ```
 ![Résumé des dépenses des candidats avec SDA.](/assets/web-scraping/sda-EC.png)
 
@@ -753,7 +759,7 @@ Vous remarquerez une ou plusieurs requêtes `fetch` qui commencent par `AAPL`. �
 
 Faites un clic droit sur l’une d’elles et ouvrez-la dans un nouvel onglet. Wow ! Vous reconnaissez cette syntaxe ? C’est du JSON ! Et il y a beaucoup de données. 😏
 
-Voici [le lien](https://query1.finance.yahoo.com/v8/finance/chart/AAPL?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=AAPL&userYfid=true&lang=en-CA&region=CA) au cas où vous en auriez besoin.
+Voici [le lien](https://query1.finance.yahoo.com/v8/finance/chart/AAPL?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=345479400&period2=1738778777&symbol=AAPL&userYfid=true&lang=en-CA&region=CA) au cas où vous en auriez besoin. Il s'agit d'un point d'accès non documenté : Yahoo peut le modifier ou renvoyer temporairement l'erreur `429 Too Many Requests`. Considérez-le comme un exemple d'inspection du réseau, et non comme une API publique stable.
 
 ![Une capture d’écran montrant l’API de Yahoo Finance.](/assets/web-scraping/raw-data.png)
 

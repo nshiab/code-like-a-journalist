@@ -41,9 +41,9 @@ Ensuite, lancez `deno task sda` pour surveiller `main.ts` et ses dépendances.
 
 ## Les données
 
-Dans le défi original, vous devez copier un répertoire GitHub et exécuter un script pour générer un fichier CSV contenant 1 milliard de lignes. Mais je l'ai fait pour vous et j'ai téléversé le fichier compressé sur mon Google Drive.
+Dans le défi original, vous devez copier un répertoire GitHub et exécuter un script pour générer un fichier CSV contenant 1 milliard de lignes. Je l'ai généré pour vous et j'ai téléversé une copie appartenant au cours sur Google Drive. Le fichier possède un identifiant Drive stable et a été vérifié le 1er septembre 2026.
 
-[Téléchargez les données ici](https://drive.google.com/file/d/1A_OCjRyHnCCMZbgT0Z5KN70pJXMA8TYD/view?usp=drive_link). Cela peut prendre quelques minutes car le fichier fait environ 4 Go.
+[Téléchargez les données ici](https://drive.google.com/file/d/1A_OCjRyHnCCMZbgT0Z5KN70pJXMA8TYD/view). Cela peut prendre quelques minutes car le fichier fait environ 4 Go.
 
 Ensuite, placez-le dans votre dossier `data` et décompressez-le. La version décompressée du fichier CSV fait environ 13 Go.
 
@@ -57,14 +57,14 @@ const sdb = new SimpleDB({ logDuration: true });
 
 const table = sdb.newTable();
 
-await table.loadData("sda/data/measurements.csv");
+table.loadData("sda/data/measurements.csv");
 await table.log();
 
 await sdb.close();
 ```
 ![Une capture d'écran de VS Code après avoir chargé un milliard de lignes de données.](/assets/one-billion-row-challenge/load-data.png)
 
-Félicitations ! Vous venez de charger 1 000 000 000 de lignes de données ! Sur mon MacBook Pro M1 avec 16 Go de RAM, cela a pris environ 26 secondes. 🥳
+Félicitations ! Vous venez de charger 1 000 000 000 de lignes de données ! Lors d'une exécution historique avec SDA 4.0.1 et Deno 2.2.2 sur mon MacBook Pro M1 avec 16 Go de RAM, cela a pris environ 26 secondes. Considérez ce chiffre comme un point de repère, et non comme un test actuel de SDA 6. 🥳
 
 Selon la RAM disponible sur votre ordinateur, vous pourriez voir un dossier `.tmp` apparaître dans votre projet. Si les données sont plus volumineuses que votre RAM, ce dossier sera utilisé pour traiter toutes les données en stockant des morceaux prétraités.
 
@@ -89,8 +89,8 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB({ logDuration: true });
 
 const table = sdb.newTable();
-await table.loadData("sda/data/measurements.csv");
-await table.summarize({
+table.loadData("sda/data/measurements.csv");
+table.summarize({
   columns: "temp",
   by: "city",
   stats: ["min", "mean", "max"],
@@ -101,7 +101,7 @@ await sdb.close();
 ```
 ![Une capture d'écran de VS Code après avoir agrégé un milliard de lignes de données.](/assets/one-billion-row-challenge/summarize.png)
 
-Le chargement et l'agrégation du milliard de valeurs a pris moins de 50 secondes sur mon ordinateur avec SDA ! 🚀
+Lors de cette même exécution historique avec SDA 4.0.1, le chargement et l'agrégation du milliard de valeurs ont pris moins de 50 secondes. Le matériel ainsi que les versions de Deno, DuckDB et SDA influencent le résultat. 🚀
 
 ## Accélérer les choses
 
@@ -119,7 +119,8 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ logDuration: true });
 
-const result = await sdb.customQuery(`
+const result = await sdb.customQuery(
+  `
 SELECT city,
     MIN(temp) AS min_temp,
     ROUND(MEAN(temp), 1) AS mean_temp,
@@ -129,7 +130,7 @@ GROUP BY city
 ORDER BY city
 LIMIT 10;
 `,
-  { returnDataFrom: "query" },
+  { returnData: true },
 );
 
 console.table(result);
@@ -138,7 +139,7 @@ await sdb.close();
 ```
 ![Une capture d'écran de VS Code après avoir agrégé un milliard de lignes de données.](/assets/one-billion-row-challenge/sql.png)
 
-Et cela s'exécute en seulement... 16 secondes ! 💥💥💥
+Lors de l'exécution historique avec SDA 4.0.1, cette requête DuckDB directe a pris 16 secondes. Le résultat est conservé pour expliquer la méthodologie, et non comme une mesure des performances de SDA 6. 💥💥💥
 
 ## Mais... comment ?
 
@@ -150,7 +151,7 @@ D'après mon expérience, utiliser SDA est plus rapide que d'utiliser Python ave
 
 Pour tester et comparer les performances de la librairie, j'ai calculé la température moyenne par décennie et par ville en utilisant les températures quotidiennes des [données climatiques ajustées et homogénéisées du Canada](https://api.weather.gc.ca/collections/ahccd-annual), soit environ 1,7 Go avec 22 millions de lignes de données. Pour plus de détails, consultez le [répertoire GitHub de la librairie](https://github.com/nshiab/simple-data-analysis).
 
-J'ai exécuté les mêmes calculs avec **simple-data-analysis@4.0.1** (Node.js, Bun et Deno), **Pandas (Python)** et le **tidyverse (R)**.
+Le graphique ci-dessous présente un test de performance historique conservé à titre de référence. J'ai exécuté le même calcul, avec les mêmes données sources et le même ordinateur, avec **simple-data-analysis@4.0.1** (Node.js, Bun et Deno), **Pandas (Python)** et le **tidyverse (R)**. Les versions exactes des autres environnements et librairies n'ont pas été consignées; il s'agit donc d'une comparaison historique qualitative, pas d'un test reproductible de SDA 6.
 
 Grâce à DuckDB, **Simple Data Analysis** a été l'option la plus rapide.
 

@@ -41,9 +41,9 @@ Then run `deno task sda` to watch `main.ts` and its dependencies.
 
 ## The data
 
-In the original challenge, you have to fork a GitHub repo and run a script to generate a CSV file with 1 billion rows of data. But I did this for you and uploaded the compressed file to my Google Drive.
+In the original challenge, you have to fork a GitHub repo and run a script to generate a CSV file with 1 billion rows of data. I generated it for you and uploaded a course-owned copy to Google Drive. The file has a stable Drive ID and was verified on September 1, 2026.
 
-[Download the data from here](https://drive.google.com/file/d/1A_OCjRyHnCCMZbgT0Z5KN70pJXMA8TYD/view?usp=drive_link). It might take a few minutes since it's around 4 GB.
+[Download the data from here](https://drive.google.com/file/d/1A_OCjRyHnCCMZbgT0Z5KN70pJXMA8TYD/view). It might take a few minutes since it's around 4 GB.
 
 Then put it in your `data` folder and unzip it. The uncompressed version of the CSV file is around 13 GB.
 
@@ -56,14 +56,14 @@ const sdb = new SimpleDB({ logDuration: true });
 
 const table = sdb.newTable();
 
-await table.loadData("sda/data/measurements.csv");
+table.loadData("sda/data/measurements.csv");
 await table.log();
 
 await sdb.close();
 ```
 ![A screenshot of VS Code after loading one billion rows of data.](/assets/one-billion-row-challenge/load-data.png)
 
-Congratulations! You just loaded 1,000,000,000 rows of data! On my MacBook Pro M1 with 16 GB of RAM, it took around 26 seconds. 🥳
+Congratulations! You just loaded 1,000,000,000 rows of data! In a historical run with SDA 4.0.1 and Deno 2.2.2 on my MacBook Pro M1 with 16 GB of RAM, it took around 26 seconds. Treat this as a reference point rather than a current SDA 6 benchmark. 🥳
 
 Depending on the RAM available on your computer, you might see a `.tmp` folder appearing in your project. If the data is bigger than your RAM, this folder will be used to process all of it by storing processed chunks in it.
 
@@ -87,8 +87,8 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 const sdb = new SimpleDB({ logDuration: true });
 
 const table = sdb.newTable();
-await table.loadData("sda/data/measurements.csv");
-await table.summarize({
+table.loadData("sda/data/measurements.csv");
+table.summarize({
   columns: "temp",
   by: "city",
   stats: ["min", "mean", "max"],
@@ -99,7 +99,7 @@ await sdb.close();
 ```
 ![A screenshot of VS Code after aggregating one billion rows of data.](/assets/one-billion-row-challenge/summarize.png)
 
-Loading and aggregating the one billion values took less than 50 seconds on my machine with SDA! 🚀
+In that same historical SDA 4.0.1 run, loading and aggregating the one billion values took less than 50 seconds. Hardware, Deno, DuckDB, and SDA versions all affect the result. 🚀
 
 ## Speeding things up
 
@@ -117,7 +117,8 @@ import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ logDuration: true });
 
-const result = await sdb.customQuery(`
+const result = await sdb.customQuery(
+  `
 SELECT city,
     MIN(temp) AS min_temp,
     ROUND(MEAN(temp), 1) AS mean_temp,
@@ -127,7 +128,7 @@ GROUP BY city
 ORDER BY city
 LIMIT 10;
 `,
-  { returnDataFrom: "query" },
+  { returnData: true },
 );
 
 console.table(result);
@@ -136,7 +137,7 @@ await sdb.close();
 ```
 ![A screenshot of VS Code after aggregating one billion rows of data.](/assets/one-billion-row-challenge/sql.png)
 
-And this runs in just... 16 seconds! 💥💥💥
+In the historical SDA 4.0.1 run, this direct DuckDB query took 16 seconds. It is preserved here to explain the methodology, not as an SDA 6 performance claim. 💥💥💥
 
 ## But... how?
 
@@ -148,7 +149,7 @@ In my experience, using SDA is faster than using Python with Pandas or R with th
 
 To test and compare the library's performance, I calculated the average temperature per decade and city using the daily temperatures from the [Adjusted and Homogenized Canadian Climate Data](https://api.weather.gc.ca/collections/ahccd-annual), which is around 1.7 GB with 22 million rows of data. For more details, check out the [library repository](https://github.com/nshiab/simple-data-analysis).
 
-I ran the same calculations with **simple-data-analysis@4.0.1** (Node.js, Bun, and Deno), **Pandas (Python)**, and the **tidyverse (R)**.
+The chart below is a preserved historical benchmark. I ran the same calculation on the same source data and computer with **simple-data-analysis@4.0.1** (Node.js, Bun, and Deno), **Pandas (Python)**, and the **tidyverse (R)**. Exact versions of the other runtimes and libraries were not recorded, so this is a qualitative historical comparison, not a reproducible SDA 6 benchmark.
 
 Thanks to DuckDB, **Simple Data Analysis** was the fastest option.
 

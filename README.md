@@ -18,7 +18,7 @@ verified on September 1, 2026, with:
 
 - Deno 2.9.6
 - @nshiab/setup-data-project 2.0.0
-- @nshiab/simple-data-analysis 6.0.0
+- @nshiab/simple-data-analysis 6.0.1
 
 Keep this list as the single source of truth when the course's tested toolchain
 changes. Lessons should use unversioned setup commands so learners receive the
