@@ -161,9 +161,9 @@ Mais si vous utilisez GitHub, vous pouvez configurer des tests automatisés dans
 
 Par exemple, j’ai des centaines de tests en place pour la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Vous pouvez [les explorer ici](https://github.com/nshiab/simple-data-analysis/tree/main/test/unit/methods).
 
-J’utilise GitHub Actions (consultez [la leçon à ce sujet](/git-and-github/github-actions)) pour les déclencher automatiquement lorsqu’une *pull request* est créée pour fusionner du nouveau code dans la branche `main`.
+J’utilise GitHub Actions (consultez [la leçon à ce sujet](/git-and-github/github-actions)) pour les déclencher automatiquement lorsqu’une *pull request* est ouverte ou mise à jour vers la branche `main`.
 
-Si les tests passent, la fusion est autorisée et la nouvelle version de la librairie peut être publiée. Mais si un ou plusieurs tests échouent, cela signifie qu’il y a une modification incompatible ou un comportement inattendu, et la PR est rejetée. Du travail est encore nécessaire. Vous pouvez consulter [le *workflow* ici](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
+La *pull request* indique si les tests ont réussi. Si un ou plusieurs échouent, il faut continuer à travailler avant de fusionner. Les règles du dépôt peuvent aussi exiger la réussite de ces vérifications et bloquer le bouton de fusion tant que ce n’est pas le cas. Vous pouvez consulter [le *workflow* ici](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
 
 Ce ne sont que quelques lignes de code, mais cela garantit que la librairie fonctionne comme prévu. Et ça m’a évité plusieurs fois de publier une nouvelle version cassée de la librairie ! 😇
 

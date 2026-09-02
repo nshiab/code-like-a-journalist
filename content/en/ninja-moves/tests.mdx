@@ -157,9 +157,9 @@ But if you are using GitHub, you can set up automated tests in your projects. Th
 
 For example, I have hundreds of tests in place for the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis). You can [explore them here](https://github.com/nshiab/simple-data-analysis/tree/main/test/unit/methods).
 
-I use GitHub Actions (check the [lesson about it](/git-and-github/github-actions)) to trigger them automatically when a pull request is made to merge new code to the main branch.
+I use GitHub Actions (check the [lesson about it](/git-and-github/github-actions)) to trigger them automatically when a pull request is opened or updated against the `main` branch.
 
-If the tests pass, the merge is allowed and the new version of the library can be published. But if one or more tests fail, it means there is a breaking change or unexpected behavior, and the PR is rejected. More work is needed. You can check the [workflow here](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
+The pull request shows whether the tests passed. If one or more fail, more work is needed before merging. Repository rules can also require these status checks to pass and block the merge button until they do. You can check the [workflow here](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
 
 It's just a few lines of code, but it guarantees that the library is working as expected. And it has saved me many times from publishing a new broken version of the library! 😇
 

@@ -65,15 +65,15 @@ Then, create a `functions` folder and a `getPercentage.ts` file with the code an
  * @returns A string representing the percentage. If `total` is 0, returns "0%".
  */
 export default function getPercentage(
-    current: number,
-    total: number,
+  current: number,
+  total: number,
 ): string {
-    if (total === 0) {
-        return "0%";
-    } else {
-        const percentage = (current / total) * 100;
-        return `${percentage}%`;
-    }
+  if (total === 0) {
+    return "0%";
+  } else {
+    const percentage = Math.round((current / total) * 100);
+    return `${percentage}%`;
+  }
 }
 ```
 
@@ -96,28 +96,26 @@ Create a `tests` folder and add a `getPercentage.test.ts` file inside it.
 
 
 ```ts showLineNumbers filename="tests/getPercentage.test.ts"
-import { assertEquals } from "jsr:@std/assert";
+import { assertEquals } from "@std/assert";
 import getPercentage from "../functions/getPercentage.ts";
 
 Deno.test("should return 50%", () => {
-    assertEquals(getPercentage(50, 100), "50%");
+  assertEquals(getPercentage(50, 100), "50%");
 });
 Deno.test("should return 33%", () => {
-    assertEquals(getPercentage(33.333, 100), "33%");
+  assertEquals(getPercentage(33.333, 100), "33%");
 });
 Deno.test("should return 0%", () => {
-    assertEquals(getPercentage(0, 100), "0%");
+  assertEquals(getPercentage(0, 100), "0%");
 });
 Deno.test("should return 0%", () => {
-    assertEquals(getPercentage(1, 0), "0%");
+  assertEquals(getPercentage(1, 0), "0%");
 });
 ```
 
 Finally, install the [@std/assert](https://jsr.io/@std/assert) standard library with: `deno add jsr:@std/assert`.
 
 Now, if you run `deno test`, everything should run smoothly.
-
-![Running tests locally.](/assets/ninja-moves/publishing-library/running-tests.png)
 
 We mustn’t forget to add the fields recommended by JSR to our `deno.json`. I copied and pasted them from the web page I told you to keep open earlier.
 
@@ -135,7 +133,7 @@ Here’s what we are adding:
   "license": "MIT",
   "exports": "./index.ts",
   "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.12"
+    "@std/assert": "jsr:@std/assert@^1.0.19"
   }
 }
 ```
@@ -144,7 +142,9 @@ Since this lesson is focused on publishing the library, I won't push this code t
 
 ## Publishing the library
 
-Now just run `deno publish`!
+Before uploading anything, run `deno publish --dry-run`. Deno will type-check the public API and apply JSR's package validations without publishing. Fix any reported errors before continuing.
+
+When the dry run succeeds, run `deno publish`!
 
 A webpage should automatically open in a web browser. If not, click on the link in the terminal.
 
@@ -198,21 +198,21 @@ But it’s very important to run our tests **before** publishing. Trust me: you 
 
 We already have tests in place. Let’s create a `test-publish` task in `deno.json` to run them before publishing. If you don’t know what tasks are, check the [Running tasks](/pushing-further/tasks) lesson.
 
-While we're at it, we can also chain a few commands to make sure our code is well formatted (`deno fmt`) and that our types are correct (`deno check`).
+While we're at it, we can also chain a few commands to make sure our code is well formatted (`deno fmt --check`) and that our types are correct (`deno check`). Using `--check` verifies formatting without changing files during publication.
 
 So now, instead of running `deno publish` directly, we would run `deno task test-publish`. If there’s a problem with our types or tests, Deno will stop and won’t publish the library.
 
 ```json showLineNumbers filename="deno.json" {2-4}
 {
   "tasks": {
-    "test-publish": "deno fmt && deno check index.ts && deno test && deno publish"
+    "test-publish": "deno fmt --check && deno check index.ts && deno test && deno publish"
   },
   "name": "@nshiab/my-first-library",
   "version": "0.1.0",
   "license": "MIT",
   "exports": "./index.ts",
   "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.12"
+    "@std/assert": "jsr:@std/assert@^1.0.19"
   }
 }
 ```
@@ -238,14 +238,14 @@ In our `deno.json`, let’s update the version. Since this is a tiny change, I s
 ```json showLineNumbers filename="deno.json" /"0.1.1"/
 {
   "tasks": {
-    "test-publish": "deno fmt && deno check index.ts && deno test && deno publish"
+    "test-publish": "deno fmt --check && deno check index.ts && deno test && deno publish"
   },
   "name": "@nshiab/my-first-library",
   "version": "0.1.1",
   "license": "MIT",
   "exports": "./index.ts",
   "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.12"
+    "@std/assert": "jsr:@std/assert@^1.0.19"
   }
 }
 ```
@@ -253,8 +253,6 @@ In our `deno.json`, let’s update the version. Since this is a tiny change, I s
 And now we use our new task `test-publish` to republish our library: `deno task test-publish`.
 
 You can see that the checks and tests are run before publishing now! 🥳
-
-![Testing and publishing a new version.](/assets/ninja-moves/publishing-library/test-publish.png)
 
 Approve the publication like before, and after a few seconds, you’ll see your library page updated with the content of your `README`!
 
@@ -275,16 +273,11 @@ Here’s a description of the columns:
 - `Update` is the version Deno suggests installing. It might not be the latest if you used `^` or `~` for the range of acceptable versions in your `deno.json`. Check the [Understanding library versions](/ninja-moves/semver) lesson for more.
 - `Latest` is the latest available version.
 
-![Outdated library.](/assets/ninja-moves/publishing-library/outdated.png)
-
 If you want to update your library, you could do it manually with `deno add jsr:@nshiab/my-first-library@0.1.1`.
 
-But when you have a lot of libraries to update, you can run the suggested Deno command to do all of them at once: `deno outdated --update`.
+But when you have a lot of libraries to update, run `deno update`. By default, it respects the version ranges in `deno.json`. Use `deno update --latest` only when you intentionally want to move beyond those ranges, including to a new major version.
 
 And done! We just updated and we’re now using our new version!
-
-![Updated library.](/assets/ninja-moves/publishing-library/deno-update.png)
-
 
 ## Advanced configuration
 
@@ -312,11 +305,11 @@ For example, here's my workflow to publish a new version of the [Simple-Data-Ana
 
 3. I create a pull request to merge the branch into `main`. I have a [GitHub Actions workflow](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml) that runs the tests. If all checks and tests pass, the pull request is accepted and merged.
 
-4. When I’m ready to publish a new version (often after a few pull requests), I run one of the `patch`, `minor`, or `major` tasks locally, as defined in the [`deno.json`](https://github.com/nshiab/simple-data-analysis/blob/d3eb64f34fdc93c6cbbe0c65914f31ac8be1f36f/deno.json#L11-L13) file from the repository.
+4. When I’m ready to publish a new version (often after a few pull requests), I run one of the `patch`, `minor`, or `major` tasks locally, as defined in the repository's [`deno.json`](https://github.com/nshiab/simple-data-analysis/blob/main/deno.json).
 
-5. These tasks run a script called [`incrementVersion.ts`](https://github.com/nshiab/simple-data-analysis/blob/main/src/incrementVersion.ts), which updates the version in `deno.json`, creates a [Git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging) and pushes it to GitHub.
+5. These tasks run all checks, then call the [`@nshiab/bump-version`](https://jsr.io/@nshiab/bump-version) tool. It updates `deno.json`, commits and pushes the change, creates a [Git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), and pushes the tag to GitHub.
 
-6. When a new tag is pushed to GitHub, two workflows are triggered: [one to publish](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/publish.yml) the library on JSR, and another to [create a release](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/release.yml) on GitHub with a summary of all the changes from the approved pull requests.
+6. When a new tag is pushed to GitHub, two workflows are triggered: [one to publish](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/jsr-publish.yml) the library on JSR, and another to [create a release](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/release.yml) on GitHub with a summary of all the changes from the approved pull requests.
 
 I like this workflow because it keeps everything in sync, saves me a lot of typing/clicking, and creates easy-to-read, useful releases. Here's the most recent one, for example, at the time of writing:
 
@@ -334,7 +327,7 @@ Sometimes, you don’t want all your code to be public — even though I’d arg
 
 With NPM, [you can pay to use private registries](https://docs.npmjs.com/creating-and-publishing-private-packages).
 
-With JSR, you can [unlist your library](https://jsr.io/docs/private-registries) so that it doesn’t appear in search results — though it remains publicly accessible. Fully private registries aren't available on JSR yet, but the team is actively working on it.
+With JSR, you can [unlist your library](https://jsr.io/docs/private-registries) so that it doesn’t appear in search results — though it remains publicly accessible. JSR does not currently support private packages.
 
 ## Conclusion
 

@@ -32,7 +32,7 @@ If you click on `Source Control` in the left sidebar, you'll see that there is n
 
 ![Message in VS Code saying that there is no Git repository.](/assets/git-and-github/git-basics/no-repo.png)
 
-To initialize a new Git repository, run this command in the terminal: `git init`.
+To initialize a new Git repository with a `main` branch, run this command in the terminal: `git init -b main`.
 
 Now, your project is using Git! But there’s nothing in it yet.
 
@@ -50,11 +50,11 @@ This API returns data as XML. We log it to the terminal.
 
 ```ts showLineNumbers filename="main.ts"
 const response = await fetch(
-  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+  "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
 const xml = await response.text();
 
-console.log(xml)
+console.log(xml);
 ```
 
 Now, you can see your new file under `Changes`. Its color also switched to green and there is a `U` next to it, meaning `Untracked`. You can also see a `1` in the left sidebar, next to the `Source Control` button, indicating that one file has been changed.
@@ -99,7 +99,7 @@ Then update your `main.ts`.
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
-  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+  "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
 const xml = await response.text();
 const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
@@ -152,7 +152,7 @@ For example, let's create an error in our code. Let’s parse the fetch response
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
-  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+  "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
 const xml = await response.json();
 const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
@@ -175,13 +175,7 @@ To retrieve a commit ID, right-click on the commit and click on `Copy Commit ID`
 
 ![Copying a commit ID](/assets/git-and-github/git-basics/copy-id.png)
 
-Then start typing `git revert` in the terminal, paste the commit ID (don't forget a space between `revert` and your commit ID), and run the command!
-
-What you’re seeing in your terminal is a text editor. The lines above the `#` section are the suggested commit message.
-
-![Reverting a commit.](/assets/git-and-github/git-basics/revert.png)
-
-To accept the suggested commit, just type `:q` in the terminal and press Enter to confirm and quit the terminal text editor. You can also click on the big blue `Commit` button.
+Run `git revert COMMIT_ID --no-edit`, replacing `COMMIT_ID` with the ID you copied. The `--no-edit` option accepts Git's suggested message, so the command can create the revert commit without opening a text editor.
 
 Now, you'll see a fourth commit, indicating that you reverted! For a *real* rollback, you can also use [`git reset`](https://git-scm.com/docs/git-reset), but reverting is safer and keeps a history of everything—including the revert!
 
@@ -203,9 +197,9 @@ For example, let's say we now want to extract the date and temperature from the 
 
 ### Adding a branch
 
-To create a new branch named `temperature`, run: `git checkout -b temperature`
+To create a new branch named `temperature` and switch to it, run: `git switch -c temperature`
 
-The `checkout` command tells Git you want to switch to another branch. The `-b` followed by `temperature` tells it to create the new branch `temperature` before switching to it. Because you are on `main`, the branch will be created from `main`. The code will be exactly the same on both branches at first.
+The `switch` command tells Git you want to switch branches. The `-c` option tells it to create the new branch before switching to it. Because you are on `main`, the branch will be created from `main`. The code will be exactly the same on both branches at first.
 
 If you want to see a list of all branches, you can run `git branch`. The one with a `*` in front of it is the branch you're currently on.
 
@@ -221,7 +215,7 @@ If you run `deno -A main.ts`, you should see the temperature logged in the termi
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
-  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+  "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
 const xml = await response.text();
 const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
@@ -249,7 +243,7 @@ Let's commit this update:
 
 ![Working on the temperature branch.](/assets/git-and-github/git-basics/commit-new-branch.png)
 
-This has been committed to the `temperature` branch. The `main` branch has not changed. To check the `main` branch, you can use `git checkout main`.
+This has been committed to the `temperature` branch. The `main` branch has not changed. To check the `main` branch, you can use `git switch main`.
 
 As you can see, our new code is not there! In case we created an error or introduced a new bug on the `temperature` branch, we know that `main` won't have it.
 
@@ -263,7 +257,7 @@ Now, let's say we are happy with our new code on the `temperature` branch. We wo
 
 To do that, we have to **merge** the branches.
 
-Make sure you are on the `main` branch (`git checkout main`) and then run `git merge temperature`. This command will merge the `temperature` branch into the `main` branch.
+Make sure you are on the `main` branch (`git switch main`) and then run `git merge temperature`. This command will merge the `temperature` branch into the `main` branch.
 
 Now, the new code is on `main`! And you can see the commit that we created in `temperature`. The history has been merged.
 
@@ -273,7 +267,7 @@ Now, the new code is on `main`! And you can see the commit that we created in `t
 
 We don't need the `temperature` branch anymore. Let's remove it by running: `git branch -d temperature`
 
-As you can see, the syntax is the same as when creating a branch, except the option is `-d` instead of `-b`. Be careful! 😬
+The `-d` option only deletes a branch after Git confirms that it has been merged. This helps protect work that has not made it into `main` yet.
 
 Now, if you run `git branch`, you won’t see `temperature` anymore.
 
@@ -287,19 +281,17 @@ You can do that with your file explorer.
 
 ![A hidden git folder.](/assets/git-and-github/git-basics/git-folder.png)
 
-Or you can do it in your terminal with this command: `rm -fr .git`
-
-But you need to be **extremely careful** when running it. This command deletes everything recursively. It could wipe out your entire computer. You must ensure you are in your project folder and be careful of typos.
+Because deleting folders from the terminal can be dangerous, use your file explorer and double-check that you selected only the `.git` folder. Your code will remain, but its Git history and configuration will be gone.
 
 ## Conclusion
 
 Congratulations! You've learned the most important Git commands:
-- `git init` to start a new Git repository
+- `git init -b main` to start a new Git repository with a `main` branch
 - `git add -A` to track the files
 - `git commit -m "A message"` to save the project
-- `git revert commitID` to revert a commit
-- `git branch -b my-new-branch` to create a new branch
-- `git checkout my-new-branch` to switch to a different branch
+- `git revert COMMIT_ID --no-edit` to revert a commit
+- `git switch -c my-new-branch` to create and switch to a new branch
+- `git switch my-new-branch` to switch to an existing branch
 - `git merge my-new-branch` to merge branches
 - `git branch -d my-new-branch` to delete a branch
 

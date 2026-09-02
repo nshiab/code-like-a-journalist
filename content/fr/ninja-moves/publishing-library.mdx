@@ -64,15 +64,15 @@ Ensuite, créez un dossier `functions` et un fichier `getPercentage.ts` avec le 
  * @returns A string representing the percentage. If `total` is 0, returns "0%".
  */
 export default function getPercentage(
-    current: number,
-    total: number,
+  current: number,
+  total: number,
 ): string {
-    if (total === 0) {
-        return "0%";
-    } else {
-        const percentage = (current / total) * 100;
-        return `${percentage}%`;
-    }
+  if (total === 0) {
+    return "0%";
+  } else {
+    const percentage = Math.round((current / total) * 100);
+    return `${percentage}%`;
+  }
 }
 ```
 
@@ -95,28 +95,26 @@ Créez un dossier `tests` et ajoutez-y un fichier `getPercentage.test.ts`.
 
 
 ```ts showLineNumbers filename="tests/getPercentage.test.ts"
-import { assertEquals } from "jsr:@std/assert";
+import { assertEquals } from "@std/assert";
 import getPercentage from "../functions/getPercentage.ts";
 
 Deno.test("should return 50%", () => {
-    assertEquals(getPercentage(50, 100), "50%");
+  assertEquals(getPercentage(50, 100), "50%");
 });
 Deno.test("should return 33%", () => {
-    assertEquals(getPercentage(33.333, 100), "33%");
+  assertEquals(getPercentage(33.333, 100), "33%");
 });
 Deno.test("should return 0%", () => {
-    assertEquals(getPercentage(0, 100), "0%");
+  assertEquals(getPercentage(0, 100), "0%");
 });
 Deno.test("should return 0%", () => {
-    assertEquals(getPercentage(1, 0), "0%");
+  assertEquals(getPercentage(1, 0), "0%");
 });
 ```
 
 Enfin, installez la librairie standard [@std/assert](https://jsr.io/@std/assert) avec la commande suivante : `deno add jsr:@std/assert`.
 
 Maintenant, si vous exécutez `deno test`, tout devrait se dérouler sans problème.
-
-![Exécution des tests en local.](/assets/ninja-moves/publishing-library/running-tests.png)
 
 N’oublions pas d’ajouter les champs recommandés par JSR dans notre fichier `deno.json`. Je les ai copiés depuis la page web que je vous ai conseillé de garder ouverte plus tôt.
 
@@ -134,7 +132,7 @@ Voici ce que nous allons ajouter :
   "license": "MIT",
   "exports": "./index.ts",
   "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.12"
+    "@std/assert": "jsr:@std/assert@^1.0.19"
   }
 }
 ```
@@ -143,7 +141,9 @@ Comme cette leçon est centrée sur la publication de la librairie, je ne vais p
 
 ## Publier la librairie
 
-Lancez maintenant simplement la commande `deno publish` !
+Avant de téléverser quoi que ce soit, exécutez `deno publish --dry-run`. Deno vérifiera les types de l’API publique et appliquera les validations de JSR sans publier. Corrigez toute erreur signalée avant de continuer.
+
+Lorsque cette simulation réussit, exécutez `deno publish` !
 
 Une page web devrait s’ouvrir automatiquement dans votre navigateur. Si ce n’est pas le cas, cliquez sur le lien affiché dans le terminal.
 
@@ -197,7 +197,7 @@ Mais il est très important d’exécuter vos tests **avant** de publier. Croyez
 
 Nous avons déjà mis en place des tests. Créons une tâche `test-publish` dans le fichier `deno.json` pour les exécuter avant la publication. Si vous ne savez pas ce que sont les tâches, consultez la leçon [Exécuter des tâches](/pushing-further/tasks).
 
-Tant qu’à faire, nous pouvons aussi enchaîner quelques commandes pour nous assurer que notre code est bien formaté (`deno fmt`) et que les types sont corrects (`deno check`).
+Tant qu’à faire, nous pouvons aussi enchaîner quelques commandes pour nous assurer que notre code est bien formaté (`deno fmt --check`) et que les types sont corrects (`deno check`). L’option `--check` vérifie le formatage sans modifier les fichiers pendant la publication.
 
 Désormais, au lieu d’exécuter directement `deno publish`, nous exécuterons `deno task test-publish`. Si un problème est détecté dans les types ou les tests, Deno s’arrêtera et n’autorisera pas la publication de la librairie.
 
@@ -205,14 +205,14 @@ Désormais, au lieu d’exécuter directement `deno publish`, nous exécuterons 
 ```json showLineNumbers filename="deno.json" {2-4}
 {
   "tasks": {
-    "test-publish": "deno fmt && deno check index.ts && deno test && deno publish"
+    "test-publish": "deno fmt --check && deno check index.ts && deno test && deno publish"
   },
   "name": "@nshiab/my-first-library",
   "version": "0.1.0",
   "license": "MIT",
   "exports": "./index.ts",
   "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.12"
+    "@std/assert": "jsr:@std/assert@^1.0.19"
   }
 }
 ```
@@ -239,14 +239,14 @@ Dans notre fichier `deno.json`, mettons à jour la version. Comme il s’agit d�
 ```json showLineNumbers filename="deno.json" /"0.1.1"/
 {
   "tasks": {
-    "test-publish": "deno fmt && deno check index.ts && deno test && deno publish"
+    "test-publish": "deno fmt --check && deno check index.ts && deno test && deno publish"
   },
   "name": "@nshiab/my-first-library",
   "version": "0.1.1",
   "license": "MIT",
   "exports": "./index.ts",
   "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.12"
+    "@std/assert": "jsr:@std/assert@^1.0.19"
   }
 }
 ```
@@ -254,8 +254,6 @@ Dans notre fichier `deno.json`, mettons à jour la version. Comme il s’agit d�
 Et maintenant, utilisons notre nouvelle tâche `test-publish` pour republier notre librairie : `deno task test-publish`.
 
 Vous pouvez constater que les vérifications et les tests sont désormais effectués avant la publication ! 🥳
-
-![Test et publication d’une nouvelle version.](/assets/ninja-moves/publishing-library/test-publish.png)
 
 Approuvez la publication comme précédemment, et après quelques secondes, vous verrez la page de votre librairie mise à jour avec le contenu de votre `README` !
 
@@ -276,16 +274,11 @@ Voici la signification des colonnes :
 - `Update` est la version que Deno vous propose d’installer. Ce n’est pas forcément la plus récente si vous avez utilisé `^` ou `~` pour définir la plage de versions acceptables dans votre `deno.json`. Consultez la leçon [Comprendre les versions de librairies](/ninja-moves/semver) pour en savoir plus.
 - `Latest` est la version la plus récente disponible.
 
-![Librairie obsolète.](/assets/ninja-moves/publishing-library/outdated.png)
-
 Si vous souhaitez mettre à jour votre librairie, vous pouvez le faire manuellement avec `deno add jsr:@nshiab/my-first-library@0.1.1`.
 
-Mais si vous avez beaucoup de librairies à mettre à jour, vous pouvez exécuter la commande Deno suggérée pour toutes les mettre à jour en une fois : `deno outdated --update`.
+Mais si vous avez beaucoup de librairies à mettre à jour, exécutez `deno update`. Par défaut, la commande respecte les plages de versions de `deno.json`. Utilisez `deno update --latest` uniquement si vous voulez volontairement dépasser ces plages, notamment pour passer à une nouvelle version majeure.
 
 Et voilà ! Nous venons de mettre à jour et utilisons désormais la nouvelle version !
-
-![Librairie mise à jour.](/assets/ninja-moves/publishing-library/deno-update.png)
-
 
 ## Configuration avancée
 
@@ -313,11 +306,11 @@ Voici par exemple mon processus pour publier une nouvelle version de la librairi
 
 3. Je crée une pull request pour fusionner la branche dans `main`. J’ai un [workflow GitHub Actions](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml) qui exécute les tests. Si toutes les vérifications et les tests passent, la pull request est acceptée et fusionnée.
 
-4. Lorsque je suis prêt à publier une nouvelle version (souvent après plusieurs pull requests), j’exécute localement l’une des tâches `patch`, `minor` ou `major`, définies dans le fichier [`deno.json`](https://github.com/nshiab/simple-data-analysis/blob/d3eb64f34fdc93c6cbbe0c65914f31ac8be1f36f/deno.json#L11-L13) du dépôt.
+4. Lorsque je suis prêt à publier une nouvelle version (souvent après plusieurs pull requests), j’exécute localement l’une des tâches `patch`, `minor` ou `major`, définies dans le fichier [`deno.json`](https://github.com/nshiab/simple-data-analysis/blob/main/deno.json) du dépôt.
 
-5. Ces tâches lancent un script appelé [`incrementVersion.ts`](https://github.com/nshiab/simple-data-analysis/blob/main/src/incrementVersion.ts), qui met à jour la version dans `deno.json`, crée un [tag Git](https://git-scm.com/book/en/v2/Git-Basics-Tagging) et le pousse sur GitHub.
+5. Ces tâches exécutent toutes les vérifications, puis appellent l’outil [`@nshiab/bump-version`](https://jsr.io/@nshiab/bump-version). Il met à jour `deno.json`, valide et pousse ce changement, crée un [tag Git](https://git-scm.com/book/en/v2/Git-Basics-Tagging), puis pousse le tag sur GitHub.
 
-6. Lorsqu’un nouveau tag est poussé sur GitHub, deux workflows sont déclenchés : [un pour publier](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/publish.yml) la librairie sur JSR, et un autre pour [créer une release](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/release.yml) sur GitHub avec un résumé de tous les changements issus des pull requests approuvées.
+6. Lorsqu’un nouveau tag est poussé sur GitHub, deux workflows sont déclenchés : [un pour publier](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/jsr-publish.yml) la librairie sur JSR, et un autre pour [créer une release](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/release.yml) sur GitHub avec un résumé de tous les changements issus des pull requests approuvées.
 
 J’aime ce flux de travail car il garde tout synchronisé, m’épargne beaucoup de saisies manuelles et de clics, et génère des releases claires et utiles. Voici par exemple la plus récente au moment où j’écris ces lignes :
 
@@ -335,7 +328,7 @@ Parfois, vous ne voulez pas rendre tout votre code public, même si je dirais qu
 
 Avec NPM, [vous pouvez payer pour utiliser des registres privés](https://docs.npmjs.com/creating-and-publishing-private-packages).
 
-Avec JSR, vous pouvez [retirer votre librairie de l’index](https://jsr.io/docs/private-registries), ce qui la rend introuvable via la recherche, même si elle reste accessible publiquement. Les librairies vraiment privés ne sont pas encore disponibles sur JSR, mais l’équipe y travaille activement.
+Avec JSR, vous pouvez [retirer votre librairie de l’index](https://jsr.io/docs/private-registries), ce qui la rend introuvable via la recherche, même si elle reste accessible publiquement. JSR ne permet pas encore de publier des librairies privées.
 
 ## Conclusion
 

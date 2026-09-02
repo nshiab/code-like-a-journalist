@@ -16,7 +16,7 @@ C'est pourquoi la **refactorisation** est une étape importante. Elle consiste �
 
 Un aspect clé de la refactorisation est de diviser les longs scripts en fonctions modulaires.
 
-Dans cette leçon, nous prendrons le code final du [calculateur de compte épargne 💸](/saving-account-calculator) et le refactoriserons. Si vous n'avez pas fait ce projet, faites-le d'abord ! Je m'attends également à ce que vous ayez terminé toutes les leçons de la section **Premiers pas** 🧑‍🎓.
+Dans cette leçon, nous prendrons le code final du [calculateur de compte épargne 💸](/saving-account-calculator) et le refactoriserons. Si vous n'avez pas fait ce projet, faites-le d'abord ! Je m'attends également à ce que vous ayez terminé toutes les leçons de la section **Fondamentaux de TypeScript** 🧑‍🎓.
 
 <NoticeIntro lang="fr"/>
 
@@ -99,9 +99,9 @@ Le script fonctionne bien, mais lire tout cela d'un coup peut être un peu intim
 
 Nous pouvons le faire en déplaçant certaines parties du code dans des fonctions utilitaires. Commencez par créer un nouveau dossier nommé `helpers` dans votre répertoire.
 
-Il semble que les lignes 12-14 pourraient facilement être encapsulées dans une fonction. Ces lignes calculent un taux d'intérêt aléatoire. Créons un nouveau fichier nommé `randomInterestRate.ts` dans le dossier `helpers` et déplaçons ces lignes dans une fonction.
+Il semble que les lignes 12-14 pourraient facilement être encapsulées dans une fonction. Ces lignes calculent un taux d'intérêt aléatoire. Créons un nouveau fichier nommé `getRandomInterestRate.ts` dans le dossier `helpers` et déplaçons ces lignes dans une fonction.
 
-```ts showLineNumbers filename="randomInterestRate.ts"
+```ts showLineNumbers filename="getRandomInterestRate.ts"
 export default function getRandomInterestRate(
   interestRate: number,
   interestRateRange: number,

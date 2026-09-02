@@ -32,7 +32,7 @@ Si vous cliquez sur `Source Control` dans la barre latérale gauche, vous verrez
 
 ![Message dans VS Code indiquant qu’il n’y a pas de dépôt Git.](/assets/git-and-github/git-basics/no-repo.png)
 
-Pour initialiser un nouveau dépôt Git, exécutez cette commande dans le terminal : `git init`.
+Pour initialiser un nouveau dépôt Git avec une branche `main`, exécutez cette commande dans le terminal : `git init -b main`.
 
 Votre projet utilise maintenant Git ! Mais il n’y a rien dedans pour l'instant.
 
@@ -51,11 +51,11 @@ Cette API retourne les données au format XML. Nous les affichons dans le termin
 
 ```ts showLineNumbers filename="main.ts"
 const response = await fetch(
-  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+  "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
 const xml = await response.text();
 
-console.log(xml)
+console.log(xml);
 ```
 
 Vous pouvez maintenant voir votre nouveau fichier sous `Changes`. Sa couleur est aussi passée au vert et un `U` est affiché à côté, ce qui signifie `Untracked`. Vous pouvez également voir un `1` dans la barre latérale gauche, à côté du bouton `Source Control`, indiquant qu’un fichier a été modifié.
@@ -100,7 +100,7 @@ Puis mettez à jour votre fichier `main.ts`.
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
-  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+  "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
 const xml = await response.text();
 const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
@@ -154,7 +154,7 @@ Par exemple, créons une erreur dans notre code. Essayons d’analyser la répon
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
-  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+  "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
 const xml = await response.json();
 const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
@@ -179,13 +179,7 @@ Pour récupérer un identifiant de commit, faites un clic droit sur le commit et
 
 ![Copie de l’ID d’un commit.](/assets/git-and-github/git-basics/copy-id.png)
 
-Commencez ensuite à taper `git revert` dans le terminal, collez l’identifiant du commit (n’oubliez pas l’espace entre `revert` et l’ID du commit), puis exécutez la commande !
-
-Ce que vous voyez dans votre terminal est un éditeur de texte. Les lignes au-dessus de la section `#` représentent le message de commit proposé.
-
-![Annulation d’un commit.](/assets/git-and-github/git-basics/revert.png)
-
-Pour accepter le message proposé, tapez simplement `:q` dans le terminal et appuyez sur Entrée pour confirmer et quitter l’éditeur de texte du terminal. Vous pouvez aussi cliquer sur le gros bouton bleu `Commit`.
+Exécutez `git revert COMMIT_ID --no-edit`, en remplaçant `COMMIT_ID` par l’identifiant copié. L’option `--no-edit` accepte le message proposé par Git afin de créer le commit d’annulation sans ouvrir d’éditeur de texte.
 
 Vous verrez maintenant un quatrième commit, indiquant que vous avez annulé le précédent ! Pour un *vrai* retour en arrière, vous pouvez aussi utiliser [`git reset`](https://git-scm.com/docs/git-reset), mais `revert` est plus sûr et garde une trace de tout — y compris de l’annulation !
 
@@ -207,9 +201,9 @@ Par exemple, disons que nous voulons maintenant extraire la date et la températ
 
 ### Ajouter une branche
 
-Pour créer une nouvelle branche nommée `temperature`, exécutez : `git checkout -b temperature`
+Pour créer une nouvelle branche nommée `temperature` et vous y placer, exécutez : `git switch -c temperature`
 
-La commande `checkout` indique à Git que vous voulez changer de branche. L’option `-b` suivie de `temperature` lui dit de créer une nouvelle branche `temperature` avant de s’y positionner. Comme vous êtes sur `main`, la branche sera créée à partir de `main`. Le code sera exactement le même sur les deux branches au départ.
+La commande `switch` indique à Git que vous voulez changer de branche. L’option `-c` lui dit de créer la nouvelle branche avant de s’y positionner. Comme vous êtes sur `main`, la branche sera créée à partir de `main`. Le code sera exactement le même sur les deux branches au départ.
 
 Pour voir la liste de toutes les branches, exécutez `git branch`. Celle avec un `*` devant est celle sur laquelle vous êtes actuellement.
 
@@ -226,7 +220,7 @@ Si vous exécutez `deno -A main.ts`, vous devriez voir la température affichée
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
-  "https://dd.weather.gc.ca/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
+  "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
 const xml = await response.text();
 const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
@@ -254,7 +248,7 @@ Faisons un commit de cette mise à jour :
 
 ![Travail sur la branche temperature.](/assets/git-and-github/git-basics/commit-new-branch.png)
 
-Ce commit a été fait sur la branche `temperature`. La branche `main`, elle, n’a pas été modifiée. Pour revenir à la branche `main`, utilisez `git checkout main`.
+Ce commit a été fait sur la branche `temperature`. La branche `main`, elle, n’a pas été modifiée. Pour revenir à la branche `main`, utilisez `git switch main`.
 
 Comme vous pouvez le constater, notre nouveau code n’est pas là ! Si jamais nous avons introduit une erreur ou un bug dans la branche `temperature`, nous savons que `main` ne l’a pas.
 
@@ -268,7 +262,7 @@ Disons maintenant que nous sommes satisfaits du nouveau code dans la branche `te
 
 Pour cela, nous devons **fusionner** les branches.
 
-Assurez-vous d’être sur la branche `main` (`git checkout main`), puis exécutez `git merge temperature`. Cette commande va fusionner la branche `temperature` dans `main`.
+Assurez-vous d’être sur la branche `main` (`git switch main`), puis exécutez `git merge temperature`. Cette commande va fusionner la branche `temperature` dans `main`.
 
 Et voilà, le nouveau code est sur `main` ! Et vous pouvez voir le commit que nous avons fait dans `temperature`. L’historique a été fusionné.
 
@@ -278,7 +272,7 @@ Et voilà, le nouveau code est sur `main` ! Et vous pouvez voir le commit que 
 
 Nous n’avons plus besoin de la branche `temperature`. Supprimons-la avec la commande : `git branch -d temperature`
 
-Comme vous pouvez le voir, la syntaxe est la même que pour créer une branche, sauf que l’option est `-d` au lieu de `-b`. Faites attention ! 😬
+L’option `-d` ne supprime une branche qu’après que Git a confirmé qu’elle a été fusionnée. Cela aide à protéger le travail qui n’a pas encore été intégré à `main`.
 
 Maintenant, si vous exécutez `git branch`, vous ne verrez plus `temperature`.
 
@@ -292,19 +286,17 @@ Vous pouvez le faire depuis votre explorateur de fichiers.
 
 ![Un dossier Git caché.](/assets/git-and-github/git-basics/git-folder.png)
 
-Ou depuis votre terminal avec cette commande : `rm -fr .git`
-
-Mais vous devez être **extrêmement prudent** en l’utilisant. Cette commande supprime tout de manière récursive. Elle pourrait effacer l’intégralité de votre ordinateur. Assurez-vous d’être dans votre projet et vérifiez bien ce que vous tapez.
+Comme la suppression de dossiers dans le terminal peut être dangereuse, utilisez votre explorateur de fichiers et vérifiez que vous avez sélectionné uniquement le dossier `.git`. Votre code restera en place, mais son historique et sa configuration Git disparaîtront.
 
 ## Conclusion
 
 Félicitations ! Vous avez appris les commandes Git les plus importantes :
-- `git init` pour démarrer un nouveau dépôt Git
+- `git init -b main` pour démarrer un nouveau dépôt Git avec une branche `main`
 - `git add -A` pour suivre les fichiers
 - `git commit -m "Un message"` pour enregistrer le projet
-- `git revert commitID` pour annuler un commit
-- `git branch -b ma-nouvelle-branche` pour créer une nouvelle branche
-- `git checkout ma-nouvelle-branche` pour changer de branche
+- `git revert COMMIT_ID --no-edit` pour annuler un commit
+- `git switch -c ma-nouvelle-branche` pour créer une nouvelle branche et vous y placer
+- `git switch ma-nouvelle-branche` pour changer de branche
 - `git merge ma-nouvelle-branche` pour fusionner des branches
 - `git branch -d ma-nouvelle-branche` pour supprimer une branche
 

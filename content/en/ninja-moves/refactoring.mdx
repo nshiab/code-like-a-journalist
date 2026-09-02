@@ -16,7 +16,7 @@ This is why **refactoring** is an important step. It means restructuring your co
 
 A key aspect of refactoring is breaking down long scripts into modular functions.
 
-In this lesson, we will take the final code from the [Savings account calculator 💸](/saving-account-calculator) and refactor it. If you haven’t done this project, do it first! I also expect that you have completed all of the lessons in the **First steps** 🧑‍🎓 section.
+In this lesson, we will take the final code from the [Savings account calculator 💸](/saving-account-calculator) and refactor it. If you haven’t done this project, do it first! I also expect that you have completed all the lessons in the **TypeScript fundamentals** 🧑‍🎓 section.
 
 <NoticeIntro />
 
@@ -98,9 +98,9 @@ The script works well, but reading all of this at once can be a bit intimidating
 
 We can do that by moving parts of the code into helper functions. Start by creating a new folder named `helpers` in your repository.
 
-It looks like lines 12-14 could easily be encapsulated in a function. These lines compute a random interest rate. Let's create a new file named `randomInterestRate.ts` in the `helpers` folder and move these lines into a function.
+It looks like lines 12-14 could easily be encapsulated in a function. These lines compute a random interest rate. Let's create a new file named `getRandomInterestRate.ts` in the `helpers` folder and move these lines into a function.
 
-```ts showLineNumbers filename="randomInterestRate.ts"
+```ts showLineNumbers filename="getRandomInterestRate.ts"
 export default function getRandomInterestRate(
   interestRate: number,
   interestRateRange: number,

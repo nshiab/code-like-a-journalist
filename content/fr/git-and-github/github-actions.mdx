@@ -36,6 +36,9 @@ import { XMLParser } from "fast-xml-parser";
 const response = await fetch(
   "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
+if (!response.ok) {
+  throw new Error(`Weather request failed: ${response.status}`);
+}
 const xml = await response.text();
 const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
 
@@ -47,20 +50,22 @@ const resultTime =
 console.log(resultTime);
 
 const elements = observation["om:result"]["elements"]["element"];
-type element = {
+type Element = {
   "@_name": string;
   "@_value": string;
 };
-const temp = elements
-  .find((d: element) => d["@_name"] === "air_temp")["@_value"];
-console.log(temp);
+const temperature =
+  elements.find((element: Element) =>
+    element["@_name"] === "air_temp"
+  )["@_value"];
+console.log(temperature);
 
 const scrapeTime = new Date().toISOString();
 console.log(scrapeTime);
 
 await Deno.writeTextFile(
   "./data.csv",
-  `\n${scrapeTime},${resultTime},${temp}`,
+  `\n${scrapeTime},${resultTime},${temperature}`,
   {
     append: true,
   },
@@ -93,11 +98,6 @@ Puis exécutez `main.ts` :
 
 Vous devriez voir la température s’afficher et une ligne ajoutée au fichier `data.csv` !
 
-![Le README.](/assets/git-and-github/github-actions/setup.png)
-<Callout type="warning" emoji="⚠️">
-  Depuis la prise de cette capture d'écran, l'URL de l'API du Service météorologique du Canada a changé. Assurez-vous de prendre l'URL indiquée dans le bloc de code donné au début de la leçon.
-</Callout>
-
 ## Créer un nouveau dépôt GitHub
 
 Initialisons un nouveau dépôt Git et poussons-le sur GitHub.
@@ -125,11 +125,6 @@ Copiez les commandes *to push an existing repository from the command line*.
 
 Et exécutez ces commandes dans le terminal de votre projet.
 
-![Dépôt synchronisé avec le nouveau dépôt GitHub.](/assets/git-and-github/github-actions/first-push.png)
-<Callout type="warning" emoji="⚠️">
-  Depuis la prise de cette capture d'écran, l'URL de l'API du Service météorologique du Canada a changé. Assurez-vous de prendre l'URL indiquée dans le bloc de code donné au début de la leçon.
-</Callout>
-
 Maintenant, si vous actualisez la page de votre dépôt GitHub, vous verrez votre code et le fichier `README.md` juste en dessous.
 
 ![Un dépôt fraîchement créé sur GitHub](/assets/git-and-github/github-actions/fresh-repo.png)
@@ -148,18 +143,7 @@ Pour que GitHub détecte automatiquement les workflows dans le dépôt, nous dev
 
 YAML signifie *YAML Ain’t Markup Language* — mais pour moi, ça ressemble quand même un peu à du markup en plus strict. L’indentation, par exemple, est très importante. C’est un format très courant pour les fichiers de configuration. Ce n’est pas compliqué, et nous allons en écrire ensemble, donc ne vous en faites pas.
 
-Créons donc les dossiers nécessaires et un nouveau fichier `.github/workflows/scrape.yml`. Laissons-le vide pour l’instant.
-
-Validez-le et poussez-le sur GitHub :
-- `git add -A`
-- `git commit -m "Adding scrape.yml"`
-- `git push`
-
-![Un fichier .yml vide.](/assets/git-and-github/github-actions/YML.png)
-
-Après quelques secondes, si vous actualisez la page Actions de votre dépôt, vous verrez que GitHub a détecté automatiquement votre workflow ! Mais comme le fichier est vide, il échoue.
-
-![Workflow échoué.](/assets/git-and-github/github-actions/failed.png)
+Créez les dossiers et le fichier `.github/workflows/scrape.yml`. Nous allons terminer le workflow avant de le valider afin que GitHub ne reçoive jamais un workflow vide et invalide.
 
 ## Écrire un workflow
 
@@ -169,26 +153,22 @@ Faisons cela étape par étape.
 
 Quand vous créez un workflow, vous devez d’abord lui donner un nom et définir quand il doit être déclenché.
 
-Ci-dessous, on indique à GitHub de déclencher ce workflow dans trois situations :
-- `push` signifie lorsqu’on pousse du nouveau code dans la branche `main`. Notez l’indentation — elle indique la hiérarchie et les regroupements.
+Ci-dessous, on indique à GitHub de déclencher ce workflow dans deux situations :
 - `workflow_dispatch` signifie qu’on pourra cliquer sur un bouton pour déclencher manuellement le workflow. Toujours pratique.
-- `schedule` définit un **cron job**, c’est-à-dire une manière d’exécuter des scripts à intervalles réguliers. Ici, `0 * * * *` signifie que le workflow s’exécutera au début de chaque heure (minute `0`).
+- `schedule` définit un **cron job**, c’est-à-dire une manière d’exécuter des scripts à intervalles réguliers. Ici, `17 * * * *` signifie que le workflow s’exécutera toutes les heures à la minute `17`.
 
 
 
-```yml showLineNumbers filename=".github/workflows/scrape.yml" {1-9}
+```yml showLineNumbers filename=".github/workflows/scrape.yml" {1-6}
 name: Scrape Montreal temperature
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "17 * * * *"
 ```
 <Callout type="info" emoji="💡">
-   Les cron jobs sont largement utilisés, mais leur syntaxe n’est pas très intuitive. J’utilise souvent [crontab.guru](https://crontab.guru/) pour m’y retrouver. Il est aussi important de noter que les cron jobs dans les workflows GitHub ne sont pas parfaitement précis. Quand votre workflow doit s’exécuter, GitHub le place dans une file d’attente en attendant qu’une machine virtuelle soit disponible. Il peut donc se lancer avec quelques minutes de retard. Pour la plupart des tâches de web scraping, ce n’est pas un problème. Mais si vous avez besoin de lancer des scripts critiques à des horaires très précis, GitHub Actions n’est peut-être pas la meilleure solution.
+   Les cron jobs sont largement utilisés, mais leur syntaxe n’est pas très intuitive. J’utilise souvent [crontab.guru](https://crontab.guru/) pour m’y retrouver. Les workflows planifiés peuvent être retardés ou même abandonnés lors des périodes de forte activité, surtout au début d’une heure. C’est pourquoi nous avons choisi la minute `17`. Ils s’exécutent depuis la branche par défaut. GitHub désactive aussi les workflows planifiés des dépôts publics après 60 jours sans activité dans le dépôt. Pour les scripts critiques qui doivent s’exécuter à une heure précise, GitHub Actions n’est peut-être pas le bon outil.
 </Callout>
 
 ### Jobs
@@ -201,16 +181,13 @@ Notre script `main.ts` écrit les données fraîchement collectées dans `data.c
 
 
 
-```yml showLineNumbers filename=".github/workflows/scrape.yml" {11-15}
+```yml showLineNumbers filename=".github/workflows/scrape.yml" {8-12}
 name: Scrape Montreal temperature
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "17 * * * *"
 
 jobs:
   scrape:
@@ -222,21 +199,18 @@ jobs:
 ### Steps
 
 Il ne reste plus qu’à indiquer à GitHub les **étapes** de ce job. Chaque étape a un nom :
-- `Checking out the repo` indique au workflow d’accéder au dépôt. On utilise pour cela l’action prête à l’emploi `actions/checkout@v4`. Il existe beaucoup d’actions disponibles, notamment pour les tâches courantes. C’est agréable de ne pas avoir à tout coder soi-même ! 🥳
+- `Check out the repository` indique au workflow d’accéder au dépôt. On utilise pour cela l’action prête à l’emploi `actions/checkout@v7`. Il existe beaucoup d’actions disponibles, notamment pour les tâches courantes. C’est agréable de ne pas avoir à tout coder soi-même ! 🥳
 - `Set up Deno` installe Deno. Là aussi, on utilise une action existante. On précise que l’on veut la version 2 de Deno.
 - `Run main.ts` exécute notre script, comme on le ferait localement.
 
 
-```yml showLineNumbers filename=".github/workflows/scrape.yml" {16-26}
+```yml showLineNumbers filename=".github/workflows/scrape.yml" {13-21}
 name: Scrape Montreal temperature
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "17 * * * *"
 
 jobs:
   scrape:
@@ -244,8 +218,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checking out the repo
-        uses: actions/checkout@v4
+      - name: Check out the repository
+        uses: actions/checkout@v7
       - name: Set up Deno
         uses: denoland/setup-deno@v2
         with:
@@ -260,19 +234,16 @@ Maintenant, si vous validez votre workflow et que vous le poussez sur GitHub, il
 
 Souvenez-vous : cela s’exécute sur une machine virtuelle. Donc le script s’exécute, ajoute une nouvelle ligne à `data.csv`, puis la machine est détruite et supprimée. Les données enregistrées en mémoire disparaissent...
 
-C’est pourquoi on ajoute une dernière étape pour **committer les modifications**. On crée un utilisateur Git appelé `Automated` qui committe et pousse les changements dans le fichier `data.csv`. Génial, non ? 🙌
+C’est pourquoi on ajoute une dernière étape pour **committer les modifications**. On utilise l’identité du robot GitHub pour valider et pousser le fichier `data.csv` mis à jour. Génial, non ? 🙌
 
 
-```yml showLineNumbers filename=".github/workflows/scrape.yml" {25-26}
+```yml showLineNumbers filename=".github/workflows/scrape.yml" {22-28}
 name: Scrape Montreal temperature
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "17 * * * *"
 
 jobs:
   scrape:
@@ -280,8 +251,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checking out the repo
-        uses: actions/checkout@v4
+      - name: Check out the repository
+        uses: actions/checkout@v7
       - name: Set up Deno
         uses: denoland/setup-deno@v2
         with:
@@ -289,7 +260,12 @@ jobs:
       - name: Run main.ts
         run: deno -A main.ts
       - name: Commit changes
-        run: git config user.name "Automated" && git config user.email "actions@users.noreply.github.com" && git add data.csv && git commit -m "Automated update" && git push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.csv
+          git commit -m "Update temperature data"
+          git push
 ```
 
 Enregistrez le fichier et poussez-le sur GitHub :
@@ -297,7 +273,7 @@ Enregistrez le fichier et poussez-le sur GitHub :
 - `git commit -m "Updating workflow"`
 - `git push`
 
-Et maintenant, si vous actualisez l’onglet Actions de votre dépôt, vous verrez que votre workflow s’exécute correctement !
+Ouvrez l’onglet `Actions` du dépôt et sélectionnez `Scrape Montreal temperature` dans la barre latérale. Cliquez sur `Run workflow`, puis confirmez avec le bouton vert `Run workflow`. Une nouvelle exécution apparaîtra après quelques secondes.
 
 ![Workflow réussi.](/assets/git-and-github/github-actions/success.png)
 
@@ -309,9 +285,7 @@ Et si vous cliquez sur le job, vous verrez les étapes, et vous pouvez cliquer s
 
 ![Étapes du job réussi.](/assets/git-and-github/github-actions/success-steps.png)
 
-Si vous retournez sur la page d’accueil du dépôt, vous verrez que le dernier commit a été fait par l’utilisateur Git `Automated` que nous avons configuré dans le workflow.
-
-![Commit automatisé.](/assets/git-and-github/github-actions/automated-commit.png)
+Si vous retournez sur la page d’accueil du dépôt, vous verrez que le dernier commit a été fait par `github-actions[bot]`.
 
 Et si vous regardez le fichier `data.csv`, vous verrez qu’une deuxième ligne a été ajoutée !
 
@@ -323,7 +297,7 @@ D’ailleurs, c’est une excellente façon de voir ce qui a changé dans des pa
 
 ![Le commit détaillé.](/assets/git-and-github/github-actions/commit.png)
 
-Ce workflow s’est exécuté lorsqu’on a poussé sur `main`. Mais maintenant, il s’exécutera automatiquement chaque heure grâce à notre cron job !
+Nous avons lancé cette exécution manuellement. Désormais, GitHub la déclenchera aussi automatiquement chaque heure grâce à notre tâche cron !
 
 Avant GitHub Actions, il aurait fallu payer pour héberger un serveur capable de faire ce scraping à intervalle régulier. Mais maintenant, vous pouvez le faire gratuitement avec un simple fichier YAML ! 💃🕺
 
@@ -355,17 +329,16 @@ const sdb = new SimpleDB();
 
 const temperatures = sdb.newTable();
 await temperatures.loadData(
-  "https://raw.githubusercontent.com/nshiab/temperature-scraper/refs/heads/main/data.csv",
+  "https://raw.githubusercontent.com/nshiab/github-actions-scraper/refs/heads/main/data.csv",
 );
 await temperatures.log();
 
 await sdb.close();
 ```
-![Récupérer les données avec la librairie Simple Data Analysis.](/assets/git-and-github/github-actions/fetch-test.png)
 
 ## Déclencher un workflow manuellement
 
-En ce moment, notre script de collecte est déclenché lorsqu’on pousse du nouveau code sur `main` et chaque heure, au début de l’heure.
+Notre script de collecte est planifié toutes les heures à la minute `17`.
 
 Mais comme nous avons ajouté `workflow_dispatch` dans notre configuration, on peut aussi le déclencher manuellement en cliquant dessus depuis la page Actions.
 
@@ -385,7 +358,7 @@ Pas d’inquiétude — vous pourrez le réactiver plus tard sans aucun problèm
 
 ## Conclusion
 
-Félicitations ! Vous savez maintenant comment créer des workflows simples. J’ai rendu [mon dépôt public](https://github.com/nshiab/temperature-scraper), alors n’hésitez pas à le forker pour vos futurs projets.
+Félicitations ! Vous savez maintenant comment créer des workflows simples. J’ai rendu [mon dépôt public](https://github.com/nshiab/github-actions-scraper), alors n’hésitez pas à le forker pour vos futurs projets.
 
 Vous pouvez utiliser ça pour faire du scraping de données — mais aussi pour plein d’autres choses ! C’est du code, donc les possibilités sont infinies ! Avec ce que vous avez appris dans cette leçon, vous serez capable de comprendre et reproduire des workflows plus sophistiqués que vous croiserez.
 
