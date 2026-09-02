@@ -1,0 +1,273 @@
+---
+title: Comment refactoriser du code TypeScript
+description: Apprenez à refactoriser du code TypeScript en le divisant en fonctions modulaires.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Refactorisation
+
+Coder, c'est comme un voyage. Vous savez d'où vous partez et où vous voulez aller (en théorie 😅). Mais vous ne savez pas quelle route emprunter. Alors, vous commencez à explorer, essayez une direction, revenez en arrière, prenez un raccourci, tombez sur des impasses, et suivez des chemins plus longs jusqu'à... finalement arriver à destination. Et c'est totalement normal.
+
+C'est la même chose avec votre code. Vous écrirez beaucoup, ferez des erreurs, trouverez des solutions de contournement et, finalement, obtiendrez vos premiers résultats. Votre code sera désordonné et long. Et c'est tout à fait normal aussi.
+
+C'est pourquoi la **refactorisation** est une étape importante. Elle consiste à restructurer votre code pour améliorer sa lisibilité, sa maintenabilité et, parfois, ses performances, tout en conservant le même résultat.
+
+Un aspect clé de la refactorisation est de diviser les longs scripts en fonctions modulaires.
+
+Dans cette leçon, nous prendrons le code final du [calculateur de compte épargne 💸](/saving-account-calculator) et le refactoriserons. Si vous n'avez pas fait ce projet, faites-le d'abord ! Je m'attends également à ce que vous ayez terminé toutes les leçons de la section **Fondamentaux de TypeScript** 🧑‍🎓.
+
+<NoticeIntro lang="fr"/>
+
+## Configuration
+
+Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
+
+- `main.ts`, où nous écrirons notre code.
+- `deno.json`, qui permet à VS Code de savoir qu'il s'agit d'un projet Deno et active l'extension Deno. Vous pouvez ajuster les paramètres dans ce fichier, mais nous le laisserons vide pour l'instant.
+
+Ouvrez le terminal et exécutez la commande suivante : `deno run --watch --check main.ts`
+
+Cette commande efface le terminal et réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+
+Maintenant, copiez, collez et sauvegardez ce code dans `main.ts`. Le script ci-dessous calcule les gains ou pertes d'un compte épargne sur 10 ans.
+
+
+```ts showLineNumbers filename="main.ts"
+const initialAmount = 5000;
+const interestRate = 2;
+const interestRateRange = 20;
+const startingYear = 2025;
+const years = 10;
+ 
+let balance = initialAmount;
+ 
+const results = [];
+ 
+for (let year = startingYear; year < startingYear + years; year++) {
+  const randomNumber = Math.random() - 0.5;
+  const randomFluctuation = randomNumber * interestRateRange;
+  const randomInterestRate = Math.round(interestRate + randomFluctuation);
+ 
+  const gainsOrLosses = Math.round(balance * (randomInterestRate / 100));
+ 
+  balance += gainsOrLosses;
+ 
+  results.push({
+    year,
+    interestRate: randomInterestRate,
+    gainsOrLosses,
+    balance,
+  });
+}
+ 
+const lastResult = results[results.length - 1];
+const finalGainsOrLosses = lastResult.balance - initialAmount;
+const perc = Math.round(
+  (finalGainsOrLosses / initialAmount) * 100,
+);
+ 
+if (finalGainsOrLosses > 0) {
+  console.log(`
+Congratulations! You've made money!
+Initial amount: $${initialAmount}
+Final amount: $${lastResult.balance}
+Gains: $${finalGainsOrLosses} (+${perc}%)
+`);
+} else if (finalGainsOrLosses < 0) {
+  console.log(`
+Sorry! You've lost money!
+Initial amount: $${initialAmount}
+Final amount: $${lastResult.balance}
+Losses: $${finalGainsOrLosses} (${perc}%)
+`);
+} else {
+  console.log("\nYou've neither lost nor gained money!\n");
+}
+ 
+console.table(results);
+```
+
+Voici ce que vous devriez voir dans votre terminal, avec des valeurs différentes.
+
+![Une capture d'écran montrant le terminal VS Code avec un tableau et des chaînes de caractères affichés.](/assets/ninja-moves/refactoring/results.png)
+
+## Fonctions utilitaires
+
+Le script fonctionne bien, mais lire tout cela d'un coup peut être un peu intimidant. Il pourrait être refactorisé pour être plus facile à lire et à comprendre.
+
+Nous pouvons le faire en déplaçant certaines parties du code dans des fonctions utilitaires. Commencez par créer un nouveau dossier nommé `helpers` dans votre répertoire.
+
+Il semble que les lignes 12-14 pourraient facilement être encapsulées dans une fonction. Ces lignes calculent un taux d'intérêt aléatoire. Créons un nouveau fichier nommé `getRandomInterestRate.ts` dans le dossier `helpers` et déplaçons ces lignes dans une fonction.
+
+```ts showLineNumbers filename="getRandomInterestRate.ts"
+export default function getRandomInterestRate(
+  interestRate: number,
+  interestRateRange: number,
+) {
+  const randomNumber = Math.random() - 0.5;
+  const randomFluctuation = randomNumber * interestRateRange;
+  const randomInterestRate = Math.round(interestRate + randomFluctuation);
+
+  return randomInterestRate;
+}
+```
+
+Les lignes 28-50 sont également d'excellentes candidates pour la refactorisation. Ces lignes affichent un message basé sur les gains ou pertes. Déplaçons-les dans une fonction nommée `logAnswer`.
+
+J'ai également supprimé le `console.table(results)` puisque nous n'en avons pas vraiment besoin.
+
+```ts showLineNumbers filename="logAnswer.ts"
+export default function logAnswer(
+  initialAmount: number,
+  results: { balance: number }[],
+) {
+  const lastResult = results[results.length - 1];
+  const finalGainsOrLosses = lastResult.balance - initialAmount;
+  const perc = Math.round(
+    (finalGainsOrLosses / initialAmount) * 100,
+  );
+
+  if (finalGainsOrLosses > 0) {
+    console.log(`
+Congratulations! You've made money!
+Initial amount: $${initialAmount}
+Final amount: $${lastResult.balance}
+Gains: $${finalGainsOrLosses} (+${perc}%)
+`);
+  } else if (finalGainsOrLosses < 0) {
+    console.log(`
+Sorry! You've lost money!
+Initial amount: $${initialAmount}
+Final amount: $${lastResult.balance}
+Losses: $${finalGainsOrLosses} (${perc}%)
+`);
+  } else {
+    console.log("\nYou've neither lost nor gained money!\n");
+  }
+}
+```
+
+Vous pourriez être perplexe face au type de `results` dans le code ci-dessus.
+
+`{ balance: number }` décrit un objet avec une clé `balance` et une valeur associée de type `number`. Les `[]` à la fin indiquent que nous nous attendons à ce que `results` soit une liste composées d'objets correspondant à cette description.
+
+Cette description de type est importante. Dans notre code, nous utilisons `balance`. Ce type garantit qu’il est présent. Si vous essayez de passer une liste d'objets sans une clé `balance` de type `number`, vous obtiendrez une erreur de type.
+
+Pour trouver le type approprié, j'ai simplement survolé `results` dans `main.ts` et copié le type inféré. Pas besoin de l'écrire vous-même ! J'ai supprimé les clés `year`, `interestRate` et `gainsOrLosses`, car nous ne les utilisons pas dans la fonction.
+
+![Une capture d'écran montrant VS Code affichant les types inférés.](/assets/ninja-moves/refactoring/inferred-types.png)
+
+Nous pouvons maintenant mettre à jour notre `main.ts`. Nous importons nos nouvelles fonctions et les utilisons. Notre script est maintenant plus simple et plus facile à comprendre.
+
+```ts showLineNumbers filename="main.ts" {1-2, 20, 32}
+import getRandomInterestRate from "./helpers/getRandomInterestRate.ts";
+import logAnswer from "./helpers/logAnswer.ts";
+
+const initialAmount = 5000;
+const interestRate = 2;
+const interestRateRange = 20;
+const startingYear = 2025;
+const years = 10;
+
+let balance = initialAmount;
+
+const results = [];
+
+for (let year = startingYear; year < startingYear + years; year++) {
+  const randomInterestRate = getRandomInterestRate(
+    interestRate,
+    interestRateRange,
+  );
+
+  const gainsOrLosses = Math.round(balance * (randomInterestRate / 100));
+
+  balance += gainsOrLosses;
+
+  results.push({
+    year,
+    interestRate: randomInterestRate,
+    gainsOrLosses,
+    balance,
+  });
+}
+
+logAnswer(initialAmount, results);
+```
+
+Nous pourrions même aller plus loin en enveloppant tout le contenu de `main.ts` dans une fonction nommée `runSimulation`.
+
+Créons un autre fichier nommé `runSimulation.ts` dans le dossier `helpers` et déplaçons-y tout ce code.
+
+Puisque nous sommes maintenant dans le dossier `helpers`, nous devons mettre à jour les chemins d'accès pour `getRandomInterestRate.ts` et `logAnswer.ts`.
+
+De plus, les constantes `initialAmount`, `interestRate`, `interestRateRange`, `startingYear` et `years` deviendront désormais des paramètres pour la fonction `runSimulation`.
+
+```ts showLineNumbers filename="runSimulation.ts"
+import getRandomInterestRate from "./getRandomInterestRate.ts";
+import logAnswer from "./logAnswer.ts";
+
+export default function runSimulation(
+  initialAmount: number,
+  interestRate: number,
+  interestRateRange: number,
+  startingYear: number,
+  years: number,
+) {
+  let balance = initialAmount;
+
+  const results = [];
+
+  for (let year = startingYear; year < startingYear + years; year++) {
+    const randomInterestRate = getRandomInterestRate(
+      interestRate,
+      interestRateRange,
+    );
+
+    const gainsOrLosses = Math.round(balance * (randomInterestRate / 100));
+
+    balance += gainsOrLosses;
+
+    results.push({
+      year,
+      interestRate: randomInterestRate,
+      gainsOrLosses,
+      balance,
+    });
+  }
+
+  logAnswer(initialAmount, results);
+}
+```
+
+Nous pouvons maintenant mettre à jour `main.ts` et le rendre... incroyablement simple.
+
+```ts showLineNumbers filename="main.ts"
+import runSimulation from "./helpers/runSimulation.ts";
+
+runSimulation(5000, 2, 20, 2025, 10);
+```
+
+Notre code est maintenant très modulaire. Alors que notre script initial ne pouvait exécuter qu'une seule simulation à la fois, nous pouvons désormais en exécuter facilement un millier ou plus !
+
+```ts showLineNumbers filename="main.ts"
+import runSimulation from "./helpers/runSimulation.ts";
+
+for (let i = 1; i <= 1000; i++) {
+  console.log(`Simulation ${i}`);
+  runSimulation(5000, 2, 20, 2025, 10);
+}
+```
+
+![Une capture d'écran montrant VS Code affichant mille simulations.](/assets/ninja-moves/refactoring/run-simulation.png)
+
+<Callout type="info" emoji="💡">
+    Vous pourriez penser que créer plusieurs fichiers rend votre code plus difficile à naviguer. Mais si vous appuyez sur `CMD` sur Mac ou `CTRL` sur PC et cliquez sur une fonction dans votre code, VS Code vous amènera automatiquement au fichier de la fonction en ouvrant un nouvel onglet.
+</Callout>
+
+## Conclusion
+
+Vous n’avez pas toujours le luxe du temps pour refactoriser votre code. Mais si vous prévoyez le réutiliser, le partager ou le maintenir pendant longtemps, c’est un investissement qui en vaut la peine, surtout si vous ajoutez des tests (mais les tests feront l’objet d’une autre leçon).
+
+<NoticeEnd lang="fr"/>

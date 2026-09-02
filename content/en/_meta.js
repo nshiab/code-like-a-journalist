@@ -1,0 +1,18 @@
+export default {
+    index: "Welcome!",
+    preamble: "Why this course?",
+    "first-steps": "1. TypeScript fundamentals 🧑‍🎓",
+    "pushing-further": "2. Working with TypeScript 🚀",
+    "simple-data-analysis": "3. Data analysis with SDA 🤓",
+    "data-projects": { type: "separator", title: "4. Data projects 🧰" },
+    "saving-account-calculator": "Savings account calculator 💸",
+    "stock-market-simulator": "Stock market simulator 📈",
+    "stats-can-census": "Wrangling Census data 🇨🇦",
+    "one-billion-row-challenge": "One billion row challenge 😱",
+    "web-scraping": "Web scraping 🔍",
+    "git-and-github": "5. Git & GitHub 🐙",
+    "ninja-moves": "6. Going further 🥷",
+    inspirations: "Inspiring people & content 📚",
+    "more": "More to come...",
+    contact: "Contact",
+};

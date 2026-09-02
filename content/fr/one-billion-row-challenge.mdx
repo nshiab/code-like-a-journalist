@@ -1,0 +1,170 @@
+---
+title: Le défi du milliard de lignes avec TypeScript 😱
+description: Un projet pour relever le défi du milliard de lignes en utilisant TypeScript et la librairie Simple Data Analysis.
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../components/Notices.jsx";
+
+# Le défi du milliard de lignes 😱
+
+Bienvenue dans ce nouveau projet où nous allons exploiter un fichier CSV contenant un milliard de lignes. Oui, UN MILLIARD !
+
+Il s'agit d'un défi très amusant créé par [Gunnar Morling](https://www.morling.dev/blog/one-billion-row-challenge/).
+
+> Votre mission, si vous l'acceptez, est en apparence simple : écrire un programme en Java pour récupérer les valeurs de température à partir d'un fichier texte et calculer les températures minimale, moyenne et maximale par station météo. Il y a juste un petit détail : le fichier contient 1 000 000 000 de lignes !
+
+Au lieu d'utiliser un programme en Java, nous allons bien sûr utiliser TypeScript, avec la librairie Simple Data Analysis (SDA) que j'ai créée ([donnez-lui un ⭐](https://github.com/nshiab/simple-data-analysis)). C'est une excellente occasion de tester sa puissance !
+
+Si vous êtes bloqué à un moment donné dans ce projet, il peut être utile de revoir les leçons précédentes expliquant les bases de SDA :
+- [Données tabulaires](/simple-data-analysis/tabular-data)
+- [Données géospatiales](/simple-data-analysis/geospatial-data)
+- [Visualisation des données](/simple-data-analysis/dataviz)
+
+Nous utiliserons Deno et VS Code. Consultez la leçon [Installation](/first-steps/setup) si nécessaire.
+
+C'est parti !
+
+<NoticeIntro lang="fr" />
+
+## Installation
+
+Pour tout installer, utilisons [setup-data-project](https://jsr.io/@nshiab/setup-data-project) comme dans les leçons précédentes.
+
+Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez : `deno run -A jsr:@nshiab/setup-data-project`
+
+Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`, puis appuyez sur `Entrée`.
+
+Ensuite, lancez `deno task sda` pour surveiller `main.ts` et ses dépendances.
+
+![Une capture d'écran de VS Code après avoir exécuté setup-data-project.](/assets/one-billion-row-challenge/setup.png)
+
+## Les données
+
+Dans le défi original, vous devez copier un répertoire GitHub et exécuter un script pour générer un fichier CSV contenant 1 milliard de lignes. Je l'ai généré pour vous et j'ai téléversé une copie appartenant au cours sur Google Drive. Le fichier possède un identifiant Drive stable et a été vérifié le 1er septembre 2026.
+
+[Téléchargez les données ici](https://drive.google.com/file/d/1A_OCjRyHnCCMZbgT0Z5KN70pJXMA8TYD/view). Cela peut prendre quelques minutes car le fichier fait environ 4 Go.
+
+Ensuite, placez-le dans votre dossier `data` et décompressez-le. La version décompressée du fichier CSV fait environ 13 Go.
+
+Pour charger les données, copiez et collez ce code dans votre `main.ts`. Selon votre ordinateur, cela peut prendre de quelques secondes à quelques minutes.
+
+
+```ts showLineNumbers filename="main.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ logDuration: true });
+
+const table = sdb.newTable();
+
+table.loadData("sda/data/measurements.csv");
+await table.log();
+
+await sdb.close();
+```
+![Une capture d'écran de VS Code après avoir chargé un milliard de lignes de données.](/assets/one-billion-row-challenge/load-data.png)
+
+Félicitations ! Vous venez de charger 1 000 000 000 de lignes de données ! Lors d'une exécution historique avec SDA 4.0.1 et Deno 2.2.2 sur mon MacBook Pro M1 avec 16 Go de RAM, cela a pris environ 26 secondes. Considérez ce chiffre comme un point de repère, et non comme un test actuel de SDA 6. 🥳
+
+Selon la RAM disponible sur votre ordinateur, vous pourriez voir un dossier `.tmp` apparaître dans votre projet. Si les données sont plus volumineuses que votre RAM, ce dossier sera utilisé pour traiter toutes les données en stockant des morceaux prétraités.
+
+Ce dossier `.tmp` peut devenir assez volumineux. Sur mon ordinateur, après la première exécution, il fait environ 8 Go.
+
+<Callout type="info" emoji="💡">
+    Si vous voulez nettoyer votre cache, exécutez `deno task clean`. Cela supprimera `.tmp`. Vous pouvez aussi le supprimer manuellement, mais n'oubliez pas de vider votre corbeille.
+</Callout>
+
+## Le défi
+
+Comme vous pouvez le voir ci-dessus, les données sont simplement une liste de villes avec des températures.
+
+Maintenant, le défi est de calculer les températures minimale, moyenne et maximale par ville. Les résultats doivent également être triés par ordre alphabétique des villes.
+
+Le code est très simple avec SDA. Vous n'avez même pas besoin de trier les lignes manuellement, car `summarize` le fait par défaut.
+
+
+```ts showLineNumbers filename="main.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ logDuration: true });
+
+const table = sdb.newTable();
+table.loadData("sda/data/measurements.csv");
+table.summarize({
+  columns: "temp",
+  by: "city",
+  stats: ["min", "mean", "max"],
+});
+await table.log();
+
+await sdb.close();
+```
+![Une capture d'écran de VS Code après avoir agrégé un milliard de lignes de données.](/assets/one-billion-row-challenge/summarize.png)
+
+Lors de cette même exécution historique avec SDA 4.0.1, le chargement et l'agrégation du milliard de valeurs ont pris moins de 50 secondes. Le matériel ainsi que les versions de Deno, DuckDB et SDA influencent le résultat. 🚀
+
+## Accélérer les choses
+
+Lorsque vous utilisez des méthodes comme `loadData` et `summarize`, SDA effectue diverses vérifications pour garder les méthodes faciles à utiliser et éviter les erreurs potentielles.
+
+Cependant, lorsque vous travaillez avec un fichier aussi volumineux, ces vérifications peuvent prendre pas mal de temps...
+
+Si vous connaissez SQL, vous pouvez écrire et exécuter vos propres requêtes pour faire exactement ce que vous voulez, sans aucun extras !
+
+Voici comment exécuter une requête SQL qui relève le défi. Notez que j'utilise `LIMIT 10` pour ne retourner que les 10 premières lignes du résultat, mais tous les calculs sont effectués.
+
+
+```ts showLineNumbers filename="main.ts"
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ logDuration: true });
+
+const result = await sdb.customQuery(
+  `
+SELECT city,
+    MIN(temp) AS min_temp,
+    ROUND(MEAN(temp), 1) AS mean_temp,
+    MAX(temp) as max_temp
+FROM read_csv('sda/data/measurements.csv')
+GROUP BY city
+ORDER BY city
+LIMIT 10;
+`,
+  { returnData: true },
+);
+
+console.table(result);
+
+await sdb.close();
+```
+![Une capture d'écran de VS Code après avoir agrégé un milliard de lignes de données.](/assets/one-billion-row-challenge/sql.png)
+
+Lors de l'exécution historique avec SDA 4.0.1, cette requête DuckDB directe a pris 16 secondes. Le résultat est conservé pour expliquer la méthodologie, et non comme une mesure des performances de SDA 6. 💥💥💥
+
+## Mais... comment ?
+
+Bien que SDA soit une librairie TypeScript, sous le capot, elle utilise [DuckDB](https://duckdb.org/), un système de base de données ultra-rapide écrit en C++.
+
+Lorsque vous utilisez des méthodes comme `loadData` ou `summarize`, SDA traduit tout en SQL et demande à DuckDB de l'exécuter.
+
+D'après mon expérience, utiliser SDA est plus rapide que d'utiliser Python avec Pandas ou R avec le Tidyverse.
+
+Pour tester et comparer les performances de la librairie, j'ai calculé la température moyenne par décennie et par ville en utilisant les températures quotidiennes des [données climatiques ajustées et homogénéisées du Canada](https://api.weather.gc.ca/collections/ahccd-annual), soit environ 1,7 Go avec 22 millions de lignes de données. Pour plus de détails, consultez le [répertoire GitHub de la librairie](https://github.com/nshiab/simple-data-analysis).
+
+Le graphique ci-dessous présente un test de performance historique conservé à titre de référence. J'ai exécuté le même calcul, avec les mêmes données sources et le même ordinateur, avec **simple-data-analysis@4.0.1** (Node.js, Bun et Deno), **Pandas (Python)** et le **tidyverse (R)**. Les versions exactes des autres environnements et librairies n'ont pas été consignées; il s'agit donc d'une comparaison historique qualitative, pas d'un test reproductible de SDA 6.
+
+Grâce à DuckDB, **Simple Data Analysis** a été l'option la plus rapide.
+
+![Un graphique montrant la durée de traitement de plusieurs scripts dans différents langages](/assets/one-billion-row-challenge/big-file.png)
+
+Cependant, rien ne vous empêche d'utiliser DuckDB avec [Python](https://duckdb.org/docs/api/python/overview.html) et [R](https://duckdb.org/docs/api/r). Mais vous n'aurez pas toutes les méthodes faciles à utiliser et les exemples que j'ai écrits pour SDA. 😬
+
+J'ai également testé les calculs géospatiaux, qui sont encore en plein développement avec DuckDB. Python et R restent les plus rapides pour le moment ! Encore une fois, pour plus de détails, consultez le [répertoire](https://github.com/nshiab/simple-data-analysis).
+
+## Conclusion
+
+Voilà, c'est tout ! J'espère que ce projet vous a convaincu de la performance de la librairie Simple Data Analysis.
+
+Plus rien ne vous empêche d'analyser des ensembles de données massifs avec TypeScript maintenant ! 💃🕺
+
+<NoticeEnd lang="fr" />

@@ -1,0 +1,188 @@
+---
+title: Utiliser des tests dans vos projets
+description: Dans cette leçon, nous apprenons à implémenter et utiliser des tests dans notre code.
+---
+
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Utiliser des tests dans vos projets
+
+Les tests sont largement utilisés en programmation pour s’assurer que les classes, fonctions et méthodes se comportent comme prévu. Quand le code est mis à jour, les tests garantissent aussi que les changements n’ont pas touché tout le travail effectué auparavant.
+
+Mais les tests peuvent aussi être très utiles dans les projets d’analyse de données et de visualisation. Vous pouvez les utiliser pour vous assurer que vos calculs correspondent à une référence indépendante. Ou, une fois que vous avez des résultats, pour vérifier que vos modifications n’ont pas un impact inattendu sur vos conclusions ou vos visuels.
+
+Personnellement, j’utilise les tests pour renforcer ma confiance dans mon travail. Je peux vérifier quelque chose une fois et écrire un test pour le valider. Par la suite, je saurai avec certitude que ce résultat est garanti. Et si le test échoue, cela signifie qu’un problème sérieux s’est produit et nécessite mon attention !
+
+Dans cette leçon, nous allons coder une fonction simple pour calculer des pourcentages et créer des tests pour nous assurer qu’elle fonctionne comme prévu.
+
+<NoticeIntro lang="fr" />
+
+## Configuration
+
+Nous allons utiliser Deno et VS Code dans cette leçon. Créons une structure de fichiers simple.
+
+Créez un nouveau dossier `helpers` et placez-y le fichier `getPercentage.ts` avec ce code. C’est la fonction que nous voulons tester. Elle s'attend à recevoir deux nombres et retourne le pourcentage sous forme de texte.
+
+
+```ts showLineNumbers filename="helpers/getPercentage.ts"
+export default function getPercentage(
+    current: number,
+    total: number,
+): string {
+    const percentage = (current / total) * 100;
+    return `${percentage}%`;
+}
+```
+
+Créez maintenant un fichier `main.ts` et utilisez la fonction.
+
+
+```ts showLineNumbers filename="main.ts"
+import getPercentage from "./helpers/getPercentage.ts";
+
+console.log(getPercentage(50, 100));
+```
+
+À partir de là, vous pouvez exécuter le script avec `deno main.ts`.
+
+Tout fonctionne comme prévu ! La fonction retourne `50%`.
+
+![Un script principal affichant une valeur dans le terminal.](/assets/ninja-moves/tests/setup.png)
+
+## Créer des tests
+
+Est-ce que notre fonction fonctionne vraiment comme prévu ? Vérifions !
+
+D’abord, installez la librairie standard [@std/assert](https://jsr.io/@std/assert) avec la commande : `deno add jsr:@std/assert`. Nous allons l’utiliser pour comparer les valeurs retournées par notre fonction avec celles que nous attendons.
+
+Créons maintenant le fichier de test. Une bonne manière d’organiser les tests dans un projet est de garder la même structure de fichiers que le reste du code.
+
+Ici, on pourrait créer un nouveau dossier `tests` avec un fichier `getPercentage.test.ts` à l’intérieur. Remarquez que ce fichier est un fichier TypeScript classique puisqu’il se termine par `.ts`. Mais comme on a ajouté `.test` juste avant l’extension, Deno sait qu’il s’agit d’un test.
+
+Voici ce que fait le code ci-dessous :
+- `Deno.test` crée un nouveau test.
+- Le premier paramètre est une description du test.
+- Le second paramètre est une fonction. On y exécute ce que l’on veut tester (ici `getPercentage`) et on vérifie que le résultat est bien celui attendu avec `assertEquals`.
+- Si le résultat est celui attendu, le test réussira. Sinon, il échouera !
+
+
+```ts showLineNumbers filename="tests/getPercentage.test.ts"
+import { assertEquals } from "@std/assert";
+import getPercentage from "../helpers/getPercentage.ts";
+
+Deno.test("should return 50% for 50 out of 100", () => {
+  const result = getPercentage(50, 100);
+  assertEquals(result, "50%");
+});
+```
+
+## Exécuter les tests
+
+Pour lancer les tests avec Deno, il suffit d’exécuter `deno test`. Deno va chercher tous les fichiers `.test.ts` dans le projet et les exécuter.
+
+Vous pouvez aussi exécuter un seul fichier de test si vous le souhaitez. Par exemple, ici ce serait `deno test tests/getPercentage.test.ts`.
+
+Si vous devez récupérer des données sur Internet, ou lire/écrire des fichiers, n’oubliez pas de passer les permissions appropriées. Pour tout autoriser, vous pouvez utiliser cette commande : `deno test -A`.
+
+![Exécution des tests avec Deno.](/assets/ninja-moves/tests/run-tests.png)
+
+Cependant, ce n’est pas très pratique de relancer cette commande à chaque fois que vous mettez votre code à jour. Comme on l’a vu dans d’autres leçons, il vaut mieux surveiller les fichiers et relancer les tests automatiquement.
+
+Pour cela, vous pouvez utiliser l’option *watch* : `deno test --watch`. Exécutez cette commande et laissez-la tourner pour le reste de la leçon.
+
+Il existe de nombreuses autres options, expliquées [dans la documentation](https://docs.deno.com/runtime/fundamentals/testing/). Une autre que j’utilise souvent est `--fail-fast`, qui arrête tous les tests dès qu’un seul échoue.
+
+![Surveillance des tests avec Deno.](/assets/ninja-moves/tests/watch-tests.png)
+
+## Ajouter des tests
+
+Selon votre contexte, le test que nous venons d’écrire peut être suffisant. Par exemple, peut-être que vous vouliez simplement vérifier le résultat d’une étape dans votre analyse de données et que vous voulez que cela reste comme ça à l’avenir.
+
+Mais pour les besoins de cette leçon, ajoutons quelques tests supplémentaires. Testons des cas limites.
+
+Par exemple, que doit-il se passer si le premier nombre est `0` ? Et si le second est `0` ? Peut-être que nous voulons que notre fonction retourne `0%` dans les deux cas.
+
+Copiez-collez le code ci-dessous. Dès que vous enregistrerez le fichier modifié, les tests se relanceront automatiquement.
+
+
+```ts showLineNumbers filename="tests/getPercentage.test.ts" {9-17}
+import { assertEquals } from "@std/assert";
+import getPercentage from "../helpers/getPercentage.ts";
+
+Deno.test("should return 50% for 50 out of 100", () => {
+  const result = getPercentage(50, 100);
+  assertEquals(result, "50%");
+});
+
+Deno.test("should return 0% for 0 out of 100", () => {
+  const result = getPercentage(0, 100);
+  assertEquals(result, "0%");
+});
+
+Deno.test("should return 0% for 1 out of 0", () => {
+  const result = getPercentage(1, 0);
+  assertEquals(result, "0%");
+});
+```
+![Un test a échoué.](/assets/ninja-moves/tests/fail.png)
+
+On peut voir que le deuxième test est passé, mais que le troisième a échoué !
+
+Quand `total` vaut `0`, notre fonction retourne `Infinity` au lieu de ce que nous voulons, c’est-à-dire `0%`.
+
+Mettons à jour notre fichier `getPercentage.ts` pour corriger cela. Copiez-collez le code ci-dessous. Dès que vous enregistrerez le fichier, les tests se relanceront automatiquement.
+
+
+```ts showLineNumbers filename="helpers/getPercentage.ts" {5-7, 10}
+export default function getPercentage(
+  current: number,
+  total: number,
+): string {
+  if (total === 0) {
+    return "0%";
+  } else {
+    const percentage = (current / total) * 100;
+    return `${percentage}%`;
+  }
+}
+```
+
+Et maintenant, on peut voir que le troisième test est passé.
+
+On sait aussi que le comportement précédent est toujours là puisque les deux premiers tests sont également passés !
+
+![Tous les tests sont passés.](/assets/ninja-moves/tests/all-passed.png)
+
+## Tests automatisés
+
+Vous pouvez bien sûr toujours lancer les tests localement. Vous pouvez même créer une [tâche](/pushing-further/tasks) pour les exécuter plus facilement.
+
+Mais si vous utilisez GitHub, vous pouvez configurer des tests automatisés dans vos projets. C’est une configuration courante pour les librairies en code ouvert, mais vous pouvez l’utiliser pour n’importe quel projet.
+
+Par exemple, j’ai des centaines de tests en place pour la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Vous pouvez [les explorer ici](https://github.com/nshiab/simple-data-analysis/tree/main/test/unit/methods).
+
+J’utilise GitHub Actions (consultez [la leçon à ce sujet](/git-and-github/github-actions)) pour les déclencher automatiquement lorsqu’une *pull request* est ouverte ou mise à jour vers la branche `main`.
+
+La *pull request* indique si les tests ont réussi. Si un ou plusieurs échouent, il faut continuer à travailler avant de fusionner. Les règles du dépôt peuvent aussi exiger la réussite de ces vérifications et bloquer le bouton de fusion tant que ce n’est pas le cas. Vous pouvez consulter [le *workflow* ici](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
+
+Ce ne sont que quelques lignes de code, mais cela garantit que la librairie fonctionne comme prévu. Et ça m’a évité plusieurs fois de publier une nouvelle version cassée de la librairie ! 😇
+
+## Tester des visualisations
+
+Les tests sont faciles à mettre en place lorsque votre code **retourne** quelque chose comme un texte, un nombre, une date, une liste ou un objet.
+
+Mais vous pouvez aussi utiliser des tests pour comparer des éléments d’une page web, comme des graphiques, et plus encore, avec [Playwright](https://playwright.dev/). Nous avons utilisé Playwright dans la [leçon sur le web scraping](/web-scraping), mais à la base, il a été créé pour faire des tests !
+
+La [documentation](https://playwright.dev/docs/intro) est très bien faite. Il y a même une section sur la [comparaison automatique de visuels avec des captures d’écran](https://playwright.dev/docs/test-snapshots).
+
+## Conclusion
+
+Vous n’avez pas toujours besoin de tests, mais dès que vous travaillez sur un projet à long terme ou complexe, prendre le temps d’écrire de simples tests à chaque fois que vous créez une nouvelle méthode ou fonction peut s’avérer être un excellent investissement.
+
+Vous aurez plus confiance en votre code et, entre le typage et les tests, vous éviterez beaucoup de vilains bugs et erreurs ! 🐞
+
+Et si jamais vous avez un bug à corriger, ajouter un test pour le couvrir garantira qu’il ne reviendra jamais !
+
+Bonnes séances de test ! 👷
+
+<NoticeEnd lang="fr" />
