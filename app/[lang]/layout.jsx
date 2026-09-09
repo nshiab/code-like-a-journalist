@@ -1,6 +1,6 @@
 import { Analytics } from "@vercel/analytics/next";
 import { notFound } from "next/navigation";
-import { Banner, Head, Search } from "nextra/components";
+import { Head, Search } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import {
     Footer,
@@ -80,11 +80,6 @@ export default async function RootLayout({ children, params }) {
     }
 
     const copy = COPY[lang];
-    const banner = (
-        <Banner dismissible={false} storageKey="v1">
-            <a href={`/${lang}/contact`}>{copy.banner}</a>
-        </Banner>
-    );
     const navbar = (
         <Navbar
             logo={<span>{copy.title}</span>}
@@ -101,7 +96,6 @@ export default async function RootLayout({ children, params }) {
             <Head />
             <body>
                 <Layout
-                    banner={banner}
                     copyPageButton={false}
                     docsRepositoryBase={DOCS_REPOSITORY_BASE}
                     editLink={copy.edit}

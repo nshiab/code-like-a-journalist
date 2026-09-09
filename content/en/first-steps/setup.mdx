@@ -35,14 +35,23 @@ For your computer to understand TypeScript and execute it, you need a runtime.
 
 Again, you have many great open-source options out there, but I find [Deno](https://deno.com/) particularly easy to use. Deno is maintained by [Deno Land Inc.](https://deno.com/company), with Ryan Dahl as the CEO. Dahl also created [Node.js](https://nodejs.org/), another open-source runtime that is very popular.
 
-Use Deno's official installer for your operating system:
-
-- On macOS or Linux, run `curl -fsSL https://deno.land/install.sh | sh`.
-- On Windows, open a PowerShell terminal and run `irm https://deno.land/install.ps1 | iex`.
-
-You can always confirm the current commands in the [official installation guide](https://docs.deno.com/runtime/getting_started/installation/). This course is tested with the Deno version listed in the repository's [tested toolchain](https://github.com/nshiab/code-like-a-journalist#tested-course-toolchain). A newer Deno 2 release should also work. If you already have Deno, run `deno upgrade` to update it.
+Visit [Deno's homepage](https://deno.com/) and copy the installation command for your operating system (Mac, Windows, or Linux). We'll show you how to run it below.
 
 ![A screenshot of Deno's website.](/assets/first-steps/setup/deno.png)
+
+Or copy the command for your operating system right here:
+
+**Mac or Linux:**
+
+```bash
+curl -fsSL https://deno.land/install.sh | sh
+```
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://deno.land/install.ps1 | iex
+```
 
 Then, follow these steps:
 
@@ -88,7 +97,7 @@ Search for `Format On Save` and check the box to enable it.
 
 The settings are saved automatically, so you can now close the `Settings` tab. You're all set!
 
-The extension is disabled by default because not every TypeScript project uses Deno. You will enable it for each Deno project in the next section. This makes VS Code use the same Deno language server as the command line for type checking, IntelliSense, linting, and formatting.
+After installing the extension, you need to enable it for your project. We'll do that in the next section.
 
 ## Let's run a script
 
@@ -99,9 +108,6 @@ To start a new project in VS Code, follow these steps:
 1. Create a new folder somewhere handy on your computer.
 2. In VS Code, click on the Explorer tab.
 3. Click on `Open Folder` and select the folder you just created. If you are asked whether you trust the authors of the files, say "Yes" to proceed.
-4. Open the Command Palette (`CMD` + `SHIFT` + `P` on Mac or `CTRL` + `SHIFT` + `P` on PC), then run `Deno: Initialize Workspace Configuration`.
-
-The last command creates `.vscode/settings.json` with `"deno.enable": true`, enabling the Deno extension only for this folder. Repeat it whenever you start a Deno project in a new folder.
 
 ![A screenshot showing how to open a new folder in VS Code.](/assets/first-steps/setup/deno-open-folder.png)
 
@@ -116,13 +122,20 @@ This code tells your computer to log *This is going to be fun!* in your terminal
 
 ![A screenshot showing how to create a new TypeScript file in VS Code.](/assets/first-steps/setup/deno-new-file.png)
 
-If you see a white dot instead of a cross on the tab label (as shown in the screenshot below), it means you modified the file but haven't saved it. Make sure to save the file by clicking in it and then pressing `CMD` + `S` on Mac or `CTRL` + `S` on PC.
+If you create or change a file without saving it, VS Code will show you that you have unsaved changes in two places:
+
+- A number on the Explorer icon on the left tells you how many files have unsaved changes.
+- In the file's tab, a white dot replaces the cross normally used to close the file.
+
+The two red arrows in the screenshot below point to these indicators. Here, the number `1` means that one file has unsaved changes, and the white dot tells us that file is `main.ts`.
+
+Make sure to save the file by clicking in it and then pressing `CMD` + `S` on Mac or `CTRL` + `S` on PC.
 
 ![A screenshot showing an unsaved file in VS Code.](/assets/first-steps/setup/save.png)
 
 Once the file is saved, we can run the script.
 
-1. Toggle the terminal.
+1. Show the terminal (click on `View => Terminal`, or toggle the terminal by pressing `CMD` + `J` on Mac or `CTRL` + `J` on Windows).
 2. Type `deno run main.ts` in the terminal and press enter.
 
 This asks your computer to use Deno to run the script `main.ts`. As a result, you should see *This is going to be fun!* in your terminal.

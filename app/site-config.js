@@ -8,8 +8,6 @@ export const COPY = {
         title: "Code Like a Journalist",
         description:
             "A free online course on TypeScript fundamentals and data analysis with SDA by computational journalist Nael Shiab.",
-        banner:
-            "Enjoying this course? Tag me in a post and I’ll feature it! 🥳 →",
         feedback: "Questions? Comments? Start a new discussion →",
         edit: "Suggest changes to this page on GitHub →",
         toc: "On this page",
@@ -31,8 +29,6 @@ export const COPY = {
         title: "Codez comme un journaliste",
         description:
             "Un cours gratuit sur les fondamentaux de TypeScript et l'analyse de données avec SDA par le journaliste computationnel Nael Shiab.",
-        banner:
-            "Vous aimez ce cours? Identifiez-moi dans une publication et je la mettrai en avant! 🥳 →",
         feedback:
             "Questions? Commentaires? Démarrez une nouvelle discussion →",
         edit: "Suggérez une modification pour cette page sur GitHub →",
