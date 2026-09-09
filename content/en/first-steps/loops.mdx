@@ -53,17 +53,17 @@ To create a loop, you start with `for`, followed by the loop parameters between 
 
 Let's rewrite our code, but this time with an array and a `for` loop.
 
-Here's what's happening in the code below, step by step:
-- On line 2, we create an array `numbers`.
-- On line 4, we create a new variable `n` that will store the values from `numbers`, one by one.
-- On lines 5 and 6, we instruct the computer to multiply the `n` value by two, store it in a new variable, and log it. The computer will do this for each value in `numbers`, one by one.
-
 ```ts showLineNumbers filename="main.ts"
+// First, create an array of numbers.
 // Add or remove items in the array and save.
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
+// Create n as we loop, putting each array value
+// in it one by one.
 for (const n of numbers) {
+  // Multiply the current value by 2.
   const multiple = n * 2;
+  // Log the current value and its result.
   console.log(n, "=>", multiple);
 }
 ```
@@ -71,16 +71,17 @@ for (const n of numbers) {
 ![A screenshot showing VS Code running a for-of loop.](/assets/first-steps/loops/for-of-loop.png)
 
 If the computer could talk 🤖, here's what it would say when running this script: 
-- Line 1: This is just a comment for humans. I ignore it.
-- Line 2: Hello `numbers`! Nice to meet you.
-- Line 3: Nothing. Humans love empty spaces.
-- Line 4: Hey, this is a `for` loop. Hello `n`! I'll use you to store each value of `numbers`, one by one.
-- Line 5-6: Let's iterate!
+- Lines 1-2: These are just comments for humans. I ignore them.
+- Line 3: Hello `numbers`! Nice to meet you.
+- Line 4: Nothing. Humans love empty spaces.
+- Lines 5-6: Another comment for humans.
+- Line 7: Hey, this is a `for` loop. Hello `n`! I'll use you to store each value of `numbers`, one by one.
+- Lines 8-11: Let's iterate! I'll skip the comments.
   - I put the first value of `numbers` in `n`. I multiply `n` by 2 and I log it.
   - I put the second value of `numbers` in `n`. I multiply `n` by 2 and I log it.
   - [...]
   - I put the tenth value of `numbers` in `n`. I multiply `n` by 2 and I log it.
-- Line 7: I iterated over all values of `numbers`. I am done! Sayonara! 👋
+- Line 12: I iterated over all values of `numbers`. I am done! Sayonara! 👋
 
 The beauty of this syntax is that no matter the number of values in `numbers` (10, 1,000, or 1,000,000), the code will remain short and straightforward, and you can be confident that all values will be processed.
 
@@ -152,6 +153,6 @@ Loops are an incredible tool for data analysis. They allow you to iterate quickl
 
 Note that there are other kinds of loops, like `while` loops. However, they are rarely used in a data analysis context.
 
-You now have the TypeScript fundamentals you need. In the next section, we'll learn how to organize code, work with files and libraries, fetch data, and run reusable tasks. Congrats! 🕺
+Congrats! You've reached the end of the chapter. Make sure to check the [chapter conclusion](/first-steps/conclusion) for project ideas to put what you've learned into practice. 🕺
 
 <NoticeEnd />
