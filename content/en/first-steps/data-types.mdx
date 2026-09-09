@@ -10,7 +10,7 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 Data types are essential to TypeScript. They are the building blocks that you'll keep using over and over.
 
-This lesson is just an overview to get you started. We'll explore these data types in more detail as we go. At the [end of this chapter](/first-steps/conclusion), you'll find a suggested project to put what you've learned into practice.
+This lesson is just an overview to get you started. We'll explore these data types in more detail as we go. We'll also have fun with data projects down the road.
 
 <NoticeIntro />
 
@@ -184,10 +184,10 @@ Dates are not a type per se... but we use them so much in data analysis that I w
 
 Dates are represented as the number of milliseconds elapsed since January 1, 1970, UTC.
 
-To create a date object, you need to use the `Date` constructor. Notice the `new` keyword and the parameters passed in the parentheses in the code below.
+To create a date object, you need to use the `Date` constructor. Notice the `new` keyword and the parameters passed in the parentheses in the code below. We use `new` because `Date` is a class, which we'll learn about in another lesson.
 
 ```ts showLineNumbers filename="main.ts"
-// Without parameters.
+// Current date and time.
 const currentTime = new Date();
 console.log("currentTime:", currentTime);
 
@@ -250,7 +250,7 @@ const nullValue = null;
 console.log(nullValue);
 ```
 
-To check if something is `undefined` or `null`, you can use the strict equality operator (`===`) or hover over the variable to see its value or type.
+To check if something is `undefined` or `null`, you can use the strict equality operator (`===`), which we'll learn about in another chapter.
 
 ```ts showLineNumbers filename="main.ts"
 let undefinedVariable;
@@ -294,6 +294,6 @@ However, if you're curious, you can type `.` after a variable to see a list of p
 
 Congrats! You are ready to have fun building your first data structures! 👷
 
-PS: I have a confession to make... There are a few more data types, such as `bigInt`, `object`, and `function`. But we'll cover them when they become relevant in coding projects.
+PS: There's more to explore, including big integers, objects, and functions. We'll cover them when they become relevant in coding projects.
 
 <NoticeEnd/>

@@ -11,7 +11,7 @@ export default function NoticeIntro({ lang } = { lang: "en" }) {
 function pickLanguage(lang) {
     if (lang === "fr") {
         return (
-            <Callout emoji="">
+            <Callout emoji="" style={{ lineHeight: 1.7 }}>
                 Vous voulez être prévenu quand de nouvelles leçons sont
                 publiées ? Abonnez-vous à{" "}
                 <a
@@ -39,7 +39,7 @@ function pickLanguage(lang) {
         );
     } else {
         return (
-            <Callout emoji="">
+            <Callout emoji="" style={{ lineHeight: 1.7 }}>
                 Want to know when new lessons are available? Subscribe to the
                 {" "}
                 <a
