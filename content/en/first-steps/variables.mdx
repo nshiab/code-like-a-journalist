@@ -14,11 +14,9 @@ Let's start your first TypeScript lesson with variables! Along the way, I'll sho
 
 Make a new folder somewhere on your computer, open it with VS Code, and create two files:
 - `main.ts` where we will code. You can add `console.log(2 + 3);` to it.
-- `deno.json`, Deno's project configuration file. It can define tasks, dependencies, permissions, and tool settings, but we will keep it empty for now.
+- `deno.json`, used to configure Deno and activate its VS Code extension. We will keep it empty for now.
 
-The Deno extension is enabled separately for each VS Code workspace. Open the Command Palette (`CMD` + `SHIFT` + `P` on Mac or `CTRL` + `SHIFT` + `P` on PC), then run `Deno: Initialize Workspace Configuration`. This creates `.vscode/settings.json` with `"deno.enable": true`. Repeat this step whenever you start a project in a new folder.
-
-Toggle the terminal and run `deno run main.ts`.
+Toggle the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `deno run main.ts`.
 
 `console.log` instructs the computer to log something to the terminal. The "something" here is the calculation `2 + 3`. Your computer runs the calculation and logs the result, which is `5`.
 
@@ -50,8 +48,6 @@ Variables are like containers. You can put stuff in them, and when you reference
 
 Let's modify our code to put the first number in the variable `a` and the second number in `b`. We'll also store the result of the calculation in the variable `c`. Copy the code below and paste it into your `main.ts`.
 
-Your computer will run this code from top to bottom. Line 1 will execute, then line 2, and so on.
-
 ```ts showLineNumbers filename="main.ts"
 const a = 2;
 const b = 4;
@@ -63,13 +59,23 @@ console.log(c);
     Have you noticed all the semicolons? They're there to ensure your computer knows when a statement ends. Don't worry if you forget them. If you followed the [Setup](/first-steps/setup) steps, they will be added automatically when you save a file.
 </Callout>
 
+Your computer will run this code from top to bottom. Line 1 will execute, then line 2, and so on.
+
+![VS Code showing variables a, b, and c and the result 6 in the terminal.](/assets/first-steps/variables/const-variables.png)
+
 If you save, you'll notice that the result in the terminal is the same. But there is a big difference in your code: you are using variables!
 
 `c` is the result of the sum of `a` and `b`, so if you change `a` to `3`, it will change the value in `c`. Instead of `6`, your computer will log `7`. Try it!
 
+If Deno is still watching in your terminal, this happens automatically when you save. If you stopped it, run this command again to have Deno clear the terminal, check your code, and rerun it each time you save:
+
+```sh
+deno run --watch --check main.ts
+```
+
 Variables are everywhere in code because they let you abstract and reuse your logic.
 
-We used `a`, `b`, and `c` for the variable names, but you can use anything as long as the names don't include spaces or special characters (except for `_`). Remember that the language is case-sensitive.
+We used `a`, `b`, and `c` for the variable names, but you can use anything as long as the names don't include spaces or special characters. Remember that the language is case-sensitive.
 
 For example, I updated our previous code with different variable names. If you run it, the result is the same in the terminal.
 
@@ -99,6 +105,7 @@ const b = 4;
 const c = a + b;
 console.log(c);
 
+// We want to put 10 in c and log it.
 c = 10;
 console.log(c);
 ```
@@ -203,9 +210,7 @@ But trust me: this will save you from nasty bugs. As an experienced data and com
 
 Using `const` will prevent you from accidentally overwriting important variables or data, and the types will ensure you are not mixing `text`, `number`, `Date`, or other data types that we will explore in the next lessons.
 
-At the end of the day, you want valid results. You want to avoid publishing incorrect information at all costs. Using `const` instead of `let` and adhering to strict `types` helps you write reliable code.
-
-So, when you're swearing at TypeScript errors, take a deep breath and repeat this out loud: *It's working for me, not against me!*
+At the end of the day, you want valid results. You want to avoid publishing incorrect information at all costs. So, when you're swearing at TypeScript errors, take a deep breath and repeat this out loud: *It's working for me, not against me!*
 
 While it might seem complicated right now, after a little bit of practice, it will all become natural. Trust me. 🙂
 
@@ -231,6 +236,8 @@ console.log(c);
 
 <Callout type="info" emoji="💡">
     To leave comments in your code, use `//` at the beginning of the line, like above. If you want to comment out multiple lines, wrap everything with `/*` at the beginning and `*/` at the end. Comments are ignored by your computer, so they are a great way to explain what your code does or to temporarily disable parts of your code.
+
+    If you don't want to type the comment markers manually, place your cursor anywhere on a line or select several lines, then press `CMD` + `/` on Mac or `CTRL` + `/` on Windows in VS Code. Press the same shortcut again to uncomment them.
 </Callout>
 
 
