@@ -5,4 +5,5 @@ export default {
     fetch: "Télécharger des données",
     libraries: "Utiliser des bibliothèques",
     tasks: "Exécuter des tâches",
+    conclusion: "Conclusion",
 };

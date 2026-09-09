@@ -9,8 +9,8 @@ const routes = files.map(toRoute).sort();
 const englishRoutes = routes.filter((route) => route.startsWith("/en"));
 const frenchRoutes = routes.filter((route) => route.startsWith("/fr"));
 
-assert(englishRoutes.length === 34, `Expected 34 English routes, found ${englishRoutes.length}.`);
-assert(frenchRoutes.length === 34, `Expected 34 French routes, found ${frenchRoutes.length}.`);
+assert(englishRoutes.length === 37, `Expected 37 English routes, found ${englishRoutes.length}.`);
+assert(frenchRoutes.length === 37, `Expected 37 French routes, found ${frenchRoutes.length}.`);
 
 const englishPaths = englishRoutes.map((route) => route.slice(3));
 const frenchPaths = frenchRoutes.map((route) => route.slice(3));
@@ -43,6 +43,22 @@ await expectResponse("/more", 307, "/fr/more", {
 });
 await expectResponse("/en/does-not-exist", 404);
 await expectResponse("/de/does-not-exist", 404);
+
+for (const prefix of ["", "/en", "/fr"]) {
+    for (const project of [
+        "saving-account-calculator",
+        "stock-market-simulator",
+        "stats-can-census",
+        "one-billion-row-challenge",
+        "web-scraping",
+    ]) {
+        await expectResponse(
+            `${prefix}/${project}?source=bookmark`,
+            308,
+            `${prefix}/data-projects/${project}?source=bookmark`,
+        );
+    }
+}
 
 const removedPaths = [
     "web-basics/html",

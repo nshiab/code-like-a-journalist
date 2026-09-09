@@ -3,4 +3,5 @@ export default {
     "geospatial-data": "Données géospatiales",
     "dataviz": "Visualiser des données",
     "sda-and-ai": "SDA et IA",
+    conclusion: "Conclusion",
 };

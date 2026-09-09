@@ -5,4 +5,5 @@ export default {
     "data-structures": "Data structures",
     conditions: "Conditions",
     loops: "Loops",
+    conclusion: "Conclusion",
 };

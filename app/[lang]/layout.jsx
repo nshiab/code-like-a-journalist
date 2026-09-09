@@ -123,7 +123,7 @@ export default async function RootLayout({ children, params }) {
                             placeholder={copy.search.placeholder}
                         />
                     }
-                    sidebar={{ defaultMenuCollapseLevel: 99 }}
+                    sidebar={{ defaultMenuCollapseLevel: 1 }}
                     themeSwitch={copy.theme}
                     toc={{
                         backToTop: copy.backToTop,
