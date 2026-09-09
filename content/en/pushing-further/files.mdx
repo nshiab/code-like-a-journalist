@@ -47,7 +47,7 @@ Oh! Something popped up in the terminal. 🧐
 
 ![A screenshot showing VS Code showing a Deno write warning in the terminal.](/assets/pushing-further/files/allow-write.png)
 
-Deno is very strict when it comes to security. By default, it doesn’t allow a script to write files on your computer. Imagine running code from an unknown source that writes dangerous files to your system—that would be terrible! 💣
+Deno is very strict when it comes to security. By default, it doesn’t allow a script to write files on your computer. Imagine running code from an unknown source that writes dangerous files to your system. That would be terrible! 💣
 
 To allow the script to write a file, you need to explicitly grant permission by adding the `--allow-write` flag to the terminal command. Permissions can be scoped: `--allow-write=.` limits writes to the current project folder instead of the entire computer.
 
@@ -171,7 +171,7 @@ This feature is also powerful for web development. For instance, a website with 
 
 In our context, it’s easier to add the `await` keyword so the computer processes the code in the intended order.
 
-To identify an asynchronous function or method, hover over it. Asynchronous functions return a `Promise`. Don’t worry—type checking will alert you if `await` is required somewhere.
+To identify an asynchronous function or method, hover over it. Asynchronous functions return a `Promise`. Don’t worry, type checking will alert you if `await` is required somewhere.
 
 ![A screenshot showing VS Code.](/assets/pushing-further/files/promise.png)
 

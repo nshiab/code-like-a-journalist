@@ -77,7 +77,7 @@ export default function getPercentage(
 }
 ```
 
-Create also an `index.ts` file — this will be the entry point of your library. When someone wants to use your library, this is the file they'll import from.
+Create also an `index.ts` file. This will be the entry point of your library. When someone wants to use your library, this is the file they'll import from.
 
 In this file, we’re just going to import our `getPercentage` function and re-export it. This is convenient because if you have many classes, functions, or other items to publish in your library, you can gather and export them all from here.
 
@@ -160,7 +160,7 @@ If you click on the `Docs` tab, you’ll see your function `getPercentage`.
 
 ![The library's docs.](/assets/ninja-moves/publishing-library/docs.png)
 
-If you click on the function, you'll be redirected to its page, with the JSDoc we wrote in its file! Now, anyone can use your code — and JSR automatically published the code and the documentation for the whole world to see! Isn’t that amazing? 🤩
+If you click on the function, you'll be redirected to its page, with the JSDoc we wrote in its file! Now, anyone can use your code, and JSR automatically published the code and the documentation for the whole world to see! Isn’t that amazing? 🤩
 
 ![The getPercentage documentation.](/assets/ninja-moves/publishing-library/getPercentage.png)
 
@@ -186,7 +186,7 @@ console.log(percentage);
 
 And now, if you run `deno run main.ts`, you'll see your function being called and returning the right output!
 
-Don't delete this project's folder for now — we'll come back to it.
+Don't delete this project's folder for now. We'll come back to it.
 
 ![Importing and using the library.](/assets/ninja-moves/publishing-library/importing.png)
 
@@ -221,7 +221,7 @@ So now, instead of running `deno publish` directly, we would run `deno task test
 
 Let’s update our project and publish a new version.
 
-Right now, there is nothing on the library’s main page on JSR — we’re missing a `README.md`. This is just some text to tell everyone what the library is about.
+Right now, there is nothing on the library’s main page on JSR. We’re missing a `README.md`. This is just some text to tell everyone what the library is about.
 
 Create a new `README.md` file in your project with the following text in it.
 
@@ -317,17 +317,17 @@ I like this workflow because it keeps everything in sync, saves me a lot of typi
 
 Publishing to JSR directly from GitHub also certifies the provenance of the library, which helps increase its score.
 
-To be honest, the score isn’t that important — it mainly promotes best practices. If you plan to be the only user of your library, don’t worry too much about it. Manual publishing might be more than enough!
+To be honest, the score isn’t that important. It mainly promotes best practices. If you plan to be the only user of your library, don’t worry too much about it. Manual publishing might be more than enough!
 
 ![The library score.](/assets/ninja-moves/publishing-library/score.png)
 
 ## Private registries
 
-Sometimes, you don’t want all your code to be public — even though I’d argue that in most cases, you probably should. But within a company, creating a private library can be incredibly useful for sharing code among teammates and reusing tested classes, functions, and methods across multiple projects.
+Sometimes, you don’t want all your code to be public, even though I’d argue that in most cases, you probably should. But within a company, creating a private library can be incredibly useful for sharing code among teammates and reusing tested classes, functions, and methods across multiple projects.
 
 With NPM, [you can pay to use private registries](https://docs.npmjs.com/creating-and-publishing-private-packages).
 
-With JSR, you can [unlist your library](https://jsr.io/docs/private-registries) so that it doesn’t appear in search results — though it remains publicly accessible. JSR does not currently support private packages.
+With JSR, you can [unlist your library](https://jsr.io/docs/private-registries) so that it doesn’t appear in search results, though it remains publicly accessible. JSR does not currently support private packages.
 
 ## Conclusion
 

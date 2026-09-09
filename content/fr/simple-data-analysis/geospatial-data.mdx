@@ -303,7 +303,7 @@ await sdb.close();
 ```
 ![Une capture d'écran montrant le nombre de feux dans chaque province canadienne.](/assets/simple-data-analysis/geospatial-data/summary.png)
 
-Nous avons maintenant le nombre de feux et la superficie totale brûlée dans chaque province. Bien sûr, il s’agit d’une approximation—certains feux ont peut-être traversé les frontières provinciales, ce que nous n’avons pas pris en compte ici.
+Nous avons maintenant le nombre de feux et la superficie totale brûlée dans chaque province. Bien sûr, il s’agit d’une approximation : certains feux ont peut-être traversé les frontières provinciales, ce que nous n’avons pas pris en compte ici.
 
 Si nous avions les périmètres des feux sous forme de polygones, nous pourrions réaliser une analyse plus précise en utilisant la méthode [`intersection`](https://jsr.io/@nshiab/simple-data-analysis-core/doc/~/SimpleTable.prototype.intersection) pour calculer le chevauchement entre chaque feu et chaque province. Peut-être que nous aborderons cela dans une autre leçon plus tard !
 

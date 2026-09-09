@@ -12,7 +12,7 @@ GitHub est une plateforme pour stocker votre code, organiser votre travail, coll
 
 Les GitHub Actions sont principalement utilisées pour exécuter automatiquement des tests et des déploiements pour des projets. Mais pour les amateurs de données comme nous, elles peuvent aussi servir à faire du *web scraping*.
 
-Dans cette leçon, nous réutilisons le code des leçons précédentes qui récupère et extrait la température la plus récente à Montréal. Mais cette fois, nous utiliserons les GitHub Actions pour le déclencher toutes les heures et accumuler les données — gratuitement ! Si vous voulez voir le projet final, [c’est par ici](https://github.com/nshiab/github-actions-scraper).
+Dans cette leçon, nous réutilisons le code des leçons précédentes qui récupère et extrait la température la plus récente à Montréal. Mais cette fois, nous utiliserons les GitHub Actions pour le déclencher toutes les heures et accumuler les données gratuitement ! Si vous voulez voir le projet final, [c’est par ici](https://github.com/nshiab/github-actions-scraper).
 
 Si ce n'est pas déjà fait, je vous recommande fortement de suivre les deux leçons précédentes ([Qu’est-ce que Git ?](/git-and-github/git-basics) et [Qu’est-ce que GitHub ?](/git-and-github/github-basics)) avant de commencer celle-ci. Je pars du principe que vous avez un compte GitHub et que vous connaissez les commandes Git de base.
 
@@ -141,7 +141,7 @@ Pour l’instant, il n’y a aucun workflow dans notre dépôt. GitHub nous en s
 
 Pour que GitHub détecte automatiquement les workflows dans le dépôt, nous devons créer des fichiers YAML dans `.github/workflows/`.
 
-YAML signifie *YAML Ain’t Markup Language* — mais pour moi, ça ressemble quand même un peu à du markup en plus strict. L’indentation, par exemple, est très importante. C’est un format très courant pour les fichiers de configuration. Ce n’est pas compliqué, et nous allons en écrire ensemble, donc ne vous en faites pas.
+YAML signifie *YAML Ain’t Markup Language*, mais pour moi, ça ressemble quand même un peu à du markup en plus strict. L’indentation, par exemple, est très importante. C’est un format très courant pour les fichiers de configuration. Ce n’est pas compliqué, et nous allons en écrire ensemble, donc ne vous en faites pas.
 
 Créez les dossiers et le fichier `.github/workflows/scrape.yml`. Nous allons terminer le workflow avant de le valider afin que GitHub ne reçoive jamais un workflow vide et invalide.
 
@@ -281,7 +281,7 @@ Si vous cliquez dessus, vous verrez les jobs. Ici, il n’y en a qu’un : `scra
 
 ![Job réussi.](/assets/git-and-github/github-actions/success-jobs.png)
 
-Et si vous cliquez sur le job, vous verrez les étapes, et vous pouvez cliquer sur chacune. C’est utile quand quelque chose échoue — vous pourrez voir les messages d’erreur ici.
+Et si vous cliquez sur le job, vous verrez les étapes, et vous pouvez cliquer sur chacune. C’est utile quand quelque chose échoue : vous pourrez voir les messages d’erreur ici.
 
 ![Étapes du job réussi.](/assets/git-and-github/github-actions/success-steps.png)
 
@@ -306,7 +306,7 @@ Avant GitHub Actions, il aurait fallu payer pour héberger un serveur capable de
 Les données validées sont sur GitHub. Pour les récupérer dans votre dépôt local, il suffit de faire un `pull` :
 - `git pull`
 
-Note : je suis allé manger avant de prendre cette capture d’écran — j’ai donc trois lignes ! Le scraper a tourné pendant que j’étais parti ! 😄
+Note : je suis allé manger avant de prendre cette capture d’écran, j’ai donc trois lignes ! Le scraper a tourné pendant que j’étais parti ! 😄
 
 ![Les données après un pull.](/assets/git-and-github/github-actions/pull.png)
 
@@ -318,7 +318,7 @@ Vous pouvez maintenant aller chercher directement cette URL.
 
 ![Lien vers les données brutes.](/assets/git-and-github/github-actions/url.png)
 
-Vous pouvez utiliser cette URL pour récupérer les dernières données et les traiter — par exemple avec la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis).
+Vous pouvez utiliser cette URL pour récupérer les dernières données et les traiter, par exemple avec la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis).
 
 
 
@@ -348,11 +348,11 @@ Mais comme nous avons ajouté `workflow_dispatch` dans notre configuration, on p
 
 Pour supprimer un workflow, il faut supprimer le fichier YAML du dépôt et valider/pousser ce changement.
 
-Mais parfois, on veut simplement le désactiver temporairement — par exemple pendant qu’on corrige quelque chose dans le code, parce qu’on n’a pas besoin des données pour l’instant, ou parce qu’on a atteint la limite de son compte GitHub gratuit ! 😬
+Mais parfois, on veut simplement le désactiver temporairement, par exemple pendant qu’on corrige quelque chose dans le code, parce qu’on n’a pas besoin des données pour l’instant, ou parce qu’on a atteint la limite de son compte GitHub gratuit ! 😬
 
 Pour désactiver un workflow tout en gardant le fichier de configuration dans le dépôt, cliquez sur le workflow dans la barre latérale gauche, puis sur le bouton `...` en haut à droite, et enfin sur `Disable workflow`.
 
-Pas d’inquiétude — vous pourrez le réactiver plus tard sans aucun problème.
+Pas d’inquiétude, vous pourrez le réactiver plus tard sans aucun problème.
 
 ![Désactiver un workflow.](/assets/git-and-github/github-actions/disable.png)
 
@@ -360,7 +360,7 @@ Pas d’inquiétude — vous pourrez le réactiver plus tard sans aucun problèm
 
 Félicitations ! Vous savez maintenant comment créer des workflows simples. J’ai rendu [mon dépôt public](https://github.com/nshiab/github-actions-scraper), alors n’hésitez pas à le forker pour vos futurs projets.
 
-Vous pouvez utiliser ça pour faire du scraping de données — mais aussi pour plein d’autres choses ! C’est du code, donc les possibilités sont infinies ! Avec ce que vous avez appris dans cette leçon, vous serez capable de comprendre et reproduire des workflows plus sophistiqués que vous croiserez.
+Vous pouvez utiliser ça pour faire du scraping de données, mais aussi pour plein d’autres choses ! C’est du code, donc les possibilités sont infinies ! Avec ce que vous avez appris dans cette leçon, vous serez capable de comprendre et reproduire des workflows plus sophistiqués que vous croiserez.
 
 Maintenant que vous avez terminé la section sur Git et GitHub, vous êtes prêt à aller plus loin en refactorisant, testant, versionnant et publiant du code TypeScript réutilisable.
 

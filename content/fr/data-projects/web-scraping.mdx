@@ -201,7 +201,7 @@ Commençons par visiter la page et extraire les URLs. Voici ce que fait le code 
 - D'abord, on importe le navigateur [`chromium`](https://www.chromium.org/chromium-projects/) depuis Playwright. Chromium est un projet en code ouvert à la base de Google Chrome. On crée un nouveau `browser`, puis un nouveau `context`, et enfin une `newPage` (lignes 1–5).
 - Ensuite, on demande à cette page d’aller sur la page des députés (ligne 7).
 - On récupère tous les éléments avec la classe `ce-mip-mp-tile-link` (ligne 9).
-- Puis on utilise la méthode `evaluateAll`, qui permet d’exécuter du code dans le navigateur — très pratique pour le scraping. Ici, on l’utilise pour extraire facilement les attributs `href` et récupérer les URLs (ligne 10).
+- Puis on utilise la méthode `evaluateAll`, qui permet d’exécuter du code dans le navigateur. C’est très pratique pour le scraping. Ici, on l’utilise pour extraire facilement les attributs `href` et récupérer les URLs (ligne 10).
 - On affiche les URLs dans le terminal (ligne 12).
 - Enfin, on ferme tout ce qui est lié à `chromium` (lignes 14–16).
 
@@ -726,7 +726,7 @@ await sdb.close();
 Parfois, au lieu d’extraire à partir du code HTML, vous pouvez utiliser directement l’API qui alimente la page. Par exemple, le site de [Yahoo Finance](https://finance.yahoo.com/) affiche beaucoup de données qu’on pourrait extraire avec Playwright. Mais une autre technique consiste à repérer l’API que la page appelle pour obtenir ses données.
 
 <Callout type="info" emoji="💡">
-    API signifie *Application Programming Interface*. Sur le web, les API sont souvent utilisées pour transférer des données. Lorsque vous appelez un point d'accès API (via une URL et parfois des paramètres), l'API renvoie les données correspondantes. Les API sont très utiles pour les sites affichant des données en temps réel, entre autres. Au lieu de reconstruire et republier le site avec de nouvelles données — ce qui peut être lent et coûteux — il suffit de mettre à jour les points d'accès de l'API. Les réponses des API sont souvent en JSON, mais elles peuvent aussi être en CSV, XML et d'autres formats.
+    API signifie *Application Programming Interface*. Sur le web, les API sont souvent utilisées pour transférer des données. Lorsque vous appelez un point d'accès API (via une URL et parfois des paramètres), l'API renvoie les données correspondantes. Les API sont très utiles pour les sites affichant des données en temps réel, entre autres. Au lieu de reconstruire et republier le site avec de nouvelles données (ce qui peut être lent et coûteux), il suffit de mettre à jour les points d'accès de l'API. Les réponses des API sont souvent en JSON, mais elles peuvent aussi être en CSV, XML et d'autres formats.
 </Callout>
 
 Sur la [page d’accueil](https://finance.yahoo.com/), vous pouvez chercher une entreprise cotée en bourse. Par exemple, recherchez Apple et cliquez sur le résultat correspondant.

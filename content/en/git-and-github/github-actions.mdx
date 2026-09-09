@@ -12,7 +12,7 @@ GitHub is a platform to store your code, organize your work, collaborate with ot
 
 GitHub Actions are mostly used to automatically run tests, builds, and deployments on projects. But for data wranglers like us, they can also be used to scrape data.
 
-In this lesson, we reuse the code that fetches and extracts the latest temperature in Montreal from the previous lessons. But this time, we’ll use GitHub Actions to trigger it every hour and accumulate the data — for free!  
+In this lesson, we reuse the code that fetches and extracts the latest temperature in Montreal from the previous lessons. But this time, we’ll use GitHub Actions to trigger it every hour and accumulate the data for free!  
 If you want to see the final product, [head over here](https://github.com/nshiab/github-actions-scraper).
 
 I strongly encourage you to complete the two previous lessons ([What is Git?](/git-and-github/git-basics) and [What is GitHub?](/git-and-github/github-basics)) before diving into this one. I'll assume you have a GitHub account and know the basic Git commands.
@@ -143,7 +143,7 @@ Right now, there are no workflows in our repository. GitHub suggests a few for u
 
 For GitHub to automatically detect workflows in the repository, we need to create YAML files in `.github/workflows/`.
 
-YAML stands for *YAML Ain’t Markup Language* — but to me, it still feels a bit like markup… just stricter. Indentation matters, for example. It’s very common for configuration files. It's not complicated and we will write some together, so don't worry about it.
+YAML stands for *YAML Ain’t Markup Language*, but to me, it still feels a bit like markup… just stricter. Indentation matters, for example. It’s very common for configuration files. It's not complicated and we will write some together, so don't worry about it.
 
 Create the folders and file `.github/workflows/scrape.yml`. We will build the complete workflow before committing it so GitHub never receives an invalid, empty workflow.
 
@@ -279,7 +279,7 @@ If you click on it, you’ll see the jobs. Here, there's just one: `scrape`.
 
 ![Success job.](/assets/git-and-github/github-actions/success-jobs.png)
 
-And if you click on the job, you'll see its steps and can click on them. This is useful when something is failing — you'll be able to see the error messages here.
+And if you click on the job, you'll see its steps and can click on them. This is useful when something is failing. You'll be able to see the error messages here.
 
 ![Success steps.](/assets/git-and-github/github-actions/success-steps.png)
 
@@ -304,7 +304,7 @@ Before GitHub Actions, you would have needed to pay for and set up a server to s
 The committed data is on GitHub. To retrieve it in your local repo, just `pull` it:
 - `git pull`
 
-Note that I went for lunch before taking this screenshot — so I have three lines! The scraper ran while I was away! 😄
+Note that I went for lunch before taking this screenshot, so I have three lines! The scraper ran while I was away! 😄
 
 ![The pulled data.](/assets/git-and-github/github-actions/pull.png)
 
@@ -316,7 +316,7 @@ Now you can directly fetch this URL.
 
 ![The link to the raw data.](/assets/git-and-github/github-actions/url.png)
 
-You can use this URL to fetch the latest data and process it — for example, with the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis).
+You can use this URL to fetch the latest data and process it, for example, with the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis).
 
 
 ```ts showLineNumbers
@@ -345,11 +345,11 @@ But since we added `workflow_dispatch` in our configuration, we can also trigger
 
 To remove a workflow, you need to actually delete the YAML file from the repository and commit/push the change.
 
-But sometimes, you just want to temporarily disable it — for example, while fixing something in the code, because you don't need the data at the moment, or because you've hit the limit of your free GitHub account! 😬
+But sometimes, you just want to temporarily disable it, for example, while fixing something in the code, because you don't need the data at the moment, or because you've hit the limit of your free GitHub account! 😬
 
 To disable a workflow while keeping the configuration file in the repository, click on the workflow in the left sidebar, then on the `...` button in the top right corner, and finally on `Disable workflow`.
 
-Don't worry — you'll be able to enable it again later without any problem.
+Don't worry, you'll be able to enable it again later without any problem.
 
 
 ![Disabling a workflow.](/assets/git-and-github/github-actions/disable.png)
@@ -358,7 +358,7 @@ Don't worry — you'll be able to enable it again later without any problem.
 
 Congratulations! You now know how to create simple workflows. I made [my repository public](https://github.com/nshiab/github-actions-scraper), so feel free to fork it for your future projects.
 
-You can use this to scrape data — but also for so many other things! This is code, so the possibilities are endless! With what you learned in this lesson, you'll be able to understand and replicate more sophisticated workflows you find around.
+You can use this to scrape data, but also for so many other things! This is code, so the possibilities are endless! With what you learned in this lesson, you'll be able to understand and replicate more sophisticated workflows you find around.
 
 With the Git and GitHub section complete, you're ready to go further by refactoring, testing, versioning, and publishing reusable TypeScript code.
 

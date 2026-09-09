@@ -60,7 +60,7 @@ console.log(xml);
 
 Vous pouvez maintenant voir votre nouveau fichier sous `Changes`. Sa couleur est aussi passée au vert et un `U` est affiché à côté, ce qui signifie `Untracked`. Vous pouvez également voir un `1` dans la barre latérale gauche, à côté du bouton `Source Control`, indiquant qu’un fichier a été modifié.
 
-Git vous informe qu’il s’agit d’un nouveau fichier — il ne l’a jamais vu auparavant et ne le suit pas encore.
+Git vous informe qu’il s’agit d’un nouveau fichier : il ne l’a jamais vu auparavant et ne le suit pas encore.
 
 ![Message dans VS Code indiquant qu’un fichier n’est pas suivi.](/assets/git-and-github/git-basics/new-file.png)
 
@@ -181,7 +181,7 @@ Pour récupérer un identifiant de commit, faites un clic droit sur le commit et
 
 Exécutez `git revert COMMIT_ID --no-edit`, en remplaçant `COMMIT_ID` par l’identifiant copié. L’option `--no-edit` accepte le message proposé par Git afin de créer le commit d’annulation sans ouvrir d’éditeur de texte.
 
-Vous verrez maintenant un quatrième commit, indiquant que vous avez annulé le précédent ! Pour un *vrai* retour en arrière, vous pouvez aussi utiliser [`git reset`](https://git-scm.com/docs/git-reset), mais `revert` est plus sûr et garde une trace de tout — y compris de l’annulation !
+Vous verrez maintenant un quatrième commit, indiquant que vous avez annulé le précédent ! Pour un *vrai* retour en arrière, vous pouvez aussi utiliser [`git reset`](https://git-scm.com/docs/git-reset), mais `revert` est plus sûr et garde une trace de tout, y compris de l’annulation !
 
 Maintenant, si vous exécutez `deno -A main.ts`, tout fonctionne comme avant notre stupide erreur.
 

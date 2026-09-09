@@ -59,7 +59,7 @@ console.log(xml);
 
 Now, you can see your new file under `Changes`. Its color also switched to green and there is a `U` next to it, meaning `Untracked`. You can also see a `1` in the left sidebar, next to the `Source Control` button, indicating that one file has been changed.
 
-Git is telling you that it's a new file—it hasn't seen it before and it's not currently being tracked.
+Git is telling you that it's a new file. It hasn't seen it before and it's not currently being tracked.
 
 ![Message in VS Code saying that there is an untracked file.](/assets/git-and-github/git-basics/new-file.png)
 
@@ -177,7 +177,7 @@ To retrieve a commit ID, right-click on the commit and click on `Copy Commit ID`
 
 Run `git revert COMMIT_ID --no-edit`, replacing `COMMIT_ID` with the ID you copied. The `--no-edit` option accepts Git's suggested message, so the command can create the revert commit without opening a text editor.
 
-Now, you'll see a fourth commit, indicating that you reverted! For a *real* rollback, you can also use [`git reset`](https://git-scm.com/docs/git-reset), but reverting is safer and keeps a history of everything—including the revert!
+Now, you'll see a fourth commit, indicating that you reverted! For a *real* rollback, you can also use [`git reset`](https://git-scm.com/docs/git-reset), but reverting is safer and keeps a history of everything, including the revert!
 
 Now, if you run `deno -A main.ts`, everything works like before this silly code mistake.
 
@@ -247,7 +247,7 @@ This has been committed to the `temperature` branch. The `main` branch has not c
 
 As you can see, our new code is not there! In case we created an error or introduced a new bug on the `temperature` branch, we know that `main` won't have it.
 
-This is why branches are so great: you can work confidently on them. You can test and break things without worrying about your previous achievements—they're kept safe! Branches are also very useful when multiple people are collaborating. Each one can work on their own thing in their own branch.
+This is why branches are so great: you can work confidently on them. You can test and break things without worrying about your previous achievements. They're kept safe! Branches are also very useful when multiple people are collaborating. Each one can work on their own thing in their own branch.
 
 ![Checking out the main branch.](/assets/git-and-github/git-basics/checkout-main.png)
 
@@ -301,7 +301,7 @@ Of course, our use case here was quite simple. Things can get more complicated w
 
 By the way, Git is great with any text-based files, but you can also track images, videos, and more!
 
-And one last piece of advice: commit often, and always assume your commit messages are public. You never know when you'll be asking a colleague for help! And if you're working on an open-source project—well, everyone will see your commits! 😅
+And one last piece of advice: commit often, and always assume your commit messages are public. You never know when you'll be asking a colleague for help! And if you're working on an open-source project, well, everyone will see your commits! 😅
 
 Now, using Git is great, but so far we've kept everything on our computer. In the next lesson, we'll talk about GitHub, which can store your code in the cloud for free!
 

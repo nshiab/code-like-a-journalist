@@ -10,7 +10,7 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 To keep your data tidy and efficiently process it, you need to structure it. The two most common data structures are objects and arrays (also called lists).
 
-In this lesson, we'll use these structures to store data about a classroom. Buckle up—there are a lot of fundamental concepts here!
+In this lesson, we'll use these structures to store data about a classroom. Buckle up! There are a lot of fundamental concepts here!
 
 <NoticeIntro />
 
@@ -71,7 +71,7 @@ console.log(student.firstName);
 ```
 
 <Callout type="info" emoji="💡">
-  If the key `firstName` was written with a space, like `"first name"`, you would need to write `student["first name"]` to access its value. This is less straightforward and can make your code harder to read and maintain. For this reason, avoiding spaces in keys is usually recommended.
+  If the key `firstName` was written with a space, like `"first name"`, you would need to write `student["first name"]` to access its value. This is why most people prefer to use camel case keys: it's faster and easier to write.
 </Callout>
 
 ### Modifying values
@@ -123,13 +123,13 @@ const names = ["James", "John", "Patricia", "Jennifer"];
 console.log(names);
 ```
 
-If you hover over the variable `names`, you'll see that its type is `string[]`, meaning it’s an array composed exclusively of strings. It's generally best to create arrays containing only one data type (or one type and `null`, as we will see later).
+If you hover over the variable `names`, you'll see that its type is `string[]`, meaning it’s an array composed exclusively of strings. It's generally best to create arrays containing only one data type (or one type and `null`, as we will see later). This keeps the data organized and lets us process all the items in the array the same way.
 
 ![A screenshot showing VS Code with a `string[]` type on hovering.](/assets/first-steps/data-structures/string-array-type.png)
 
 ### Indexes
 
-Because arrays are ordered, we can retrieve a specific data point using an **index**. Indexes start at `0`.
+Arrays preserve the order of their items. Because arrays are ordered, we can retrieve a specific data point using an **index**. Indexes start at `0`.
 
 For example:
 - To retrieve the name of the first student, use the index `0`.
@@ -406,6 +406,6 @@ There’s much more to explore about objects and arrays... And there are other d
 
 What we’ve covered represents about 90% of what you’ll use on a daily basis. And I don’t want to overload your brain too soon! (Too late? 😬)
 
-Next, let's explore conditions and loops. You'll use these concepts in the project suggested in the [chapter conclusion](/first-steps/conclusion).
+Next, let's explore conditions and loops.
 
 <NoticeEnd/>

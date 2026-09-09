@@ -202,7 +202,7 @@ Let's start by visiting the page and extracting the URLs. Here's what the code b
 - First, we import the [`chromium` browser](https://www.chromium.org/chromium-projects/) from Playwright, which is an open-source project powering Google Chrome. We create a new `browser`, then a new `context`, and finally a `newPage` (lines 1–5).
 - Then we instruct this page to visit the MPs page (line 7). 
 - We retrieve all elements with the `ce-mip-mp-tile-link` class (line 9).
-- Then we use the `evaluateAll` method, which allows you to run code in the browser — very handy when web scraping. Here, we use it to easily extract the `href` attributes to retrieve the URLs (line 10).
+- Then we use the `evaluateAll` method, which allows you to run code in the browser. This is very handy when web scraping. Here, we use it to easily extract the `href` attributes to retrieve the URLs (line 10).
 - We log the URLs (line 12).
 - Finally, we close everything related to `chromium` (lines 14-16).
 
@@ -728,7 +728,7 @@ await sdb.close();
 Sometimes, instead of scraping the HTML code, you can directly use the API feeding data to the page. For example, the [Yahoo Finance](https://finance.yahoo.com/) website displays a lot of data that could be scraped with Playwright. But another technique is to look for the API the page calls for data.
 
 <Callout type="info" emoji="💡">
-    API stands for *Application Programming Interface*. On the web, APIs are often used to transfer data. When you call an API endpoint (using a URL and sometimes parameters), the API sends back the relevant data. APIs are very useful for websites displaying live data, among other things. Instead of rebuilding and republishing the website with new data—which can be slow and costly—you just need to update your API endpoints. API responses are often in JSON but can also be in CSV, XML, and other formats.
+    API stands for *Application Programming Interface*. On the web, APIs are often used to transfer data. When you call an API endpoint (using a URL and sometimes parameters), the API sends back the relevant data. APIs are very useful for websites displaying live data, among other things. Instead of rebuilding and republishing the website with new data (which can be slow and costly), you just need to update your API endpoints. API responses are often in JSON but can also be in CSV, XML, and other formats.
 </Callout>
 
 On the [home page](https://finance.yahoo.com/), you can search for a publicly traded company. For example, search for Apple and click on the relevant result.
