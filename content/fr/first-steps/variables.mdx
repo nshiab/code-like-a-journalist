@@ -28,7 +28,7 @@ Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécute
 
 ## `watch` et `check`
 
-Actuellement, ce script ne s'exécute qu'une seule fois. C'est un peu embêtant de devoir clicker sur le terminal et de le relancer manuellement à chaque modification.
+Actuellement, ce script ne s'exécute qu'une seule fois. C'est un peu embêtant de devoir passer au terminal et relancer la commande à chaque modification.
 
 Utilisons l'option `--watch` pour que Deno relance automatiquement notre code chaque fois que nous enregistrons une modification. Pendant que nous y sommes, nous utiliserons également l'option `--check` pour que Deno s'assure que notre code est correct avant de l'exécuter.
 
@@ -36,7 +36,7 @@ Tapez et exécutez `deno run --watch --check main.ts` dans le terminal. Vous ver
 
 Deno effacera le terminal et relancera `main.ts` à chaque fois que vous l'enregistrez. Très pratique !
 
-Si vous voulez arrêter le tout, cliquez dans le terminal et appuyez sur `CTRL` + `C` (ça devrait être la même chose sur PC et sur Mac). Mais nous garderons la surveillance pour le reste de la leçon.
+Si vous voulez arrêter la surveillance, cliquez dans le terminal et appuyez sur `CTRL` + `C` (ça devrait être la même chose sur PC et sur Mac). Mais nous garderons la surveillance pour le reste de la leçon.
 
 ![Une capture d'écran montrant VS Code surveillant main.ts.](/assets/first-steps/variables/watch.png)
 
@@ -44,7 +44,7 @@ Si vous voulez arrêter le tout, cliquez dans le terminal et appuyez sur `CTRL` 
 
 Ajoutons maintenant des variables à notre code.
 
-Les variables sont comme des conteneurs. Vous pouvez y mettre des choses, et lorsque vous les référencez, Deno regardera ce qu'il y a à l'intérieur et l'utilisera. C'est très pratique, car vous pouvez réutiliser la même variable à différent endroit dans votre code.
+Les variables sont comme des conteneurs. Vous pouvez y mettre des choses, et lorsque vous les référencez, Deno regardera ce qu'il y a à l'intérieur et l'utilisera. C'est très pratique, car vous pouvez réutiliser la même variable à différents endroits dans votre code.
 
 Modifions notre code pour mettre le premier nombre dans la variable `a` et le deuxième nombre dans `b`. Nous stockerons également le résultat du calcul dans la variable `c`. Copiez le code ci-dessous et collez-le dans votre fichier `main.ts`.
 
@@ -225,15 +225,13 @@ const b = 4;
 let c = a + b;
 console.log(c);
 
-// c est typé comme un nombre, donc nous ne pouvons
-// le remplacer que par des nombres.
+// c est typé comme un nombre, donc nous ne pouvons le remplacer que par des nombres.
 c = 10;
 console.log(c);
 
 // Nous pouvons remplacer c en utilisant c lui-même.
 c = c * c;
 console.log(c);
-
 ```
 
 <Callout type="info" emoji="💡">
