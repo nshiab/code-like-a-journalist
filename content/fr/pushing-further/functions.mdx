@@ -32,7 +32,7 @@ Vous pouvez utiliser cette configuration pour tester le code fourni dans cette l
 
 Pour créer une fonction, vous devez la déclarer en utilisant le mot-clé `function`, suivi de son nom avec des parenthèses `()` et des accolades `{}`.
 
-Créons une fonction appelée `sayHello` qui affiche `"Hello!"`. Le code que vous voulez que la fonction exécute doit être placé entre les `{}`. (Nous parlerons de ce qui se place entre les `()` dans un instant.)
+Créons une fonction appelée `sayHello` qui affiche `"Hello!"`. Le code que vous voulez que la fonction exécute doit être placé entre les `{}`. Nous parlerons de ce qui se place entre les `()` dans un instant.
 
 Copiez et collez le code ci-dessous dans `main.ts`.
 
@@ -87,7 +87,7 @@ Dans le code ci-dessous, nous ajoutons un paramètre `name` à la fonction `sayH
 
 ```ts showLineNumbers filename="main.ts"
 function sayHello(name: string) {
-  console.log(`Hello, ${name}!`);
+  console.log("Hello, " + name + "!");
 }
 
 sayHello();
@@ -95,6 +95,18 @@ sayHello();
 <Callout type="info" emoji="💡">
     À la ligne 1, la syntaxe `name: string` est appelée un **type explicite**. Cela signifie que `name` doit être un `string`. La plupart du temps, les types dans votre code sont inférés. Mais dans certains cas, vous devez spécifier explicitement les types souhaités. La définition des paramètres de fonction est l’un de ces cas.
 </Callout>
+
+Lorsque vous utilisez `+` avec des chaînes de caractères, il les **concatène**, c'est-à-dire qu'il les joint ensemble. Mais nous préférons généralement utiliser des backticks avec `${}` pour insérer la valeur d'une variable ou le résultat d'une expression dans une chaîne. Les chaînes écrites avec des backticks sont appelées **template literals**, et cette façon d'insérer des valeurs s'appelle l'**interpolation de chaînes**.
+
+Voici la même fonction avec l'interpolation de chaînes :
+
+```ts showLineNumbers filename="main.ts"
+function sayHello(name: string) {
+  console.log(`Hello, ${name}!`);
+}
+
+sayHello();
+```
 
 Si vous copiez, collez et sauvegardez ce code, vous rencontrerez une erreur. Cela se produit parce que votre fonction attend maintenant un paramètre `name`, et vous ne le fournissez pas lorsque vous appelez la fonction à la ligne 5.
 
@@ -131,7 +143,7 @@ sayHello("Jane");
 
 Rappelez-vous que les paramètres des fonctions sont typés. Si vous essayez de passer un nombre au lieu d’un texte comme `name`, vous obtiendrez une erreur.
 
-Encore une fois, les types travaillent pour vous. La vérification des types sur les paramètres des fonctions vous évitera de nombreuses séances de débogage.
+Encore une fois, les types travaillent pour vous. La vérification des types sur les paramètres des fonctions vous évitera de nombreuses séances de débogage. 🐞
 
 ![Une capture d'écran montrant VS Code affichant une erreur de type.](/assets/pushing-further/functions/type-error.png)
 
@@ -224,7 +236,7 @@ Rien ne fonctionnera pour le moment. C'est normal. Vous pouvez cliquer sur l’i
 ![Une capture d'écran montrant VS Code affichant deux fichiers TypeScript.](/assets/pushing-further/functions/new-file.png)
 
 <Callout type="info" emoji="💡">
-    Dans VS Code, les fichiers s’ouvrent sous forme d’onglets. Par défaut, un seul onglet est affiché. Si vous voulez voir plusieurs onglets côte à côte, faites un clic droit sur un onglet, puis cliquez sur `Split up`, `Split down`, `Split left` ou `Split right`. Dans la capture d’écran ci-dessous, j’ai choisi `Split right`.
+    Dans VS Code, les fichiers s’ouvrent sous forme d’onglets. Par défaut, un seul onglet est affiché. Si vous voulez voir plusieurs onglets côte à côte, faites un clic droit sur un onglet, puis cliquez sur `Split up`, `Split down`, `Split left` ou `Split right`. Dans la capture d’écran ci-dessus, j’ai choisi `Split right`.
 </Callout>
 
 Maintenant, la fonction `convertDollarsToEuros` est dans un fichier séparé, mais elle ne peut pas encore être utilisée ailleurs. Il y a un avertissement jaune à ce sujet.
@@ -265,7 +277,7 @@ console.log(`${dollars} Canadian dollars is ${euros} euros`);
 
 Et maintenant, tout fonctionne ! Si nous avions plusieurs fichiers où `convertDollarsToEuros` était nécessaire, nous pourrions facilement importer la fonction et la réutiliser à plusieurs endroits !
 
-![Une capture d'écran montrant VS Code important et utilisant une fonction TypeScript.](/assets/pushing-further/functions/intellisense.png)
+![Une capture d'écran montrant VS Code important et utilisant une fonction TypeScript.](/assets/pushing-further/functions/working.png)
 
 De plus, comme nous surveillons `main.ts` avec la commande `deno run --watch --check`, nous surveillons automatiquement toutes les dépendances de `main.ts`. Cela signifie que si vous mettez à jour `convertDollarsToEuros.ts` et le sauvegardez, le terminal sera nettoyé et le script sera réexécuté. Tellement pratique !
 
@@ -296,13 +308,17 @@ export default function convertDollarsToEuros(dollars: number) {
 }
 ```
 
+<Callout type="info" emoji="💡">
+    Dans cet exemple, je fais un peu de zèle avec `@param` et `@returns`, mais vous pouvez aussi écrire du texte ordinaire dans le commentaire JSDoc. Il s'affichera quand même comme documentation lorsque vous survolerez la fonction.
+</Callout>
+
 La raison pour laquelle JSDoc est si pratique est que VS Code (et de nombreux autres outils) le comprend. Si vous survolez la fonction dans `main.ts` maintenant, vous verrez non seulement les types, mais aussi votre documentation qui s’affiche !
 
 ![Une capture d'écran montrant VS Code affichant la documentation JSDoc pour une fonction.](/assets/pushing-further/functions/documentation.png)
 
 Nous pouvons améliorer notre documentation en ajoutant un exemple.
 
-Pour que VS Code reconnaissent l'exemple comme du code, nous utilisons un **bloc de code délimité** avec trois backticks `` ``` ``. Lors de l'ouverture du bloc, nous spécifions également `ts` pour que VS Code sache qu'il s'agit de TypeScript et applique la coloration syntaxique appropriée.
+Pour que VS Code reconnaisse l'exemple comme du code, nous utilisons un **bloc de code délimité** avec trois backticks `` ``` ``. Lors de l'ouverture du bloc, nous spécifions également `ts` pour que VS Code sache qu'il s'agit de TypeScript et applique la coloration syntaxique appropriée.
 
 ```ts showLineNumbers filename="convertDollarsToEuros.ts" {4-9}
 /**
@@ -385,6 +401,6 @@ Avec la fonction classique, vous deviez taper explicitement `num: number` car vo
 
 Les fonctions sont une partie fondamentale de la programmation. Elles vous aident à organiser votre code, à le rendre réutilisable et à le garder propre.
 
-Si vous voulez approfondir vos connaissances sur les fonctions, consultez la [leçon sur la refactorisation](/ninja-moves/refactoring) dans la section *Techniques de ninja* 🥷.
+Si vous voulez approfondir vos connaissances sur les fonctions, consultez la [leçon sur la refactorisation](/ninja-moves/refactoring) dans la section *Aller plus loin*.
 
 <NoticeEnd lang="fr"/>

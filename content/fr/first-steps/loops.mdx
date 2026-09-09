@@ -53,17 +53,17 @@ Pour créer une boucle, vous commencez par `for`, suivi des paramètres de la bo
 
 Réécrivons notre code, mais cette fois avec une liste et une boucle `for`.
 
-Voici ce qui se passe dans le code ci-dessous, étape par étape :
-- À la ligne 2, nous créons une liste `numbers`.
-- À la ligne 4, nous créons une nouvelle variable `n` qui stockera les valeurs de `numbers`, une par une.
-- Aux lignes 5 et 6, nous indiquons à l'ordinateur de multiplier la valeur de `n` par deux, de la stocker dans une nouvelle variable, puis de l'afficher. L'ordinateur fera cela pour chaque valeur de `numbers`, une par une.
-
 ```ts showLineNumbers filename="main.ts"
-// Ajoutez ou supprimez des éléments dans la liste et sauvegardez.
+// D'abord, créez une liste de nombres.
+// Ajoutez ou retirez des éléments dans la liste et enregistrez.
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
+// Créez n au fil de la boucle pour y placer
+// chaque valeur de la liste, une par une.
 for (const n of numbers) {
+  // Multipliez la valeur actuelle par 2.
   const multiple = n * 2;
+  // Affichez la valeur actuelle et son résultat.
   console.log(n, "=>", multiple);
 }
 ```
@@ -71,16 +71,17 @@ for (const n of numbers) {
 ![Une capture d'écran montrant VS Code exécutant une boucle for-of.](/assets/first-steps/loops/for-of-loop.png)
 
 Si l'ordinateur pouvait parler 🤖, voici ce qu'il dirait en exécutant ce script :
-- Ligne 1 : Ce n'est qu'un commentaire pour les humains. Je l'ignore.
-- Ligne 2 : Bonjour `numbers` ! Enchanté de faire ta connaissance.
-- Ligne 3 : Rien. Les humains adorent les espaces vides.
-- Ligne 4 : Oh, une boucle `for`. Salut `n` ! Je vais t'utiliser pour stocker chaque valeur de `numbers`, une par une.
-- Ligne 5-6 : Itérons !
+- Lignes 1-2 : Ce ne sont que des commentaires pour les humains. Je les ignore.
+- Ligne 3 : Bonjour `numbers` ! Enchanté de faire ta connaissance.
+- Ligne 4 : Rien. Les humains adorent les espaces vides.
+- Lignes 5-6 : Un autre commentaire pour les humains.
+- Ligne 7 : Oh, une boucle `for`. Salut `n` ! Je vais t'utiliser pour stocker chaque valeur de `numbers`, une par une.
+- Lignes 8-11 : Itérons ! Je vais ignorer les commentaires.
   - Je mets la première valeur de `numbers` dans `n`. Je multiplie `n` par 2 et je l'affiche.
   - Je mets la deuxième valeur de `numbers` dans `n`. Je multiplie `n` par 2 et je l'affiche.
   - [...]
   - Je mets la dixième valeur de `numbers` dans `n`. Je multiplie `n` par 2 et je l'affiche.
-- Ligne 7 : J'ai itéré sur toutes les valeurs de `numbers`. J'ai terminé ! Sayonara ! 👋
+- Ligne 12 : J'ai itéré sur toutes les valeurs de `numbers`. J'ai terminé ! Sayonara ! 👋
 
 La beauté de cette syntaxe est que, peu importe le nombre de valeurs dans `numbers` (10, 1 000 ou 1 000 000), le code restera court et clair, et vous pouvez être sûr que toutes les valeurs seront traitées.
 
@@ -152,6 +153,6 @@ Les boucles sont un outil incroyable pour l'analyse de données. Elles vous perm
 
 Notez qu'il existe d'autres types de boucles, comme les boucles `while`. Cependant, elles sont rarement utilisées dans un contexte d'analyse de données.
 
-Vous maîtrisez maintenant les fondamentaux de TypeScript dont vous avez besoin. Dans la prochaine section, nous apprendrons à organiser le code, à travailler avec des fichiers et des librairies, à récupérer des données et à exécuter des tâches réutilisables. Félicitations ! 🕺
+Félicitations ! Vous avez atteint la fin du chapitre. Consultez la [conclusion du chapitre](/first-steps/conclusion) pour trouver des idées de projets et mettre en pratique ce que vous avez appris. 🕺
 
 <NoticeEnd lang="fr" />

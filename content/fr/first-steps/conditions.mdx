@@ -10,7 +10,7 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 Vous utilisez constamment des instructions conditionnelles dans votre vie quotidienne. L'eau bout-elle dans la casserole ? Si oui, mettez les pâtes. Sinon, attendez encore quelques minutes. 🧑‍🍳
 
-C'est la même chose dans votre code. Selon les données, vous pouvez demander à votre programme ou algorithme à agir différemment.
+C'est la même chose dans votre code. Selon les données, vous pouvez demander à votre programme ou algorithme d'agir différemment.
 
 <NoticeIntro lang="fr" />
 
@@ -35,14 +35,39 @@ Pour écrire des conditions, nous utilisons les instructions conditionnelles `if
 
 La première condition doit toujours être testée avec `if`. La condition doit être placée entre `()`. Si la condition est remplie, l'ordinateur exécutera le code à l'intérieur des `{}` qui suivent.
 
-Si nous voulons tester plus d'une condition, nous utilisons `else if` avec une condition entre `()` suivie par du code à exécuter à l'intérieur des `{}`. Tester plusieurs conditions n'est pas toujours nécessaire.
+Par exemple, le code ci-dessous affiche `I am older than you!` dans le terminal uniquement si `myAge` est supérieur à `yourAge`.
+
+```ts showLineNumbers filename="main.ts"
+// Modifiez les âges
+// pour tester les différentes possibilités.
+const myAge = 36;
+const yourAge = 25;
+
+if (myAge > yourAge) {
+  console.log("I am older than you!");
+}
+```
+
+Si nous voulons tester plus d'une condition, nous utilisons `else if` avec une condition entre `()` suivie par du code à exécuter à l'intérieur des `{}`.
+
+Tester plusieurs conditions n'est pas toujours nécessaire, mais dans l'exemple ci-dessous, nous voulons aussi afficher `You are older than me!` si `myAge` est inférieur à `yourAge`.
+
+```ts showLineNumbers filename="main.ts"
+// Modifiez les âges
+// pour tester les différentes possibilités.
+const myAge = 36;
+const yourAge = 25;
+
+if (myAge > yourAge) {
+  console.log("I am older than you!");
+} else if (myAge < yourAge) {
+  console.log("You are older than me!");
+}
+```
 
 Si nous voulons exécuter du code lorsque aucune des conditions n'est remplie, nous utilisons `else`. Puisque `else` ne teste aucune condition, nous n'avons pas besoin de `()`, mais nous devons fournir le code à exécuter à l'intérieur des `{}`. Bien que terminer avec un `else` ne soit pas obligatoire, cela aide souvent à éviter des bogues.
 
-Par exemple, le code ci-dessous compare `myAge` et `yourAge` :
-- Si `myAge` est supérieur à `yourAge` (ligne 6), nous affichons `I am older than you!` dans le terminal. Les autres instructions conditionnelles sont ignorées.
-- Si la première condition n'est pas remplie, nous vérifions une autre condition avec `else if` (ligne 8). Si `myAge` est inférieur à `yourAge`, nous affichons `You are older than me!`. Les autres instructions conditionnelles sont ignorées.
-- Enfin, si aucune des conditions ci-dessus n'est remplie, cela signifie que nous avons le même âge. Dans ce cas, nous utilisons `else` (ligne 10) pour afficher `We are the same age!`.
+Par exemple, dans le code ci-dessous, si aucune des conditions n'est remplie, cela signifie que nous avons le même âge. Nous utilisons donc `else` pour afficher `We are the same age!` dans le terminal.
 
 ```ts showLineNumbers filename="main.ts"
 // Modifiez les âges
@@ -80,7 +105,7 @@ Voici les principaux opérateurs de comparaison que vous utiliserez au quotidien
 - `!==` : différent de
 
 <Callout type="info" emoji="💡">
-  Vous pourriez voir des exemples sur le web avec `==` et `!=`. Ces opérateurs ne vérifient pas le type des valeurs, il est donc préférable d'utiliser `===` et `!==`, qui vérifient l'égalité stricte.
+  Vous pourriez voir des exemples sur le web avec `==` et `!=`. Ces opérateurs peuvent convertir automatiquement les valeurs avant de les comparer, ce qui peut produire des résultats inattendus. Il est préférable d'utiliser `===` et `!==`, qui comparent sans convertir les types.
 </Callout>
 
 Et voici les opérateurs en action. Nous stockons les résultats dans des variables et les affichons :
@@ -125,11 +150,12 @@ Sans opérateurs logiques, cela pourrait ressembler à ceci, avec des conditions
 
 ```ts showLineNumbers filename="main.ts"
 // Modifiez l'âge et la province pour tester les conditions.
-// Ne vous préoccupez pas du `: number` et `: string`.
+// Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;
 const myProvince: string = "Quebec";
 
 if (myProvince === "Quebec") {
+  // Après avoir vérifié la province, nous vérifions aussi l'âge.
   if (myAge >= 18) {
     console.log("You are allowed!");
   } else {
@@ -146,52 +172,45 @@ if (myProvince === "Quebec") {
 }
 ```
 
-Voici le même code avec l'opérateur logique `&&` pour s'assurer que `age` **ET** `province` respectent des conditions spécifiques. Cette approche est plus simple à comprendre et plus facile à déboguer !
-
-Voici ce que fait le code ci-dessous :
-- À la ligne 6, nous vérifions si `myProvince` est `"Quebec"` **ET** si `myAge` est supérieur ou égal à `18`. Si c'est vrai, vous pouvez commander une boisson.
-- À la ligne 8, nous vérifions si `myProvince` est `"Ontario"` **ET** si `myAge` est supérieur ou égal à `19`. Si c'est vrai, vous pouvez commander une boisson.
-- À ce stade, il est possible que la province soit un texte inattendu. À la ligne 10, nous vérifions si `myProvince` n'est pas `"Quebec"` **ET** n'est pas `"Ontario"`. Si c'est vrai, nous informons l'utilisateur que nous ne reconnaissons pas cette province.
-- À la ligne 12, la seule possibilité restante est que l'utilisateur n'est pas autorisé à commander une boisson.
+Voici le même code avec l'opérateur logique `&&` pour s'assurer que `myAge` **ET** `myProvince` respectent des conditions spécifiques. Cette approche est plus simple à comprendre et plus facile à déboguer !
 
 ```ts showLineNumbers filename="main.ts"
-// Change the age and province to test the conditions.
-// Don't worry about the `: number` and `: string` for now.
+// Modifiez l'âge et la province pour tester les conditions.
+// Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;
 const myProvince: string = "Quebec";
 
+// Les deux conditions doivent être vraies : Québec ET au moins 18 ans.
 if (myProvince === "Quebec" && myAge >= 18) {
   console.log("You are allowed!");
 } else if (myProvince === "Ontario" && myAge >= 19) {
+  // Ontario ET au moins 19 ans.
   console.log("You are allowed!");
 } else if (myProvince !== "Quebec" && myProvince !== "Ontario") {
+  // La province n'est ni le Québec ni l'Ontario.
   console.log("I don't know this province!");
 } else {
   console.log("You are not allowed!");
 }
 ```
 
-We could also write the same algorithm with a mix of `&&` and `||`. Additionally, we can use variables to simplify the code.
-
-Here's what the code below does:
-- On line 6, we check if `myProvince` is `"Quebec"` **AND** `myAge` is greater than or equal to `18`. We store the result in the variable `isAllowedInQuebec`, which can only be `true` or `false`. (If you hover over it, you'll see its type is `boolean`.)
-- On line 7, we do the same for Ontario, storing the result in `isAllowedInOntario`.
-- On line 9, we check if `isAllowedInQuebec` is `true` **OR** `isAllowedInOntario` is `true`. Only one of these needs to be `true` for the code inside the following `{}` to execute.
-- On line 11, we log a message to the user if the province is something unexpected.
-- By the time the computer reaches line 13, the only remaining possibility is that the user is not allowed to order a drink!
+Nous pourrions aussi écrire le même algorithme avec un mélange de `&&` et de `||`. Nous pouvons également utiliser des variables pour simplifier le code.
 
 ```ts showLineNumbers filename="main.ts"
 // Modifiez l'âge et la province pour tester les conditions.
-// Ne vous préoccupez pas du `: number` et `: string`.
+// Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;
 const myProvince: string = "Quebec";
 
+// Stockez chaque condition combinée sous forme de true ou false.
 const isAllowedInQuebec = myProvince === "Quebec" && myAge >= 18;
 const isAllowedInOntario = myProvince === "Ontario" && myAge >= 19;
 
+// Au moins une condition doit être vraie.
 if (isAllowedInQuebec || isAllowedInOntario) {
   console.log("You are allowed!");
 } else if (myProvince !== "Quebec" && myProvince !== "Ontario") {
+  // La province n'est ni le Québec ni l'Ontario.
   console.log("I don't know this province!");
 } else {
   console.log("You are not allowed!");
@@ -200,39 +219,32 @@ if (isAllowedInQuebec || isAllowedInOntario) {
 
 ## Opérateur conditionnel
 
-Il existe une autre façon d'écrire des instructions conditionnelles simples en utilisant la syntaxe `condition ? si vrai : si faux`. Cette syntaxe est appelée **opérateur conditionnel** (également connu sous le nom d'**opérateur ternaire**).
+Il existe une autre façon d'écrire des instructions conditionnelles simples en utilisant la syntaxe `condition ? valueWhenTrue : valueWhenFalse`. Cette syntaxe est appelée **opérateur conditionnel** (également connu sous le nom d'**opérateur ternaire**).
 
 C'est idéal pour des conditions simples, vous permettant de remplacer les instructions `if` et `else` par une seule ligne.
 
-Voici une autre variation de notre algorithme en utilisant cette syntaxe. Une autre différence notable est qu'au lieu d'utiliser plusieurs fois `console.log`, nous créons une variable `message` et l'affichons une seule fois à la fin.
-
-Voici ce que fait le code :
-- À la ligne 6, nous créons une variable `message` avec une chaîne vide. Nous utilisons `let` pour pouvoir modifier sa valeur ultérieurement.
-- À la ligne 8, nous vérifions si `myProvince` est égal à `"Quebec"`. Si la province est le Québec, la ligne 9 est exécutée :
-  - Si `myAge` est supérieur ou égal à `18`, la valeur de `message` est remplacée par `"You are allowed!"`.
-  - Sinon, la valeur de `message` est remplacée par `"You are not allowed!"`.
-- À la ligne 10, nous vérifions si `myProvince` est égal à `"Ontario"`. Si la province est l'Ontario, la ligne 11 est exécutée :
-  - Si `myAge` est supérieur ou égal à `19`, la valeur de `message` est remplacée par `"You are allowed!"`.
-  - Sinon, la valeur de `message` est remplacée par `"You are not allowed!"`.
-- À la ligne 12, la seule possibilité restante est que la province ne soit ni Québec ni Ontario. Ainsi, nous remplaçons le message à la ligne 13 par `"I don't know this province!"`.
-- À la ligne 16, nous affichons le `message` mis à jour.
+Voici une autre variation de notre algorithme en utilisant cette syntaxe.
 
 ```ts showLineNumbers filename="main.ts"
 // Modifiez l'âge et la province pour tester les conditions.
-// Ne vous préoccupez pas du `: number` et `: string`.
+// Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;
 const myProvince: string = "Quebec";
 
+// Utilisez let pour pouvoir modifier le message ci-dessous.
 let message = "";
 
 if (myProvince === "Quebec") {
+  // Choisissez le premier message si la condition est vraie, sinon le second.
   message = myAge >= 18 ? "You are allowed!" : "You are not allowed!";
 } else if (myProvince === "Ontario") {
+  // Faites le même choix avec l'âge minimum de l'Ontario.
   message = myAge >= 19 ? "You are allowed!" : "You are not allowed!";
 } else {
   message = "I don't know this province!";
 }
 
+// Affichez le message choisi une fois les conditions vérifiées.
 console.log(message);
 ```
 
@@ -242,7 +254,7 @@ Tous les algorithmes discutés ci-dessus pour vérifier si l'utilisateur peut co
 
 Eh bien, cela dépend vraiment du contexte et de vos préférences personnelles.
 
-Rappelez-vous, vous êtes en train d'apprendre un langage de programmation. Et comme dans n'importe quel langage, il existe de nombreuses façons d'exprimer la même idée. Tant que votre ordinateur et vos collègues peuvent vous comprendre, tout ira bien !
+Rappelez-vous, vous êtes en train d'apprendre un langage de programmation. Et comme dans n'importe quel langage, il existe de nombreuses façons d'exprimer la même idée. Tant que votre ordinateur et vos collègues peuvent vous comprendre, tout ira bien ! 🤖
 
 Maintenant, il est temps de passer à la leçon suivante. Découvrons les boucles !
 

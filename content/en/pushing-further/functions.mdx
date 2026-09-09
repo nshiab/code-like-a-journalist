@@ -31,7 +31,7 @@ You can use this setup to test the code provided in this lesson.
 
 To create a function, you need to declare it using the `function` keyword, followed by its name with parentheses `()` and curly brackets `{}`.
 
-Let's create a function named `sayHello` that logs `"Hello!"`. The code you want the function to execute must go between the `{}`. (We'll talk about what goes between the `()` in a minute.)
+Let's create a function named `sayHello` that logs `"Hello!"`. The code you want the function to execute must go between the `{}`. We'll talk about what goes between the `()` in a minute.
 
 Copy and paste the code below into `main.ts`.
 
@@ -86,7 +86,7 @@ In the code below, we add a parameter `name` to the function `sayHello` and spec
 
 ```ts showLineNumbers filename="main.ts"
 function sayHello(name: string) {
-  console.log(`Hello, ${name}!`);
+  console.log("Hello, " + name + "!");
 }
 
 sayHello();
@@ -94,6 +94,18 @@ sayHello();
 <Callout type="info" emoji="💡">
     On line 1, the `name: string` syntax is called an **explicit type**. It means that `name` must be a `string`. Most of the time, the types in your code are inferred. But in some cases, you need to explicitly specify what you want the types to be. Defining function parameters is one of these cases.
 </Callout>
+
+When you use `+` with strings, it **concatenates** them, meaning it joins them together. But we usually prefer backticks with `${}` to insert a variable's value or the result of an expression into a string. Strings written with backticks are called **template literals**, and inserting values this way is called **string interpolation**.
+
+Here's the same function using string interpolation:
+
+```ts showLineNumbers filename="main.ts"
+function sayHello(name: string) {
+  console.log(`Hello, ${name}!`);
+}
+
+sayHello();
+```
 
 If you copy, paste and save this code, you'll encounter an error. This happens because your function now expects a parameter `name`, and you're not providing it when calling the function on line 5.
 
@@ -294,6 +306,10 @@ export default function convertDollarsToEuros(dollars: number) {
 }
 ```
 
+<Callout type="info" emoji="💡">
+    In this example, I'm being fancy with `@param` and `@returns`, but you can also write regular text inside the JSDoc comment. It will still appear as documentation when you hover over the function.
+</Callout>
+
 The reason why JSDoc is so handy is because VS Code (and many other tools) understands it. If you hover over the function in `main.ts` now, you'll see not only the types but also your documentation popping up!
 
 ![A screenshot showing VS Code displaying JSDoc for a function.](/assets/pushing-further/functions/documentation.png)
@@ -383,6 +399,6 @@ With the regular function, you had to explicitly type `num: number` because your
 
 Functions are a fundamental part of programming. They help you organize your code, make it reusable, and keep it clean.
 
-If you want to dig deeper into functions, check out the [Refactoring lesson](/ninja-moves/refactoring) in the *Ninja moves* 🥷 section.
+If you want to dig deeper into functions, check out the [Refactoring lesson](/ninja-moves/refactoring) in the *Going Further* section.
 
 <NoticeEnd />

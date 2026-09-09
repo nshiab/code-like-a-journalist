@@ -8,9 +8,9 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Types de données
 
-Les types de données sont essentiels en TypeScript. Ce sont les blocs de construction sur lesquelles vos analyses se baseront.
+Les types de données sont essentiels en TypeScript. Ce sont les éléments de base que vous utiliserez encore et encore.
 
-Cette leçon est une introduction pour vous aider à démarrer. Nous explorerons ces types de données plus en détail au fil du cours. À la [fin de ce chapitre](/first-steps/conclusion), vous trouverez un projet suggéré pour mettre en pratique ce que vous avez appris.
+Cette leçon est une introduction pour vous aider à démarrer. Nous explorerons ces types de données plus en détail au fil du cours. Nous nous amuserons aussi avec des projets de données plus tard.
 
 <NoticeIntro lang="fr" />
 
@@ -187,10 +187,10 @@ Les dates ne sont pas un type en soi... mais nous les utilisons tellement en ana
 
 Les dates sont représentées comme le nombre de millisecondes écoulées depuis le 1er janvier 1970, UTC.
 
-Pour créer un objet date, vous devez utiliser le constructeur `Date`. Remarquez le mot-clé `new` et les paramètres passés entre parenthèses dans le code ci-dessous.
+Pour créer un objet date, vous devez utiliser le constructeur `Date`. Remarquez le mot-clé `new` et les paramètres passés entre parenthèses dans le code ci-dessous. Nous utilisons `new` parce que `Date` est une classe, un concept que nous aborderons dans une autre leçon.
 
 ```ts showLineNumbers filename="main.ts"
-// Sans paramètres.
+// Date et heure actuelles.
 const currentTime = new Date();
 console.log("currentTime:", currentTime);
 
@@ -254,7 +254,7 @@ const nullValue = null;
 console.log(nullValue);
 ```
 
-Pour vérifier si quelque chose est `undefined` ou `null`, vous pouvez utiliser l'opérateur d'égalité stricte (`===`) ou passer votre curseur sur la variable.
+Pour vérifier si quelque chose est `undefined` ou `null`, vous pouvez utiliser l'opérateur d'égalité stricte (`===`), que nous découvrirons dans un autre chapitre.
 
 ```ts showLineNumbers filename="main.ts"
 let undefinedVariable;
@@ -299,6 +299,6 @@ Cependant, si vous êtes curieux, vous pouvez taper un `.` après une variable p
 
 Félicitations ! Vous êtes prêt à vous amuser en construisant vos premières structures de données ! 👷
 
-PS : J'ai une confession à faire... Il existe encore quelques types de données, comme `bigInt`, `object` et `function`. Mais nous les aborderons lorsque pertinents dans des projets concrets.
+PS : Il reste encore des choses à explorer, notamment les grands entiers, les objets et les fonctions. Nous les aborderons lorsqu'ils deviendront utiles dans des projets de code.
 
 <NoticeEnd lang="fr" />

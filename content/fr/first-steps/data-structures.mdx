@@ -71,7 +71,7 @@ console.log(student.firstName);
 ```
 
 <Callout type="info" emoji="💡">
-  Si la clé `firstName` était écrite avec un espace, comme `"first name"`, vous devriez écrire `student["first name"]` pour accéder à sa valeur. Cela est moins intuitif et peut rendre votre code plus difficile à lire et à maintenir. Pour cette raison, il est généralement recommandé d'éviter les espaces dans les clés.
+  Si la clé `firstName` était écrite avec un espace, comme `"first name"`, vous devriez écrire `student["first name"]` pour accéder à sa valeur. C'est pourquoi la plupart des gens préfèrent utiliser des clés en camel case : c'est plus rapide et plus facile à écrire.
 </Callout>
 
 ### Modifier des valeurs
@@ -123,13 +123,13 @@ const names = ["James", "John", "Patricia", "Jennifer"];
 console.log(names);
 ```
 
-Si vous survolez la variable `names`, vous verrez que son type est `string[]`, ce qui signifie qu’il s’agit d’une liste composée exclusivement de chaînes de caractères. Il est généralement préférable de créer des listes contenant un seul type de données (ou un type et `null`, comme nous le verrons plus tard).
+Si vous survolez la variable `names`, vous verrez que son type est `string[]`, ce qui signifie qu’il s’agit d’une liste composée exclusivement de chaînes de caractères. Il est généralement préférable de créer des listes contenant un seul type de données (ou un type et `null`, comme nous le verrons plus tard). Cela permet de garder les données organisées et de traiter tous les éléments de la liste de la même façon.
 
 ![Une capture d'écran montrant VS Code avec un type `string[]` au survol.](/assets/first-steps/data-structures/string-array-type.png)
 
 ### Index
 
-Étant donné que les listes sont ordonnées, nous pouvons récupérer un élément spécifique en utilisant un **index**. Les index commencent à `0`.
+Les listes conservent l'ordre de leurs éléments. Étant donné que les listes sont ordonnées, nous pouvons récupérer un élément spécifique en utilisant un **index**. Les index commencent à `0`.
 
 Par exemple :
 - Pour récupérer le nom du premier étudiant, utilisez l’index `0`.
@@ -213,7 +213,7 @@ console.log(namesSubset);
 
 #### `.sort()`
 
-La méthode `.sort()` trie la liste par ordre croissant par défaut.
+La méthode `.sort()` trie les listes contenant des chaînes de caractères par ordre croissant par défaut.
 
 Il est également possible de passer un argument pour trier d'autres types de données d'une manière spécifique, mais nous aborderons cela plus tard.
 
@@ -405,6 +405,6 @@ Il y a encore beaucoup à explorer sur les objets et les listes... Et il existe 
 
 Ce que nous avons couvert représente environ 90 % de ce que vous utiliserez au quotidien. Et je ne veux pas surcharger votre cerveau trop vite ! (Trop tard ? 😬)
 
-Passons maintenant aux conditions et aux boucles. Vous utiliserez ces concepts dans le projet suggéré dans la [conclusion du chapitre](/first-steps/conclusion).
+Passons maintenant aux conditions et aux boucles.
 
 <NoticeEnd lang="fr" />
