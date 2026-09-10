@@ -1,0 +1,48 @@
+/* Preserve the Nextra 3 callout palette after upgrading to Nextra 4. */
+.nextra-callout[class~="x:bg-green-100"] {
+    border-color: #ffedd5;
+    background-color: #fff7ed;
+    color: #9a3412;
+}
+
+.nextra-callout[class~="x:bg-blue-100"] {
+    border-color: #bfdbfe;
+    background-color: #dbeafe;
+    color: #1e3a8a;
+}
+
+.nextra-callout[class~="x:bg-yellow-50"] {
+    border-color: #fef9c3;
+    background-color: #fefce8;
+    color: #713f12;
+}
+
+.nextra-callout[class~="x:bg-red-100"] {
+    border-color: #fecaca;
+    background-color: #fee2e2;
+    color: #7f1d1d;
+}
+
+.dark .nextra-callout[class~="x:bg-green-100"] {
+    border-color: rgb(251 146 60 / 30%);
+    background-color: rgb(251 146 60 / 20%);
+    color: #fdba74;
+}
+
+.dark .nextra-callout[class~="x:bg-blue-100"] {
+    border-color: rgb(191 219 254 / 30%);
+    background-color: rgb(30 58 138 / 30%);
+    color: #bfdbfe;
+}
+
+.dark .nextra-callout[class~="x:bg-yellow-50"] {
+    border-color: rgb(254 240 138 / 30%);
+    background-color: rgb(161 98 7 / 30%);
+    color: #fef08a;
+}
+
+.dark .nextra-callout[class~="x:bg-red-100"] {
+    border-color: rgb(254 202 202 / 30%);
+    background-color: rgb(127 29 29 / 30%);
+    color: #fecaca;
+}

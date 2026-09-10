@@ -1,12 +1,28 @@
 import nextra from "nextra";
 
 const withNextra = nextra({
-    theme: "nextra-theme-docs",
-    themeConfig: "./theme.config.jsx",
+    contentDirBasePath: "/",
     defaultShowCopyCode: true,
 });
 
 export default withNextra({
+    redirects() {
+        const projects = [
+            "saving-account-calculator",
+            "stock-market-simulator",
+            "stats-can-census",
+            "one-billion-row-challenge",
+            "web-scraping",
+        ];
+        return ["", "/en", "/fr"].flatMap((prefix) =>
+            projects.map((project) => ({
+                source: `${prefix}/${project}`,
+                destination: `${prefix}/data-projects/${project}`,
+                permanent: true,
+                locale: false,
+            })),
+        );
+    },
     i18n: {
         locales: ["en", "fr"],
         defaultLocale: "en",

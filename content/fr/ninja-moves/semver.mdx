@@ -1,0 +1,92 @@
+---
+title: Comprendre le versionnage de librairies (SemVer)
+description: Dans cette leçon, on apprend ce qu’est le versionnage sémantique et comment l’interpréter.
+---
+
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Comprendre le versionnage de librairies
+
+Vous avez peut-être remarqué que les versions de librairies sur NPM, JSR et dans votre fichier `deno.json` (ou `package.json`) sont accompagnées de numéros.
+
+Par exemple, la version de la librairie [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) utilisée dans ce cours est la `6.0.1`. Cette convention de numérotation s’appelle le **versionnage sémantique**, ou **SemVer** pour faire court.
+
+Quand les responsables d’une librairie mettent à jour ces numéros, c’est (en général 😅) pour une bonne raison et, dans cette leçon, je vais vous expliquer laquelle !
+
+<NoticeIntro lang="fr" />
+
+## Majeure, mineure et patch
+
+### Majeure
+
+Le premier chiffre correspond à la version majeure. Quand ce chiffre change, cela signifie que des changements importants et **incompatibles** ont été introduits. Si vous utilisez une ancienne version et que vous mettez à jour la librairie, vous devrez probablement modifier votre code. Certaines classes, méthodes, fonctions, etc. ont été modifiées ou supprimées.
+
+Donc si vous prévoyez de mettre à jour vers une version majeure, prévoyez toujours un peu de temps pour ajuster votre projet. Et demandez-vous toujours si ça en vaut vraiment la peine !
+
+Par exemple, si vous utilisez `simple-data-analysis@6.0.0` et qu’une nouvelle version `simple-data-analysis@7.0.0` sort, consultez les [notes de version](https://github.com/nshiab/simple-data-analysis/releases) pour évaluer les avantages et les inconvénients d’une mise à jour dans votre projet.
+
+Il y a aussi un point important à savoir sur les versions majeures : lorsqu’une librairie est en `v0.x.x`, cela signifie généralement qu’elle n’est pas encore prête. Les responsables vont probablement introduire beaucoup de changements importants avant d’atteindre une `v1.0.0`, le temps de trouver la meilleure manière de tout construire. Beaucoup de bugs sont aussi à prévoir.
+
+### Mineure
+
+Les versions mineures sont généralement utilisées pour annoncer de nouvelles fonctionnalités.
+
+Par exemple, si vous utilisez `simple-data-analysis@6.0.0` et qu’une nouvelle version `simple-data-analysis@6.1.0` sort, cela signifie probablement qu’une nouvelle classe, de nouvelles méthodes ou fonctions sont disponibles. Les anciennes sont toujours là et devraient continuer à fonctionner.
+
+C’est beaucoup plus sûr de mettre à jour vers une version mineure, car vous ne devriez pas avoir à réécrire votre projet. Mais bon, c’est du code, et les mainteneurs sont humains (pour l'instant 🤖)… donc il peut toujours y avoir des surprises ! 😬
+
+### Patch
+
+Les versions patch sont utilisées pour corriger des bugs et améliorer le fonctionnement en coulisses. Elles n’apportent généralement rien de nouveau. Elles rendent juste la librairie plus stable.
+
+Ce sont les versions les plus sûres à mettre à jour. Vous ne devriez pas avoir besoin de changer votre code pour une mise à jour patch.
+
+### Autres versions
+
+Certains mainteneurs publient aussi des versions `alpha`, `beta` et `rc` (*release candidate*).
+
+Ces versions sont disponibles à tous, mais à vos risques et périls. De nombreux bugs et changements incompatibles sont à prévoir.
+
+## `^` et `~`
+
+Comme ce serait agaçant de devoir mettre à jour tout le temps les librairies pour chaque nouvelle version `minor` ou `patch`, certains projets ajoutent un préfixe `^` ou `~` devant les versions dans les fichiers `deno.json` ou `package.json`.
+
+Ces symboles définissent une **plage** de versions acceptables pour une librairie.
+
+### `^` (accent circonflexe)
+
+Le `^` signifie que le projet doit rester sur une même version majeure, mais peut utiliser n’importe quelle version mineure ou patch.
+
+Par exemple, `simple-data-analysis@^6.0.0` signifie que le projet peut utiliser les versions compatibles avant `v7.0.0`. Donc `simple-data-analysis@6.1.0` et `simple-data-analysis@6.1.1` sont valides.
+
+### `~` (tilde)
+
+Le `~` est plus strict : le projet doit rester sur une même version majeure **et** mineure, mais peut utiliser n’importe quel patch.
+
+Par exemple, `simple-data-analysis@~6.1.0` signifie que le projet peut utiliser les correctifs avant `v6.2.0`, comme `simple-data-analysis@6.1.1`.
+
+## Mettre à jour ses dépendances
+
+Vous pouvez suivre des projets et des mainteneurs sur GitHub pour rester à jour avec vos librairies préférées (voyez la [leçon sur GitHub](/git-and-github/github-basics)), mais vous pouvez aussi utiliser directement Deno et NPM pour vérifier si certaines de vos librairies sont dépassées.
+
+### Deno
+
+Avec Deno, vous pouvez exécuter la commande `deno outdated` dans votre terminal. Deno va automatiquement vérifier JSR et NPM et vous indiquer les mises à jour disponibles. Vous pouvez ensuite choisir les librairies à mettre à jour.
+
+Il existe aussi [plusieurs options](https://docs.deno.com/runtime/reference/cli/outdated/) avec cette commande.
+
+Vérifiez toujours que votre projet fonctionne correctement après une mise à jour, et que les bonnes versions sont bien écrites dans votre fichier `deno.json`.
+
+### NPM
+
+NPM propose la même chose avec la commande `npm outdated`. Pour mettre à jour les librairies, vous pouvez utiliser `npm update`.
+
+Encore une fois, vérifiez toujours que votre projet fonctionne comme prévu après la mise à jour, et que les bonnes versions sont bien écrites dans votre fichier `package.json`.
+
+## Conclusion
+
+Le SemVer est utile pour comprendre les conséquences possibles d’une mise à jour de librairie. Mais n’oubliez pas que ce n’est qu’une convention. Rien n’oblige quiconque à la suivre.
+
+Tous les projets ne suivent pas SemVer de la même manière. Avant de mettre à jour une dépendance importante, lisez sa politique de versionnage et ses notes de version au lieu de vous fier uniquement aux numéros.
+
+<NoticeEnd lang="fr" />
