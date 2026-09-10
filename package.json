@@ -21,12 +21,17 @@
   },
   "homepage": "https://www.code-like-a-journalist.com/",
   "dependencies": {
-    "@nshiab/journalism": "npm:@jsr/nshiab__journalism@^1.21.9",
-    "@vercel/analytics": "^1.4.1",
-    "next": "^15.1.2",
+    "@nshiab/journalism-format": "npm:@jsr/nshiab__journalism-format@^1.1.10",
+    "@vercel/analytics": "^1.6.1",
+    "next": "^15.5.25",
     "nextra": "^3.3.1",
     "nextra-theme-docs": "^3.3.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "overrides": {
+    "@xmldom/xmldom": "0.9.12",
+    "postcss": "8.5.28",
+    "typescript": "6.0.3"
   }
 }

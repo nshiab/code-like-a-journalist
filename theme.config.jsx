@@ -1,7 +1,7 @@
 // Nice example here: https://github.com/shuding/nextra/blob/v3/examples/swr-site/theme.config.tsx
 import { LocaleSwitch, useConfig } from "nextra-theme-docs";
 import { useRouter } from "nextra/hooks";
-import { formatDate } from "@nshiab/journalism/web";
+import { formatDate } from "@nshiab/journalism-format";
 import { Analytics } from "@vercel/analytics/next";
 
 const TITLE = {
