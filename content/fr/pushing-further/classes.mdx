@@ -14,7 +14,7 @@ Tout comme les fonctions, les classes sont un pilier de la programmation. Elles 
 
 Pour être honnête, les classes sont un peu avancées, et vous n’en créerez probablement pas tout de suite. Mais vous utiliserez très souvent des classes déjà codées (comme `new Date()`), donc il est important d’avoir une idée générale de leur fonctionnement.
 
-Notez que je m’attends à ce que vous ayez complété les leçons précédentes, en particulier celle sur les **[Functions](/pushing-further/functions)**.
+Notez que je m’attends à ce que vous ayez complété les leçons précédentes, en particulier celle sur les **[Fonctions](/pushing-further/functions)**.
 
 Allons-y !
 
@@ -37,7 +37,7 @@ Vous pouvez utiliser cette configuration pour tester le code fourni dans cette l
 
 ## Créer une classe
 
-Pour créer une classe, vous devez la déclarer avec le mot-clé `class`, suivi de son nom et de crochets `{}`. Par convention, les noms de classes commencent par une majuscule.
+Pour créer une classe, vous devez la déclarer avec le mot-clé `class`, suivi de son nom et d’accolades `{}`. Par convention, les noms de classes commencent par une majuscule.
 
 Créons une classe nommée `Person`.
 
@@ -83,11 +83,26 @@ Pour faire cela, vous devez utiliser le `constructor` de la classe. Le construct
 
 On peut donner au `constructor` des paramètres (ici, `name` et `age`). En utilisant le mot-clé `this`, on peut assigner ces paramètres aux propriétés.
 
+```ts showLineNumbers filename="main.ts" {5-8}
+class Person {
+  name: string;
+  age: number;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+}
+
+const john = new Person();
+const emily = new Person();
+```
+
 Il est maintenant possible de passer des arguments lors de l’instanciation de la classe. Nous avons créé une seule classe, mais `john` et `emily` ont maintenant chacun leur propre `name` et `age`. Et bien sûr, tout est typé, donc l’éditeur de code vous aide avec l’autocomplétion et s’assure que vous passez les bons types de données. Magique ! 🪄✨
 
 Vous pouvez accéder aux propriétés d’une instance de classe comme vous le feriez avec des objets, en utilisant un `.`.
 
-```ts showLineNumbers filename="main.ts" {5-8, 14-15} /"john", 30/ /"emily", 35/
+```ts showLineNumbers filename="main.ts" {14-15} /"john", 30/ /"emily", 35/
 class Person {
   name: string;
   age: number;
@@ -115,6 +130,28 @@ Les méthodes s’écrivent comme des fonctions, mais sans le mot-clé `function
 
 Par exemple, créons une méthode appelée `makeOlder`. Chaque fois qu’elle est appelée, elle ajoutera `1` à la propriété `age`.
 
+```ts showLineNumbers filename="main.ts" {10-12}
+class Person {
+  name: string;
+  age: number;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+
+  makeOlder() {
+    this.age = this.age + 1;
+  }
+}
+
+const john = new Person("john", 30);
+const emily = new Person("emily", 35);
+
+console.log(john.name, john.age);
+console.log(emily.name, emily.age);
+```
+
 Pour appeler une méthode, utilisez un `.` juste après une instance ou une variable contenant une instance, puis tapez le nom de la méthode suivi de `()`.
 
 Ci-dessous, nous appelons la méthode `makeOlder` trois fois sur `john`. Nous l’avons instancié avec un `age` de `30`, mais lorsqu’on affiche son `age`, il est maintenant de `33` !
@@ -123,7 +160,7 @@ Et comme toutes les instances sont indépendantes, `emily` a toujours `35` ! B
 
 
 
-```ts showLineNumbers filename="main.ts" {10-12, 18-20}
+```ts showLineNumbers filename="main.ts" {18-20}
 class Person {
   name: string;
   age: number;
@@ -152,7 +189,7 @@ console.log(emily.name, emily.age);
 
 Appeler la méthode `makeOlder` trois fois n’est pas très pratique. Comme les fonctions, les méthodes peuvent avoir des paramètres. Mettons à jour notre code pour passer un nombre d’années à la méthode.
 
-Tout comme les paramètres de fonction, les paramètres de méthode sont typés, ce qui est très pratique et vous aide à éviter les fautes de frappe et les bugs.
+Et tout comme les paramètres de fonction, les paramètres de méthode sont typés, ce qui est très pratique et vous aide à éviter les fautes de frappe et les bugs.
 
 
 ```ts showLineNumbers filename="main.ts" {18} /year: number/ /+ year/

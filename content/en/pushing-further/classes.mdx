@@ -82,12 +82,27 @@ To do that, you need to use the class `constructor`. The constructor looks like 
 
 We can give the `constructor` parameters (here, `name` and `age`). By using the `this` keyword, we can assign the parameters to the properties.
 
+```ts showLineNumbers filename="main.ts" {5-8}
+class Person {
+  name: string;
+  age: number;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+}
+
+const john = new Person();
+const emily = new Person();
+```
+
 It's now possible to pass arguments when we instantiate the class. We created just one class, but `john` and `emily` now each have their own `name` and `age`. And of course, everything is typed, so the code editor will help you out with autocomplete and will make sure you're passing the right data types. Magic! 🪄✨
 
 You can access class instance properties just like you would with objects, using a `.`.
 
 
-```ts showLineNumbers filename="main.ts" {5-8, 14-15} /"john", 30/ /"emily", 35/
+```ts showLineNumbers filename="main.ts" {14-15} /"john", 30/ /"emily", 35/
 class Person {
   name: string;
   age: number;
@@ -115,6 +130,28 @@ Methods are written like functions, but without the `function` keyword. You have
 
 For example, let's create a method called `makeOlder`. Each time it's called, it will add `1` to the `age` property.
 
+```ts showLineNumbers filename="main.ts" {10-12}
+class Person {
+  name: string;
+  age: number;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+
+  makeOlder() {
+    this.age = this.age + 1;
+  }
+}
+
+const john = new Person("john", 30);
+const emily = new Person("emily", 35);
+
+console.log(john.name, john.age);
+console.log(emily.name, emily.age);
+```
+
 To call a method, use `.` right after an instance or a variable storing an instance, then type the name of the method followed by `()`.
 
 Below, we call the `makeOlder` method three times on `john`. We instantiated him with an `age` of `30`, but when we log his `age`, it's now `33`!
@@ -122,7 +159,7 @@ Below, we call the `makeOlder` method three times on `john`. We instantiated him
 And since all instances are independent, `emily` is still `35`! Of course, `emily` also has the `makeOlder` method. Feel free to test it!
 
 
-```ts showLineNumbers filename="main.ts" {10-12, 18-20}
+```ts showLineNumbers filename="main.ts" {18-20}
 class Person {
   name: string;
   age: number;
@@ -151,7 +188,7 @@ console.log(emily.name, emily.age);
 
 Calling the method `makeOlder` three times is not very convenient. Just like functions, methods can have parameters. Let's update our code to pass a number of years to the method.
 
-Just like function parameters, method parameters are typed, which is very convenient and helps you avoid typos and bugs.
+And just like function parameters, method parameters are typed, which is very convenient and helps you avoid typos and bugs.
 
 
 ```ts showLineNumbers filename="main.ts" {18} /year: number/ /+ year/
