@@ -37,6 +37,8 @@ With Deno, writing files is very easy. You can use the `Deno` global object, whi
 
 The method requires a path as the first parameter and a string as the second parameter. In the code below, we want to create a file named `hello.txt` containing `"Hello!"`.
 
+The `./` makes this a relative path: it points to the folder where we run the script, which is the folder we created during setup.
+
 Copy, paste, and save this code in `main.ts`. We’ll talk about the `await` keyword in a minute.
 
 ```ts showLineNumbers filename="main.ts"
@@ -49,13 +51,13 @@ Oh! Something popped up in the terminal. 🧐
 
 Deno is very strict when it comes to security. By default, it doesn’t allow a script to write files on your computer. Imagine running code from an unknown source that writes dangerous files to your system. That would be terrible! 💣
 
-To allow the script to write a file, you need to explicitly grant permission by adding the `--allow-write` flag to the terminal command. Permissions can be scoped: `--allow-write=.` limits writes to the current project folder instead of the entire computer.
+To allow the script to write a file, you need to explicitly grant permission by adding the `--allow-write` flag to the terminal command.
 
 At the beginning of this lesson, we ran the script with: `deno run --watch --check main.ts`
 
 Stop it by clicking in your terminal and pressing `CTRL + C` (this works on both Mac and PC).
 
-Then rerun it with: `deno run --watch --check --allow-write=. main.ts`
+Then rerun it with: `deno run --watch --check --allow-write main.ts`
 
 Now it works! A new text file has been created with text content in it. You now know how to permanently store data on your computer!
 
@@ -80,27 +82,27 @@ By default, Deno doesn’t allow a script to read files on your computer. Again,
 
 ![A screenshot showing VS Code showing a Deno read warning in the terminal.](/assets/pushing-further/files/allow-read.png)
 
-To allow the script to read a file, you need to explicitly grant permission by adding the `--allow-read` flag to the terminal command. We can again limit access to the current project folder.
+To allow the script to read a file, you need to explicitly grant permission by adding the `--allow-read` flag to the terminal command.
 
 Stop running your script by clicking in your terminal and pressing `CTRL + C` (this works on both Mac and PC).
 
-Then rerun it with: `deno run --watch --check --allow-read=. main.ts`
+Then rerun it with: `deno run --watch --check --allow-read main.ts`
 
 Now it works. You’ve successfully retrieved the text content from the `hello.txt` file!
 
 ![A screenshot showing VS Code reading a text file with Deno.](/assets/pushing-further/files/read-working.png)
 
-## Reading and writing in the project folder 👮
+## All permissions granted 👮
 
-While Deno's explicit permissions are a great security feature, typing several flags can become repetitive during development.
+While Deno’s explicit permissions are a great security feature when running unknown code, it’s not very convenient during development.
 
-Since we will read and write files in this lesson, we can grant both permissions and limit them to the current project folder.
+If you trust the code you are running (and all its dependencies!), you can use the flag `-A` to allow the script to do anything it wants.
 
-Click on your terminal, press `CTRL + C` to stop it, and run: `deno run --watch --check --allow-read=. --allow-write=. main.ts`
+Here, it’s fine since we are just running our own code.
 
-Now your script can read and write files inside this project without accessing files elsewhere. We will use these scoped permissions for the rest of this lesson.
+Click on your terminal, press `CTRL + C` to stop it, and run: `deno run --watch --check -A main.ts`
 
-You may see examples elsewhere using `-A`, the short form of `--allow-all`. It disables Deno's permission sandbox entirely, so it is safer to grant only the access your script needs.
+Now your script can write, read, and more! We will use this command for the rest of this lesson, as well as for the upcoming lessons.
 
 ## JSON
 
@@ -132,7 +134,7 @@ await Deno.writeTextFile(
 
 Because it has the `.json` extension, the file is understood by VS Code and Deno. Its content is displayed with the proper data types. In the screenshot above, the names are highlighted as strings and the ages as numbers. If we wrote everything into a `.txt` file, everything would appear as plain text.
 
-Additionally, because it’s a JSON file, you can import it like a `.ts` file by adding the `with { type: "json" }` assertion.
+Additionally, because it’s a JSON file, you can import it like a `.ts` file by adding the `with { type: "json" }` import attribute.
 
 ```ts showLineNumbers filename="main.ts"
 import data from "./data.json" with { type: "json" };
@@ -141,7 +143,7 @@ console.log(data);
 ```
 ![A screenshot showing VS Code reading a JSON file with Deno.](/assets/pushing-further/files/json-read.png)
 
-Because it’s JSON, the type checking works out of the box, which is wonderful.
+And because it’s JSON, the type checking works out of the box, which is wonderful.
 
 If you add a `.` after `data`, VS Code will suggest array methods because it knows the data stored in `data.json` is an array.
 
@@ -154,6 +156,25 @@ If you select the first object of `data` with `[0]` and type a `.` to access a k
 And if you try to access keys that don’t exist in the objects, you’ll get an error. Isn’t that amazing? 😍
 
 ![A screenshot showing VS Code reading a JSON file with Deno.](/assets/pushing-further/files/json-object-error.png)
+
+Sometimes, you can’t or don’t want to use the `import` syntax for a JSON file. Instead, you can read it with `Deno.readTextFile()`. However, this gives you a string: the contents of the file as text.
+
+```ts showLineNumbers filename="main.ts"
+const rawData = await Deno.readTextFile("./data.json");
+console.log(rawData);
+```
+
+![VS Code logging the JSON file contents as raw text.](/assets/pushing-further/files/json-raw-data.png)
+
+To turn that text back into an array or object, use `JSON.parse()`.
+
+```ts showLineNumbers filename="main.ts" {2} /data/3
+const rawData = await Deno.readTextFile("./data.json");
+const data = JSON.parse(rawData);
+console.log(data);
+```
+
+![VS Code logging the array of objects after parsing the JSON text.](/assets/pushing-further/files/json-parsed-data.png)
 
 ## About `await`
 

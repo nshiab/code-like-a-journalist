@@ -37,6 +37,8 @@ Avec Deno, écrire des fichiers est très facile. Vous pouvez utiliser l’objet
 
 Cette méthode nécessite un chemin d'accès comme premier paramètre et du texte comme deuxième paramètre. Dans le code ci-dessous, nous voulons créer un fichier nommé `hello.txt` contenant `"Hello!"`.
 
+Le `./` indique un chemin relatif : il pointe vers le dossier où nous exécutons le script, celui que nous avons créé au début de la leçon.
+
 Copiez, collez et sauvegardez ce code dans `main.ts`. Nous parlerons du mot-clé `await` dans un instant.
 
 ```ts showLineNumbers filename="main.ts"
@@ -49,13 +51,13 @@ Oh ! Quelque chose est apparu dans le terminal. 🧐
 
 Deno est très strict en matière de sécurité. Par défaut, il n'autorise pas un script à écrire des fichiers sur votre ordinateur. Imaginez exécuter du code provenant d'une source inconnue qui écrit des fichiers dangereux sur votre système... Ce serait terrible ! 💣
 
-Pour permettre au script d'écrire un fichier, vous devez explicitement accorder l'autorisation en ajoutant l'option `--allow-write` à la commande du terminal. Les permissions peuvent être limitées : `--allow-write=.` restreint l'écriture au dossier du projet actuel plutôt qu'à tout l'ordinateur.
+Pour permettre au script d'écrire un fichier, vous devez explicitement accorder l'autorisation en ajoutant l'option `--allow-write` à la commande du terminal.
 
 Au début de cette leçon, nous avons exécuté le script avec : `deno run --watch --check main.ts`
 
 Arrêtez-le en cliquant dans votre terminal et en appuyant sur `CTRL + C` (cela fonctionne sur Mac et PC).
 
-Ensuite, relancez-le avec : `deno run --watch --check --allow-write=. main.ts`
+Ensuite, relancez-le avec : `deno run --watch --check --allow-write main.ts`
 
 Et maintenant, ça fonctionne ! Un nouveau fichier texte a été créé avec son contenu. Vous savez désormais comment stocker des données de façon permanente sur votre ordinateur !
 
@@ -80,27 +82,27 @@ Par défaut, Deno n'autorise pas un script à lire des fichiers sur votre ordina
 
 ![Une capture d'écran montrant VS Code affichant un avertissement Deno concernant la lecture dans le terminal.](/assets/pushing-further/files/allow-read.png)
 
-Pour permettre au script de lire un fichier, vous devez explicitement accorder l'autorisation en ajoutant l'option `--allow-read` à la commande du terminal. Nous pouvons encore limiter l'accès au dossier du projet actuel.
+Pour permettre au script de lire un fichier, vous devez explicitement accorder l'autorisation en ajoutant l'option `--allow-read` à la commande du terminal.
 
 Arrêtez votre script en cliquant dans votre terminal et en appuyant sur `CTRL + C` (cela fonctionne sur Mac et PC).
 
-Ensuite, relancez-le avec : `deno run --watch --check --allow-read=. main.ts`
+Ensuite, relancez-le avec : `deno run --watch --check --allow-read main.ts`
 
 Et maintenant, ça fonctionne. Vous avez réussi à récupérer le contenu texte du fichier `hello.txt` !
 
 ![Une capture d'écran montrant VS Code lisant un fichier texte avec Deno.](/assets/pushing-further/files/read-working.png)
 
-## Lire et écrire dans le dossier du projet 👮
+## Permissions accordées 👮
 
-Bien que les permissions explicites de Deno soient une excellente fonctionnalité de sécurité, saisir plusieurs options peut devenir répétitif pendant le développement.
+Bien que les permissions explicites de Deno soient une excellente fonctionnalité de sécurité lors de l'exécution de code inconnu, ce n'est pas très pratique pendant le développement.
 
-Puisque nous allons lire et écrire des fichiers dans cette leçon, nous pouvons accorder les deux permissions en les limitant au dossier du projet actuel.
+Si vous faites confiance au code que vous exécutez (et à toutes ses dépendances !), vous pouvez utiliser l'option `-A` pour permettre au script de faire tout ce qu'il veut.
 
-Cliquez dans votre terminal, appuyez sur `CTRL + C` pour l'arrêter, puis exécutez : `deno run --watch --check --allow-read=. --allow-write=. main.ts`
+Ici, c'est acceptable, car nous exécutons uniquement notre propre code.
 
-Votre script peut maintenant lire et écrire des fichiers dans ce projet sans accéder aux fichiers situés ailleurs. Nous utiliserons ces permissions limitées pour le reste de cette leçon.
+Cliquez dans votre terminal, appuyez sur `CTRL + C` pour l'arrêter, puis exécutez : `deno run --watch --check -A main.ts`
 
-Vous verrez peut-être ailleurs des exemples utilisant `-A`, la forme courte de `--allow-all`. Cette option désactive complètement le bac à sable de Deno. Il est donc plus sûr d'accorder uniquement les accès nécessaires à votre script.
+Votre script peut maintenant écrire, lire et bien plus encore ! Nous allons utiliser cette commande pour le reste de cette leçon, tout comme pour les prochaines leçons.
 
 ## JSON
 
@@ -132,7 +134,7 @@ await Deno.writeTextFile(
 
 Comme le fichier a l'extension `.json`, il est compris par VS Code et Deno. Son contenu est affiché avec les types de données appropriés. Dans la capture d'écran ci-dessus, les noms sont mis en évidence comme du texte et les âges comme des nombres. Si nous avions tout écrit dans un fichier `.txt`, tout apparaîtrait comme du texte brut.
 
-De plus, parce qu'il s'agit d'un fichier JSON, vous pouvez l'importer comme un fichier `.ts` en ajoutant l'assertion `with { type: "json" }`.
+De plus, parce qu'il s'agit d'un fichier JSON, vous pouvez l'importer comme un fichier `.ts` en ajoutant l’attribut d’importation `with { type: "json" }`.
 
 ```ts showLineNumbers filename="main.ts"
 import data from "./data.json" with { type: "json" };
@@ -141,7 +143,7 @@ console.log(data);
 ```
 ![Une capture d'écran montrant VS Code lisant un fichier JSON avec Deno.](/assets/pushing-further/files/json-read.png)
 
-Comme il s'agit de JSON, la vérification des types fonctionne directement, ce qui est formidable.
+Et comme il s'agit de JSON, la vérification des types fonctionne directement, ce qui est formidable.
 
 Si vous ajoutez un `.` après `data`, VS Code suggérera des méthodes pour les listes car il sait que les données stockées dans `data.json` sont une liste.
 
@@ -154,6 +156,25 @@ Si vous sélectionnez le premier objet de `data` avec `[0]` et tapez un `.` pour
 Et si vous essayez d'accéder à des clés qui n'existent pas dans les objets, vous obtiendrez une erreur. N'est-ce pas incroyable ? 😍
 
 ![Une capture d'écran montrant VS Code lisant un fichier JSON avec Deno.](/assets/pushing-further/files/json-object-error.png)
+
+Parfois, vous ne pouvez pas ou ne voulez pas utiliser la syntaxe `import` pour un fichier JSON. Vous pouvez alors le lire avec `Deno.readTextFile()`. Cependant, cette méthode renvoie une chaîne de caractères : le contenu du fichier sous forme de texte.
+
+```ts showLineNumbers filename="main.ts"
+const rawData = await Deno.readTextFile("./data.json");
+console.log(rawData);
+```
+
+![VS Code affichant le contenu du fichier JSON sous forme de texte brut.](/assets/pushing-further/files/json-raw-data.png)
+
+Pour transformer ce texte en tableau ou en objet, utilisez `JSON.parse()`.
+
+```ts showLineNumbers filename="main.ts" {2} /data/3
+const rawData = await Deno.readTextFile("./data.json");
+const data = JSON.parse(rawData);
+console.log(data);
+```
+
+![VS Code affichant le tableau d’objets après la conversion du texte JSON.](/assets/pushing-further/files/json-parsed-data.png)
 
 ## À propos de `await`
 
