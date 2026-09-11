@@ -1,5 +1,5 @@
 ---
-title: Écrire et lire des fichiers avec Deno
+title: Écrire et lire des fichiers avec TypeScript
 description: Apprenez à écrire et lire des fichiers avec Deno, y compris la gestion des données JSON et la compréhension des opérations asynchrones.
 ---
 
@@ -127,7 +127,7 @@ await Deno.writeTextFile(
 );
 ```
 <Callout type="info" emoji="💡">
-    À la ligne 8, nous avons utilisé l'objet global `JSON`, qui est toujours disponible lorsque vous codez, et sa méthode `stringify()`. `writeTextFile` nécessite un `string`, mais `data` est une liste d'objets. Nous utilisons donc **stringify** pour transformer `data` en texte JSON. La méthode complémentaire est `JSON.parse()`, qui rend leur forme originale à des listes, objets et valeurs qui ont été transofrmé en texte JSON.
+    À la ligne 8, nous avons utilisé l'objet global `JSON`, qui est toujours disponible lorsque vous codez, et sa méthode `stringify()`. `writeTextFile` nécessite un `string`, mais `data` est une liste d'objets. Nous utilisons donc **stringify** pour transformer `data` en texte JSON. La méthode complémentaire est `JSON.parse()`, qui rend leur forme originale à des listes, objets et valeurs qui ont été transformés en texte JSON.
 </Callout>
 
 ![Une capture d'écran montrant VS Code écrivant un fichier JSON avec Deno.](/assets/pushing-further/files/json-write.png)
@@ -192,7 +192,7 @@ Cette fonctionnalité est également formidable pour le développement web. Par 
 
 Dans notre contexte, il est plus simple d'ajouter le mot-clé `await` pour que l'ordinateur traite le code dans l'ordre affiché.
 
-Pour identifier une fonction ou une méthode asynchrone, survolez-la. Les fonctions asynchrones retourne une promesse (`Promise`). Pas d'inquiétude: la vérification des types vous alertera si `await` est requis quelque part.
+Pour identifier une fonction ou une méthode asynchrone, survolez-la. Les fonctions asynchrones retournent une promesse (`Promise`). Pas d'inquiétude: la vérification des types vous alertera si `await` est requis quelque part.
 
 ![Une capture d'écran montrant VS Code.](/assets/pushing-further/files/promise.png)
 

@@ -29,7 +29,7 @@ const data = await response.json();
 console.log(data);
 ```
 
-Maintenant, pour exécuter et surveiller ce fichier, nous utilisions auparavant la commande `deno run --watch --check --allow-net=raw.githubusercontent.com main.ts`, mais c'est un peu fastidieux à taper, et retenir toutes ces options est fatigant. Plus vos projets deviennent complexes, plus ces commandes de terminal peuvent s'allonger.
+Maintenant, pour exécuter et surveiller ce fichier, nous utilisions auparavant la commande `deno run --watch --check --allow-net main.ts`, mais c'est un peu fastidieux à taper, et retenir toutes ces options est fatigant. Plus vos projets deviennent complexes, plus ces commandes de terminal peuvent s'allonger.
 
 Alors, créons une tâche `main` à la place.
 
@@ -38,16 +38,14 @@ Ouvrez votre fichier `deno.json` et ajoutez ceci. N'oubliez pas de sauvegarder !
 ```json showLineNumbers filename="deno.json"
 {
   "tasks": {
-    "main": "deno run --watch --check --allow-net=raw.githubusercontent.com main.ts"
+    "main": "deno run --watch --check --allow-net main.ts"
   }
 }
 ```
 
 Maintenant, vous pouvez exécuter la commande `deno task main`. Deno va chercher dans votre `deno.json` une tâche nommée `main` et exécuter la commande correspondante.
 
-La tâche enregistre la permission réseau exacte du script. Vous n'avez donc pas besoin de vous en souvenir et le script ne peut toujours pas contacter d'autres hôtes. Exécutez `deno task` sans nom pour afficher les tâches disponibles.
-
-C'est bien plus simple à taper ! Et si vous souhaitez ajouter d'autres options ou mettre à jour la tâche, vous pourrez toujours l'exécuter avec `deno task main`.
+C'est bien plus simple à taper ! Si vous souhaitez ajouter d’autres permissions, comme lire ou écrire des fichiers, il suffit de modifier la commande dans `deno.json`. Vous exécuterez toujours la tâche avec la même commande : `deno task main`.
 
 ![Une capture d'écran montrant VS Code exécutant une tâche Deno.](/assets/pushing-further/tasks/task.png)
 
@@ -55,6 +53,10 @@ C'est bien plus simple à taper ! Et si vous souhaitez ajouter d'autres option
     Vous pouvez avoir autant de tâches que vous le souhaitez et les nommer comme bon vous semble. Avec d'autres *runtimes* populaires, comme **Node.js** ou **Bun**, les `tasks` sont appelés `scripts` et sont stockés dans `package.json` au lieu de `deno.json`. Mais Deno est compatible avec eux et les détectera quand même.
 </Callout>
 
-Vous savez maintenant comment travailler avec TypeScript dans des projets complets. Nous allons ensuite mettre ces compétences en pratique pour acquérir, analyser et visualiser des données avec SDA. 🥳
+## Conclusion
+
+Les tâches sont utiles dans toutes sortes de projets, que ce soit pour exécuter un script, extraire des données du Web, analyser des données ou créer et publier un site web. Elles rendent ces commandes faciles à lancer, et nous les utiliserons dans les prochaines leçons et les prochains projets.
+
+Félicitations, vous avez atteint la fin du chapitre 2 ! Lisez la [conclusion du chapitre](/pushing-further/conclusion) pour découvrir des idées de projets et d’autres façons de mettre en pratique tout ce que vous avez appris dans ce chapitre. 🥳
 
 <NoticeEnd lang="fr"/>

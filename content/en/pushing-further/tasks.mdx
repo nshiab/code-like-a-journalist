@@ -29,7 +29,7 @@ const data = await response.json();
 console.log(data);
 ```
 
-Now, to run and watch this file, we previously used `deno run --watch --check --allow-net=raw.githubusercontent.com main.ts`, but it's a bit annoying to write, and remembering all these options is tiring. The more complex your projects get, the longer these terminal commands can become.
+Now, to run and watch this file, we previously used `deno run --watch --check --allow-net main.ts`, but it's a bit annoying to write, and remembering all these options is tiring. The more complex your projects get, the longer these terminal commands can become.
 
 So, let's create a `main` task instead.
 
@@ -38,16 +38,14 @@ Open your `deno.json` and add this. Don't forget to save! 🙃
 ```json showLineNumbers filename="deno.json"
 {
   "tasks": {
-    "main": "deno run --watch --check --allow-net=raw.githubusercontent.com main.ts"
+    "main": "deno run --watch --check --allow-net main.ts"
   }
 }
 ```
 
 Now, you can run `deno task main`. Deno will look inside your `deno.json` to find a task named `main` and execute the relevant command.
 
-The task records the script's exact network permission, so you don't have to remember it and the script still cannot contact other hosts. Run `deno task` without a task name whenever you want to list the available tasks.
-
-This is much easier to type! And if you want to add more options or update the task, you’ll still be able to run it with `deno task main`.
+This is much easier to type! Also, if you want to add more permissions, such as reading or writing files, just update the command in `deno.json`. You’ll still run the task with the same command: `deno task main`.
 
 ![A screenshot showing VS Code running a Deno task.](/assets/pushing-further/tasks/task.png)
 
@@ -55,6 +53,10 @@ This is much easier to type! And if you want to add more options or update the t
     You can have as many tasks as you want, and you can name them however you like. In other popular runtimes, like **Node.js** or **Bun**, `tasks` are called `scripts` and are stored in `package.json` instead of `deno.json`. But Deno is compatible with them and will find them anyway.
 </Callout>
 
-You now know how to work with TypeScript in complete projects. Next, we'll put these skills to work by acquiring, analyzing, and visualizing data with SDA. 🥳
+## Conclusion
+
+Tasks are useful in all kinds of projects, whether you’re running a script, scraping the web, analyzing data, or building and publishing a website. They make these commands convenient to run, and we’ll use them throughout the upcoming lessons and projects.
+
+Congratulations, you’ve reached the end of Chapter 2! Read the [chapter conclusion](/pushing-further/conclusion) for project ideas and other ways to put everything you’ve learned in this chapter into practice. 🥳
 
 <NoticeEnd />

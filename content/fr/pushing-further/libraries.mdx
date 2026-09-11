@@ -1,20 +1,20 @@
 ---
-title: Utiliser des bibliothèques avec Deno
+title: Utiliser des bibliothèques TypeScript
 description: Apprenez à installer et utiliser des bibliothèques TypeScript publiées sur NPM et JSR avec Deno.
 ---
 
 import { Callout } from 'nextra/components'
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
-# Utiliser des bibliothèques avec Deno
+# Utiliser des bibliothèques
 
 Des millions de personnes à travers le monde travaillent avec JavaScript et TypeScript. L'une des raisons de leur popularité est l'immense écosystème de bibliothèques. De nombreux développeurs partagent leur code publiquement, ce qui permet à tout le monde de l'utiliser gratuitement.
 
 Dans les prochaines leçons, nous utiliserons des bibliothèques en code ouvert pour analyser d'énormes ensembles de données et créer de superbes visualisations.
 
-<NoticeIntro lang="fr"/>
-
 Une note sur le vocabulaire : les *bibliothèques* sont aussi souvent appelées *libraries*, *packages* ou *modules*.
+
+<NoticeIntro lang="fr"/>
 
 Préparons maintenant notre environnement de travail avant de plonger dans cette leçon.
 
@@ -57,7 +57,7 @@ Cette page fournit de nombreuses informations utiles :
 - Dans la section principale, on voit une courte description et des liens vers la documentation, des exemples, et plus encore.
 - Sur la droite, il y a un lien vers la page GitHub et le site officiel de la bibliothèque.
 - On peut voir le nombre de téléchargements hebdomadaires, indiquant la popularité de la bibliothèque.
-- La liste des contributeurs inclut **Mike Bostock** et **Philippe Rivière**, deux experts bien connus en visualisation de données.
+- La liste des responsables inclut **Mike Bostock** et **Philippe Rivière**, deux experts bien connus en visualisation de données.
 
 Ces détails (ainsi que ceux sur la page GitHub) nous aident à déterminer si une bibliothèque est fiable. Soyez toujours prudent avant d'exécuter du code inconnu ! 🦠
 
@@ -128,7 +128,7 @@ Recherchons une bibliothèque pour convertir notre fichier CSV. Rendez-vous sur 
 
 ![Une capture d'écran montrant les résultats de JSR.](/assets/pushing-further/libraries/jsr-csv.png)
 
-Parmi les résultats, vous verrez une bibliothèque commençant par `@std`. Cela signifie qu’elle fait partie de la **bibliothèque standard** et qu’elle est maintenue par l’équipe de Deno, ce qui garantit des bibliothèques de haute qualité et bien testées pour des cas d’usage courants.
+Parmi les résultats, vous verrez une bibliothèque commençant par `@std`. Cela signifie qu’elle fait partie de la **bibliothèque standard** et qu’elle est maintenue par l’équipe de Deno, qui fournit des bibliothèques de haute qualité et bien testées pour des cas d’usage courants.
 
 Utilisons-la ! [Cliquez ici](https://jsr.io/@std/csv).
 
