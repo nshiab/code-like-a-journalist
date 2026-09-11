@@ -1,12 +1,12 @@
 ---
-title: Comment analyser des données tabulaires avec la librairie simple-data-analysis
+title: Analyse de données avec la librairie Simple Data Analysis
 description: Dans cette leçon, nous apprenons à utiliser SDA en traitant des données historiques de température.
 ---
 
 import { Callout } from 'nextra/components'
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
-# La librairie Simple Data Analysis
+# Analyse de données avec la librairie Simple Data Analysis
 
 Dans cette leçon, nous allons apprendre à utiliser la librairie en code ouvert que j'ai créée : [simple-data-analysis](https://github.com/nshiab/simple-data-analysis). Nous analyserons des données historiques de température moyenne quotidienne dans trois villes canadiennes à titre d'exemple. Notre objectif sera de répondre à cette question :
 
@@ -16,66 +16,88 @@ Pour ce faire, nous calculerons la température moyenne par période de 30 ans e
 
 Si vous avez une minute, ajoutez un ⭐ à la [page GitHub](https://github.com/nshiab/simple-data-analysis) de la librairie. C'est toujours agréable de savoir que son travail en code ouvert est apprécié. 😊
 
-Notez que je m'attends à ce que vous ayez au moins complété les sections **Premiers pas 🧑‍🎓** et **Aller plus loin 🚀**.
+Avant de commencer cette leçon, assurez-vous d’avoir terminé le **chapitre 1 : Fondamentaux de TypeScript** et le **chapitre 2 : Travailler avec TypeScript**.
 
 
 <NoticeIntro lang="fr" />
 
 ## Installation
 
-La librairie est publiée sur [JSR](https://jsr.io/@nshiab/simple-data-analysis), et vous pouvez l'installer en exécutant `deno add jsr:@nshiab/simple-data-analysis`.
+La librairie est publiée sur [JSR](https://jsr.io/@nshiab/simple-data-analysis) et [NPM](https://www.npmjs.com/package/@nshiab/simple-data-analysis), et vous pouvez l'installer en exécutant `deno add jsr:@nshiab/simple-data-analysis`.
 
 Mais il y a une meilleure façon. 😏
 
-Créez un nouveau dossier sur votre ordinateur et exécutez plutôt cette commande : `deno run -A jsr:@nshiab/setup-data-project`
+Créez un nouveau dossier sur votre ordinateur et exécutez plutôt cette commande : `deno -A jsr:@nshiab/setup-data-project`
 
-Cela indique à Deno d'exécuter l'outil [setup-data-project](https://jsr.io/@nshiab/setup-data-project), que j'ai créé pour installer et configurer facilement tout ce dont vous avez besoin pour démarrer une nouvelle analyse de données. Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`, puis appuyez sur `Entrée`.
+Cela indique à Deno d'exécuter l'outil [setup-data-project](https://github.com/nshiab/setup-data-project), que j'ai créé pour installer et configurer facilement tout ce dont vous avez besoin pour démarrer une nouvelle analyse de données. Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`.
 
-Après avoir exécuté la commande, votre terminal affichera une description des fichiers créés et des librairies installées.
+![Capture d'écran montrant simple-data-analysis sélectionnée dans setup-data-project.](/assets/simple-data-analysis/tabular-data/setup.png)
 
-![Capture d'écran montrant VS Code après l'exécution de setup-data-project.](/assets/simple-data-analysis/tabular-data/setup.png)
+Après avoir sélectionné `simple-data-analysis` avec la barre d’espace, appuyez sur `Entrée`.
 
-### Fichiers créés
+L’outil de configuration téléchargera, installera et créera tout ce dont nous avons besoin dans ce dossier pour le reste de la leçon.
 
-- `deno.json` : Si vous l'ouvrez, vous verrez les tâches `sda`, `all-tests` et `clean`, ainsi que les librairies installées. Nous utiliserons `sda` pour surveiller, vérifier et exécuter `sda/main.ts`.
-- `.gitignore` : Un fichier important lors de l'utilisation de `git` pour sauvegarder notre code. Ne vous en souciez pas pour l’instant ; il y aura une leçon complète à ce sujet.
-- `.env` : Un fichier pour les variables d'environnement, comme les clés API. Il est ignoré par Git.
-- `sda/main.ts` : Le fichier principal de notre script. C'est ici que nous écrirons notre code.
-- `sda/helpers` : Un dossier vide pour le moment, mais vous pourrez l’utiliser pour vos fonctions.
-- `sda/data` : Un dossier vide pour le moment, mais c’est ici que nous stockerons nos données pour l’analyse.
-- `sda/output` : Un dossier vide pour le moment. C'est ici que nous écrirons nos résultats dans des fichiers.
-- `sda/tests` : Un dossier vide dans lequel vous pouvez mettre des tests.
-- `docs` : La documentation des librairies sélectionnées pendant la configuration.
-- `README.md` : Un fichier texte contenant quelques informations sur le projet, que vous pouvez modifier comme bon vous semble.
-- `AGENTS.md` : Des instructions qui aident les agents de code à travailler avec le projet et les librairies installées.
+![VS Code montrant la configuration terminée et les fichiers créés par setup-data-project.](/assets/simple-data-analysis/tabular-data/setup-complete.png)
 
-### Librairies installées
+L’outil de configuration a créé plusieurs dossiers et fichiers. Le dossier le plus important est `sda`. Vous y trouverez :
 
-- [`simple-data-analysis`](https://github.com/nshiab/simple-data-analysis) : La librairie que nous utiliserons pour traiter les données.
-- [`@observablehq/plot`](https://github.com/observablehq/plot) : Une librairie créée par Mike Bostock (créateur de d3.js) que nous utiliserons pour créer des graphiques et des cartes. Elle est installée automatiquement avec SDA.
+- `main.ts` : Notre script principal. C’est ici que nous écrirons notre code.
+- `helpers` : Un dossier pour nos fonctions.
+- `data` : Un dossier pour les données que nous analyserons.
+- `output` : Un dossier pour nos résultats.
 
-Maintenant que vous savez ce qu’il y a dans votre dossier, passons au travail. Exécutez la tâche suggérée pour exécuter et surveiller notre code : `deno task sda`
+Le dossier `docs` et le fichier `AGENTS.md` sont destinés aux agents d’IA. Ils leur fournissent des instructions pour utiliser la librairie SDA et organiser votre code.
+
+Il y a aussi d’autres fichiers, comme `.env` et `.gitignore`, ainsi que le dossier `sda/tests`. Ne vous en préoccupez pas pour l’instant ; nous les utiliserons plus tard.
+
+Et, bien sûr, il y a `deno.json`. Sa section `tasks` contient la tâche `sda`, qui exécute notre script principal. Sa section `imports` montre que [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) est installée, ainsi qu’[Observable Plot](https://github.com/observablehq/plot), une librairie que nous utiliserons pour les visualisations de données.
+
+![VS Code montrant la tâche sda et les librairies installées dans deno.json.](/assets/simple-data-analysis/tabular-data/deno-json.png)
+
+Maintenant que vous savez ce qu’il y a dans votre dossier, passons au travail. Exécutez la tâche suggérée : `deno task sda`. Elle exécutera `./sda/main.ts` et le surveillera. Chaque fois que vous enregistrerez votre code, il sera réexécuté automatiquement.
 
 ## Création d'une table
 
 Laissez-moi vous expliquer le code actuel dans `./sda/main.ts`.
 
-Lorsque vous utilisez SDA, vous créez une **base de données en mémoire**. C'est ce qui se passe à la ligne 3 avec `const sdb = new SimpleDB()`. Une fois nos calculs terminés, nous fermons la base de données à la ligne 7 avec `await sdb.close()`. La fermeture exécute aussi les transformations encore en attente et nettoie les fichiers temporaires et les fichiers de cache.
+Lorsque vous utilisez SDA, vous créez une **base de données en mémoire**. C'est ce qui se passe à la ligne 3 avec `const sdb = new SimpleDB()`. Une fois nos calculs terminés, nous fermons la base de données à la ligne 10 avec `await sdb.close()`.
 
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="main.ts" {3, 10}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
+const table = sdb.newTable();
 
-// Do your magic here!
+await table
+  .loadArray([{ message: "Hello simple-data-analysis!" }])
+  .log();
 
 await sdb.close();
 ```
 
 Comme dans une base de données classique, avec SimpleDB, les données sont stockées dans des **tables**. Si vous êtes plus familier avec Excel ou Google Sheets, les tables peuvent être comprises comme des onglets.
 
-Créons-en une pour stocker les températures quotidiennes.
+Le code de départ crée une table à la ligne 4, charge un tableau contenant un message d’exemple avec `.loadArray()` et l’affiche avec `.log()`.
+
+```ts showLineNumbers filename="main.ts" {4, 6-8}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+const table = sdb.newTable();
+
+await table
+  .loadArray([{ message: "Hello simple-data-analysis!" }])
+  .log();
+
+await sdb.close();
+```
+
+C’est pourquoi la commande `deno task sda` affiche dans le terminal une table nommée `table1`, avec une colonne `message` et une seule cellule contenant `Hello simple-data-analysis!`.
+
+![VS Code montrant le code de départ et sa table contenant un seul message dans le terminal.](/assets/simple-data-analysis/tabular-data/starter-table.png)
+
+Remplaçons cet exemple par une table pour les températures quotidiennes. Mettez à jour `./sda/main.ts` avec le code ci-dessous.
 
 Pour créer une table, vous pouvez utiliser la méthode `.newTable()`. Vous pouvez lui donner un nom (bien que ce soit optionnel) et stocker la table dans une variable. En général, je nomme la variable et la table de la même façon.
 
@@ -92,8 +114,6 @@ await sdb.close();
 
 Maintenant que nous avons une table, nous pouvons utiliser les méthodes de la table ! Sur une nouvelle ligne, tapez la variable `temperatures` (qui fait maintenant référence à la table) et ajoutez un `.` immédiatement après pour voir toutes les méthodes disponibles. Vous pouvez utiliser les flèches haut et bas de votre clavier pour consulter leur documentation et leurs exemples. Il y en a beaucoup !
 
-Toutes les méthodes documentées avec des exemples sont également [disponibles sur JSR](https://jsr.io/@nshiab/simple-data-analysis/doc).
-
 Dans la capture d’écran ci-dessous, je me suis arrêté sur `loadData`, qui est la méthode que nous allons utiliser dans un instant.
 
 ![Capture d’écran montrant la documentation de VS Code pour loadData.](/assets/simple-data-analysis/tabular-data/load-data-doc.png)
@@ -106,21 +126,14 @@ Utilisons la méthode `loadData` pour le récupérer. Notez que cette méthode p
 
 Ce serait intéressant de voir les données une fois chargées. Nous pouvons le faire en appelant la méthode `log`.
 
-SDA 6 distingue deux types de méthodes :
-
-- Les **transformations et chargeurs** comme `loadData()`, `join()`, `filter()` et `summarize()` sont synchrones. Ils placent du travail dans une file d'attente et renvoient immédiatement la table, ce qui permet de les chaîner avec `.`.
-- Les **observateurs et opérations externes** comme `log()`, `getData()`, `writeData()`, `writeChart()` et `writeMap()` sont asynchrones. Lorsque vous en appelez un avec `await`, SDA exécute d'abord le travail en attente dans l'ordre du programme, puis produit le résultat.
-
-La même règle vaut pour les transformations d'IA : `aiRowByRow()` met les requêtes en attente, puis un observateur les exécute. Pour exécuter un pipeline qui se termine par des transformations sans encore fermer la base de données, utilisez `await table.run()` ou `await sdb.run()`. À la fin du script, `await sdb.close()` exécute tout travail encore en attente, enregistre les métadonnées nécessaires et nettoie les ressources de la base de données.
-
-
-```ts showLineNumbers filename="main.ts" {7-9, 11}
+```ts showLineNumbers filename="main.ts" {7-11}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
 
-const temperatures = await sdb
-  .newTable("temperatures")
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures
   .loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
   )
@@ -129,7 +142,13 @@ const temperatures = await sdb
 await sdb.close();
 ```
 
-Et voici le résultat ! Nous pouvons voir que les données du fichier CSV ont été intégrées dans la table `temperature`, qui contient désormais trois colonnes et 131 192 lignes.
+<Callout type="info" emoji="💡">
+    SDA possède deux types de méthodes. Les **méthodes synchrones**, comme `loadData()`, ajoutent des instructions à une liste d’étapes à exécuter. Vous pouvez les enchaîner avec `.` pour construire votre analyse. Les **méthodes asynchrones**, comme `log()`, exécutent les étapes précédentes avant d’afficher, d’écrire ou d’envoyer les résultats.
+
+    C’est l’un des avantages de SDA : vous pouvez écrire vos étapes de traitement dans l’ordre, ce qui rend le code facile à écrire et à suivre. Plus loin dans cette leçon, nous enchaînerons plusieurs étapes pour voir à quel point cela peut être pratique.
+</Callout>
+
+Et voici le résultat ! Nous pouvons voir que les données du fichier CSV ont été intégrées dans la table `temperatures`, qui contient désormais trois colonnes et 131 192 lignes.
 
 ![Capture d’écran montrant les données de température enregistrées dans le terminal.](/assets/simple-data-analysis/tabular-data/data-loaded.png)
 
@@ -140,61 +159,70 @@ Ce serait mieux de remplacer les identifiants (`id`) par les noms des villes. Le
 Allons le récupérer aussi.
 
 
-```ts showLineNumbers filename="main.ts" {11-15}
+```ts showLineNumbers filename="main.ts" {13, 15-19}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
 
 const temperatures = sdb.newTable("temperatures");
-temperatures.loadData(
-  "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-);
-await temperatures.log();
+
+await temperatures
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+  )
+  .log();
 
 const cities = sdb.newTable("cities");
-cities.loadData(
-  "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-);
-await cities.log();
+
+await cities
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+  )
+  .log();
 
 await sdb.close();
 ```
+
+La capture d’écran ci-dessous montre seulement la table `cities`, car il n’y a pas assez de place pour tout afficher. Dans votre terminal, le script devrait afficher d’abord la table `temperatures`, puis la table `cities`.
 
 ![Capture d’écran montrant les noms des villes dans le terminal.](/assets/simple-data-analysis/tabular-data/cities-loaded.png)
 
-Maintenant, nous voulons intégrer les noms des villes dans la table `temperature`. Pour cela, nous pouvons utiliser la méthode `.join()`.
+Maintenant, nous voulons intégrer les noms des villes dans la table `temperatures`. Pour cela, nous pouvons utiliser la méthode `.join()`.
 
 Par défaut, cette méthode recherche une colonne commune dans deux tables et associe les lignes en fonction des valeurs de cette colonne.
 
-Ainsi, lorsque nous écrivons `temperature.join(cities)`, nous demandons à SDA de trouver une colonne commune (qui est `id`) dans `temperature` et `cities`, puis d'ajouter les valeurs de `cities` correspondant au même `id` aux lignes correspondantes dans `temperature`.
-
-Notez que j’ai mis en commentaire les appels précédents à `log` aux lignes 9 et 15 pour éviter de surcharger le terminal.
+Ainsi, lorsque nous écrivons `temperatures.join(cities)`, nous demandons à SDA de trouver une colonne commune (qui est `id`) dans `temperatures` et `cities`, puis d'ajouter les valeurs de `cities` correspondant au même `id` aux lignes correspondantes dans `temperatures`.
 
 
-```ts showLineNumbers filename="main.ts" {17-18}
+```ts showLineNumbers filename="main.ts" {21-23}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
 
 const temperatures = sdb.newTable("temperatures");
-temperatures.loadData(
-  "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-);
-// await temperatures.log();
+
+await temperatures
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+  )
+  .log();
 
 const cities = sdb.newTable("cities");
-cities.loadData(
-  "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-);
-// await cities.log();
 
-temperatures.join(cities);
-await temperatures.log();
+await cities
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+  )
+  .log();
+
+await temperatures
+  .join(cities)
+  .log();
 
 await sdb.close();
 ```
 
-Et maintenant, nous avons les noms des villes dans la table `temperature` !
+Et maintenant, nous avons les noms des villes dans la table `temperatures` !
 
 ![Capture d’écran montrant les noms des villes dans la table temperature.](/assets/simple-data-analysis/tabular-data/join.png)
 
@@ -202,57 +230,63 @@ Et maintenant, nous avons les noms des villes dans la table `temperature` !
 
 Actuellement, à chaque fois que nous enregistrons `main.ts`, les deux fichiers CSV sont téléchargés à nouveau à partir de GitHub. Cela est lent et inutile puisque les données ne changent pas.
 
-Mettons tout ce que nous avons fait jusqu’à présent en cache avec la méthode `.cache()`.
+Réutilisons les données que nous avons déjà téléchargées grâce à la méthode `.cache()`.
 
-Passez à `.cache()` une fonction qui reçoit la table mise en cache. Dans cette fonction, placez les transformations en attente sur ce paramètre. La première fois, SDA exécute le travail et conserve le résultat dans `.sda-cache`. Les exécutions suivantes le réutilisent jusqu'à ce que la fonction, les opérations précédentes de la table ou une autre table lue par la fonction change. Les autres valeurs qui influencent le résultat peuvent être indiquées avec l'option `inputs`.
+Nous pouvons passer une fonction à la méthode `.cache()`. La première fois qu’elle s’exécute, SDA effectue toutes les étapes qu’elle contient, y compris le téléchargement des données et les calculs, puis enregistre le résultat dans le dossier `.sda-cache`, qui est créé s’il n’existe pas déjà.
 
-Ici, j’ai défini l’option `cacheVerbose` à `true` lors de l’instanciation de `SimpleDB` afin d'afficher les informations liées au cache dans le terminal.
+Si nous relançons le script sans modifier la fonction, SDA réutilise le résultat enregistré au lieu de télécharger les données et de refaire les calculs.
+
+Ici, nous mettons en cache le téléchargement des données depuis GitHub pour `temperatures` et `cities`. Nous définissons aussi l’option `cacheVerbose` à `true` pour afficher davantage d’informations sur le cache dans le terminal.
 
 
-```ts showLineNumbers filename="main.ts" {7, 20} /{ cacheVerbose: true }/
+```ts showLineNumbers filename="main.ts" {7-12, 16-21} /{ cacheVerbose: true }/
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
 const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
+
+await temperatures.cache(() => {
+  temperatures
     .loadData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-    )
-    .join(cities);
+    );
 });
 
-await temperatures.log();
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .log();
 
 await sdb.close();
 ```
 
 Voici le résultat lors de la première exécution.
 
-Comme indiqué dans le terminal, SDA n’a rien trouvé en cache pour le code entre les lignes 8 et 19, donc il a tout exécuté. Cela a pris 1 sec, 441 ms avec ma connexion Internet et mon ordinateur. Le dossier `.sda-cache` a été créé, et les données y sont maintenant mises en cache.
+Comme indiqué dans le terminal, SDA n’a rien trouvé en cache pour le code dans les deux fonctions passées à `.cache()`, donc il a tout exécuté. Cela a pris 1 sec, 298 ms avec ma connexion Internet et mon ordinateur. Le dossier `.sda-cache` a été créé, et les données y sont maintenant mises en cache.
 
 ![Capture d’écran montrant les données mises en cache.](/assets/simple-data-analysis/tabular-data/nothing-in-cache.png)
 
 Quand j’enregistre `main.ts` à nouveau (`CMD` + `S` sur Mac et `CTRL` + `S` sur PC), le comportement change.
 
-SDA vérifie si le code entre les lignes 8 et 19 a été modifié. Comme il est exactement le même, SDA charge simplement les résultats de l’exécution précédente stockés dans `.sda-cache`.
+SDA vérifie si le code dans les deux fonctions passées à `.cache()` a été modifié. Comme il est exactement le même, SDA charge simplement les résultats de l’exécution précédente stockés dans `.sda-cache`.
 
-Au lieu de 1 sec, 441 ms, l’exécution du script n’a pris que... 32 ms ! C'est 45 fois plus rapide ! 😱
+Au lieu de 1 sec, 298 ms, l’exécution du script n’a pris que... 19 ms ! C'est environ 68 fois plus rapide ! 😱
 
 Ici, la majeure partie du temps gagné provient de la récupération des données qui se fait par le Web. Mais comme nous le verrons dans d’autres leçons, vous pouvez également mettre en cache les résultats de calculs lourds qui prennent du temps à s’exécuter, ce qui peut améliorer considérablement votre productivité.
 
 ![Capture d’écran montrant les données récupérées depuis le cache.](/assets/simple-data-analysis/tabular-data/in-cache.png)
 
 <Callout type="info" emoji="💡">
-    Appelez toujours `await sdb.close()` à la fin du script. Cette méthode exécute le travail restant, libère la base de données et supprime les données en cache inutilisées. Pour vider complètement le cache, exécutez `deno task clean`.
+    Appelez toujours `await sdb.close()` à la fin du script. Cette méthode supprime les données en cache inutilisées ; sinon, le dossier `.sda-cache` pourrait grossir indéfiniment. Pour vider le cache manuellement, supprimez le dossier `.sda-cache` ou exécutez `deno task clean`.
 </Callout>
 
 ## Explorer les données
@@ -647,7 +681,7 @@ await sdb.close();
 
 ### Visualisation avec Plot
 
-Les visualisations dans le terminal sont assez limitées. Si vous voulez créer des graphiques plus élaborés, vous pouvez utiliser [Observable Plot](https://github.com/observablehq/plot), qui a été installé lors de la configuration avec [setup-data-project](https://jsr.io/@nshiab/setup-data-project).
+Les visualisations dans le terminal sont assez limitées. Si vous voulez créer des graphiques plus élaborés, vous pouvez utiliser [Observable Plot](https://github.com/observablehq/plot), qui a été installé lors de la configuration avec [setup-data-project](https://github.com/nshiab/setup-data-project).
 
 Nous ferons une leçon complète sur Plot plus tard. Cela peut sembler compliqué pour l’instant, mais une fois que vous aurez assimilé les bases, vous verrez que c'est une librairie de visualisation de données exceptionnelle.
 
