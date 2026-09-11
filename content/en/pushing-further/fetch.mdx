@@ -56,15 +56,13 @@ By default, Deno blocks any script from connecting to the web, which is a great 
 
 ![A screenshot showing Deno warning about a network connection.](/assets/pushing-further/fetch/allow-net.png)
 
-To allow your code to connect to the internet, you need to pass the `--allow-net` flag in the terminal command. You can limit it to the host you need with `--allow-net=raw.githubusercontent.com`.
+To allow your code to connect to the internet, you need to pass the `--allow-net` flag in the terminal command.
 
-So instead of running your script with `deno run --watch --check main.ts` as instructed at the beginning of this lesson, use `deno run --watch --check --allow-net=raw.githubusercontent.com main.ts`.
+So instead of running your script with `deno run --watch --check main.ts` as instructed at the beginning of this lesson, use `deno run --watch --check --allow-net main.ts`.
 
-Since we'll also write data to our project folder later, grant that specific access too.
+Since we'll also write data to a file later, let's allow writing too.
 
-Click on your terminal and press `CTRL + C` to stop the script from running (this works on both Mac and PC). Then run: `deno run --watch --check --allow-net=raw.githubusercontent.com --allow-write=. main.ts`
-
-Unlike `-A` (`--allow-all`), these scoped flags keep the rest of Deno's permission sandbox in place.
+Click on your terminal and press `CTRL + C` to stop the script from running (this works on both Mac and PC). Then run: `deno run --watch --check --allow-net --allow-write main.ts`
 
 Now it works!
 
@@ -74,7 +72,7 @@ Wow... There is a lot of stuff in this response, and that’s normal. Your compu
 
 In our case, we know it’s a JSON file, so we can call the `.json()` asynchronous method to parse the response data as JSON.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="main.ts" {5}
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
 );
@@ -90,7 +88,7 @@ Here we go! We’ve fetched the data, and now we can work with it!
 
 Instead of fetching it every time, we could write the data to a file for future use.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="main.ts" {7}
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
 );
