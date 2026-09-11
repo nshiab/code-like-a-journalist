@@ -10,11 +10,11 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 Des millions de personnes à travers le monde travaillent avec JavaScript et TypeScript. L'une des raisons de leur popularité est l'immense écosystème de bibliothèques. De nombreux développeurs partagent leur code publiquement, ce qui permet à tout le monde de l'utiliser gratuitement.
 
-Dans les prochaines leçons, nous utiliserons des bibliothèques en code ouvert pour analyser d'énormes ensembles de données et créer de superbes visualisations interactives.
+Dans les prochaines leçons, nous utiliserons des bibliothèques en code ouvert pour analyser d'énormes ensembles de données et créer de superbes visualisations.
 
 <NoticeIntro lang="fr"/>
 
-D'abord, un peu de vocabulaire : les *bibliothèques* sont aussi souvent appelées *libraries*, *packages* ou *modules*.
+Une note sur le vocabulaire : les *bibliothèques* sont aussi souvent appelées *libraries*, *packages* ou *modules*.
 
 Préparons maintenant notre environnement de travail avant de plonger dans cette leçon.
 
@@ -65,7 +65,7 @@ Installer `d3` dans un projet Deno est très simple. Cliquez sur votre terminal,
 
 Si vous ouvrez votre `deno.json`, vous verrez quelque chose de nouveau : **imports** ! Ces imports indiquent à Deno quelles bibliothèques (et quelles versions) vous souhaitez utiliser dans ce projet.
 
-Deno crée ou met aussi à jour `deno.lock`. L'import dans `deno.json` peut utiliser une plage de versions compatibles, tandis que le fichier de verrouillage enregistre les versions exactes et leurs empreintes d'intégrité. Ajoutez les deux fichiers à Git afin que le projet résolve les mêmes versions de dépendances sur un autre ordinateur.
+Deno crée ou met aussi à jour `deno.lock`, qui contient des informations supplémentaires sur la bibliothèque. Gardez ce fichier, mais ne vous en préoccupez pas : Deno le gère automatiquement.
 
 ![Une capture d'écran montrant les imports dans deno.json.](/assets/pushing-further/libraries/d3-add.png)
 <Callout type="info" emoji="💡">
@@ -78,9 +78,9 @@ Reprenons le [fichier CSV des températures de Montréal](https://raw.githubuser
 
 Si vous récupérez ces données, vous remarquerez que c'est juste du texte. CSV signifie **Comma-Separated Values** (valeurs séparées par des virgules) et vous ne pouvez pas travailler avec directement. Il serait bien mieux de le convertir en une liste d'objets.
 
-Copiez-collez le code ci-dessous dans `main.ts`, puis exécutez la commande suivante : `deno run --watch --check --allow-net=raw.githubusercontent.com main.ts`
+Copiez-collez le code ci-dessous dans `main.ts`, puis exécutez la commande suivante : `deno run --watch --check --allow-net main.ts`
 
-N'oubliez pas la permission réseau, sinon votre code ne sera pas autorisé à récupérer des données. La limiter à `raw.githubusercontent.com` bloque les autres hôtes réseau.
+N'oubliez pas la permission réseau, sinon votre code ne sera pas autorisé à récupérer des données.
 
 ```ts showLineNumbers filename="main.ts"
 const response = await fetch(
@@ -150,7 +150,7 @@ Comme vous l’avez peut-être remarqué, nous avons utilisé `jsr:` au lieu de 
 ![Une capture d'écran montrant un module JSR ajouté.](/assets/pushing-further/libraries/jsr-add.png)
 
 <Callout type="info" emoji="💡">
-    Tout comme les modules NPM, les modules JSR sont mis en cache. Si vous devez vider votre cache, exécutez `deno clean`. Pour installer toutes les bibliothèques listées dans `deno.json` et les vérifier avec `deno.lock`, exécutez `deno install`. En intégration continue, `deno ci` exige en plus un fichier de verrouillage à jour.
+    Tout comme les modules NPM, les modules JSR sont mis en cache. Si vous devez vider votre cache, exécutez `deno clean`. Pour installer toutes les bibliothèques listées dans `deno.json` et les vérifier avec `deno.lock`, exécutez `deno install`.
 </Callout>
 
 Mettons maintenant à jour notre code dans `main.ts` pour utiliser `@std` au lieu de `d3`. Une différence clé est que nous devons définir l'option `skipFirstRow` sur `true` pour ignorer la première ligne qui contient les en-têtes des colonnes CSV.

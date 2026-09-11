@@ -10,9 +10,9 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 Millions of people around the world work with JavaScript and TypeScript. Part of the reason for their popularity is the vast ecosystem of libraries. Many developers share their code publicly, making it free for anyone to use.
 
-In later lessons, we will use open-source libraries to analyze huge datasets and create stunning interactive visualizations.
+In later lessons, we will use open-source libraries to analyze huge datasets and create stunning visualizations.
 
-First, a bit of vocabulary: *libraries* are also often called *packages* or *modules*.
+A note about vocabulary: *libraries* are also often called *packages* or *modules*.
 
 <NoticeIntro />
 
@@ -65,7 +65,7 @@ Installing `d3` in a Deno project is very easy. Click on your terminal, stop wat
 
 If you open your `deno.json`, you'll see something new: **imports**! These tell Deno what libraries (and their versions) you want to use in this project.
 
-Deno also creates or updates `deno.lock`. The import in `deno.json` can use a compatible version range, while the lockfile records the exact resolved versions and integrity hashes. Commit both files when you use Git so the project resolves the same dependency versions on another computer.
+Deno also creates or updates `deno.lock`, which contains more information about the library. Keep this file around, but don’t worry about it: Deno manages it automatically.
 
 ![A screenshot showing deno.json imports.](/assets/pushing-further/libraries/d3-add.png)
 
@@ -79,9 +79,9 @@ Let's reuse the [Montreal temperature CSV file](https://raw.githubusercontent.co
 
 If you fetch this data, you'll notice it's just text. CSV stands for **Comma-Separated Values**. You can't work with it directly. It would be much better to convert it into an array of objects.
 
-Copy and paste the code below into `main.ts`, then run: `deno run --watch --check --allow-net=raw.githubusercontent.com main.ts`
+Copy and paste the code below into `main.ts`, then run: `deno run --watch --check --allow-net main.ts`
 
-Don't forget the network permission, or your code won’t be allowed to fetch data. Limiting it to `raw.githubusercontent.com` keeps other network hosts blocked.
+Don't forget the network permission, or your code won’t be allowed to fetch data.
 
 ```ts showLineNumbers filename="main.ts"
 const response = await fetch(
@@ -151,7 +151,7 @@ As you may have noticed, we used `jsr:` instead of `npm:` so that Deno looks for
 ![A screenshot showing a JSR module being added.](/assets/pushing-further/libraries/jsr-add.png)
 
 <Callout type="info" emoji="💡">
-    Just like NPM modules, JSR modules are cached. If you ever need to clear your cache, run `deno clean`. To install all libraries listed in `deno.json` and verify them against `deno.lock`, run `deno install`. In continuous integration, `deno ci` additionally requires an up-to-date lockfile.
+    Just like NPM modules, JSR modules are cached. If you ever need to clear your cache, run `deno clean`. To install all libraries listed in `deno.json` and verify them against `deno.lock`, run `deno install`.
 </Callout>
 
 Now, let’s update our code in `main.ts` to use `@std` instead of `d3`. One key difference is that we need to set the option `skipFirstRow` to `true` to skip the first line, which contains the CSV column headers.
