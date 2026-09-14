@@ -284,36 +284,40 @@ Here, most of the time saved is from fetching the data. But as we will see in ot
 
 ## Exploring the data
 
-To explore the data, we can use the `.summarize()` method. It aggregates the data in the table.
+To explore the data, we can use the `.summarize()` method. It aggregates the data in the table. We’ll start by exploring the `time` column, with the results broken down by `city`.
 
-Let's start with `time`. We specify the `categories` as the values in the `city` column to see the details for each city.
+Since this is just a quick exploration, we can chain `.summarize()` right after `.join()` and before `.log()`. With just a few lines added to our script, everything will be processed and displayed in the terminal.
 
-```ts showLineNumbers filename="main.ts" {22-25}
+```ts showLineNumbers filename="main.ts" {25-28}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
 const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
+
+await temperatures.cache(() => {
+  temperatures
     .loadData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-    )
-    .join(cities);
+    );
 });
 
-temperatures.summarize({
-  columns: "time",
-  by: "city",
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
 });
-await temperatures.log();
+
+await temperatures
+  .join(cities)
+  .summarize({
+    columns: "time",
+    by: "city",
+  })
+  .log();
 
 await sdb.close();
 ```
@@ -328,7 +332,7 @@ But there is a problem... The `count` column has different values for each city.
     If the table layout is displayed weirdly in your terminal, it's because the width of the table is bigger than the width of your terminal. Right-click on the terminal and look for `Toggle size with content width`. There is also a handy shortcut that I use all the time to do that: `OPTION` + `Z` on Mac and `ALT` + `Z` on PC.
 </Callout>
 
-Let's now check what we have in `t`, which stands for *temperature*. Just replace `"time"` with `"t"` on line 23.
+Let's now check what we have in `t`, which stands for *temperature*. Just replace `"time"` with `"t"` on line 24.
 
 Hmm... Not only do we have missing rows in our data, as we saw just above, but we also have some rows with `null` values.
 
@@ -336,35 +340,39 @@ Hmm... Not only do we have missing rows in our data, as we saw just above, but w
 
 Let's take care of this right away by using the `.removeMissing()` method. It removes any rows with a `null` value. You can also specify specific columns if needed, but it's not necessary here.
 
-Let's put that in the cache while we're at it.
+We can chain `.removeMissing()` directly after `.loadData()`. Here, I chose to add it inside the `.cache()` method.
 
-```ts showLineNumbers filename="main.ts" {21}
+```ts showLineNumbers filename="main.ts" {12}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
 const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
+
+await temperatures.cache(() => {
+  temperatures
     .loadData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
     )
-    .join(cities)
     .removeMissing();
 });
 
-temperatures.summarize({
-  columns: "time",
-  by: "city",
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
 });
-await temperatures.log();
+
+await temperatures
+  .join(cities)
+  .summarize({
+    columns: "t",
+    by: "city",
+  })
+  .log();
 
 await sdb.close();
 ```
@@ -381,88 +389,92 @@ One of my go-to resources when I want to analyze climate data is [climatedata.ca
 
 So this is what we are going to do here!
 
-First, let's add a new column with the `time` year. The `.addColumn()` method needs three arguments:
-- The name of the new column. Here, it's `year`.
-- The type of the data in the column. Here, it's `number`.
-- The definition of the data in the column. This is an SQL expression (more about it below). We want to extract the year from `time`.
+First, let’s extract the year from the `time` column with the `.extractDatePart()` method. This method makes it easy to extract the year, month, week number, or other parts of a date from a column containing dates.
 
-
-```ts showLineNumbers filename="main.ts" {24}
+```ts showLineNumbers filename="main.ts" {26}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
 const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
+
+await temperatures.cache(() => {
+  temperatures
     .loadData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
     )
-    .join(cities)
     .removeMissing();
 });
 
-temperatures.addColumn("year", "number", `YEAR(time)`);
-await temperatures.log();
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .log();
 
 await sdb.close();
 ```
-<Callout type="info" emoji="💡">
-    `YEAR(time)` is a SQL expression. The [*Structured Query Language*](https://fr.wikipedia.org/wiki/Structured_Query_Language) is a very common language when working with databases. Under the hood, SDA works in SQL. But don't worry, you don't have to be an expert in SQL to use SDA. When you need SQL, it will stay very basic, like in the example above, and we will learn the basics as we work on lessons and projects.
-</Callout>
 
-![A screenshot showing the addColumn method.](/assets/simple-data-analysis/tabular-data/year.png)
+
+![A screenshot showing the extractDatePart method.](/assets/simple-data-analysis/tabular-data/year.png)
 
 Now, we can bin the years with the `.bins()` method. As you may start to understand, there is a SDA method to do pretty much anything you need when analyzing data. 😎
 
-The method needs three arguments:
+The `.bins()` method needs three arguments:
 - The column storing the values
 - The interval for the bins
 - The name of the new column storing the bins
 
-Just to check if everything was done as expected, we can log the result of `await temperatures.getUniques("bin")`, which will return all the unique values in the new column `bin`.
+To check that everything worked as expected, we can use `await temperatures.logUniques("bin")` to display all the unique values in the new `bin` column.
 
-```ts showLineNumbers filename="main.ts" {25, 28}
+```ts showLineNumbers filename="main.ts" {27, 30}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
 const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
+
+await temperatures.cache(() => {
+  temperatures
     .loadData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
     )
-    .join(cities)
     .removeMissing();
 });
 
-temperatures.addColumn("year", "number", `YEAR(time)`);
-temperatures.bins("year", 30, "bin");
-await temperatures.log();
+const cities = sdb.newTable("cities");
 
-console.log(await temperatures.getUniques("bin"));
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "bin")
+  .log();
+
+await temperatures.logUniques("bin");
 
 await sdb.close();
 ```
 
 This is looking great!
 
-![A screenshot showing the bins and getUniques method.](/assets/simple-data-analysis/tabular-data/bins.png)
+![A screenshot showing the bins and logUniques methods.](/assets/simple-data-analysis/tabular-data/bins.png)
+
+The unique values in the `bin` column are looking good. Of course, the last bin, from 2020 to 2049, will be incomplete, but we’ll deal with that later.
 
 ## Summarizing and filtering the data
 
@@ -477,37 +489,41 @@ Let's use our `.summarize()` method again. But this time, we will use more optio
 Also, the table now has 15 rows, but `.log()` just shows the first 10. So we ask it to log 15 to have a better look at the result.
 
 
-```ts showLineNumbers filename="main.ts" {26-31} /{ count: 15 }/
+```ts showLineNumbers filename="main.ts" {28-33} /15/
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
 const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
+
+await temperatures.cache(() => {
+  temperatures
     .loadData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
     )
-    .join(cities)
     .removeMissing();
 });
 
-temperatures.addColumn("year", "number", `YEAR(time)`);
-temperatures.bins("year", 30, "bin");
-temperatures.summarize({
-  columns: "t",
-  by: ["city", "bin"],
-  stats: ["mean", "count"],
-  decimals: 2,
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
 });
-await temperatures.log({ count: 15 });
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "bin")
+  .summarize({
+    columns: "t",
+    by: ["city", "bin"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .log(15);
 
 await sdb.close();
 ```
@@ -522,43 +538,49 @@ We could filter out bins that have less than 90% of the expected number of days.
 
 To do that, let's use the `.filter()` method, which takes an SQL expression as a condition. As you can see below, it's pretty simple.
 
-```ts showLineNumbers filename="main.ts" {32}
+```ts showLineNumbers filename="main.ts" {34}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
 const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
+
+await temperatures.cache(() => {
+  temperatures
     .loadData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
     )
-    .join(cities)
     .removeMissing();
 });
 
-temperatures.addColumn("year", "number", `YEAR(time)`);
-temperatures.bins("year", 30, "bin");
-temperatures.summarize({
-  columns: "t",
-  by: ["city", "bin"],
-  stats: ["mean", "count"],
-  decimals: 2,
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
 });
-temperatures.filter(`count >= 9861`);
-await temperatures.log({ count: 15 });
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "bin")
+  .summarize({
+    columns: "t",
+    by: ["city", "bin"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .log(15);
 
 await sdb.close();
 ```
 <Callout type="info" emoji="💡">
-    You don't have to use backticks for SQL expressions, like I wrote on lines 24 and 32. The methods just expect strings. Using backticks is just a habit I took because template literals are useful for injecting variables into strings, and it's something we will often do with SQL expressions, as we will see in later lessons and projects.
+    The `.filter()` method and a few other SDA methods expect SQL expressions. Above, `count >= 9861` means “keep rows where `count` is greater than or equal to 9,861.” SQL stands for *Structured Query Language*, a language for working with databases. We’ll only need the basics with SDA, and we’ll learn them as we go.
+
+    I like to write SQL expressions between backticks so I can recognize them quickly, but single or double quotes work too: these methods just expect a string. Backticks also let us use template literals to insert variables into expressions, which can be handy, as we’ll see later.
 </Callout>
 
 We are now left with 11 rows.
