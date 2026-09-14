@@ -181,9 +181,11 @@ await sdb.close();
 
 The screenshot below only shows the `cities` table because there isn’t enough space to show everything. In your terminal, the script should display the `temperatures` table first, followed by the `cities` table.
 
+As you can see, the `id` column is present in both the `cities` and `temperatures` tables, but the city names are only in the `cities` table. We would like to bring those names into the `temperatures` table.
+
 ![A screenshot showing the cities names in the terminal.](/assets/simple-data-analysis/tabular-data/cities-loaded.png)
 
-Now, we want to bring the city names into the `temperatures` table. To do that, we can use the `.join()` method.
+To do that, we can use the `.join()` method.
 
 By default, this method looks for a common column in two tables and matches rows based on the values in this column.
 
@@ -265,7 +267,7 @@ await sdb.close();
 
 Here's the result on the first run.
 
-As indicated in the terminal, SDA didn't find anything in cache for the code inside the two `.cache()` functions, so it ran everything, and it took 1 sec, 298 ms with my internet connection and computer. `.sda-cache` has been created, and data is now cached in it.
+As indicated in the terminal, SDA didn't find anything in cache for the code inside the two `.cache()` functions, so it ran everything, and it took 1 sec, 459 ms with my internet connection and computer. `.sda-cache` has been created, and data is now cached in it.
 
 ![A screenshot showing data being cached.](/assets/simple-data-analysis/tabular-data/nothing-in-cache.png)
 
@@ -273,7 +275,7 @@ When I save `main.ts` again (`CMD` + `S` on Mac and `CTRL` + `S` on PC), it's di
 
 SDA checked if the code inside the two `.cache()` functions had been modified. Since it's exactly the same, it just loads the results of the previous run, which are stored in `.sda-cache`.
 
-Instead of 1 sec, 298 ms, running the script took only... 19 ms! That's about 68 times faster! 😱
+Instead of 1 sec, 459 ms, running the script took only... 28 ms! That's about 52 times faster! 😱
 
 Here, most of the time saved is from fetching the data. But as we will see in other lessons, you can also cache the results of heavy computations that take a long time to run, which can significantly improve your productivity.
 
@@ -325,6 +327,8 @@ await sdb.close();
 The `min` and `max` values show that we have over a hundred years' worth of daily temperatures for our three cities. This is pretty good for checking trends!
 
 But there is a problem... The `count` column has different values for each city. In theory, we should have around 44,195 days in 121 years. We see fewer than that here, which means we will have to deal with missing data...
+
+By the way, did you notice how fast that was? We summarized more than 130,000 rows in an instant. SDA is faaaast! ⚡
 
 ![A screenshot showing the time values aggregated.](/assets/simple-data-analysis/tabular-data/time.png)
 
@@ -379,7 +383,7 @@ await sdb.close();
 
 Here we go! No more `null` temperatures.
 
-Since we changed the code in the `.cache()` method, you'll notice that the message in the terminal indicates that the code is being run again. Pretty clever, huh? 😉
+Since we changed the code in the `.cache()` method, you'll notice that the message in the terminal indicates that the code is being run again. The previously cached data has also been removed automatically. Pretty clever, huh? 😉
 
 ![A screenshot showing the removeMissing method.](/assets/simple-data-analysis/tabular-data/remove-missing.png)
 
@@ -428,14 +432,16 @@ await sdb.close();
 
 Now, we can bin the years with the `.bins()` method. As you may start to understand, there is a SDA method to do pretty much anything you need when analyzing data. 😎
 
-The `.bins()` method needs three arguments:
+The `.bins()` method needs four arguments:
+
 - The column storing the values
 - The interval for the bins
-- The name of the new column storing the bins
+- The name of the new column storing the start of each bin
+- The name of the new column storing the end of each bin
 
-To check that everything worked as expected, we can use `await temperatures.logUniques("bin")` to display all the unique values in the new `bin` column.
+Here, we bin the `year` values into 30-year periods and store their boundaries in two new columns named `yearStart` and `yearEnd`.
 
-```ts showLineNumbers filename="main.ts" {27, 30}
+```ts showLineNumbers filename="main.ts" {27}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
@@ -462,32 +468,72 @@ await cities.cache(() => {
 await temperatures
   .join(cities)
   .extractDatePart("time", "year")
-  .bins("year", 30, "bin")
+  .bins("year", 30, "yearStart", "yearEnd")
   .log();
-
-await temperatures.logUniques("bin");
 
 await sdb.close();
 ```
 
 This is looking great!
 
-![A screenshot showing the bins and logUniques methods.](/assets/simple-data-analysis/tabular-data/bins.png)
+![A screenshot showing the yearStart and yearEnd columns created by the bins method.](/assets/simple-data-analysis/tabular-data/bins.png)
 
-The unique values in the `bin` column are looking good. Of course, the last bin, from 2020 to 2049, will be incomplete, but we’ll deal with that later.
+Let's quickly check the bins we created. We select only the `yearStart` and `yearEnd` columns (line 28), remove duplicate rows so that each bin appears once (line 29), and sort the result to make it easier to review (line 30).
+
+This code is only for this quick check, so we’ll remove these three lines afterward.
+
+```ts showLineNumbers filename="main.ts" {28-30}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .selectColumns(["yearStart", "yearEnd"])
+  .removeDuplicates()
+  .sort()
+  .log();
+
+await sdb.close();
+```
+
+Everything is looking great, and the bins make sense. The 2020–2050 bin will, of course, be incomplete, but we’ll deal with that later.
+
+![A screenshot showing the unique 30-year bins sorted by year.](/assets/simple-data-analysis/tabular-data/bins-unique.png)
 
 ## Summarizing and filtering the data
 
 Now that we have our daily temperatures binned properly, we can easily compute the average temperature per 30-year period for each city.
 
 Let's use our `.summarize()` method again. But this time, we will use more options:
+
 - The values are still our temperatures in the `t` column.
-- There are now two categories. We want to keep the cities and the bins!
-- We want the mean and a count of the values for each city and each bin.
+- We group the values by `city` and by the `yearStart` and `yearEnd` columns that define each bin.
+- We want the `mean` and a `count` of the values for each city and each bin.
 - We round the values to two decimals.
 
-Also, the table now has 15 rows, but `.log()` just shows the first 10. So we ask it to log 15 to have a better look at the result.
-
+Also, the table now has 15 rows, but by default, `.log()` just shows the first 10. So we ask it to log 15 to have a better look at the result.
 
 ```ts showLineNumbers filename="main.ts" {28-33} /15/
 import { SimpleDB } from "@nshiab/simple-data-analysis";
@@ -516,10 +562,10 @@ await cities.cache(() => {
 await temperatures
   .join(cities)
   .extractDatePart("time", "year")
-  .bins("year", 30, "bin")
+  .bins("year", 30, "yearStart", "yearEnd")
   .summarize({
     columns: "t",
-    by: ["city", "bin"],
+    by: ["city", "yearStart", "yearEnd"],
     stats: ["count", "mean"],
     decimals: 2,
   })
@@ -530,7 +576,7 @@ await sdb.close();
 
 This is looking very good. Thanks to the `count`, we can clearly see where data is missing.
 
-Of course, the `[2020-2049]` bins are incomplete, but so is the `[1990-2019]` bin for `MONTREAL`. In theory, the 30-year bins should have around 10,957 days.
+Of course, the bins with a `yearStart` of 2020 and a `yearEnd` of 2050 are incomplete, but so is the `MONTREAL` bin with a `yearStart` of 1990 and a `yearEnd` of 2020. In theory, the 30-year bins should have around 10,957 days.
 
 ![A screenshot showing the summary method.](/assets/simple-data-analysis/tabular-data/summary.png)
 
@@ -565,10 +611,10 @@ await cities.cache(() => {
 await temperatures
   .join(cities)
   .extractDatePart("time", "year")
-  .bins("year", 30, "bin")
+  .bins("year", 30, "yearStart", "yearEnd")
   .summarize({
     columns: "t",
-    by: ["city", "bin"],
+    by: ["city", "yearStart", "yearEnd"],
     stats: ["count", "mean"],
     decimals: 2,
   })
@@ -583,64 +629,11 @@ await sdb.close();
     I like to write SQL expressions between backticks so I can recognize them quickly, but single or double quotes work too: these methods just expect a string. Backticks also let us use template literals to insert variables into expressions, which can be handy, as we’ll see later.
 </Callout>
 
-We are now left with 11 rows.
+Before filtering, the table had 15 rows. We are now left with 11.
 
 ![A screenshot showing the filter method.](/assets/simple-data-analysis/tabular-data/filter.png)
 
-## Trends
-
-### Reformatting
-
-Whether we want to visualize the data or compute statistical indicators to check for trends, we have a problem: our bins are text. It would be much easier to have them as numbers.
-
-This is what the code below does:
-
-- On line 33, we use the `.splitExtract()` method to split the bins on the `-` character, then pick the first part (index `0`) and put it in a new column `startYear`.
-- On line 34, we trim the leftover `[`.
-- Finally, on line 35, we convert the values in the column `startYear` to `number`.
-
-By the way, you can always hover over the methods to see their documentation and examples. I took the time to document each one of them. 🫡
-
-
-```ts showLineNumbers filename="main.ts" {33-35}
-import { SimpleDB } from "@nshiab/simple-data-analysis";
-
-const sdb = new SimpleDB({ cacheVerbose: true });
-
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
-const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
-    .loadData(
-      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
-    )
-    .join(cities)
-    .removeMissing();
-});
-
-temperatures.addColumn("year", "number", `YEAR(time)`);
-temperatures.bins("year", 30, "bin");
-temperatures.summarize({
-  columns: "t",
-  by: ["city", "bin"],
-  stats: ["mean", "count"],
-  decimals: 2,
-});
-temperatures.filter(`count >= 9861`);
-temperatures.splitExtract("bin", "-", 0, "startYear");
-temperatures.trim("startYear", { character: "[" });
-temperatures.convert({ startYear: "number" });
-await temperatures.log({ count: 15 });
-
-await sdb.close();
-```
-![A screenshot showing how to clean strings.](/assets/simple-data-analysis/tabular-data/cleaning.png)
+## Looking for trends
 
 ### Visualization in the terminal
 
@@ -648,47 +641,46 @@ We can now easily visualize our data!
 
 With SDA, you can create basic charts in your terminal. Here, we use `.logDotChart()`, and we can clearly see how temperatures have increased over the previous century.
 
-
-```ts showLineNumbers filename="main.ts" {38}
+```ts showLineNumbers filename="main.ts" {33}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
 const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
+await temperatures.cache(() => {
+  temperatures
     .loadData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
     )
-    .join(cities)
     .removeMissing();
 });
 
-temperatures.addColumn("year", "number", `YEAR(time)`);
-temperatures.bins("year", 30, "bin");
-temperatures.summarize({
-  columns: "t",
-  by: ["city", "bin"],
-  stats: ["mean", "count"],
-  decimals: 2,
+const cities = sdb.newTable("cities");
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
 });
-temperatures.filter(`count >= 9861`);
-temperatures.splitExtract("bin", "-", 0, "startYear");
-temperatures.trim("startYear", { character: "[" });
-temperatures.convert({ startYear: "number" });
-await temperatures.log({ count: 15 });
 
-await temperatures.logDotChart("startYear", "mean", { smallMultiples: "city" });
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .logDotChart("yearStart", "mean", { smallMultiples: "city" });
 
 await sdb.close();
 ```
+
+The `smallMultiples: "city"` option gives us a separate chart for each city.
+
 ![A screenshot showing how to log charts in the terminal.](/assets/simple-data-analysis/tabular-data/dot-charts.png)
 
 ### Visualization with Plot
@@ -699,45 +691,43 @@ We will do a full lesson on Plot later. It might seem complicated right now, but
 
 In the example below, we write a chart as a PNG file in our `./sda/output` folder.
 
-
-```ts showLineNumbers filename="main.ts" {39-72}
+```ts showLineNumbers filename="main.ts" {2, 34, 36-65}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 import { dot, line, plot } from "@observablehq/plot";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
 const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
+await temperatures.cache(() => {
+  temperatures
     .loadData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
     )
-    .join(cities)
     .removeMissing();
 });
 
-temperatures.addColumn("year", "number", `YEAR(time)`);
-temperatures.bins("year", 30, "bin");
-temperatures.summarize({
-  columns: "t",
-  by: ["city", "bin"],
-  stats: ["mean", "count"],
-  decimals: 2,
+const cities = sdb.newTable("cities");
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
 });
-temperatures.filter(`count >= 9861`);
-temperatures.splitExtract("bin", "-", 0, "startYear");
-temperatures.trim("startYear", { character: "[" });
-temperatures.convert({ startYear: "number" });
-await temperatures.log({ count: 15 });
 
-const chart = (data: unknown[]) =>
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .log("all");
+
+await temperatures.writeChart((data) =>
   plot({
     inset: 20,
     marginLeft: 50,
@@ -752,13 +742,13 @@ const chart = (data: unknown[]) =>
     color: { legend: true },
     marks: [
       line(data, {
-        x: "startYear",
+        x: "yearStart",
         y: "mean",
         stroke: "city",
         curve: "natural",
       }),
       dot(data, {
-        x: "startYear",
+        x: "yearStart",
         y: "mean",
         fill: "white",
         stroke: "city",
@@ -766,14 +756,19 @@ const chart = (data: unknown[]) =>
         r: 4,
       }),
     ],
-  });
-await temperatures.writeChart(
-  chart,
-  "./sda/output/temperatures.png",
-);
+  }), "./sda/output/temperatures.png");
 
 await sdb.close();
 ```
+
+We could have replaced the `.logDotChart()` used in the previous step by chaining `.writeChart()` directly. Sometimes, however, we want to see the data in the terminal and write a chart at the same time.
+
+This is why, for convenience, we log the data in one chain and write the chart in a separate `await` chain.
+
+By the way, passing `"all"` to `.log()` tells SDA to display every row in the table, no matter how many rows there are. It’s a nice little option!
+
+With this new chart, it’s pretty clear that temperatures have risen in all three cities we analyzed. Of course, we excluded the most recent complete 30-year period for Montreal because it didn’t contain enough data. 📈
+
 ![A screenshot showing how to write charts with Plot.](/assets/simple-data-analysis/tabular-data/plot.png)
 
 <Callout type="info" emoji="💡">
@@ -788,59 +783,112 @@ For trends, you can also rely on statistical indicators like correlations and li
 
 Let's start with correlations. Note that I removed the code to generate the chart.
 
-Like `.summarize()`, the `.correlations` method replaces the data in the table with the result of its computations.
-
-
-```ts showLineNumbers filename="main.ts" {37-41}
+```ts showLineNumbers filename="main.ts" {37-44}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
 const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
+
+await temperatures.cache(() => {
+  temperatures
     .loadData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
     )
-    .join(cities)
     .removeMissing();
 });
 
-temperatures.addColumn("year", "number", `YEAR(time)`);
-temperatures.bins("year", 30, "bin");
-temperatures.summarize({
-  columns: "t",
-  by: ["city", "bin"],
-  stats: ["mean", "count"],
-  decimals: 2,
-});
-temperatures.filter(`count >= 9861`);
-temperatures.splitExtract("bin", "-", 0, "startYear");
-temperatures.trim("startYear", { character: "[" });
-temperatures.convert({ startYear: "number" });
+const cities = sdb.newTable("cities");
 
-temperatures.correlations({
-  x: "startYear",
-  y: "mean",
-  by: "city",
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
 });
-await temperatures.log({ count: 15 });
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .log("all");
+
+await temperatures
+  .correlations({
+    x: "yearStart",
+    y: "mean",
+    by: "city",
+    outputTable: "correlations",
+  })
+  .log();
 
 await sdb.close();
 ```
+
+Like `.summarize()`, the `.correlations()` method replaces the data in the table with the result of its computations. In the code above, to avoid overwriting the `temperatures` table, we set `outputTable: "correlations"`, which creates a new table named `correlations` and keeps the data in `temperatures` intact.
 
 As we can see, the correlations are close to 1, meaning there is a strong relationship between the years and the temperature. When one goes up, the other goes up too.
 
 ![A screenshot showing how to compute correlations.](/assets/simple-data-analysis/tabular-data/correlation.png)
 
-We can also compute linear regressions, which are more descriptive. Just replace the `.correlations` method with `.linearRegressions` on line 37 and add the option `decimals: 2` to round the values on line 41.
+We can also compute linear regressions, which are more descriptive. Here, we replace `.correlations()` with `.linearRegressions()`, round the results to two decimals, and store them in a new table named `linearRegressions`.
+
+```ts showLineNumbers filename="main.ts" {37-45}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .log("all");
+
+await temperatures
+  .linearRegressions({
+    x: "yearStart",
+    y: "mean",
+    by: "city",
+    decimals: 2,
+    outputTable: "linearRegressions",
+  })
+  .log();
+
+await sdb.close();
+```
 
 Again, the r<sup>2</sup> is close to 1, meaning the two variables are related. The slope also tells us that the temperature increased by 0.02°C each year on average.
 
@@ -850,56 +898,66 @@ These three Canadian cities warmed up! 🌡️🌡️🌡️
 
 ## Writing data
 
-For the sake of the lesson, let's write our results to a file. With the `.writeData()` method, you can save CSV, JSON, and Parquet files. If you are working with big files, you have options available to compress them.
+For the sake of the lesson, let's write our results to files. With the `.writeData()` method, you can save CSV, JSON, and Parquet files. If you are working with big files, you have options available to compress them.
 
-
-```ts showLineNumbers filename="main.ts" {45}
+```ts showLineNumbers filename="main.ts" {47-48} /const linearRegressions =/
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
-const cities = sdb.newTable("cities");
-await cities.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
-  );
-});
-
 const temperatures = sdb.newTable("temperatures");
-await temperatures.cache((table) => {
-  table
+
+await temperatures.cache(() => {
+  temperatures
     .loadData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
     )
-    .join(cities)
     .removeMissing();
 });
 
-temperatures.addColumn("year", "number", `YEAR(time)`);
-temperatures.bins("year", 30, "bin");
-temperatures.summarize({
-  columns: "t",
-  by: ["city", "bin"],
-  stats: ["mean", "count"],
-  decimals: 2,
-});
-temperatures.filter(`count >= 9861`);
-temperatures.splitExtract("bin", "-", 0, "startYear");
-temperatures.trim("startYear", { character: "[" });
-temperatures.convert({ startYear: "number" });
+const cities = sdb.newTable("cities");
 
-temperatures.linearRegressions({
-  x: "startYear",
-  y: "mean",
-  by: "city",
-  decimals: 2,
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
 });
-await temperatures.log({ count: 15 });
 
-await temperatures.writeData("./sda/output/temperatures.csv");
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .log("all");
+
+const linearRegressions = await temperatures
+  .linearRegressions({
+    x: "yearStart",
+    y: "mean",
+    by: "city",
+    decimals: 2,
+    outputTable: "linearRegressions",
+  })
+  .log();
+
+await temperatures.writeData("sda/output/temperatures.csv");
+await linearRegressions.writeData("sda/output/linearRegressions.csv");
 
 await sdb.close();
 ```
+
+In the code above, we created the `linearRegressions` variable to store the table created with `outputTable: "linearRegressions"`. This lets us easily call `.writeData()` on that table on line 48.
+
+Now, if you check the `output` folder in the Explorer on the left, you’ll see your two CSV files.
+
+![VS Code showing the two CSV files in the output folder.](/assets/simple-data-analysis/tabular-data/write-data.png)
 
 ## Conclusion
 
@@ -907,8 +965,8 @@ Well, that was quite an adventure! This is your first SDA project!
 
 I hope you see the value of the library. With easy-to-use methods, you can produce complex analyses.
 
-For now, we worked with two small files, but the library is also extremely performant. Wait until we crunch your first 1-billion-row file. 😇 (Yeah, this is not a joke. We will really do that in a future project.)
+You are now ready to tackle more complex datasets. You can have fun with the [One billion row challenge 😱](/data-projects/one-billion-row-challenge). Yes, really, one billion rows! This project puts what you learned here into practice and pushes it further, introducing new methods that make processing huge volumes of data painless.
 
-But before that, let's dive into the next lesson about geospatial data. That's another strength of SDA: you can use it with geometries, coordinates, and maps too! 🌎
+After you’ve tried the One billion row challenge, you can dive into the next lesson about geospatial data. That's another strength of SDA: you can use it with geometries, coordinates, and maps too! 🌎
 
 <NoticeEnd />
