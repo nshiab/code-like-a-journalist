@@ -16,21 +16,25 @@ To do that, we will convert a CSV file containing the latitude and longitude of 
 
 If you have a moment, please consider adding a ⭐ to the library's [GitHub repository](https://github.com/nshiab/simple-data-analysis). It's always nice to know your open-source work is appreciated. 😊
 
-Note that you should have already completed the **First steps 🧑‍🎓** and **Pushing further 🚀** sections, as well as the previous lesson on **[Tabular data](/simple-data-analysis/tabular-data)** from this section.
+Note that you should have already completed **Chapter 1: TypeScript Fundamentals** and **Chapter 2: Working with TypeScript**, as well as the previous lesson on **[Tabular data](/simple-data-analysis/tabular-data)** from this chapter.
 
 <NoticeIntro />
 
 ## Setup
 
-As we did in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `deno run -A jsr:@nshiab/setup-data-project`
+As we did in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `deno -A jsr:@nshiab/setup-data-project`
 
 When prompted, use the space bar to select `simple-data-analysis`, then press `Enter`. Plot is installed automatically with SDA.
+
+[setup-data-project](https://github.com/nshiab/setup-data-project) is another open-source library I created. It installs and configures everything you need so you can quickly get to work on a data project.
+
+![A screenshot showing simple-data-analysis selected in setup-data-project.](/assets/simple-data-analysis/tabular-data/setup.png)
 
 After running this command, your terminal will display a description of the created files and installed libraries.
 
 Next, run the suggested task to start and watch `sda/main.ts`: `deno task sda`
 
-![A screenshot showing VS Code after running setup-data-project.](/assets/simple-data-analysis/geospatial-data/setup.png)
+![VS Code showing the starter code and its table with a single message in the terminal.](/assets/simple-data-analysis/tabular-data/starter-table.png)
 
 ## Loading and caching data
 
@@ -40,65 +44,77 @@ Let's start by fetching the 2023 Canadian wildfire data. 🔥 I uploaded the dat
 
 First, we create a new table and use the `loadData` method to load the data. Then, we use `log` to display it in the terminal.
 
-```ts showLineNumbers filename="main.ts" {5-9}
+```ts showLineNumbers filename="main.ts" {5-10}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
 
-const fires = sdb.newTable("fires");
-fires.loadData(
-  "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-);
-await fires.log();
+await sdb
+  .newTable("fires")
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
+  )
+  .log();
 
 await sdb.close();
 ```
+
 ![A screenshot showing the 2023 Canadian wildfires data in VS Code terminal.](/assets/simple-data-analysis/geospatial-data/log-fires.png)
 
 As we can see, we have around 7,000 wildfires. The latitude and longitude values are stored in two separate columns. To convert these into geometries that allow us to use geospatial methods, we can use the `createPoints` method.
 
 This method requires three arguments: the name of the column storing latitude, the name of the column storing longitude, and the name of the new column where the point geometries will be stored, which I usually name `geom`.
 
-
-```ts showLineNumbers filename="main.ts" {9}
+```ts showLineNumbers filename="main.ts" {10}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
 
-const fires = sdb.newTable("fires");
-fires.loadData(
-  "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-);
-fires.createPoints("lat", "lon", "geom");
-await fires.log();
+await sdb
+  .newTable("fires")
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
+  )
+  .createPoints("lat", "lon", "geom")
+  .log();
 
 await sdb.close();
 ```
+
 ![A screenshot showing the 2023 Canadian wildfires as point geometries.](/assets/simple-data-analysis/geospatial-data/log-fires-points.png)
 
-This looks good. We can cache the data for now instead of fetching it every time. This will also speed up our code execution.
+<Callout type="info" emoji="💡">
+    In the `geom` column, you can see `EPSG:4326`. This identifies the coordinate reference system, or projection, used for the geometries. When your data uses latitude and longitude, this is what you want to see. In other projects, we will learn more about projections and how to convert geometry coordinates from one projection to another.
+</Callout>
 
-The `cacheVerbose` option will tell SDA to log extra information in the terminal regarding the cache, such as the time saved by using it.
+This looks good. Instead of fetching the data every time, it would be nice to store it locally on our machine. We can do that with the `cache` method.
 
-The first time you run this code, the data will be fetched and stored in a new folder called `.sda-cache` in your project. On subsequent runs, SDA will use the cached data instead of refetching it, saving resources and making data retrieval faster!
+We can also enable the `cacheVerbose` option to log extra information in the terminal regarding the cache, such as the time saved by using it.
 
-```ts showLineNumbers filename="main.ts" {6, 11} /{ cacheVerbose: true }/
+The first time you run this code, the data will be fetched and stored in a new folder called `.sda-cache` in your project.
+
+```ts showLineNumbers filename="main.ts" {5-6, 11-12} /{ cacheVerbose: true }/
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache((table) => {
-  table.loadData(
+await fires.cache(() => {
+  fires.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-  );
-  table.createPoints("lat", "lon", "geom");
+  )
+    .createPoints("lat", "lon", "geom");
 });
 await fires.log();
 
 await sdb.close();
 ```
-![A screenshot showing the 2023 Canadian wildfires being cached.](/assets/simple-data-analysis/geospatial-data/fires-cache.png)
+
+![A screenshot showing the wildfire data being fetched and stored in the cache.](/assets/simple-data-analysis/geospatial-data/fires-cache.png)
+
+But if you save `main.ts` again (`Command` + `S` on macOS or `Ctrl` + `S` on Windows) to rerun the script, you will see that the next execution loads the data directly from `.sda-cache` instead of fetching it from GitHub. This is much faster, and it avoids making unnecessary requests to GitHub's servers every time the code runs.
+
+![A screenshot showing the wildfire data being loaded from the cache.](/assets/simple-data-analysis/geospatial-data/fires-cache-hit.png)
 
 ### Provinces
 
@@ -108,7 +124,7 @@ GeoJSON is a widely used format for geospatial data. It's convenient because it'
 
 For example, the Canadian provinces GeoJSON is structured as shown below, with each province represented as a `feature` object. The `geometry` field contains the province's borders as `coordinates`, and the `properties` field includes metadata such as the province's name in both French and English (since Canada is bilingual 🇨🇦).
 
-There are different types of geometries in GeoJSON, such as `Point`, `Polygon`, and `MultiPolygon`, as seen in this dataset.
+There are different types of geometries in GeoJSON, such as `Point`, `Polygon`, and `MultiPolygon`.
 
 ```json
 {
@@ -142,52 +158,25 @@ Luckily, we don't have to deal with nested objects. SDA will convert all of this
 
 To fetch the wildfires CSV file, we used `loadData`, but since the provinces data is in a geospatial format, we will use `loadGeoData` instead. BTW, this method can load all kinds of geospatial formats, not just GeoJSON. 🤓
 
-```ts showLineNumbers filename="main.ts" {14-18}
+While we're at it, let's cache it, just like we did with the fires data.
+
+```ts showLineNumbers filename="main.ts" {14-20}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache((table) => {
-  table.loadData(
+await fires.cache(() => {
+  fires.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-  );
-  table.createPoints("lat", "lon", "geom");
+  )
+    .createPoints("lat", "lon", "geom");
 });
 await fires.log();
 
 const provinces = sdb.newTable("provinces");
-provinces.loadGeoData(
-  "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
-);
-await provinces.log();
-
-await sdb.close();
-```
-![A screenshot showing the Canadian provinces data in VS Code terminal.](/assets/simple-data-analysis/geospatial-data/log-provinces.png)
-
-As we can see in the screenshot above, each GeoJSON feature has been transformed into a row in the table. The `geometry` coordinates are stored in the `geom` column by default, and all the properties have been restructured as columns. Very handy!
-
-The data doesn't need to be transformed, so let's cache it too!
-
-
-```ts showLineNumbers filename="main.ts" {15, 19}
-import { SimpleDB } from "@nshiab/simple-data-analysis";
-
-const sdb = new SimpleDB({ cacheVerbose: true });
-
-const fires = sdb.newTable("fires");
-await fires.cache((table) => {
-  table.loadData(
-    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-  );
-  table.createPoints("lat", "lon", "geom");
-});
-await fires.log();
-
-const provinces = sdb.newTable("provinces");
-await provinces.cache((table) => {
-  table.loadGeoData(
+await provinces.cache(() => {
+  provinces.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
@@ -196,51 +185,54 @@ await provinces.log();
 await sdb.close();
 ```
 
-Using the cache makes the code run 11 times faster on my machine! And I'm sure it's speeding things up on your end too. 😁
+![A screenshot showing the Canadian provinces data in VS Code terminal.](/assets/simple-data-analysis/geospatial-data/log-provinces.png)
 
-![A screenshot showing the result of caching the Canadian provinces boundaries.](/assets/simple-data-analysis/geospatial-data/provinces-cache.png)
+As we can see in the screenshot above, each GeoJSON feature has been transformed into a row in the table. The `geometry` coordinates are stored in the `geom` column by default, and all the properties have been restructured as columns. Very handy!
+
+Thanks to the `cache` method, the code on my machine now runs in just 31 milliseconds instead of 517 milliseconds. That's much faster, and it avoids bothering GitHub's servers every time. All the time is saved by loading the data from `.sda-cache` instead of fetching it over the internet, which is way, way, way faster! In other lessons and projects, we will also cache the results of heavy computations, which is very useful too. ⚡
 
 ## Spatial join
 
 Now that we have our fires and provinces, we can perform a **spatial join**. We’ll use the `joinGeo` method to match each fire with the province it occurred in.
 
-On lines 22-24, we call the `joinGeo` method on the `fires` table. As arguments, we pass:
+On lines 22-25, we call the `joinGeo` method on the `fires` table. As arguments, we pass:
 - the `provinces` table, so each fire attempts to match with a province,
 - the `"inside"` condition (also called a predicate), meaning each fire will be matched with the province it falls within,
-- the `outputTable` option to return the result of the join as a new table, which we store in the variable `firesInsideProvinces`.
+- the `outputTable` option to name the table returned by the join `firesInsideProvinces`.
 
-Finally, we log the new table `firesInsideProvinces` on line 25.
+Finally, we log the new table on line 26.
 
-
-```ts showLineNumbers filename="main.ts" {22-25}
+```ts showLineNumbers filename="main.ts" {22-26}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache((table) => {
-  table.loadData(
+await fires.cache(() => {
+  fires.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-  );
-  table.createPoints("lat", "lon", "geom");
+  )
+    .createPoints("lat", "lon", "geom");
 });
 await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache((table) => {
-  table.loadGeoData(
+await provinces.cache(() => {
+  provinces.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
 await provinces.log();
 
-const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
-  outputTable: "firesInsideProvinces",
-});
-await firesInsideProvinces.log();
+await fires
+  .joinGeo(provinces, "inside", {
+    outputTable: "firesInsideProvinces",
+  })
+  .log();
 
 await sdb.close();
 ```
+
 ![A screenshot showing the result joining fires and provinces.](/assets/simple-data-analysis/geospatial-data/join.png)
 
 <Callout type="info" emoji="💡">
@@ -248,6 +240,8 @@ await sdb.close();
 </Callout>
 
 As you can see, each fire is now matched with a province! Thanks to the spatial join, we now know in which province each fire occurred.
+
+The last column, `geomProvinces`, contains the province geometry, which is repeated for every matching fire. With large tables, repeated geometries can quickly increase processing time and memory usage. The `joinGeo` method provides the `excludeLeftGeometry` and `excludeRightGeometry` options, which you can use independently to omit unneeded geometries and keep joins fast and memory-efficient. As usual, SDA has you covered for all your data and geospatial analysis needs! 😎
 
 ## Summarizing
 
@@ -260,325 +254,321 @@ We can use the `summarize` method on the `firesInsideProvinces` table.
 We pass the following parameters to the method:
 - The `hectares` column as the values,
 - The `nameEnglish` column as categories, so we get results for each province,
-- The `count` and `sum` functions for the `hectares` values,
+- For `stats`, two new columns: `nbFires` using the `count` calculation and `burntArea` using the `sum` calculation,
 - The `decimals: 0` option to round the values.
 
-
-```ts showLineNumbers filename="main.ts" {25-30}
+```ts showLineNumbers filename="main.ts" {26-32}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache((table) => {
-  table.loadData(
+await fires.cache(() => {
+  fires.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-  );
-  table.createPoints("lat", "lon", "geom");
+  )
+    .createPoints("lat", "lon", "geom");
 });
 await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache((table) => {
-  table.loadGeoData(
+await provinces.cache(() => {
+  provinces.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
 await provinces.log();
 
-const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
-  outputTable: "firesInsideProvinces",
-});
-firesInsideProvinces.summarize({
-  columns: "hectares",
-  by: "nameEnglish",
-  stats: ["count", "sum"],
-  decimals: 0,
-});
-await firesInsideProvinces.log();
+await fires
+  .joinGeo(provinces, "inside", {
+    outputTable: "firesInsideProvinces",
+  })
+  .summarize({
+    columns: "hectares",
+    by: "nameEnglish",
+    stats: { nbFires: "count", burntArea: "sum" },
+    decimals: 0,
+  })
+  .log();
 
 await sdb.close();
 ```
+
 ![A screenshot showing the number of fires in each Canadian province.](/assets/simple-data-analysis/geospatial-data/summary.png)
 
 We now have the number of fires and the total area burned in each province. Of course, this is an approximation: some fires may have crossed provincial borders, which we haven’t accounted for here.
 
 If we had the fire perimeters as polygons, we could achieve a more precise analysis using the [`intersection`](https://jsr.io/@nshiab/simple-data-analysis-core/doc/~/SimpleTable.prototype.intersection) method to compute the overlap between each fire and each province. Maybe we'll cover that in another lesson later!
 
-For now, let's make our data more presentable by renaming the columns and sorting the rows.
+For now, let's sort the rows by burned area in descending order.
 
-
-```ts showLineNumbers filename="main.ts" {31-35}
+```ts showLineNumbers filename="main.ts" {32}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache((table) => {
-  table.loadData(
+await fires.cache(() => {
+  fires.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-  );
-  table.createPoints("lat", "lon", "geom");
+  )
+    .createPoints("lat", "lon", "geom");
 });
 await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache((table) => {
-  table.loadGeoData(
+await provinces.cache(() => {
+  provinces.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
 await provinces.log();
 
-const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
-  outputTable: "firesInsideProvinces",
-});
-firesInsideProvinces.summarize({
-  columns: "hectares",
-  by: "nameEnglish",
-  stats: ["count", "sum"],
-  decimals: 0,
-});
-firesInsideProvinces.renameColumns({
-  count: "nbFires",
-  sum: "burntArea",
-});
-firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.log();
+await fires
+  .joinGeo(provinces, "inside", {
+    outputTable: "firesInsideProvinces",
+  })
+  .summarize({
+    columns: "hectares",
+    by: "nameEnglish",
+    stats: { nbFires: "count", burntArea: "sum" },
+    decimals: 0,
+  })
+  .sort({ burntArea: "desc" })
+  .log();
 
 await sdb.close();
 ```
-![A screenshot showing new column names.](/assets/simple-data-analysis/geospatial-data/renamed.png)
+
+![A screenshot showing the provinces sorted by burned area.](/assets/simple-data-analysis/geospatial-data/renamed.png)
 
 ## Visualizing the data
 
 ### In the terminal
 
-We can represent our final table as a bar chart directly in the terminal using the `logBarChart` method.
+Generating charts in the terminal is great for quick insights. Here, we use the `logBarChart` method and its handy `showPercentages` option to get a better sense of how the burned area is distributed across all provinces. We can also see a `null` category, meaning some fires were not matched to a province. We might want to remove those later.
 
-```ts showLineNumbers filename="main.ts" {38}
+```ts showLineNumbers filename="main.ts" {33-37}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache((table) => {
-  table.loadData(
+await fires.cache(() => {
+  fires.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-  );
-  table.createPoints("lat", "lon", "geom");
+  )
+    .createPoints("lat", "lon", "geom");
 });
 await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache((table) => {
-  table.loadGeoData(
+await provinces.cache(() => {
+  provinces.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
 await provinces.log();
 
-const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
-  outputTable: "firesInsideProvinces",
-});
-firesInsideProvinces.summarize({
-  columns: "hectares",
-  by: "nameEnglish",
-  stats: ["count", "sum"],
-  decimals: 0,
-});
-firesInsideProvinces.renameColumns({
-  count: "nbFires",
-  sum: "burntArea",
-});
-firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.log();
-
-await firesInsideProvinces.logBarChart("nameEnglish", "burntArea");
+await fires
+  .joinGeo(provinces, "inside", {
+    outputTable: "firesInsideProvinces",
+  })
+  .summarize({
+    columns: "hectares",
+    by: "nameEnglish",
+    stats: { nbFires: "count", burntArea: "sum" },
+    decimals: 0,
+  })
+  .sort({ burntArea: "desc" })
+  .logBarChart(
+    "nameEnglish",
+    "burntArea",
+    { showPercentages: true },
+  );
 
 await sdb.close();
 ```
+
 ![A screenshot showing a bar chart in the terminal.](/assets/simple-data-analysis/geospatial-data/bar-chart.png)
 
 ### Saving a chart
 
-We can also save a chart using [Plot](https://github.com/observablehq/plot), which was installed automatically with SDA by `setup-data-project`.
+You can create fancier charts in a file using [Plot](https://github.com/observablehq/plot), which was installed automatically with SDA by `setup-data-project`, and save them with the `writeChart` method.
 
 Don't worry about the syntax for now. We'll cover Plot in detail in a future lesson.
 
-
-```ts showLineNumbers filename="main.ts" {2, 39-55}
+```ts showLineNumbers filename="main.ts" {2, 34-67}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
-import { barX, plot } from "@observablehq/plot";
+import { barX, plot, textX } from "@observablehq/plot";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache((table) => {
-  table.loadData(
+await fires.cache(() => {
+  fires.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-  );
-  table.createPoints("lat", "lon", "geom");
+  )
+    .createPoints("lat", "lon", "geom");
 });
 await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache((table) => {
-  table.loadGeoData(
+await provinces.cache(() => {
+  provinces.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
 await provinces.log();
 
-const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
-  outputTable: "firesInsideProvinces",
-});
-firesInsideProvinces.summarize({
-  columns: "hectares",
-  by: "nameEnglish",
-  stats: ["count", "sum"],
-  decimals: 0,
-});
-firesInsideProvinces.renameColumns({
-  count: "nbFires",
-  sum: "burntArea",
-});
-firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.log();
-
-const chart = (data: unknown[]) =>
-  plot({
-    marginLeft: 170,
-    grid: true,
-    x: { tickFormat: (d) => `${d / 1_000_000}M`, label: "Burnt area (ha)" },
-    y: { label: null },
-    color: { scheme: "Reds" },
-    marks: [
-      barX(data, {
-        x: "burntArea",
-        y: "nameEnglish",
-        fill: "burntArea",
-        sort: { y: "-x" },
+await fires
+  .joinGeo(provinces, "inside", {
+    outputTable: "firesInsideProvinces",
+  })
+  .summarize({
+    columns: "hectares",
+    by: "nameEnglish",
+    stats: { nbFires: "count", burntArea: "sum" },
+    decimals: 0,
+  })
+  .sort({ burntArea: "desc" })
+  .writeChart(
+    (data) =>
+      plot({
+        title: "Burnt area by province (2023)",
+        marginLeft: 170,
+        grid: true,
+        x: { tickFormat: (d) => `${d / 1_000_000}M`, label: "Burnt area (ha)" },
+        y: { label: null },
+        color: { scheme: "Reds" },
+        marks: [
+          barX(data, {
+            x: "burntArea",
+            y: "nameEnglish",
+            fill: "burntArea",
+            sort: { y: "-x" },
+          }),
+          textX(data, {
+            x: "burntArea",
+            y: "nameEnglish",
+            textAnchor: "start",
+            text: (d) =>
+              d
+                ? d.burntArea < 1_000_000
+                  ? `${Math.round(d.burntArea / 1_000)}k`
+                  : `${(d.burntArea / 1_000_000).toFixed(1)}M`
+                : "",
+            dx: 5,
+            fill: "black",
+            stroke: "white",
+          }),
+        ],
       }),
-    ],
-  });
-await firesInsideProvinces.writeChart(chart, "./sda/output/chart.png");
+    "./sda/output/chart.png",
+  );
 
 await sdb.close();
 ```
 
-You can click on the screenshot below to zoom in.
+VS Code can open images. Click the new `chart.png` file in the `output` folder to preview it directly in your editor. When you update and save your code, the script runs again and overwrites the file, while the open image tab automatically refreshes to show your changes. Very nice! 😊
 
 ![A screenshot showing a Plot bar chart.](/assets/simple-data-analysis/geospatial-data/plot-chart.png)
 
 ### Saving a map
 
-Since this is geospatial data, you might want to create a map. You can do that with Plot as well.
+Since this is geospatial data, you might want to create a map. You can do that with Plot and the `writeMap` method.
 
 The code below creates a map with the province boundaries and the wildfires. The size of the fire markers depends on the area burned, and their color corresponds to their cause.
 
-One useful trick is to put all the geospatial data we want to map into the same table, which is done on line 42 below.
-
 Again, don't worry about the syntax. We’ll go over it in a dedicated lesson on Plot.
 
-
-```ts showLineNumbers filename="main.ts" {2, 39-84}
+```ts showLineNumbers filename="main.ts" {2, 36-79}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache((table) => {
-  table.loadData(
+await fires.cache(() => {
+  fires.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-  );
-  table.createPoints("lat", "lon", "geom");
+  )
+    .createPoints("lat", "lon", "geom");
 });
 await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache((table) => {
-  table.loadGeoData(
+await provinces.cache(() => {
+  provinces.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
 await provinces.log();
 
-const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
-  outputTable: "firesInsideProvinces",
-});
-firesInsideProvinces.summarize({
-  columns: "hectares",
-  by: "nameEnglish",
-  stats: ["count", "sum"],
-  decimals: 0,
-});
-firesInsideProvinces.renameColumns({
-  count: "nbFires",
-  sum: "burntArea",
-});
-firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.log();
+await fires
+  .joinGeo(provinces, "inside", {
+    outputTable: "firesInsideProvinces",
+  })
+  .summarize({
+    columns: "hectares",
+    by: "nameEnglish",
+    stats: { nbFires: "count", burntArea: "sum" },
+    decimals: 0,
+  })
+  .sort({ burntArea: "desc" })
+  .log();
 
-const provincesAndFires = provinces.clone({
-  name: "firesAndProvinces",
-});
-provincesAndFires.insertTables(fires, { unifyColumns: true });
-provincesAndFires.addColumn("isFire", "boolean", `hectares > 0`);
-provincesAndFires.replace("cause", {
-  "H": "Human",
-  "N": "Natural",
-  "U": "Unknown",
-});
-const makeMap = (geoData: {
-  features: {
-    properties: { [key: string]: unknown };
-  }[];
-}) => {
-  const fires = geoData.features.filter((d) => d.properties.isFire);
-  const provinces = geoData.features.filter((d) => !d.properties.isFire);
+await fires
+  .clone("firesAndProvinces")
+  .insertTables(provinces, { unifyColumns: true })
+  .replace("cause", {
+    H: "Human",
+    N: "Natural",
+    U: "Unknown",
+  })
+  .writeMap(
+    (geoData) => {
+      const fires = geoData.features.filter((d) =>
+        d.properties.hectares !== null
+      );
+      const provinces = geoData.features.filter((d) =>
+        d.properties.hectares === null
+      );
 
-  return plot({
-    projection: {
-      type: "conic-conformal",
-      rotate: [100, -60],
-      domain: geoData,
+      return plot({
+        projection: {
+          type: "conic-conformal",
+          rotate: [100, -60],
+          domain: geoData,
+        },
+        color: {
+          legend: true,
+        },
+        r: { range: [0.5, 25] },
+        marks: [
+          geo(provinces, {
+            stroke: "lightgray",
+            fill: "whitesmoke",
+          }),
+          geo(fires, {
+            r: "hectares",
+            fill: "cause",
+            fillOpacity: 0.25,
+            stroke: "cause",
+            strokeOpacity: 0.5,
+          }),
+        ],
+      });
     },
-    color: {
-      legend: true,
-    },
-    r: { range: [0.5, 25] },
-    marks: [
-      geo(provinces, {
-        stroke: "lightgray",
-        fill: "whitesmoke",
-      }),
-      geo(fires, {
-        r: "hectares",
-        fill: "cause",
-        fillOpacity: 0.25,
-        stroke: "cause",
-        strokeOpacity: 0.5,
-      }),
-    ],
-  });
-};
-await provincesAndFires.writeMap(makeMap, "./sda/output/map.png", {
-  rewind: true,
-});
+    "./sda/output/map.png",
+  );
 
 await sdb.close();
 ```
 
-You can click on the screenshot below to zoom in.
-
-![A screenshot showing a Plot bar chart.](/assets/simple-data-analysis/geospatial-data/make-map.png)
-
 Here's the map we created above. Quite beautiful. 😍
 
-![A map created with simple-data-analysis and Plot.](/assets/simple-data-analysis/geospatial-data/fires-map.png)
-
+![A screenshot showing a Plot map in VS Code.](/assets/simple-data-analysis/geospatial-data/make-map.png)
 
 ## Exporting the data
 
@@ -586,97 +576,96 @@ Here's the map we created above. Quite beautiful. 😍
 
 If you want to save a table, you can use the `writeData` method. This allows you to export data in CSV, JSON, or Parquet format.
 
-```ts showLineNumbers filename="main.ts" {38}
+This method is for tabular data, meaning tables without geometries. Scroll down to see how to export geospatial files.
+
+```ts showLineNumbers filename="main.ts" {22, 35}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache((table) => {
-  table.loadData(
+await fires.cache(() => {
+  fires.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-  );
-  table.createPoints("lat", "lon", "geom");
+  )
+    .createPoints("lat", "lon", "geom");
 });
 await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache((table) => {
-  table.loadGeoData(
+await provinces.cache(() => {
+  provinces.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
 await provinces.log();
 
-const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
-  outputTable: "firesInsideProvinces",
-});
-firesInsideProvinces.summarize({
-  columns: "hectares",
-  by: "nameEnglish",
-  stats: ["count", "sum"],
-  decimals: 0,
-});
-firesInsideProvinces.renameColumns({
-  count: "nbFires",
-  sum: "burntArea",
-});
-firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.log();
+const firesInsideProvinces = await fires
+  .joinGeo(provinces, "inside", {
+    outputTable: "firesInsideProvinces",
+  })
+  .summarize({
+    columns: "hectares",
+    by: "nameEnglish",
+    stats: { nbFires: "count", burntArea: "sum" },
+    decimals: 0,
+  })
+  .sort({ burntArea: "desc" })
+  .log();
 
 await firesInsideProvinces.writeData("./sda/output/firesInsideProvinces.csv");
 
 await sdb.close();
 ```
+
 ![A screenshot showing a CSV file.](/assets/simple-data-analysis/geospatial-data/write.png)
 
 ### Geospatial data
 
-If needed, we can also export our tables containing geometries using `writeGeoData`. This allows us to save them as GeoJSON or GeoParquet files.
+If needed, we can also export our tables containing geometries using `writeGeoData`. This allows us to save them in GeoJSON, GeoParquet, or Shapefile format.
 
-```ts showLineNumbers filename="main.ts" {38-39}
+```ts showLineNumbers filename="main.ts" {35-36}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ cacheVerbose: true });
 
 const fires = sdb.newTable("fires");
-await fires.cache((table) => {
-  table.loadData(
+await fires.cache(() => {
+  fires.loadData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/firesCanada2023.csv",
-  );
-  table.createPoints("lat", "lon", "geom");
+  )
+    .createPoints("lat", "lon", "geom");
 });
 await fires.log();
 
 const provinces = sdb.newTable("provinces");
-await provinces.cache((table) => {
-  table.loadGeoData(
+await provinces.cache(() => {
+  provinces.loadGeoData(
     "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
   );
 });
 await provinces.log();
 
-const firesInsideProvinces = fires.joinGeo(provinces, "inside", {
-  outputTable: "firesInsideProvinces",
-});
-firesInsideProvinces.summarize({
-  columns: "hectares",
-  by: "nameEnglish",
-  stats: ["count", "sum"],
-  decimals: 0,
-});
-firesInsideProvinces.renameColumns({
-  count: "nbFires",
-  sum: "burntArea",
-});
-firesInsideProvinces.sort({ burntArea: "desc" });
-await firesInsideProvinces.log();
+await fires
+  .joinGeo(provinces, "inside", {
+    outputTable: "firesInsideProvinces",
+  })
+  .summarize({
+    columns: "hectares",
+    by: "nameEnglish",
+    stats: { nbFires: "count", burntArea: "sum" },
+    decimals: 0,
+  })
+  .sort({ burntArea: "desc" })
+  .log();
 
 await fires.writeGeoData("./sda/output/fires.geojson");
 await provinces.writeGeoData("./sda/output/provinces.geojson");
 
 await sdb.close();
 ```
+
+![A screenshot showing the GeoJSON files created in the output folder.](/assets/simple-data-analysis/geospatial-data/write-geo.png)
 
 If you saved them as GeoJSON files, you can visualize them directly in VS Code after installing the [Geo Data Viewer extension](https://marketplace.visualstudio.com/items?itemName=RandomFractalsInc.geo-data-viewer).
 
@@ -690,8 +679,6 @@ I hope you noticed how easy it was to wrangle geospatial data with SDA. One of t
 
 Whether you're working with tabular or geospatial data, SDA provides consistent and intuitive methods to help you get your work done efficiently.
 
-You are also ready to tackle [Wrangling Statistics Canada Census data 🇨🇦](/data-projects/stats-can-census), where you’ll put these tabular and geospatial techniques into practice on a large real-world dataset.
-
-Since SDA is integrated with Plot, you can also create stunning data visualizations. And that's the topic of the next lesson. See you there! 📈
+Now you can keep going with [Visualizing data with Simple Data Analysis and Plot](/simple-data-analysis/dataviz) to better understand how to create amazing charts and maps. See you there! 📈
 
 <NoticeEnd />
