@@ -18,17 +18,24 @@ This lesson assumes you've already completed the [Tabular data](/simple-data-ana
 
 ## Setup
 
-As in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `deno -A jsr:@nshiab/setup-data-project`
+As we did in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `deno -A jsr:@nshiab/setup-data-project`
 
-When prompted, use the space bar to select `simple-data-analysis` and `journalism-format`, then press `Enter`. Plot is installed automatically with SDA.
+[setup-data-project](https://github.com/nshiab/setup-data-project) is another open-source library I created. It installs and configures everything you need so you can quickly get to work on a data project.
+
+When prompted, use the space bar to select `simple-data-analysis`, then press `Enter`. Plot is installed automatically with SDA.
+
+![A screenshot showing simple-data-analysis selected in setup-data-project.](/assets/simple-data-analysis/tabular-data/setup.png)
 
 After running this command, your terminal will display a description of the created files and installed libraries.
 
 Next, run the suggested task to start and watch `sda/main.ts`: `deno task sda`
 
-![A screenshot showing VS Code after running setup-data-project.](/assets/simple-data-analysis/dataviz/setup.png)
+![VS Code showing the starter code and its table with a single message in the terminal.](/assets/simple-data-analysis/tabular-data/starter-table.png)
+
+## Creating our helper functions
 
 To keep our code organized, let's create two functions:
+
 - `crunchData`, where we'll fetch and clean the wildfire data.
 - `visualizeData`, where we'll generate charts and maps.
 
@@ -36,6 +43,7 @@ Let's start with `crunchData`. Create a `crunchData.ts` file in `./sda/helpers/`
 
 Inside, we'll fetch and cache the wildfire data. This dataset is a slightly modified version of the one used in the previous lesson. It includes dates and only fires with a `hectares` burnt value greater than zero.
 
+The first time we use the `cache` method, SDA executes the code and stores the resulting table in the `.sda-cache` folder in our project. As we work, we'll rerun our script many times. Instead of fetching the data from GitHub on every run, which would be slow and could overwhelm GitHub's servers, SDA will load it directly from the cache.
 
 ```ts showLineNumbers filename="crunchData.ts"
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -59,6 +67,12 @@ export default async function visualizeData(fires: SimpleTable) {
 }
 ```
 
+![A screenshot showing two TypeScript files side by side in VS Code.](/assets/simple-data-analysis/dataviz/split-right.png)
+
+<Callout type="info" emoji="💡">
+    To view multiple files side by side in VS Code, right-click a file tab and select `Split Right`. This is handy when you want to look at and work across multiple files at the same time.
+</Callout>
+
 Let's update `main.ts` to create the `fires` table and pass it to our new functions.
 
 ```ts  showLineNumbers filename="main.ts"
@@ -74,6 +88,9 @@ await visualizeData(fires);
 
 await sdb.close();
 ```
+
+Don't forget to save all three files (`Command` + `S` on macOS or `Ctrl` + `S` on Windows). You should then see the `fires` table in the terminal.
+
 ![A screenshot showing VS Code after running helper functions.](/assets/simple-data-analysis/dataviz/helpers.png)
 
 ## Prepping the data
@@ -82,7 +99,7 @@ We have around 5,000 wildfires. Let's say that we would like to visualize how mu
 
 In `crunchData.ts`, let's sum up our fires per date and province.
 
-```ts showLineNumbers filename="crunchData.ts" {10-15}
+```ts showLineNumbers filename="crunchData.ts" {10-14}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(fires: SimpleTable) {
@@ -96,15 +113,17 @@ export default async function crunchData(fires: SimpleTable) {
     columns: "hectares",
     by: ["province", "startdate"],
     stats: "sum",
-    decimals: 1,
   });
 }
 ```
+
+Since we aggregated the data, we went from more than 5,000 rows to just over 1,000.
+
 ![A screenshot showing VS Code logging data tables.](/assets/simple-data-analysis/dataviz/summary.png)
 
 Now, we can compute the cumulative sum per province with the method `accumulate`. We can also round the values with the `round` method to avoid floating point errors.
 
-```ts showLineNumbers filename="crunchData.ts" {16-19}
+```ts showLineNumbers filename="crunchData.ts" {16-21}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(fires: SimpleTable) {
@@ -114,18 +133,21 @@ export default async function crunchData(fires: SimpleTable) {
     );
   });
 
-  fires.summarize({
-    columns: "hectares",
-    by: ["province", "startdate"],
-    stats: "sum",
-    decimals: 1,
-  });
-  fires.accumulate("sum", "cumulativeHectares", {
-    by: "province",
-  });
-  fires.round("cumulativeHectares", { decimals: 1 });
+  fires
+    .summarize({
+      columns: "hectares",
+      by: ["province", "startdate"],
+      stats: "sum",
+    })
+    .accumulate(
+      "sum",
+      "cumulativeHectares",
+      { by: "province" },
+    )
+    .round("cumulativeHectares", 1);
 }
 ```
+
 ![A screenshot showing a new column cumulativeHectares in a data table.](/assets/simple-data-analysis/dataviz/cumulative.png)
 
 Let's visualize this data now!
@@ -134,28 +156,23 @@ Let's visualize this data now!
 
 SDA has some methods to easily log charts in your terminal. It's a great way to quickly inspect your data. Let's work in `visualizeData.ts`.
 
-In the example below, we use the `logDotChart` method with the `startdate` column for the x values and `cumulativeHectares` for the y values. I also added a few options:
+In the example below, we use the `logDotChart` method with the `startdate` column for the x values and `cumulativeHectares` for the y values. We also add two options:
+
 - We use the `province` values to create small multiples (one chart per province).
 - We make all the charts share the same scales, which is convenient for comparing provinces visually.
-- We format the y-axis labels with the `formatNumber` function from the [journalism-format](https://github.com/nshiab/journalism-format) library selected during setup.
 
-```ts showLineNumbers filename="visualizeData.ts" {6-14}
+```ts showLineNumbers filename="visualizeData.ts" {5-8}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
-import { formatNumber } from "@nshiab/journalism-format";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  await fires.logDotChart(
-    "startdate",
-    "cumulativeHectares",
-    {
-      smallMultiples: "province",
-      fixedScales: true,
-      formatY: (d) => formatNumber(d as number, { decimals: 0, suffix: " ha" }),
-    },
-  );
+  await fires.logDotChart("startdate", "cumulativeHectares", {
+    smallMultiples: "province",
+    fixedScales: true,
+  });
 }
 ```
+
 ![A screenshot showing dot charts in the terminal.](/assets/simple-data-analysis/dataviz/dot-charts.png)
 
 You are not limited to dot charts. You can also use the methods `logLineChart`, `logBarChart`, and `logHistogram`.
@@ -170,7 +187,7 @@ However, while these methods are very handy, they are quite limited.
 
 SDA integrates Plot seamlessly, and `setup-data-project` installs it automatically when you select SDA.
 
-To create a chart and save it as a file (`.jpeg`, `.png`, or `.svg` if you want to rework it in Illustrator), you can use the `writeChart` method.
+To create a chart and save it as a file (`.png` or `.svg` if you want to rework it in Illustrator), you can use the `writeChart` method.
 
 The `writeChart` method requires two arguments:
 - A function that draws a Plot chart.
@@ -178,69 +195,81 @@ The `writeChart` method requires two arguments:
 
 In `visualizeData.ts`, let's create a simple line chart showing the area burnt throughout 2023 for each province.
 
-```ts showLineNumbers filename="visualizeData.ts" {2, 6-16}
+```ts showLineNumbers filename="visualizeData.ts" {2, 6-19}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { line, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      marks: [
-        line(data, {
-          x: "startdate",
-          y: "cumulativeHectares",
-          stroke: "province",
+  await fires
+    .writeChart(
+      (data) =>
+        plot({
+          marks: [
+            line(data, {
+              x: "startdate",
+              y: "cumulativeHectares",
+              stroke: "province",
+            }),
+          ],
         }),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+      "./sda/output/chart.png",
+    );
 }
 ```
+
 ![A screenshot showing a line chart saved as png.](/assets/simple-data-analysis/dataviz/draw-chart.png)
 
 <Callout type="info" emoji="💡">
-   To open two tabs one on top of the other, right-click on the tab you want at the bottom and click on `Split down`. In the screenshot above, I toggled the terminal, but even if it's not displayed, it's still running and watching `main.ts`. So anytime I update the chart code, `main.ts` is rerun and the chart updates.
+    As a reminder, you can right-click a file tab or a file in the Explorer on the left and select `Split Right` to view several files, including images, side by side. Since the SDA task is watching `main.ts`, every time you update and save your code, the script runs automatically and refreshes the chart. Keeping the chart open next to your code lets you see your changes right away.
 </Callout>
 
 Let me explain what's going on above:
-- On lines 6-15, I create an arrow function `drawChart`. The function expects an array of `unknown` values because it doesn't know what's in our table. In reality, our data will be an array of objects, as usual.
-- On line 7, I call the `plot` function from Plot. This function creates a chart and requires an object with some options.
-- On line 8, I add a `marks` key with an array. This is the most important option. `marks` define the shapes that represent our data.
-- On lines 9-13, inside the `marks` array, I call the `line` function to create lines based on our `data`. For the `line` options, I specify the `x` values (`startdate`), the `y` values (`cumulativeHectares`), and the `stroke` color (based on `province` values).
-- Finally, on line 16, I call the `writeChart` method on the `fires` table. The first argument is our `drawChart` function, which will automatically receive the `fires` data. The second argument specifies where we want the chart to be saved, which is in the `output` folder.
+
+- On line 2, I import the `line` and `plot` functions from Plot.
+- On lines 6-19, I call `writeChart` on the `fires` table.
+- On line 8, the arrow function receives the rows from `fires` as `data`.
+- On lines 9-17, the arrow function returns the chart created by `plot`.
+- On line 10, I add a `marks` array. Marks are the shapes used to represent our data in a Plot chart.
+- On lines 11-15, I add a `line` mark. It uses `startdate` for the x values, `cumulativeHectares` for the y values, and `province` for the stroke color.
+- On line 18, I pass the second argument to `writeChart`, which specifies where the chart should be saved.
 
 Our chart is quite basic for now, and there are some issues, like the y-axis. Let's fix it!
 
-```ts showLineNumbers filename="visualizeData.ts" {8-14}
+```ts showLineNumbers filename="visualizeData.ts" {10-16}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { line, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      inset: 10,
-      y: {
-        grid: true,
-        label: "Area burned (hectares)",
-        ticks: 5,
-        tickFormat: (d) => `${d / 1_000_000}M`,
-      },
-      marks: [
-        line(data, {
-          x: "startdate",
-          y: "cumulativeHectares",
-          stroke: "province",
+  await fires
+    .writeChart(
+      (data) =>
+        plot({
+          inset: 10,
+          y: {
+            grid: true,
+            label: "Area burned (hectares)",
+            ticks: 5,
+            tickFormat: (d) => `${d / 1_000_000}M`,
+          },
+          marks: [
+            line(data, {
+              x: "startdate",
+              y: "cumulativeHectares",
+              stroke: "province",
+            }),
+          ],
         }),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+      "./sda/output/chart.png",
+    );
 }
 ```
+
 ![A screenshot showing a chart with a better y axis.](/assets/simple-data-analysis/dataviz/y-axis.png)
 
 This is better! To update the y-axis, you can pass options to `y` as an object. Here's what we are doing in the code above:
+
 - We add grids to make the chart more readable.
 - We format the top axis label to be more understandable with the unit.
 - We limit the axis ticks to 5.
@@ -252,39 +281,43 @@ Now, let's update the `x` label. There's no need to modify the x tick labels bec
 
 The colors are currently assigned automatically. We can choose a different scheme and maybe add a legend.
 
-```ts showLineNumbers filename="visualizeData.ts" {15-21}
+```ts showLineNumbers filename="visualizeData.ts" {17-23}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { line, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      inset: 10,
-      y: {
-        grid: true,
-        label: "Area burned (hectares)",
-        ticks: 5,
-        tickFormat: (d) => `${d / 1_000_000}M`,
-      },
-      x: {
-        label: "Date",
-      },
-      color: {
-        legend: true,
-        scheme: "tableau10",
-      },
-      marks: [
-        line(data, {
-          x: "startdate",
-          y: "cumulativeHectares",
-          stroke: "province",
+  await fires
+    .writeChart(
+      (data) =>
+        plot({
+          inset: 10,
+          y: {
+            grid: true,
+            label: "Area burned (hectares)",
+            ticks: 5,
+            tickFormat: (d) => `${d / 1_000_000}M`,
+          },
+          x: {
+            label: "Date",
+          },
+          color: {
+            legend: true,
+            scheme: "tableau10",
+          },
+          marks: [
+            line(data, {
+              x: "startdate",
+              y: "cumulativeHectares",
+              stroke: "province",
+            }),
+          ],
         }),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+      "./sda/output/chart.png",
+    );
 }
 ```
+
 ![A screenshot showing a chart with a color legend.](/assets/simple-data-analysis/dataviz/x-colors.png)
 
 Hmmmm... The color legend doesn't work very well with so many categories. We need to change our strategy. Instead of a color legend, maybe we could add a dot and a text label at the end of each line.
@@ -293,107 +326,117 @@ Let's remove the color legend and add a `dot` mark. Since we want to add dots at
 
 Note that the order in the `marks` array is important. Marks are drawn in sequence, so if you want a shape to appear on top of another, add it later in the array.
 
-```ts showLineNumbers filename="visualizeData.ts" {2, 27-34}
+Don't forget to remove `legend: true` from the `color` options! ⚠️
+
+```ts showLineNumbers filename="visualizeData.ts" {29-36} /dot/1 /selectLast/1
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dot, line, plot, selectLast } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      inset: 10,
-      y: {
-        grid: true,
-        label: "Area burned (hectares)",
-        ticks: 5,
-        tickFormat: (d) => `${d / 1_000_000}M`,
-      },
-      x: {
-        label: "Date",
-      },
-      color: {
-        scheme: "tableau10",
-      },
-      marks: [
-        line(data, {
-          x: "startdate",
-          y: "cumulativeHectares",
-          stroke: "province",
+  await fires
+    .writeChart(
+      (data) =>
+        plot({
+          inset: 10,
+          y: {
+            grid: true,
+            label: "Area burned (hectares)",
+            ticks: 5,
+            tickFormat: (d) => `${d / 1_000_000}M`,
+          },
+          x: {
+            label: "Date",
+          },
+          color: {
+            scheme: "tableau10",
+          },
+          marks: [
+            line(data, {
+              x: "startdate",
+              y: "cumulativeHectares",
+              stroke: "province",
+            }),
+            dot(
+              data,
+              selectLast({
+                x: "startdate",
+                y: "cumulativeHectares",
+                fill: "province",
+              }),
+            ),
+          ],
         }),
-        dot(
-          data,
-          selectLast({
-            x: "startdate",
-            y: "cumulativeHectares",
-            fill: "province",
-          }),
-        ),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+      "./sda/output/chart.png",
+    );
 }
 ```
+
 ![A screenshot showing a line chart with dots at the end.](/assets/simple-data-analysis/dataviz/dots.png)
 
 And now let's add the text labels. We use `selectLast` again with some additional options:
-- In addition to `x` and `y`, we also use `z` to let Plot know that we want a text label for each province. If we had used `fill` or `stroke` with `province` values, this would have been automatic, as the text would match the line colors. However, I prefer black text for labels.
-- We use the values in the `province` column for the `text`.
+
 - We apply a black `fill` with a white `stroke` to improve readability, ensuring the text remains visible even when overlapping other chart elements.
 - We set `textAnchor` to `start` so the text aligns with the `dot`, but we shift it by 5 pixels with `dx` to prevent it from touching the dot.
+- We use `x` and `y` to position the labels, and `z` to create one label for each province. The `text` option uses the values in the `province` column for the labels.
 
-```ts showLineNumbers filename="visualizeData.ts" {2, 35-47}
+```ts showLineNumbers filename="visualizeData.ts" {37-49} /text/1
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dot, line, plot, selectLast, text } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      inset: 10,
-      y: {
-        grid: true,
-        label: "Area burned (hectares)",
-        ticks: 5,
-        tickFormat: (d) => `${d / 1_000_000}M`,
-      },
-      x: {
-        label: "Date",
-      },
-      color: {
-        scheme: "tableau10",
-      },
-      marks: [
-        line(data, {
-          x: "startdate",
-          y: "cumulativeHectares",
-          stroke: "province",
+  await fires
+    .writeChart(
+      (data) =>
+        plot({
+          inset: 10,
+          y: {
+            grid: true,
+            label: "Area burned (hectares)",
+            ticks: 5,
+            tickFormat: (d) => `${d / 1_000_000}M`,
+          },
+          x: {
+            label: "Date",
+          },
+          color: {
+            scheme: "tableau10",
+          },
+          marks: [
+            line(data, {
+              x: "startdate",
+              y: "cumulativeHectares",
+              stroke: "province",
+            }),
+            dot(
+              data,
+              selectLast({
+                x: "startdate",
+                y: "cumulativeHectares",
+                fill: "province",
+              }),
+            ),
+            text(
+              data,
+              selectLast({
+                text: "province",
+                fill: "black",
+                stroke: "white",
+                textAnchor: "start",
+                dx: 5,
+                x: "startdate",
+                y: "cumulativeHectares",
+                z: "province",
+              }),
+            ),
+          ],
         }),
-        dot(
-          data,
-          selectLast({
-            x: "startdate",
-            y: "cumulativeHectares",
-            fill: "province",
-          }),
-        ),
-        text(
-          data,
-          selectLast({
-            x: "startdate",
-            y: "cumulativeHectares",
-            z: "province",
-            text: "province",
-            fill: "black",
-            stroke: "white",
-            textAnchor: "start",
-            dx: 5,
-          }),
-        ),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+      "./sda/output/chart.png",
+    );
 }
 ```
+
 ![A screenshot showing a line chart with dots and text labels at the end.](/assets/simple-data-analysis/dataviz/text-labels.png)
 
 This is much better! But our chart needs some obvious adjustments now.
@@ -403,11 +446,13 @@ For example, we can see that the dots and labels at the end of the lines are not
 We also notice that not much is happening before mid-April and after October 1st.
 
 Let's go back to `crunchData.ts` to fix that:
-- On line 10, we filter the fires to keep only those with a `startDate` between April 15, 2023, and October 1st, 2023.
-- After calculating the cumulative values, we remove the now-unneeded `sum` column. Then we retrieve the maximum `cumulativeHectares` for each province and store the results in a new table, `maxValuesPerProvince`. We rename its result column to match the one in `fires`, add the final date for our data (October 1st, 2023), and insert those rows into `fires`.
 
+- On line 11, we filter the fires to keep only those with a `startdate` between April 15, 2023, and October 1, 2023.
+- After calculating the cumulative values, we remove the now-unneeded `sum` column.
+- Since these values are cumulative, we know that each province's maximum value will stay the same for the rest of the year. Between lines 25 and 32, we use `summarize` to retrieve the maximum value per province, then use `addColumn` to add the last date we want to show in our chart.
+- Finally, on line 34, we insert these final values back into `fires`. Now, the data for every province has the same final date.
 
-```ts showLineNumbers filename="crunchData.ts" {10, 21-30}
+```ts showLineNumbers filename="crunchData.ts" {11, 23-34}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(fires: SimpleTable) {
@@ -417,87 +462,98 @@ export default async function crunchData(fires: SimpleTable) {
     );
   });
 
-  fires.filter(`startdate >= '2023-04-15' && startdate <= '2023-10-01'`);
-  fires.summarize({
-    columns: "hectares",
-    by: ["province", "startdate"],
-    stats: "sum",
-    decimals: 1,
-  });
-  fires.accumulate("sum", "cumulativeHectares", {
-    by: "province",
-  });
-  fires.round("cumulativeHectares", { decimals: 1 });
-  fires.removeColumns("sum");
-  const maxValuesPerProvince = fires.summarize({
-    columns: "cumulativeHectares",
-    by: "province",
-    stats: "max",
-    outputTable: "maxValuesPerProvince",
-  });
-  maxValuesPerProvince.renameColumns({ max: "cumulativeHectares" });
-  maxValuesPerProvince.addColumn("startdate", "date", `'2023-10-01'`);
+  fires
+    .filter(`startdate >= '2023-04-15' && startdate <= '2023-10-01'`)
+    .summarize({
+      columns: "hectares",
+      by: ["province", "startdate"],
+      stats: "sum",
+    })
+    .accumulate(
+      "sum",
+      "cumulativeHectares",
+      { by: "province" },
+    )
+    .round("cumulativeHectares", 1)
+    .removeColumns("sum");
+
+  const maxValuesPerProvince = fires
+    .summarize({
+      columns: "cumulativeHectares",
+      by: "province",
+      stats: { cumulativeHectares: "max" },
+      outputTable: "maxValuesPerProvince",
+    })
+    .addColumn("startdate", "date", `'2023-10-01'`);
+
   fires.insertTables(maxValuesPerProvince);
 }
 ```
+
 ![A screenshot showing a line chart with aligned labels.](/assets/simple-data-analysis/dataviz/labels-aligned.png)
 
 And now, our labels are properly aligned!
 
-Let's go back to `visualizeData.ts` to fix the right margin. We can also filter out some labels to prevent overlapping text.
+Let's go back to `visualizeData.ts` to fix the right margin. We can also filter out some labels to prevent overlapping text and add a caption explaining which labels are not shown.
 
-```ts showLineNumbers filename="visualizeData.ts" {8, 46}
+```ts showLineNumbers filename="visualizeData.ts" {10-11, 13} /filter: (d) => d.cumulativeHectares >= 400_000/
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dot, line, plot, selectLast, text } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
-  const drawChart = (data: unknown[]) =>
-    plot({
-      inset: 10,
-      marginRight: 110,
-      y: {
-        grid: true,
-        label: "Area burned (hectares)",
-        ticks: 5,
-        tickFormat: (d) => `${d / 1_000_000}M`,
-      },
-      x: {
-        label: "Date",
-      },
-      color: {
-        scheme: "tableau10",
-      },
-      marks: [
-        line(data, {
-          x: "startdate",
-          y: "cumulativeHectares",
-          stroke: "province",
+  await fires.log();
+  await fires
+    .writeChart(
+      (data) =>
+        plot({
+          caption:
+            "Labels for provinces with less than 400,000 hectares burned are not shown.",
+          inset: 10,
+          marginRight: 110,
+          y: {
+            grid: true,
+            label: "Area burned (hectares)",
+            ticks: 5,
+            tickFormat: (d) => `${d / 1_000_000}M`,
+          },
+          x: {
+            label: "Date",
+          },
+          color: {
+            scheme: "tableau10",
+          },
+          marks: [
+            line(data, {
+              x: "startdate",
+              y: "cumulativeHectares",
+              stroke: "province",
+            }),
+            dot(
+              data,
+              selectLast({
+                x: "startdate",
+                y: "cumulativeHectares",
+                fill: "province",
+              }),
+            ),
+            text(
+              data,
+              selectLast({
+                text: "province",
+                fill: "black",
+                stroke: "white",
+                textAnchor: "start",
+                dx: 5,
+                x: "startdate",
+                y: "cumulativeHectares",
+                z: "province",
+                filter: (d) => d.cumulativeHectares >= 400_000,
+              }),
+            ),
+          ],
         }),
-        dot(
-          data,
-          selectLast({
-            x: "startdate",
-            y: "cumulativeHectares",
-            fill: "province",
-          }),
-        ),
-        text(
-          data,
-          selectLast({
-            x: "startdate",
-            y: "cumulativeHectares",
-            z: "province",
-            text: "province",
-            fill: "black",
-            stroke: "white",
-            textAnchor: "start",
-            dx: 5,
-            filter: (d) => d.cumulativeHectares >= 400_000,
-          }),
-        ),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+      "./sda/output/chart.png",
+    );
 }
 ```
 
@@ -515,8 +571,7 @@ Our previous chart was quite traditional, but you can also create more unconvent
 
 For example, let's create a beeswarm of our fires.
 
-We can update `crunchData.ts` to return to our raw data. However, let's keep only fires greater than 1 hectare. That leaves us with around 2,400 fires. This is quite a lot, considering we want to visualize each fire individually!
-
+We can update `crunchData.ts` to return to our raw data. However, let's keep only fires greater than 1 hectare. That leaves us with around 2,400 fires. This is quite a lot, considering we want to visualize each fire individually in this type of chart!
 
 ```ts showLineNumbers filename="crunchData.ts"
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -539,62 +594,77 @@ import { dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      marks: [
-        dot(data, { y: "hectares" }),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+  await fires.writeChart(
+    (data) =>
+      plot({
+        marks: [
+          dot(data, { y: "hectares" }),
+        ],
+      }),
+    "./sda/output/chart.png",
+  );
 }
 ```
+
 ![The fires as simple dots.](/assets/simple-data-analysis/dataviz/fires-dots.png)
 
 Right now, our fires are overlapping. The purpose of a beeswarm chart is to stack data points in a way that ensures each one remains visible.
 
-To create a beeswarm, we can use the `dodge` transform with the `middle` option. Let's update our code.
+To create a beeswarm, we can use the `dodgeX` transform with the `middle` option. Let's update our code.
 
 Rendering this chart may take a few seconds, depending on your machine's processing power.
 
-```ts showLineNumbers filename="visualizeData.ts" {2, 9}
+```ts showLineNumbers filename="visualizeData.ts" {12} /dodgeX/1
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      marks: [
-        dot(data, dodgeX("middle", { y: "hectares" })),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+  await fires.writeChart(
+    (data) =>
+      plot({
+        marks: [
+          dot(
+            data,
+            dodgeX("middle", { y: "hectares" }),
+          ),
+        ],
+      }),
+    "./sda/output/chart.png",
+  );
 }
 ```
+
 ![Our first beeswarm.](/assets/simple-data-analysis/dataviz/fires-dodge.png)
 
 It looks like we have a looooot of small wildfires and a few very big ones.
 
 A logarithmic scale could help with that! Let's change our `y` scale `type` to `log`.
 
-```ts showLineNumbers filename="visualizeData.ts" {8-10}
+```ts showLineNumbers filename="visualizeData.ts" {9-11}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      y: {
-        type: "log",
-      },
-      marks: [
-        dot(data, dodgeX("middle", { y: "hectares" })),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+  await fires.writeChart(
+    (data) =>
+      plot({
+        y: {
+          type: "log",
+        },
+        marks: [
+          dot(
+            data,
+            dodgeX("middle", { y: "hectares" }),
+          ),
+        ],
+      }),
+    "./sda/output/chart.png",
+  );
 }
 ```
+
 ![The beeswarm chart with a logarithmic scale.](/assets/simple-data-analysis/dataviz/log-scale.png)
 
 This is already much better. Another improvement would be to scale the dot radius based on fire size. 
@@ -602,140 +672,160 @@ This is already much better. Another improvement would be to scale the dot radiu
 We can update the options for the `dot` function and adjust the `r` scale to ensure a minimum radius of 1 pixel and a maximum of 20 pixels.
 
 
-```ts showLineNumbers filename="visualizeData.ts" {11-13, 15}
+```ts showLineNumbers filename="visualizeData.ts" {12-14} /r: "hectares"/
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      y: {
-        type: "log",
-      },
-      r: {
-        range: [1, 20],
-      },
-      marks: [
-        dot(data, dodgeX("middle", { y: "hectares", r: "hectares" })),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+  await fires.writeChart(
+    (data) =>
+      plot({
+        y: {
+          type: "log",
+        },
+        r: {
+          range: [1, 20],
+        },
+        marks: [
+          dot(
+            data,
+            dodgeX("middle", { y: "hectares", r: "hectares" }),
+          ),
+        ],
+      }),
+    "./sda/output/chart.png",
+  );
 }
 ```
+
 ![The beeswarm chart with the radius tied to the hectares burned.](/assets/simple-data-analysis/dataviz/radiuses.png)
 
 We are getting there.
 
 Let's fill the circles based on the cause of the fire and add a legend.
 
-```ts showLineNumbers filename="visualizeData.ts" {14-16, 20}
+```ts showLineNumbers filename="visualizeData.ts" {15-17} /fill: "cause"/
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      y: {
-        type: "log",
-      },
-      r: {
-        range: [1, 20],
-      },
-      color: {
-        legend: true,
-      },
-      marks: [
-        dot(
-          data,
-          dodgeX("middle", { y: "hectares", r: "hectares", fill: "cause" }),
-        ),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+  await fires.writeChart(
+    (data) =>
+      plot({
+        y: {
+          type: "log",
+        },
+        r: {
+          range: [1, 20],
+        },
+        color: {
+          legend: true,
+        },
+        marks: [
+          dot(
+            data,
+            dodgeX("middle", { y: "hectares", r: "hectares", fill: "cause" }),
+          ),
+        ],
+      }),
+    "./sda/output/chart.png",
+  );
 }
 ```
+
 ![The beeswarm chart with the color depending on the cause of fire.](/assets/simple-data-analysis/dataviz/fires-color.png)
 
 To help compare the causes, we could use facets. Let's do that to create three small charts instead of one large one. 
 
 To achieve this, we use the `fx` option to create horizontal facets. Let's also increase the chart width for better readability.
 
-```ts showLineNumbers filename="visualizeData.ts" {8, 25}
+```ts showLineNumbers filename="visualizeData.ts" {9} /fx: "cause"/
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      width: 800,
-      y: {
-        type: "log",
-      },
-      r: {
-        range: [1, 20],
-      },
-      color: {
-        legend: true,
-      },
-      marks: [
-        dot(
-          data,
-          dodgeX("middle", {
-            y: "hectares",
-            r: "hectares",
-            fill: "cause",
-            fx: "cause",
-          }),
-        ),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+  await fires.writeChart(
+    (data) =>
+      plot({
+        width: 800,
+        y: {
+          type: "log",
+        },
+        r: {
+          range: [1, 20],
+        },
+        color: {
+          legend: true,
+        },
+        marks: [
+          dot(
+            data,
+            dodgeX(
+              "middle",
+              {
+                y: "hectares",
+                r: "hectares",
+                fill: "cause",
+                fx: "cause",
+              },
+            ),
+          ),
+        ],
+      }),
+    "./sda/output/chart.png",
+  );
 }
 ```
+
 ![The beeswarm chart with facets on the cause of fires.](/assets/simple-data-analysis/dataviz/facets.png)
 
 This is starting to look very good. We probably don't need the color legend anymore. 
 
 Let's tweak the labels and axes, then call it a day!
 
-```ts showLineNumbers filename="visualizeData.ts" {8-9, 12-14, 19-21}
+```ts showLineNumbers filename="visualizeData.ts" {9-10, 13-15, 20-22}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { dodgeX, dot, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawChart = (data: unknown[]) =>
-    plot({
-      width: 800,
-      marginTop: 40,
-      y: {
-        type: "log",
-        label: "Hectares",
-        ticks: 5,
-        grid: true,
-      },
-      r: {
-        range: [1, 20],
-      },
-      fx: {
-        label: null,
-      },
-      marks: [
-        dot(
-          data,
-          dodgeX("middle", {
-            y: "hectares",
-            r: "hectares",
-            fill: "cause",
-            fx: "cause",
-          }),
-        ),
-      ],
-    });
-  await fires.writeChart(drawChart, "./sda/output/chart.png");
+  await fires.writeChart(
+    (data) =>
+      plot({
+        width: 800,
+        marginTop: 40,
+        y: {
+          type: "log",
+          label: "Hectares",
+          ticks: 5,
+          grid: true,
+        },
+        r: {
+          range: [1, 20],
+        },
+        fx: {
+          label: null,
+        },
+        marks: [
+          dot(
+            data,
+            dodgeX(
+              "middle",
+              {
+                y: "hectares",
+                r: "hectares",
+                fill: "cause",
+                fx: "cause",
+              },
+            ),
+          ),
+        ],
+      }),
+    "./sda/output/chart.png",
+  );
 }
 ```
 
