@@ -9,8 +9,8 @@ const routes = files.map(toRoute).sort();
 const englishRoutes = routes.filter((route) => route.startsWith("/en"));
 const frenchRoutes = routes.filter((route) => route.startsWith("/fr"));
 
-assert(englishRoutes.length === 37, `Expected 37 English routes, found ${englishRoutes.length}.`);
-assert(frenchRoutes.length === 37, `Expected 37 French routes, found ${frenchRoutes.length}.`);
+assert(englishRoutes.length === 39, `Expected 39 English routes, found ${englishRoutes.length}.`);
+assert(frenchRoutes.length === 39, `Expected 39 French routes, found ${frenchRoutes.length}.`);
 
 const englishPaths = englishRoutes.map((route) => route.slice(3));
 const frenchPaths = frenchRoutes.map((route) => route.slice(3));
@@ -38,7 +38,7 @@ await expectResponse(
     "/fr/first-steps/setup",
     { "accept-language": "fr-CA,fr;q=0.9" },
 );
-await expectResponse("/more", 307, "/fr/more", {
+await expectResponse("/contact", 307, "/fr/contact", {
     cookie: "NEXT_LOCALE=fr",
 });
 await expectResponse("/en/does-not-exist", 404);
@@ -58,6 +58,7 @@ for (const prefix of ["", "/en", "/fr"]) {
             `${prefix}/data-projects/${project}?source=bookmark`,
         );
     }
+
 }
 
 const removedPaths = [
@@ -68,6 +69,9 @@ const removedPaths = [
     "d3-chart",
     "d3-map",
     "git-and-github/github-pages",
+    "inspirations",
+    "more",
+    "simple-data-analysis/sda-and-ai",
 ];
 await Promise.all(
     ["en", "fr"].flatMap((language) =>
