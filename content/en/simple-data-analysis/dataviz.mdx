@@ -841,10 +841,11 @@ With SDA, you can work with both tabular and geospatial data. When wrangling geo
 
 Let's map our fires along with the Canadian province boundaries.
 
-First, we need to store the fire geometries in the same table as the province boundaries. Both datasets use longitude and latitude, so we load them as `EPSG:4326`. Before inserting the rows, we explicitly cast both columns to `GEOMETRY('EPSG:4326')`; this keeps them compatible even if a cached table retains a different CRS type annotation. The two awaited `run()` calls execute those queued type changes before the cross-table insertion is queued.
+First, we need to store the fire geometries in the same table as the province boundaries.
 
-Let's reuse what we did in the previous lesson and update `crunchData.ts`. We'll modify it to take a second table, `provinces`, as a parameter. We fetch and cache the province boundaries, then insert them into the `fires` table. Before inserting, we add a column `isFire` to the `fires` table to easily differentiate them later.
+Let's reuse what we did in the previous lesson and update `crunchData.ts`. We'll modify it to take a second table, `provinces`, as a parameter. For the fires, we create point geometries from the `lat` and `lon` columns. We also add an `isFire` column set to `true`.
 
+Then, we fetch and cache the province boundaries and add the same `isFire` column, this time set to `false`. Finally, we insert the provinces into `fires` and use the `unifyColumns` option because the two tables do not have the same columns.
 
 ```ts showLineNumbers filename="crunchData.ts"
 import { SimpleTable } from "@nshiab/simple-data-analysis";
@@ -853,25 +854,22 @@ export default async function crunchData(
   fires: SimpleTable,
   provinces: SimpleTable,
 ) {
-  await fires.cache((table) => {
-    table.loadData(
-      "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
-    );
-    table.createPoints("lat", "lon", "geom", { projection: "EPSG:4326" });
-    table.addColumn("isFire", "boolean", `TRUE`);
+  await fires.cache(() => {
+    fires
+      .loadData(
+        "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+      )
+      .createPoints("lat", "lon", "geom")
+      .addColumn("isFire", "boolean", `TRUE`);
   });
 
-  await provinces.cache((table) => {
-    table.loadGeoData(
+  await provinces.cache(() => {
+    provinces.loadGeoData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
-      { toEPSG4326: true },
-    );
+    )
+      .addColumn("isFire", "boolean", `FALSE`);
   });
 
-  fires.updateColumn("geom", `geom::GEOMETRY('EPSG:4326')`);
-  provinces.updateColumn("geom", `geom::GEOMETRY('EPSG:4326')`);
-  await provinces.run();
-  await fires.run();
   fires.insertTables(provinces, { unifyColumns: true });
 }
 ```
@@ -906,317 +904,311 @@ await sdb.close();
 
 Here's what you should see to start on the right foot.
 
+You can see that the projection for the fires is `EPSG:4326`, which means it uses latitude and longitude. This is the right projection for what we want to do next.
+
+You can also see that `nameEnglish` and `nameFrench` are `null`. This is because the fire data doesn't have these columns. They come from the `provinces` table.
+
 ![VS Code running and watching main.ts.](/assets/simple-data-analysis/dataviz/map-start.png)
 
-Now, let's work on our map in `visualizeData`. Instead of using `writeChart`, we must use `writeMap`.
+If you want to see the provinces we inserted into `fires`, replace `log` with `logBottom`. This method shows the last 10 rows by default. Here, all the columns specific to fires are `null` because the provinces don't have those values. However, `nameEnglish` and `nameFrench` are populated, and the `geom` column also has the correct `EPSG:4326` projection. It's always important to ensure that you're using the right projection.
 
-Since we are working with geospatial data, `writeMap` passes the data as GeoJSON to the drawing function. This is why `drawMap` expects data with the type `{ features: { properties: { [key: string]: unknown } }[] }`. Essentially, this means that our table data is now stored in each feature's `properties`.
+![VS Code showing the provinces at the bottom of the fires table.](/assets/simple-data-analysis/dataviz/map-start-bottom.png)
 
-To easily work with the fires and the provinces, we first isolate them on lines 9-14. Then, in the `plot` function, we use the `geo` mark, which handles the geospatial coordinates of the features.
+Now that we have all of the data in one table, it's easy to call just one method to draw both the fires and the provincial boundaries. Let's work on our map in `visualizeData`. Instead of using `writeChart`, we must use `writeMap`.
 
-```ts showLineNumbers filename="visualizeData.ts" {2, 6-23}
+`writeMap` works just like `writeChart`. Its first parameter is a function that returns an Observable Plot chart, and its second parameter specifies where to write the chart.
+
+There is one important difference. With `writeChart`, the data passed to the function was an array of objects. With `writeMap`, it is GeoJSON: a collection of features whose data is stored in each feature's `properties`. You can see this on lines 8-13, where we use `feature.properties.isFire` to separate the fires from the provinces. On lines 16 and 17, we draw them separately with Observable Plot's `geo` mark, which is designed to render geospatial features.
+
+```ts showLineNumbers filename="visualizeData.ts" {2, 6-20}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawMap = (
-    data: { features: { properties: { [key: string]: unknown } }[] },
-  ) => {
-    const firesPoints = data.features.filter(
-      (feature) => feature.properties.isFire,
-    );
-    const provincesPolygons = data.features.filter(
-      (feature) => !feature.properties.isFire,
-    );
-
-    return plot({
-      marks: [
-        geo(provincesPolygons),
-        geo(firesPoints),
-      ],
-    });
-  };
-  await fires.writeMap(drawMap, "./sda/output/map.png");
+  await fires
+    .writeMap((geoData) => {
+      const fires = geoData.features.filter(
+        (feature) => feature.properties.isFire,
+      );
+      const provinces = geoData.features.filter(
+        (feature) => !feature.properties.isFire,
+      );
+      return plot({
+        marks: [
+          geo(provinces),
+          geo(fires),
+        ],
+      });
+    }, "./sda/output/map.png");
 }
 ```
+
 ![VS Code showing a basic map.](/assets/simple-data-analysis/dataviz/basic-map.png)
 
 As you can see in the screenshot above, the `geo` mark automatically detected the point coordinates of our fires and the polygon coordinates of the Canadian province boundaries. Pretty clever! 🤓
 
 Right now, the projection is Mercator. Fortunately, Plot supports better projections. Let's update the `projection` option:
-- Set the `type` to `conic-conformal`.
-- Use the `rotate` option to ensure the map isn't tilted with this projection.
-- Use the `domain` option to help Plot make our geospatial data take up as much space as possible on the map.
 
-```ts showLineNumbers filename="visualizeData.ts" {17-21}
+- Set the `type` to `conic-conformal`.
+- Use the `rotate` option to properly align Canada within the projection.
+- Use the `domain` option to fit the full extent of our geospatial data within the map, taking up as much space as possible without being cut off.
+
+```ts showLineNumbers filename="visualizeData.ts" {15-19}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawMap = (
-    data: { features: { properties: { [key: string]: unknown } }[] },
-  ) => {
-    const firesPoints = data.features.filter(
-      (feature) => feature.properties.isFire,
-    );
-    const provincesPolygons = data.features.filter(
-      (feature) => !feature.properties.isFire,
-    );
-
-    return plot({
-      projection: {
-        type: "conic-conformal",
-        rotate: [100, -60],
-        domain: data,
-      },
-      marks: [
-        geo(provincesPolygons),
-        geo(firesPoints),
-      ],
-    });
-  };
-  await fires.writeMap(drawMap, "./sda/output/map.png");
+  await fires
+    .writeMap((geoData) => {
+      const fires = geoData.features.filter(
+        (feature) => feature.properties.isFire,
+      );
+      const provinces = geoData.features.filter(
+        (feature) => !feature.properties.isFire,
+      );
+      return plot({
+        projection: {
+          type: "conic-conformal",
+          rotate: [100, -60],
+          domain: geoData,
+        },
+        marks: [
+          geo(provinces),
+          geo(fires),
+        ],
+      });
+    }, "./sda/output/map.png");
 }
 ```
+
 ![VS Code showing a conic conformal projection.](/assets/simple-data-analysis/dataviz/projection.png)
 
-This is looking better. Let's style our province boundaries to create a nice light background.
+This is looking better. I chose Observable Plot's `conic-conformal` projection because it belongs to the same projection family commonly used by Natural Resources Canada and Statistics Canada for maps of Canada.
 
-```ts showLineNumbers filename="visualizeData.ts" {23-26}
+Let's style our province boundaries to create a nice light background.
+
+```ts showLineNumbers filename="visualizeData.ts" /{/7 /stroke: "lightgray",/ /fill: "whitesmoke",/ /}/4
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawMap = (
-    data: { features: { properties: { [key: string]: unknown } }[] },
-  ) => {
-    const firesPoints = data.features.filter(
-      (feature) => feature.properties.isFire,
-    );
-    const provincesPolygons = data.features.filter(
-      (feature) => !feature.properties.isFire,
-    );
-
-    return plot({
-      projection: {
-        type: "conic-conformal",
-        rotate: [100, -60],
-        domain: data,
-      },
-      marks: [
-        geo(provincesPolygons, {
-          stroke: "lightgray",
-          fill: "whitesmoke",
-        }),
-        geo(firesPoints),
-      ],
-    });
-  };
-  await fires.writeMap(drawMap, "./sda/output/map.png");
+  await fires
+    .writeMap((geoData) => {
+      const fires = geoData.features.filter(
+        (feature) => feature.properties.isFire,
+      );
+      const provinces = geoData.features.filter(
+        (feature) => !feature.properties.isFire,
+      );
+      return plot({
+        projection: {
+          type: "conic-conformal",
+          rotate: [100, -60],
+          domain: geoData,
+        },
+        marks: [
+          geo(provinces, {
+            stroke: "lightgray",
+            fill: "whitesmoke",
+          }),
+          geo(fires),
+        ],
+      });
+    }, "./sda/output/map.png");
 }
 ```
+
 ![VS Code showing province boundaries as light grey.](/assets/simple-data-analysis/dataviz/boundaries.png)
 
 Now, let's work on the fires. Since they are point geometries, Plot automatically represents them as dots using the `geo` mark.
 
-But nothing stops us from using another mark! Let's create a `spike` map instead.
+But nothing stops us from using another mark! Let's create a `spike` map instead. Spikes use a `length` property and a corresponding `length` scale. We set its range to `[1, 100]`, so the spikes are between 1 and 100 pixels tall.
 
 Because the fires are a collection of GeoJSON features, we need to use arrow functions to specify where Plot should find the right values for the spike options.
 
-```ts showLineNumbers filename="visualizeData.ts" {2, 22-24, 30-34}
+```ts showLineNumbers filename="visualizeData.ts" {20-22, 28-32} /spike/1
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot, spike } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawMap = (
-    data: { features: { properties: { [key: string]: unknown } }[] },
-  ) => {
-    const firesPoints = data.features.filter(
-      (feature) => feature.properties.isFire,
-    );
-    const provincesPolygons = data.features.filter(
-      (feature) => !feature.properties.isFire,
-    );
-
-    return plot({
-      projection: {
-        type: "conic-conformal",
-        rotate: [100, -60],
-        domain: data,
-      },
-      length: {
-        range: [1, 100],
-      },
-      marks: [
-        geo(provincesPolygons, {
-          stroke: "lightgray",
-          fill: "whitesmoke",
-        }),
-        spike(firesPoints, {
-          x: (d) => d.properties.lon,
-          y: (d) => d.properties.lat,
-          length: (d) => d.properties.hectares,
-        }),
-      ],
-    });
-  };
-  await fires.writeMap(drawMap, "./sda/output/map.png");
+  await fires
+    .writeMap((geoData) => {
+      const fires = geoData.features.filter(
+        (feature) => feature.properties.isFire,
+      );
+      const provinces = geoData.features.filter(
+        (feature) => !feature.properties.isFire,
+      );
+      return plot({
+        projection: {
+          type: "conic-conformal",
+          rotate: [100, -60],
+          domain: geoData,
+        },
+        length: {
+          range: [1, 100],
+        },
+        marks: [
+          geo(provinces, {
+            stroke: "lightgray",
+            fill: "whitesmoke",
+          }),
+          spike(fires, {
+            x: (d) => d.properties.lon,
+            y: (d) => d.properties.lat,
+            length: (d) => d.properties.hectares,
+          }),
+        ],
+      });
+    }, "./sda/output/map.png");
 }
 ```
+
 ![VS Code showing a basic spike map.](/assets/simple-data-analysis/dataviz/basic-spike-map.png)
 
-This is quite interesting! Now, let's color-code the spikes based on the cause of the wildfires.
+This is quite interesting! Now, let's color-code the spikes based on the cause of the wildfires. Observable Plot assigns one color to each cause. Each spike uses that color for its outline and a translucent version for its fill, allowing us to see spikes that overlap.
 
-```ts showLineNumbers filename="visualizeData.ts" {25-27, 37}
+```ts showLineNumbers filename="visualizeData.ts" {23-25} /stroke: (d) => d.properties.cause,/
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot, spike } from "@observablehq/plot";
 
 export default async function visualizeData(fires: SimpleTable) {
   await fires.log();
-  const drawMap = (
-    data: { features: { properties: { [key: string]: unknown } }[] },
-  ) => {
-    const firesPoints = data.features.filter(
-      (feature) => feature.properties.isFire,
-    );
-    const provincesPolygons = data.features.filter(
-      (feature) => !feature.properties.isFire,
-    );
-
-    return plot({
-      projection: {
-        type: "conic-conformal",
-        rotate: [100, -60],
-        domain: data,
-      },
-      length: {
-        range: [1, 100],
-      },
-      color: {
-        legend: true,
-      },
-      marks: [
-        geo(provincesPolygons, {
-          stroke: "lightgray",
-          fill: "whitesmoke",
-        }),
-        spike(firesPoints, {
-          x: (d) => d.properties.lon,
-          y: (d) => d.properties.lat,
-          length: (d) => d.properties.hectares,
-          stroke: (d) => d.properties.cause,
-        }),
-      ],
-    });
-  };
-  await fires.writeMap(drawMap, "./sda/output/map.png");
+  await fires
+    .writeMap((geoData) => {
+      const fires = geoData.features.filter(
+        (feature) => feature.properties.isFire,
+      );
+      const provinces = geoData.features.filter(
+        (feature) => !feature.properties.isFire,
+      );
+      return plot({
+        projection: {
+          type: "conic-conformal",
+          rotate: [100, -60],
+          domain: geoData,
+        },
+        length: {
+          range: [1, 100],
+        },
+        color: {
+          legend: true,
+        },
+        marks: [
+          geo(provinces, {
+            stroke: "lightgray",
+            fill: "whitesmoke",
+          }),
+          spike(fires, {
+            x: (d) => d.properties.lon,
+            y: (d) => d.properties.lat,
+            length: (d) => d.properties.hectares,
+            stroke: (d) => d.properties.cause,
+          }),
+        ],
+      });
+    }, "./sda/output/map.png");
 }
 ```
+
 ![VS Code showing a colored spike map.](/assets/simple-data-analysis/dataviz/spikes-color.png)
 
-We have a lot of overlapping spikes. By default, Plot draws the spikes in the order they appear in the data. Let's change that to create a nice 3D effect.
+Adding colors helps, but many spikes still overlap. By default, Plot fills spikes with an opacity of 0.3. Transparency can be useful for revealing marks behind one another, but here the many overlapping fills create too much visual noise.
 
-Let's update `crunchData` to sort the fires in descending order by their latitude (`lat`) values. This way, the fires with a greater latitude (further north) will be drawn first and will be overlapped by the ones with a smaller latitude (further south). This approach adds some perspective to the map. 
+In the code below, we set `fillOpacity` to `1` and use lighter versions of the legend colors. Some spikes will hide others, but the map will be much easier to read. We also increase the maximum spike height from 100 to 200 pixels to make the differences more visible.
 
-Thank you to [Philippe Rivière](https://github.com/Fil) for the suggestion! 😊
+```ts showLineNumbers filename="visualizeData.ts" {21, 36-45}
+import { SimpleTable } from "@nshiab/simple-data-analysis";
+import { geo, plot, spike } from "@observablehq/plot";
 
-```ts showLineNumbers filename="crunchData.ts" {13}
+export default async function visualizeData(fires: SimpleTable) {
+  await fires.log();
+  await fires
+    .writeMap((geoData) => {
+      const fires = geoData.features.filter(
+        (feature) => feature.properties.isFire,
+      );
+      const provinces = geoData.features.filter(
+        (feature) => !feature.properties.isFire,
+      );
+      return plot({
+        projection: {
+          type: "conic-conformal",
+          rotate: [100, -60],
+          domain: geoData,
+        },
+        length: {
+          range: [1, 200],
+        },
+        color: {
+          legend: true,
+        },
+        marks: [
+          geo(provinces, {
+            stroke: "lightgray",
+            fill: "whitesmoke",
+          }),
+          spike(fires, {
+            x: (d) => d.properties.lon,
+            y: (d) => d.properties.lat,
+            length: (d) => d.properties.hectares,
+            stroke: (d) => d.properties.cause,
+            fillOpacity: 1,
+            fill: (d) => {
+              if (d.properties.cause === "Human") {
+                return "#b5caff";
+              } else if (d.properties.cause === "Natural") {
+                return "#ffe6a8";
+              } else {
+                return "#ffb9ad";
+              }
+            },
+          }),
+        ],
+      });
+    }, "./sda/output/map.png");
+}
+```
+<Callout type="info" emoji="💡">
+   There are many ways to represent colors. Here, I am using HEX color values. Read [this](https://www.w3schools.com/html/html_colors_hex.asp) if you want to know more.
+</Callout>
+
+There is one more adjustment to make now that the spikes are opaque: their drawing order. By default, Plot draws them in the order they appear in the data. Instead, we'll order them by latitude so fires with a greater latitude (further north) are drawn first and fires with a smaller latitude (further south) appear in front. This adds some perspective to the map.
+
+We can update `crunchData` to sort the fires by latitude in descending order. Thank you to [Philippe Rivière](https://github.com/Fil) for the suggestion! 😊
+
+```ts showLineNumbers filename="crunchData.ts" {25}
 import { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function crunchData(
   fires: SimpleTable,
   provinces: SimpleTable,
 ) {
-  await fires.cache((table) => {
-    table.loadData(
-      "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
-    );
-    table.createPoints("lat", "lon", "geom", { projection: "EPSG:4326" });
-    table.addColumn("isFire", "boolean", `TRUE`);
-    table.sort({ lat: "desc" });
+  await fires.cache(() => {
+    fires
+      .loadData(
+        "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/reported_fires_2023.csv",
+      )
+      .createPoints("lat", "lon", "geom")
+      .addColumn("isFire", "boolean", `TRUE`);
   });
 
-  await provinces.cache((table) => {
-    table.loadGeoData(
+  await provinces.cache(() => {
+    provinces.loadGeoData(
       "https://raw.githubusercontent.com/nshiab/simple-data-analysis/main/test/geodata/files/CanadianProvincesAndTerritories.json",
-      { toEPSG4326: true },
-    );
+    )
+      .addColumn("isFire", "boolean", `FALSE`);
   });
 
-  fires.updateColumn("geom", `geom::GEOMETRY('EPSG:4326')`);
-  provinces.updateColumn("geom", `geom::GEOMETRY('EPSG:4326')`);
-  await provinces.run();
-  await fires.run();
-  fires.insertTables(provinces, { unifyColumns: true });
+  fires
+    .insertTables(provinces, { unifyColumns: true })
+    .sort({ lat: "desc" });
 }
 ```
-
-Also, by default, Plot assigns an opacity of 0.3 to the fill color of the spikes. Instead, we can use paler colors that match the color legend. Removing the transparency will help reduce visual confusion on the map.
-
-Additionally, we can increase the maximum spike height for better visibility.
-
-```ts showLineNumbers filename="visualizeData.ts" {23, 38-47}
-import { SimpleTable } from "@nshiab/simple-data-analysis";
-import { geo, plot, spike } from "@observablehq/plot";
-
-export default async function visualizeData(fires: SimpleTable) {
-  await fires.log();
-  const drawMap = (
-    data: { features: { properties: { [key: string]: unknown } }[] },
-  ) => {
-    const firesPoints = data.features.filter(
-      (feature) => feature.properties.isFire,
-    );
-    const provincesPolygons = data.features.filter(
-      (feature) => !feature.properties.isFire,
-    );
-
-    return plot({
-      projection: {
-        type: "conic-conformal",
-        rotate: [100, -60],
-        domain: data,
-      },
-      length: {
-        range: [1, 200],
-      },
-      color: {
-        legend: true,
-      },
-      marks: [
-        geo(provincesPolygons, {
-          stroke: "lightgray",
-          fill: "whitesmoke",
-        }),
-        spike(firesPoints, {
-          x: (d) => d.properties.lon,
-          y: (d) => d.properties.lat,
-          length: (d) => d.properties.hectares,
-          stroke: (d) => d.properties.cause,
-          fillOpacity: 1,
-          fill: (d) => {
-            if (d.properties.cause === "Human") {
-              return "#b5caff";
-            } else if (d.properties.cause === "Natural") {
-              return "#ffe6a8";
-            } else {
-              return "#ffb9ad";
-            }
-          },
-        }),
-      ],
-    });
-  };
-  await fires.writeMap(drawMap, "./sda/output/map.png");
-}
-```
-<Callout type="info" emoji="💡">
-   There are many ways to represent colors. Here, I am using HEX color values. Read [this](https://www.w3schools.com/html/html_colors_hex.asp) if you want to know more.
-</Callout>
 
 This is looking great! To learn more about maps, check out the [`geo` mark documentation](https://observablehq.com/plot/marks/geo) as well as the [`projection` documentation](https://observablehq.com/plot/features/projections).
 
@@ -1228,10 +1220,12 @@ Congrats! You now know how to create data visualizations with SDA and Plot!
 
 I hope the step-by-step examples helped you understand how to build everything from simple charts to more innovative ones using both tabular and geospatial data.
 
-These visualizations are saved as images, making them easy to use in articles, reports, and other publications.
+Here, we saved our visualizations as PNG images. If you change `.png` to `.svg` in the output path, you'll get a vector version that you can customize further in software like Adobe Illustrator or use on a web page.
+
+I chose Observable Plot for SDA because the same Plot code used throughout this lesson can also be reused directly on a web page. This makes your visualizations flexible, versatile, and easy to adapt for other projects.
 
 Now you are ready to tackle [Wrangling Statistics Canada Census data 🇨🇦](/data-projects/stats-can-census), where you’ll put these tabular and geospatial techniques into practice on a large real-world dataset.
 
-In the next lesson, we'll complete this section by learning how to use AI with SDA and, just as importantly, how to evaluate its results critically.
+After you've crunched the Canadian census data, you can continue with [SDA and AI](/simple-data-analysis/sda-and-ai), where you'll learn how to use Simple Data Analysis with large language models.
 
 <NoticeEnd />
