@@ -1,0 +1,75 @@
+---
+title: Gérer les erreurs avec try et catch en TypeScript
+description: Apprenez à capturer et à gérer les erreurs dans votre code TypeScript.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Gérer les erreurs avec `try` et `catch`
+
+Même du code bien écrit peut rencontrer des erreurs. Un fichier peut être introuvable, un site Web peut être indisponible ou des données peuvent ne pas avoir la structure attendue.
+
+Par défaut, une erreur arrête votre script. Mais parfois, vous savez comment votre code devrait réagir. Les mots-clés `try` et `catch` de TypeScript vous permettent de **capturer** une erreur et de décider quoi faire ensuite.
+
+<NoticeIntro lang="fr" />
+
+## Configuration
+
+Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, puis créez deux fichiers :
+
+- `main.ts`, où nous écrirons notre code.
+- `deno.json`, qui sert à configurer Deno et à activer son extension VS Code. Nous le laisserons vide pour l'instant.
+
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez : `deno run --watch --check --allow-read main.ts`
+
+## Capturer une erreur
+
+Le code suivant essaie de lire un fichier qui n'existe pas :
+
+```ts showLineNumbers filename="main.ts"
+const text = await Deno.readTextFile("./article.txt");
+
+console.log(text);
+```
+
+Lorsque Deno ne trouve pas `article.txt`, il déclenche une erreur et arrête le script.
+
+Nous pouvons gérer cette erreur avec `try` et `catch` :
+
+```ts showLineNumbers filename="main.ts"
+try {
+  const text = await Deno.readTextFile("./article.txt");
+  console.log(text);
+} catch (error) {
+  console.log("Le fichier n'a pas pu être lu.");
+  console.log(error);
+}
+```
+
+Deno exécute d'abord le code à l'intérieur du bloc `try`. Si le code fonctionne, le bloc `catch` est ignoré. Si une erreur survient, Deno cesse d'exécuter le bloc `try` et passe à `catch`.
+
+Le paramètre `error` contient de l'information sur ce qui s'est mal passé. L'afficher peut vous aider à comprendre et à corriger le problème.
+
+<Callout type="info" emoji="💡">
+    Capturez uniquement les erreurs que votre code peut gérer de manière utile. Les autres erreurs devraient arrêter le script afin que vous puissiez les remarquer et les corriger.
+</Callout>
+
+## Retourner une valeur de repli
+
+Parfois, vous avez seulement besoin d'une valeur de repli lorsqu'une opération asynchrone échoue. Dans cet exemple, `Deno.stat()` retourne de l'information sur un fichier lorsqu'il existe. S'il n'existe pas, `.catch()` retourne `null` :
+
+```ts showLineNumbers filename="main.ts"
+const path = "./article.txt";
+const fileInfo = await Deno.stat(path).catch(() => null);
+
+if (fileInfo) {
+  console.log("Le fichier existe!");
+} else {
+  console.log("Le fichier n'existe pas.");
+}
+```
+
+Cette syntaxe raccourcie avec `.catch()` est utile lorsque vous pouvez remplacer une erreur par une simple valeur de repli. Ici, `null` indique au reste de notre code qu'aucun fichier n'a été trouvé.
+
+<NoticeEnd lang="fr" />

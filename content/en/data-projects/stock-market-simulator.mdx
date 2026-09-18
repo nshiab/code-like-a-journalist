@@ -136,36 +136,24 @@ We don’t want to overwhelm Yahoo’s servers with our requests. We must respec
 
 The idea is pretty simple. The first time we fetch the data, we write it to a file. Then, every time the code runs again, if the file exists (which it will), we use it instead of fetching the data again.
 
-To check whether the file already exists on our machine, we can use the `exists` function from Deno's standard library [@std/fs](https://jsr.io/@std/fs/doc/~/exists) (*fs* stands for *file system*).
+So first, create a new folder called `data`, where we will store the cached data.
 
-Install it by running: `deno add jsr:@std/fs`.
+![A screenshot showing a new data folder in VS Code.](/assets/stock-market-simulator/create-data-folder.png)
 
-Create a new folder called `data`, where we will store the cached data.
-
-Now, update `getData.ts` to check whether a cached file exists. If it does, the function reads and returns it. Otherwise, it calls `getYahooFinanceData`, saves the returned array, and returns it.
-
-The code below handles caching. Here’s what happens when you run it:
-
-- Lines 1–2 import the two library functions we need.
-- Line 5 uses `symbol` to create a different cache path for each company.
-- Line 8 checks whether that file already exists.
-- If it does, lines 9–10 read and parse its JSON.
-- If it doesn't, lines 13–21 fetch the data and write it to the cache.
-- Line 24 returns the data, no matter where it came from.
+Now, we're going to update `getData` to check whether a cached file exists. To do that, we use `Deno.stat()`, which returns information if the file exists. If it doesn't, `catch()` returns `null`. We can then use `if` and `else` branches to read the data from the file if it exists, or fetch fresh data if it doesn't.
 
 ```ts showLineNumbers filename="getData.ts"
-import { exists } from "@std/fs";
 import { getYahooFinanceData } from "@nshiab/journalism-finance";
 
 export default async function getData(symbol: string) {
-  const path = `data/${symbol}.json`;
-  let dailyStockData: { timestamp: number; value: number }[];
+  const path = `./data/${symbol}.json`;
+  let dailyStockData;
 
-  if (await exists(path)) {
-    console.log("=> Retrieving data from cache...");
+  if (await Deno.stat(path).catch(() => null)) {
+    console.log(`=> Cached data found at ${path}. Reading it...`);
     dailyStockData = JSON.parse(await Deno.readTextFile(path));
   } else {
-    console.log("=> Fetching data...");
+    console.log("=> No cached data found. Fetching it from Yahoo Finance...");
     dailyStockData = await getYahooFinanceData(
       symbol,
       new Date("1970-01-01"),
@@ -173,6 +161,7 @@ export default async function getData(symbol: string) {
       "adjclose",
       "1d",
     );
+    console.log(`=> Data fetched. Writing it to ${path} for the next run...`);
     await Deno.writeTextFile(path, JSON.stringify(dailyStockData));
   }
 
@@ -180,45 +169,81 @@ export default async function getData(symbol: string) {
 }
 ```
 
+<Callout type="info" emoji="💡">
+    `catch()` is a way to capture errors triggered by your code. We will explore it in more detail in the [Handling errors with `try` and `catch`](/ninja-moves/try-catch) lesson. Don't worry about it for now. We'll dive into it later.
+</Callout>
+
+Here’s what happens when you run this code:
+
+- On line 4, `path` contains the location and name of the cache file. We include `symbol` so each company has its own file and its data isn't overwritten.
+- On line 5, `dailyStockData` is a `let` variable because it will receive either cached data or fresh data from Yahoo Finance.
+- On line 7, `Deno.stat()` checks whether the file exists.
+- If it does, line 8 logs that cached data was found and shows the file path. Line 9 then reads the file and parses its text back into an array of objects.
+- Otherwise, line 11 logs that no cached data was found and that fresh data will be fetched from Yahoo Finance. Lines 12–18 then fetch it.
+- Once the fresh data has been received, line 19 logs where it will be saved for the next run. Line 20 stringifies the array and writes it to that file.
+- Finally, line 23 returns `dailyStockData`, whether it came from the cache or Yahoo Finance.
+
 Now, run and watch `main.ts` with all permissions enabled:
 
 `deno -A --watch --check main.ts`
 
-The first time you run this code, you'll see the fetching message in the terminal, and a new file named `AAPL.json` will be created in `data`.
+The first time you run this code, Deno won't find a file named `AAPL.json`. The `if` block on lines 8–9 won't be executed. Instead, lines 11–20 under `else` will run. You'll see the two messages in the terminal, and line 20 will create `AAPL.json` in the `data` folder.
 
-The data has been fetched and written to a file for future use. If you're curious, you can check what's inside `AAPL.json`!
+![A screenshot showing stock data being fetched and written to AAPL.json.](/assets/stock-market-simulator/data-fetched-aapl.png)
 
-If you rerun `main.ts` by saving it again, you'll see the cache message instead. The data is no longer fetched; it is read from the local file.
+<Callout type="info" emoji="💡">
+    Wondering what `timestamp` means? This huge number is the number of milliseconds since January 1, 1970. This is how JavaScript tracks dates and times behind the scenes. Here, the library gives us the timestamp directly instead of a date, but as we'll see, JavaScript makes it easy to go back and forth between dates and timestamps.
+</Callout>
+
+Now, rerun `main.ts` by saving it again (`CMD` + `S` on Mac or `CTRL` + `S` on PC). This time, the condition on line 7 is met because Deno finds `AAPL.json`. Lines 8–9 are executed, while everything under `else` is skipped. We don't need to fetch the data again. We read it from our local file instead. This is faster and doesn't annoy Yahoo's servers with another request.
+
+![A screenshot showing stock data being read from AAPL.json.](/assets/stock-market-simulator/data-cached-aapl.png)
 
 You can keep cached data for multiple companies. For example, replace `AAPL` in the `symbol` variable with `GOOG` to get the historical stock prices of Alphabet (formerly Google) and run the code.
 
+```ts showLineNumbers filename="main.ts" {3}
+import getData from "./helpers/getData.ts";
+
+const symbol = "GOOG";
+const dailyStockData = await getData(symbol);
+
+console.table(dailyStockData.slice(0, 10));
+```
+
 You'll see another file, `GOOG.json`, being created in `data`.
+
+![A screenshot showing stock data for Alphabet being fetched and written to GOOG.json.](/assets/stock-market-simulator/data-fetched-goog.png)
 
 If you switch back to `AAPL`, the data is still there. No need to fetch it again!
 
 And if you want more up-to-date prices, just delete the files in `data` and rerun your code. Easy!
 
+```ts showLineNumbers filename="main.ts" {3}
+import getData from "./helpers/getData.ts";
+
+const symbol = "AAPL";
+const dailyStockData = await getData(symbol);
+
+console.table(dailyStockData.slice(0, 10));
+```
+
+![A screenshot showing the cached Apple data being read after switching back to AAPL.](/assets/stock-market-simulator/switch-back-to-aapl.png)
+
 <Callout type="info" emoji="💡">
-    Here, we are using caching to avoid pinging Yahoo's servers too many times. But caching is also very commonly used to improve performance. Reading a local file is much faster than fetching data over the Internet.
+    Here, we are using caching to avoid pinging Yahoo's servers too many times. But caching is also very commonly used to improve performance. Reading a local file is much faster than fetching data over the Internet. For example, a script might perform heavy calculations that take a long time. Instead of repeating them every time the script runs, you can cache the results and read them directly on future runs.
 </Callout>
 
 ## Calculating returns
 
 We now have everything we need to calculate returns!
 
-Let's create another function, `getFinalAmount`, in `helpers`. This function will need three parameters:
+Let's create another function, `calculateFinalAmount`, in `helpers`. This function will need three parameters:
 - The `amount` invested, which must be a `number`
 - The `startDate`, which is the `Date` of the investment
 - The `dailyStockData` returned by `getYahooFinanceData`, which is an array of objects pairing a `timestamp` with a `value`
 
-First, we filter the data to keep only prices on or after the investment date. Because the library returns timestamps in milliseconds, we can compare them directly with `startDate.getTime()`.
-
-Then, we retrieve the first and last stock prices from the filtered data. The rate of return is the difference between those two prices, divided by the initial price. Finally, we apply that rate to the amount invested.
-
-For example, if the adjusted stock price doubled, the rate of return would be `1`, or 100%, and our investment would also double.
-
-```ts showLineNumbers filename="getFinalAmount.ts"
-export default function getFinalAmount(
+```ts showLineNumbers filename="calculateFinalAmount.ts"
+export default function calculateFinalAmount(
   amount: number,
   startDate: Date,
   dailyStockData: { timestamp: number; value: number }[],
@@ -238,13 +263,22 @@ export default function getFinalAmount(
 }
 ```
 
-In `main.ts`, we can create variables `amount` and `startDate` to store the initial amount invested and the date of the investment, then pass them to our new function.
+Here’s what happens when we call this function:
 
-We store the result of the function `getFinalAmount` in a new variable called `finalAmount`.
+- Line 6 logs when the function is called.
+- Lines 8–10 keep only data from the investment date onward.
+- Line 12 retrieves the stock's initial value.
+- Lines 13–14 retrieve its latest value.
+- Line 15 calculates the rate of return, which can be positive or negative.
+- Line 17 calculates the final amount: the initial amount plus the amount multiplied by the rate of return.
 
-```ts showLineNumbers filename="main.ts" {2, 6-7, 11}
+If we run our code now, nothing will happen. We still need to call our new function in `main.ts`.
+
+First, we import `calculateFinalAmount`. Then, we create the `amount` and `startDate` variables and pass them, along with `dailyStockData`, to the function. Finally, we store its result in a new variable called `finalAmount`.
+
+```ts showLineNumbers filename="main.ts" {2, 5-6, 10, 12}
 import getData from "./helpers/getData.ts";
-import getFinalAmount from "./helpers/getFinalAmount.ts";
+import calculateFinalAmount from "./helpers/calculateFinalAmount.ts";
 
 const symbol = "AAPL";
 const amount = 1000;
@@ -252,22 +286,22 @@ const startDate = new Date("2020-01-01");
 
 const dailyStockData = await getData(symbol);
 
-const finalAmount = getFinalAmount(amount, startDate, dailyStockData);
+const finalAmount = calculateFinalAmount(amount, startDate, dailyStockData);
 
 console.log(finalAmount);
 ```
 
-And here's the result! It works! You would have $3,266 today (as of Feb. 2025) if you had invested $1,000 in Apple in January 2020.
+And here's the result! It works! You would have approximately $4,639 today (as of September 2026) if you had invested $1,000 in Apple in January 2020.
 
 ![A screenshot showing the final amount invested.](/assets/stock-market-simulator/final-amount.png)
 
-## The results
+## Displaying the result
 
-Let's create a function to better log the results.
+Let's create a function to display the result more clearly.
 
-In `helpers`, create the function `logResult`.
+In `helpers`, create a function called `logResult`.
 
-For the `startDate`, we can convert it to text using `.toISOString()`, which returns the investment date in this format: `"2020-01-01T00:00:00.000Z"`. To keep only the date, we split the text on `"T"`. The `.split()` method returns an array: `["2020-01-01", "00:00:00.000Z"]`. Since we only need the date, we use the index `[0]`.
+To make the message easier to read, we format `startDate` with `.toLocaleDateString("en-US")`. `"en-US"` is what we call a locale. It specifies that the date should be formatted in English for the United States, but you can pass any locale you want, such as `"fr-CA"` for French in Canada. We also round `finalAmount` with `Math.round()`.
 
 ```ts showLineNumbers filename="logResult.ts"
 export default function logResult(
@@ -276,10 +310,11 @@ export default function logResult(
   startDate: Date,
   finalAmount: number,
 ) {
+  const formattedDate = startDate.toLocaleDateString("en-US");
+  const roundedAmount = Math.round(finalAmount);
+
   console.log(
-    `\nIf you had invested $${amount} in ${symbol} on ${
-      startDate.toISOString().split("T")[0]
-    }, you would have $${Math.round(finalAmount)} today.\n`,
+    `\nIf you had invested $${amount} in ${symbol} on ${formattedDate}, you would have $${roundedAmount} today.\n`,
   );
 }
 ```
@@ -288,7 +323,7 @@ We can now use this function in `main.ts`.
 
 ```ts showLineNumbers filename="main.ts" {3, 13}
 import getData from "./helpers/getData.ts";
-import getFinalAmount from "./helpers/getFinalAmount.ts";
+import calculateFinalAmount from "./helpers/calculateFinalAmount.ts";
 import logResult from "./helpers/logResult.ts";
 
 const symbol = "AAPL";
@@ -297,14 +332,14 @@ const startDate = new Date("2020-01-01");
 
 const dailyStockData = await getData(symbol);
 
-const finalAmount = getFinalAmount(amount, startDate, dailyStockData);
+const finalAmount = calculateFinalAmount(amount, startDate, dailyStockData);
 
 logResult(amount, symbol, startDate, finalAmount);
 ```
 
-Beautiful, isn't it? 😍
+![A VS Code screenshot showing the formatted investment result in the terminal.](/assets/stock-market-simulator/log-result.png)
 
-![A VS Code screenshot showing a script simulating the stock market](/assets/stock-market-simulator/final-result.png)
+Beautiful, isn't it? 😍
 
 ## Wait a minute...
 
@@ -312,46 +347,58 @@ Everything works fine with a `startDate` of January 2020... But what would happe
 
 That's impossible! Our code should warn the user.
 
-Update `startDate` to `"1950-01-01"` to test it out... It's returning an amount, but it should be throwing an error.
+Update `startDate` to `"1950-01-01"` to test it out... It's returning an amount, but it should be throwing an error! 😱
 
-We can update `main.ts` to compare the `startDate` with the first timestamp in `dailyStockData`. If the investment date is earlier than the first available price, we throw an error with a message.
+![A VS Code screenshot showing an impossible investment result for a date before Apple was publicly traded.](/assets/stock-market-simulator/impossible-result.png)
 
-```ts showLineNumbers filename="main.ts" {7, 11-15}
-import getData from "./helpers/getData.ts";
-import getFinalAmount from "./helpers/getFinalAmount.ts";
-import logResult from "./helpers/logResult.ts";
+Let's squash this bug! 🐛
 
-const symbol = "AAPL";
-const amount = 1000;
-const startDate = new Date("1950-01-01");
+We can update `calculateFinalAmount`, which already receives both `startDate` and `dailyStockData`. The lines we're adding below compare the investment date with the first available price. If the investment date is earlier, the helper throws an error with a message.
 
-const dailyStockData = await getData(symbol);
+```ts showLineNumbers filename="calculateFinalAmount.ts" {8-12}
+export default function calculateFinalAmount(
+  amount: number,
+  startDate: Date,
+  dailyStockData: { timestamp: number; value: number }[],
+) {
+  console.log("=> Calculating final amount...");
 
-if (startDate.getTime() < dailyStockData[0].timestamp) {
-  throw new Error(
-    "The company was not public at that time. Please choose a later date.",
+  if (startDate.getTime() < dailyStockData[0].timestamp) {
+    throw new Error(
+      "The company was not public at that time. Please choose a later date.",
+    );
+  }
+
+  const filteredDailyStockData = dailyStockData.filter((dailyData) =>
+    dailyData.timestamp >= startDate.getTime()
   );
+
+  const initialValue = filteredDailyStockData[0].value;
+  const finalValue = filteredDailyStockData[filteredDailyStockData.length - 1]
+    .value;
+  const rateOfReturn = (finalValue - initialValue) / initialValue;
+
+  return amount + amount * rateOfReturn;
 }
-
-const finalAmount = getFinalAmount(amount, startDate, dailyStockData);
-
-logResult(amount, symbol, startDate, finalAmount);
 ```
+
+![A screenshot showing an error being thrown from calculateFinalAmount.](/assets/stock-market-simulator/error.png)
+
 <Callout type="info" emoji="💡">
-    Throwing errors is very useful to stop running your script and provide a message to the user (or yourself). Always aim for clear messages that will help you debug easily or will help the user to act accordingly.
+    Throwing an error stops the script and (hopefully) provides a useful message. The error also shows where it originated. In the screenshot above, `calculateFinalAmount.ts:9:11` means line 9, character 11 of that file. In VS Code, `CMD` + click this reference to jump directly to the error, which is very handy for debugging.
 </Callout>
 
 That's better. We won't return impossible results now! You can safely play with different `startDate` values.
 
-![A screenshot showing an error being thrown.](/assets/stock-market-simulator/error.png)
+But are we completely safe? What happens if you provide a date in the future? 🤔 Try to find a way to throw a different error when that happens. Here's a hint: `Date.now()` gives you the current date and time as a number of milliseconds.
 
 ## Conclusion
 
-Congratulations! You've learned many things in this project. We explored historical prices on Yahoo Finance, used a library to fetch clean data, cached it locally, and calculated returns for an amount invested on a specific date. That's a lot!
+Congratulations! You've learned many things in this project. We used a library to fetch clean data, cached it locally, and calculated returns for an amount invested on a specific date. That's a lot!
 
 Now, you can experiment more with this script. Search for other companies on Yahoo's website and copy-paste their symbols. Test different amounts and investment dates!
 
-Or tweak the code to add more functionalities. Here are some ideas:
+Or tweak the code to add more features. Here are some ideas:
 - Compare the returns for multiple companies
 - Invest in multiple companies at once
 - Buy and sell shares at different dates
