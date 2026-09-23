@@ -281,7 +281,7 @@ Here, most of the time saved is from fetching the data. But as we will see in ot
 
 ![A screenshot showing data being retrieved from the cache.](/assets/simple-data-analysis/tabular-data/in-cache.png)
 <Callout type="info" emoji="💡">
-    Always call `await sdb.close()` at the end of your script. It removes unused cached data; otherwise, the `.sda-cache` folder could grow indefinitely. To clear the cache manually, delete the `.sda-cache` folder or run `deno task clean`.
+    Always call `await sdb.close()` at the end of your script. It removes unused cached data; otherwise, the `.sda-cache` folder could grow indefinitely. To clear the cache manually, delete `.sda-cache`. You can also run `deno task clean`, which deletes both `.sda-cache` and `.tmp`.
 </Callout>
 
 ## Exploring the data
