@@ -1210,6 +1210,8 @@ export default async function getDisseminationAreas(sdb: SimpleDB) {
 
 With the change saved, all 43 metropolitan areas are processed and their maps are created! 🥳 On my machine, this cached run took just seven seconds (thanks, cached data!), which is impressive for creating so many maps.
 
+These maps are PNG images. If you'd prefer editable vector files, change `.png` to `.svg` in the `writeMap` output path. You can then open the SVGs and tweak them in software like Illustrator.
+
 Open a few images in `sda/output` to see the results. Montréal is my city, and I find the patterns of household income across it fascinating. Here's its map at full resolution:
 
 ![A map of Montréal showing how median household income varies across its dissemination areas.](/assets/stats-can-census/montreal-final-map.png)

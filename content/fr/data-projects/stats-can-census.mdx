@@ -1212,6 +1212,8 @@ export default async function getDisseminationAreas(sdb: SimpleDB) {
 
 Une fois la modification enregistrée, les 43 régions métropolitaines sont traitées et leurs cartes sont créées ! 🥳 Sur mon ordinateur, cette exécution avec le cache n'a pris que sept secondes (merci, le cache !). C'est impressionnant pour autant de cartes.
 
+Ces cartes sont des images PNG. Si vous préférez des fichiers vectoriels modifiables, remplacez `.png` par `.svg` dans le chemin de sortie de `writeMap`. Vous pourrez ensuite ouvrir les fichiers SVG et les retoucher dans un logiciel comme Illustrator.
+
 Ouvrez quelques images dans `sda/output` pour voir le résultat. Montréal est ma ville et je trouve fascinants les motifs du revenu des ménages qu'on y voit. Voici sa carte en pleine résolution :
 
 ![Une carte de Montréal montrant comment le revenu médian des ménages varie entre les aires de diffusion.](/assets/stats-can-census/montreal-final-map.png)
