@@ -9,8 +9,8 @@ const routes = files.map(toRoute).sort();
 const englishRoutes = routes.filter((route) => route.startsWith("/en"));
 const frenchRoutes = routes.filter((route) => route.startsWith("/fr"));
 
-assert(englishRoutes.length === 39, `Expected 39 English routes, found ${englishRoutes.length}.`);
-assert(frenchRoutes.length === 39, `Expected 39 French routes, found ${frenchRoutes.length}.`);
+assert(englishRoutes.length === 40, `Expected 40 English routes, found ${englishRoutes.length}.`);
+assert(frenchRoutes.length === 40, `Expected 40 French routes, found ${frenchRoutes.length}.`);
 
 const englishPaths = englishRoutes.map((route) => route.slice(3));
 const frenchPaths = frenchRoutes.map((route) => route.slice(3));
@@ -20,16 +20,18 @@ assert(
 );
 
 const failures = [];
-await Promise.all(
-    routes.map(async (route) => {
-        const response = await fetch(`${BASE_URL}${route}`, {
-            redirect: "manual",
-        });
-        if (response.status !== 200) {
-            failures.push(`${response.status} ${route}`);
-        }
-    }),
-);
+for (let index = 0; index < routes.length; index += 4) {
+    await Promise.all(
+        routes.slice(index, index + 4).map(async (route) => {
+            const response = await fetch(`${BASE_URL}${route}`, {
+                redirect: "manual",
+            });
+            if (response.status !== 200) {
+                failures.push(`${response.status} ${route}`);
+            }
+        }),
+    );
+}
 
 await expectResponse("/", 307, "/en");
 await expectResponse(
@@ -43,6 +45,17 @@ await expectResponse("/contact", 307, "/fr/contact", {
 });
 await expectResponse("/en/does-not-exist", 404);
 await expectResponse("/de/does-not-exist", 404);
+await expectResponse(
+    "/git-and-github/github-actions",
+    307,
+    "/en/git-and-github/github-actions",
+);
+await expectResponse(
+    "/git-and-github/github-basics",
+    307,
+    "/fr/git-and-github/github-basics",
+    { "accept-language": "fr-CA,fr;q=0.9" },
+);
 
 for (const prefix of ["", "/en", "/fr"]) {
     for (const project of [

@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { proxy as localeProxy } from "nextra/locales";
 
 const SUPPORTED_LOCALES = new Set(["en", "fr"]);
-const LOCALE_SEGMENT = /^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/i;
+// Only treat a short language code (optionally with a region) as a locale.
+// Section slugs such as "git-and-github" must reach Nextra's locale redirect.
+const LOCALE_SEGMENT = /^[a-z]{2,3}(?:-[a-z]{2}|-[0-9]{3})?$/i;
 
 export function proxy(request) {
     const firstSegment = request.nextUrl.pathname.split("/", 2)[1];
