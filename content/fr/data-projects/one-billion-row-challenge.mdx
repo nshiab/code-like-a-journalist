@@ -21,7 +21,7 @@ Si vous êtes bloqué à un moment donné dans ce projet, il peut être utile de
 - [Données géospatiales](/simple-data-analysis/geospatial-data)
 - [Visualisation des données](/simple-data-analysis/dataviz)
 
-Nous utiliserons Deno et VS Code. Consultez la leçon [Installation](/first-steps/setup) si nécessaire.
+Nous utiliserons Node.js et VS Code. Consultez la leçon [Installation](/first-steps/setup) si nécessaire.
 
 C'est parti !
 
@@ -29,19 +29,19 @@ C'est parti !
 
 ## Installation
 
-Pour tout installer, utilisons [`@nshiab/setup-data-project`](https://jsr.io/@nshiab/setup-data-project), comme dans les leçons précédentes.
+Pour tout installer, utilisons [`@nshiab/setup-data-project`](https://github.com/nshiab/setup-data-project), comme dans les leçons précédentes.
 
-Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez : `deno -A jsr:@nshiab/setup-data-project`
+Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez : `npx @nshiab/setup-data-project`
 
 Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`, puis appuyez sur `Entrée`.
 
-![Une capture d'écran montrant simple-data-analysis sélectionnée dans setup-data-project.](/assets/simple-data-analysis/tabular-data/setup.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/setup.png" alt={"Une capture d'écran montrant simple-data-analysis sélectionnée dans setup-data-project."} lang="fr" />
 
-Ensuite, lancez `deno task sda` pour surveiller `main.ts` et ses dépendances.
+Ensuite, lancez `npm run sda` pour surveiller `sda/main.ts` et ses dépendances.
 
-Voici ce que vous devriez voir dans votre fichier `main.ts` et votre terminal si tout s'est bien passé.
+Voici ce que vous devriez voir dans votre fichier `sda/main.ts` et votre terminal si tout s'est bien passé.
 
-![Une capture d'écran montrant le fichier main.ts généré et le résultat attendu dans le terminal.](/assets/one-billion-row-challenge/setup.png)
+<OutdatedScreenshot src="/assets/one-billion-row-challenge/setup.png" alt={"Une capture d'écran montrant le fichier main.ts généré et le résultat attendu dans le terminal."} lang="fr" />
 
 ## Les données
 
@@ -49,24 +49,24 @@ Dans le défi original, vous devez copier un répertoire GitHub et exécuter un 
 
 [Téléchargez les données ici](https://drive.google.com/file/d/1A_OCjRyHnCCMZbgT0Z5KN70pJXMA8TYD/view). Cela peut prendre quelques minutes car le fichier fait environ 4 Go.
 
-Ensuite, placez-le dans votre dossier `data` et décompressez-le. La version décompressée du fichier CSV fait environ 13 Go.
+Ensuite, placez-le dans votre dossier `sda/data` et décompressez-le. La version décompressée du fichier CSV fait environ 13 Go.
 
-Pour charger les données, copiez et collez ce code dans votre `main.ts`. Selon votre ordinateur, cela peut prendre de quelques secondes à quelques minutes.
+Pour charger les données, copiez et collez ce code dans votre `sda/main.ts`. Selon votre ordinateur, cela peut prendre de quelques secondes à quelques minutes.
 
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ logDuration: true });
 
-sdb
+await sdb
   .newTable()
   .loadData("sda/data/measurements.csv")
   .log();
 
 await sdb.close();
 ```
-![Une capture d'écran de VS Code après avoir chargé un milliard de lignes de données.](/assets/one-billion-row-challenge/load-data.png)
+<OutdatedScreenshot src="/assets/one-billion-row-challenge/load-data.png" alt={"Une capture d'écran de VS Code après avoir chargé un milliard de lignes de données."} lang="fr" />
 
 Félicitations ! Vous venez de charger 1 000 000 000 de lignes de données ! Comme vous pouvez le voir, cela prend environ sept secondes sur mon M4 Max, ce qui est très impressionnant pour un fichier CSV de cette taille. 🥳
 
@@ -75,7 +75,7 @@ Selon la RAM disponible sur votre ordinateur, vous pourriez voir un dossier `.tm
 Ce dossier `.tmp` peut devenir assez volumineux. Mais ne vous inquiétez pas : lorsque vous configurez un projet avec `@nshiab/setup-data-project`, il est automatiquement ajouté à `.gitignore` afin que vous ne le mettiez pas en ligne par erreur sur GitHub ou ailleurs.
 
 <Callout type="info" emoji="💡">
-    Si vous voulez nettoyer votre cache, exécutez `deno task clean`. Cela supprimera `.tmp`. Vous pouvez aussi le supprimer manuellement, mais n'oubliez pas de vider votre corbeille.
+    Si vous voulez nettoyer votre cache, exécutez `npm run clean`. Cela supprime `.sda-cache`, `.journalism-cache` et `.tmp`, y compris les données mises en cache. Vous pouvez aussi supprimer un seul de ces dossiers manuellement.
 </Callout>
 
 ## Le défi
@@ -86,7 +86,7 @@ Maintenant, le défi est de calculer les températures minimale, moyenne et maxi
 
 Avec SDA, c'est très facile. Nous devons appeler une seule méthode, `summarize`, pour effectuer les calculs. Nous n'avons même pas besoin de trier les lignes manuellement, car `summarize` le fait par défaut.
 
-```ts showLineNumbers filename="main.ts" {8-12}
+```ts showLineNumbers filename="sda/main.ts" {8-12}
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB({ logDuration: true });
@@ -104,7 +104,7 @@ await sdb
 await sdb.close();
 ```
 
-![Une capture d'écran de VS Code après avoir agrégé un milliard de lignes de données.](/assets/one-billion-row-challenge/summarize.png)
+<OutdatedScreenshot src="/assets/one-billion-row-challenge/summarize.png" alt={"Une capture d'écran de VS Code après avoir agrégé un milliard de lignes de données."} lang="fr" />
 
 Sur mon ordinateur, ce code s'exécute encore plus rapidement que le simple chargement du fichier CSV, car la table finale est beaucoup plus petite que la table complète d'un milliard de lignes. Tout est traité à la volée, ce qui est assez incroyable. 🚀
 

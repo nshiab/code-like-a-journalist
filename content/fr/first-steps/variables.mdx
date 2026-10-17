@@ -1,6 +1,6 @@
 ---
 title: Variables en TypeScript
-description: Apprenez à définir et à utiliser des variables en TypeScript. Découvrez des astuces pour utiliser efficacement VS Code avec Deno.
+description: Apprenez à définir et à utiliser des variables en TypeScript. Découvrez des astuces pour utiliser efficacement VS Code avec Node.js.
 ---
 
 import { Callout } from 'nextra/components'
@@ -8,47 +8,49 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Variables
 
-Commençons votre première leçon de TypeScript avec les variables ! En chemin, je vous montrerai quelques astuces et conseils pour travailler avec TypeScript, VS Code et Deno.
+Commençons votre première leçon de TypeScript avec les variables ! En chemin, je vous montrerai quelques astuces et conseils pour travailler avec TypeScript, VS Code et Node.js.
 
 <NoticeIntro lang="fr"/>
 
-Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
-- `main.ts` où nous coderons. Vous pouvez y ajouter `console.log(2 + 3);`.
-- `deno.json`, qui sert à configurer Deno et à activer son extension VS Code. Nous le laisserons vide pour l'instant.
+Utilisez le projet créé dans [Installation](/first-steps/setup), ou créez un nouveau dossier vide, ouvrez-le avec VS Code et exécutez `npx @nshiab/setup-data-project` sans sélectionner de librairie.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `deno run main.ts`.
+Remplacez le contenu de `sda/main.ts` par `console.log(2 + 3);` et enregistrez.
+
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis le dossier du projet qui contient `package.json`.
 
 `console.log` indique à l'ordinateur d'afficher quelque chose dans le terminal. Ici, le "quelque chose" est le calcul `2 + 3`. Votre ordinateur effectue le calcul et affiche le résultat, qui est `5`.
 
-![Une capture d'écran montrant VS Code avec les fichiers main.ts et deno.json.](/assets/first-steps/variables/run.png)
+<OutdatedScreenshot src="/assets/first-steps/variables/run.png" alt={"Une capture d'écran montrant VS Code avec les fichiers main.ts et deno.json."} lang="fr" />
 
 <Callout type="info" emoji="💡">
     Vous avez peut-être remarqué que votre code s'affiche avec plusieurs couleurs. Cela s'appelle *code highlighting*. Dans le code, chaque mot a un rôle différent et se voit attribuer une couleur. Par exemple, ici `console` est un objet, et `log` est l'une de ses méthodes. De plus, en tapant, vous pouvez voir des suggestions d'auto-complétion et des infobulles. Cela s'appelle l'*IntelliSense*. C'est votre éditeur qui essaie de deviner ce que vous pourriez vouloir écrire et fournit une documentation. Pour l'instant, vous pouvez ignorer tout cela, mais nous l'utiliserons plus tard.
 </Callout>
 
-## `watch` et `check`
+## Surveillance et vérification des types
 
-Actuellement, ce script ne s'exécute qu'une seule fois. C'est un peu embêtant de devoir passer au terminal et relancer la commande à chaque modification.
+Voyons comment la surveillance et les vérifications du projet nous aident à travailler.
 
-Utilisons l'option `--watch` pour que Deno relance automatiquement notre code chaque fois que nous enregistrons une modification. Pendant que nous y sommes, nous utiliserons également l'option `--check` pour que Deno s'assure que notre code est correct avant de l'exécuter.
+La commande `npm run sda` démarre déjà Node.js en mode surveillance : il relance automatiquement notre code chaque fois que nous enregistrons une modification. Cela relance le script ; cela ne vérifie pas les types TypeScript.
 
-Tapez et exécutez `deno run --watch --check main.ts` dans le terminal. Vous verrez votre script s'exécuter. Maintenant, changez `3` en `4` dans votre code et enregistrez votre fichier (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+Si la commande est toujours en cours, laissez-la tourner. Sinon, relancez `npm run sda`. Maintenant, changez `3` en `4` dans votre code et enregistrez votre fichier (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
 
-Deno effacera le terminal et relancera `main.ts` à chaque fois que vous l'enregistrez. Très pratique !
+Node.js relancera `sda/main.ts` à chaque fois que vous l'enregistrez. Très pratique !
+
+Pour vérifier les types, ouvrez un deuxième terminal avec le bouton `+` du panneau du terminal et exécutez `npm run all-tests`. Cette commande vérifie les types, le formatage et les règles de qualité du code, puis exécute les tests éventuels. Utilisez `npm run fix` pour le formatage et les corrections automatiques, puis vérifiez à nouveau. Une vérification réussie ne garantit pas que votre logique ou vos données sont correctes, mais elle permet de repérer beaucoup d'erreurs.
 
 Si vous voulez arrêter la surveillance, cliquez dans le terminal et appuyez sur `CTRL` + `C` (ça devrait être la même chose sur PC et sur Mac). Mais nous garderons la surveillance pour le reste de la leçon.
 
-![Une capture d'écran montrant VS Code surveillant main.ts.](/assets/first-steps/variables/watch.png)
+<OutdatedScreenshot src="/assets/first-steps/variables/watch.png" alt={"Une capture d'écran montrant VS Code surveillant main.ts."} lang="fr" />
 
 ## Variables avec `const`
 
 Ajoutons maintenant des variables à notre code.
 
-Les variables sont comme des conteneurs. Vous pouvez y mettre des choses, et lorsque vous les référencez, Deno regardera ce qu'il y a à l'intérieur et l'utilisera. C'est très pratique, car vous pouvez réutiliser la même variable à différents endroits dans votre code.
+Les variables sont comme des conteneurs. Vous pouvez y mettre des choses, et lorsque vous les référencez, Node.js regardera ce qu'il y a à l'intérieur et l'utilisera. C'est très pratique, car vous pouvez réutiliser la même variable à différents endroits dans votre code.
 
-Modifions notre code pour mettre le premier nombre dans la variable `a` et le deuxième nombre dans `b`. Nous stockerons également le résultat du calcul dans la variable `c`. Copiez le code ci-dessous et collez-le dans votre fichier `main.ts`.
+Modifions notre code pour mettre le premier nombre dans la variable `a` et le deuxième nombre dans `b`. Nous stockerons également le résultat du calcul dans la variable `c`. Copiez le code ci-dessous et collez-le dans votre fichier `sda/main.ts`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const a = 2;
 const b = 4;
 const c = a + b;
@@ -56,21 +58,21 @@ console.log(c);
 ```
 
 <Callout type="info" emoji="💡">
-    Avez-vous remarqué tous les points-virgules ? Ils sont là pour s'assurer que votre ordinateur sache quand une instruction se termine. Ne vous inquiétez pas si vous les oubliez. Si vous avez suivi les étapes d'[Installation](/first-steps/setup), ils seront ajoutés automatiquement lorsque vous enregistrez un fichier.
+    Avez-vous remarqué tous les points-virgules ? Ils marquent la fin des instructions. Le formateur du projet s'occupe de la présentation du code, mais prenez l'habitude de les écrire explicitement dans vos exemples.
 </Callout>
 
 Votre ordinateur exécutera ce code de haut en bas. La ligne 1 sera exécutée, puis la ligne 2, et ainsi de suite.
 
-![VS Code montrant les variables a, b et c et le résultat 6 dans le terminal.](/assets/first-steps/variables/const-variables.png)
+<OutdatedScreenshot src="/assets/first-steps/variables/const-variables.png" alt={"VS Code montrant les variables a, b et c et le résultat 6 dans le terminal."} lang="fr" />
 
 Si vous enregistrez, vous remarquerez que le résultat dans le terminal est le même. Mais il y a une grande différence dans votre code : vous utilisez des variables !
 
 `c` est le résultat de la somme de `a` et `b`, donc si vous changez `a` en `3`, cela changera la valeur dans `c`. Au lieu de `6`, votre ordinateur affichera `7`. Essayez-le !
 
-Si Deno surveille toujours votre fichier dans le terminal, cela se fait automatiquement lorsque vous enregistrez. Si vous l'avez arrêté, relancez cette commande pour que Deno efface le terminal, vérifie votre code et le réexécute à chaque enregistrement :
+Si Node.js surveille toujours votre fichier dans le terminal, cela se fait automatiquement lorsque vous enregistrez. Si vous l'avez arrêté, relancez cette commande pour que Node.js réexécute votre code à chaque enregistrement :
 
 ```sh
-deno run --watch --check main.ts
+npm run sda
 ```
 
 Les variables sont omniprésentes dans le code car elles permettent d'abstraire et de réutiliser votre logique.
@@ -79,7 +81,7 @@ Nous avons utilisé `a`, `b` et `c` comme noms de variables, mais vous pouvez ut
 
 Par exemple, j'ai mis à jour notre code précédent avec des noms de variables différents. Si vous l'exécutez, le résultat sera le même dans le terminal.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const banana = 2;
 const super_apple = 4;
 const POTATO = banana + super_apple;
@@ -99,7 +101,7 @@ Essayons de remplacer le contenu dans notre code sans changer `const` en `let`.
 
 Mettez à jour votre code ⚠️ **MAIS NE L'ENREGISTREZ PAS ENCORE** ⚠️ ! Je veux d'abord vous montrer quelque chose.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const a = 3;
 const b = 4;
 const c = a + b;
@@ -114,7 +116,7 @@ En tapant, votre éditeur vérifie votre code. Et maintenant, nous voyons du rou
 
 Pour le savoir, survolez le `c` souligné par une ligne ondulée.
 
-![Une capture d'écran montrant une erreur dans VS Code.](/assets/first-steps/variables/const-error-before-save.png)
+<OutdatedScreenshot src="/assets/first-steps/variables/const-error-before-save.png" alt={"Une capture d'écran montrant une erreur dans VS Code."} lang="fr" />
 
 Oh ! Cela indique que nous essayons de remplacer le contenu d'une variable constante, ce qui est interdit. Merci, éditeur de code. Je suis content que tu aies détecté cela **avant d'exécuter le code**.
 
@@ -124,17 +126,17 @@ Maintenant, exécutons ce code, juste par curiosité. Enregistrez le fichier.
 
 Comme prévu, le code plante, et l'erreur s'affiche également dans le terminal.
 
-![Une capture d'écran montrant une erreur dans le terminal de VS Code.](/assets/first-steps/variables/const-error.png)
+<OutdatedScreenshot src="/assets/first-steps/variables/const-error.png" alt={"Une capture d'écran montrant une erreur dans le terminal de VS Code."} lang="fr" />
 
 <Callout type="info" emoji="💡">
-    Lorsqu'une erreur est générée, Deno vous indique où se trouve le code problématique. Ici, il dit que le problème est à `.../main.ts:7:1`, ce qui signifie dans le fichier `main.ts`, à la septième ligne et au premier caractère. Si vous appuyez sur `CMD` sur Mac ou `CTRL` sur PC et cliquez sur ce chemin de fichier, cela vous y mènera directement. C'est très pratique lorsque vous commencez à travailler avec beaucoup de fichiers.
+    Lorsqu'une erreur est générée, Node.js vous indique où se trouve le code problématique. Par exemple, `.../sda/main.ts:7:1` désigne le fichier `sda/main.ts`, à la septième ligne et au premier caractère. La ligne et la colonne exactes peuvent varier selon votre code. Si vous appuyez sur `CMD` sur Mac ou `CTRL` sur PC et cliquez sur ce chemin de fichier, cela vous y mènera directement. C'est très pratique lorsque vous commencez à travailler avec beaucoup de fichiers.
 </Callout>
 
 Mais comment corriger cette erreur ?
 
 Si nous voulons remplacer le contenu d'une variable, nous devons remplacer `const` par `let` lors de la création de la variable `c` à la ligne 3.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -148,7 +150,7 @@ Maintenant, le code s'exécute sans problème ! Si vous mettez à jour votre cod
 
 Nous pouvons également réutiliser `c` pour le remplacer... par lui-même ! Les deux dernières lignes du code ci-dessous remplacent `c` par `c` au carré (`c` multiplié par lui-même).
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -161,9 +163,9 @@ c = c * c;
 console.log(c);
 ```
 
-Voici le résultat du code ci-dessus :
+Le code ci-dessus affiche `7`, puis `10`, puis `100`.
 
-![Une capture d'écran montrant un résultat au carré dans le terminal.](/assets/first-steps/variables/squared.png)
+<OutdatedScreenshot src="/assets/first-steps/variables/squared.png" alt={"Une capture d'écran montrant un résultat au carré dans le terminal."} lang="fr" />
 
 ## Variables typées
 
@@ -171,13 +173,13 @@ Il y a autre chose à savoir sur les variables : **le type de données est impor
 
 Par exemple, si vous survolez `c` maintenant, vous verrez qu'il a un type `number`. Cela est dû au fait que la somme de `a` et `b` est un nombre. Le type ici est **inféré**.
 
-![Une capture d'écran montrant une variable de type number dans VS Code.](/assets/first-steps/variables/type-number.png)
+<OutdatedScreenshot src="/assets/first-steps/variables/type-number.png" alt={"Une capture d'écran montrant une variable de type number dans VS Code."} lang="fr" />
 
 Maintenant, remplaçons `c` par du texte à la ligne `6`. En TypeScript, le texte est appelé un `string`, car c'est une chaîne (*string* en anglais) de caractères. Pour que votre ordinateur le reconnaisse comme du texte, il doit être entouré de guillemets.
 
 Mettez à jour votre code ⚠️ **MAIS NE L'ENREGISTREZ PAS ENCORE** ⚠️ ! Désolé, j'ai encore crié. 😬
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -196,11 +198,13 @@ Si nous remplaçons `c` par du texte à la ligne 6, que se passe-t-il à la lign
 
 Encore une fois, l'éditeur a détecté l'erreur **avant d'exécuter le code**. En TypeScript, **les variables sont typées**, ce qui nous aide à écrire du code fiable et robuste.
 
-![Une capture d'écran montrant une erreur de type dans VS Code lors d'un survol.](/assets/first-steps/variables/type-error-hover.png)
+<OutdatedScreenshot src="/assets/first-steps/variables/type-error-hover.png" alt={"Une capture d'écran montrant une erreur de type dans VS Code lors d'un survol."} lang="fr" />
 
-Et si nous enregistrons le fichier, le script plante, comme prévu.
+**Enregistrez maintenant le fichier et exécutez `npm run all-tests` dans votre deuxième terminal.** La vérification des types signale qu'une chaîne de caractères ne peut pas être assignée à une variable de type `number`.
 
-![Une capture d'écran montrant une erreur de type dans VS Code.](/assets/first-steps/variables/type-error.png)
+Node.js se comporte différemment : il exécute le code sans vérifier les types. Il affiche `7`, puis le texte, puis `NaN`, car multiplier ce texte par lui-même ne produit pas de nombre. Le script ne plante pas. C'est précisément pourquoi nous utilisons le vérificateur TypeScript en plus de Node.js : un script qui s'exécute peut quand même produire un résultat invalide.
+
+<OutdatedScreenshot src="/assets/first-steps/variables/type-error.png" alt={"Une capture d'écran montrant une erreur de type dans VS Code."} lang="fr" />
 
 ## Conclusion
 
@@ -216,7 +220,7 @@ Bien que cela puisse sembler compliqué pour l'instant, après un peu de pratiqu
 
 Et comme je serais un très mauvais enseignant si je vous laissais terminer une leçon sur une erreur, mettons à jour le code une dernière fois, avec des commentaires cette fois-ci.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Nous créons des variables constantes.
 const a = 3;
 const b = 4;

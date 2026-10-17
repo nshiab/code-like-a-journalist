@@ -14,18 +14,17 @@ By encapsulating code within functions, you can reuse the same code over and ove
 
 Let's set things up for this lesson.
 
-Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+Create a new project with `npx @nshiab/setup-data-project`, following the [setup lesson](/first-steps/setup). For this lesson, leave all optional libraries unselected. Open the generated project folder in VS Code and use the generated `sda/main.ts` for your code.
 
-- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
-- `deno.json`, used to configure Deno and activate its VS Code extension. We will keep it empty for now.
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project root, the folder containing `package.json`.
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run the following command:  `deno run --watch --check main.ts`
+This command reruns your code every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC). Stop it with `CTRL` + `C` on either system.
 
-This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+Node.js runs TypeScript without checking its types. Use `npm run all-tests` to check the project, and `npm run fix` to apply formatting and automatic fixes, as explained in the setup lesson.
 
 You can use this setup to test the code provided in this lesson.
 
-![A screenshot showing VS Code running and watching a TypeScript file.](/assets/pushing-further/functions/setup.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/setup.png" alt={"A screenshot showing VS Code running and watching a TypeScript file."} lang="en" />
 
 ## Basic function
 
@@ -33,9 +32,9 @@ To create a function, you need to declare it using the `function` keyword, follo
 
 Let's create a function named `sayHello` that logs `"Hello!"`. The code you want the function to execute must go between the `{}`. We'll talk about what goes between the `()` in a minute.
 
-Copy and paste the code below into `main.ts`.
+Copy and paste the code below into `sda/main.ts`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 function sayHello() {
   console.log("Hello!");
 }
@@ -45,7 +44,7 @@ If you save and run this code, nothing will get logged. You created a function, 
 
 To **call a function**, you need to use its name followed by `()`, as shown on line 5 below.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 function sayHello() {
   console.log("Hello!");
 }
@@ -56,11 +55,11 @@ sayHello()
     Giving functions clear and understandable names is key to maintaining a clean, easy-to-debug, and reusable codebase. Since functions are supposed to do something, it's often a good idea to use a verb as a naming convention.
 </Callout>
 
-![A screenshot showing VS Code logging Hello!.](/assets/pushing-further/functions/hello.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/hello.png" alt={"A screenshot showing VS Code logging Hello!."} lang="en" />
 
 Now, you can reuse it as many times as you want!
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 function sayHello() {
   console.log("Hello!");
 }
@@ -72,7 +71,7 @@ sayHello()
 sayHello()
 ```
 
-![A screenshot showing VS Code logging multiple Hello!.](/assets/pushing-further/functions/hellos.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/hellos.png" alt={"A screenshot showing VS Code logging multiple Hello!."} lang="en" />
 
 ## Parameters
 
@@ -84,7 +83,7 @@ Parameters are defined between the `()` when declaring the function, and they ar
 
 In the code below, we add a parameter `name` to the function `sayHello` and specify that `name` must be of type `string`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 function sayHello(name: string) {
   console.log("Hello, " + name + "!");
 }
@@ -99,7 +98,7 @@ When you use `+` with strings, it **concatenates** them, meaning it joins them t
 
 Here's the same function using string interpolation:
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 function sayHello(name: string) {
   console.log(`Hello, ${name}!`);
 }
@@ -107,13 +106,13 @@ function sayHello(name: string) {
 sayHello();
 ```
 
-If you copy, paste and save this code, you'll encounter an error. This happens because your function now expects a parameter `name`, and you're not providing it when calling the function on line 5.
+VS Code and `npm run all-tests` report a type error here: the function expects a `name` argument, but the call on line 5 provides none. If you run it anyway with `npm run sda`, Node.js prints `Hello, undefined!` because it doesn’t enforce TypeScript types.
 
-![A screenshot showing VS Code showing an error because of a missing argument.](/assets/pushing-further/functions/missing-name.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/missing-name.png" alt={"A screenshot showing VS Code showing an error because of a missing argument."} lang="en" />
 
 Let's pass the **argument** `"Nael"` to the function on line 5. Now, it logs `"Hello, Nael!"`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 function sayHello(name: string) {
   console.log(`Hello, ${name}!`);
 }
@@ -121,11 +120,11 @@ function sayHello(name: string) {
 sayHello("Nael");
 ```
 
-![A screenshot showing VS Code logging "Hello Nael".](/assets/pushing-further/functions/hello-nael.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/hello-nael.png" alt={"A screenshot showing VS Code logging \"Hello Nael\"."} lang="en" />
 
 And now, we can call the same function with different names.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 function sayHello(name: string) {
   console.log(`Hello, ${name}!`);
 }
@@ -137,13 +136,13 @@ sayHello("John");
 sayHello("Jane");
 ```
 
-![A screenshot showing VS Code logging multiple "Hello" with different names.](/assets/pushing-further/functions/hello-names.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/hello-names.png" alt={"A screenshot showing VS Code logging multiple \"Hello\" with different names."} lang="en" />
 
-Remember that function parameters are typed. If you try to pass a number instead of a string as `name`, you'll get an error.
+Remember that function parameters are typed. If you try to pass a number instead of a string as `name`, VS Code and `npm run all-tests` report a type error.
 
 Again, types work for you. Type checking on function parameters will save you from many debugging sessions. 🐞
 
-![A screenshot showing VS Code showing a type error.](/assets/pushing-further/functions/type-error.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/type-error.png" alt={"A screenshot showing VS Code showing a type error."} lang="en" />
 
 Anything can be a function parameter: strings, numbers, booleans, objects, or even other functions!
 
@@ -151,7 +150,7 @@ You can also have multiple parameters between the function `()`, separated by a 
 
 For example, here, we add a new parameter `isTired`, which is expected to be a boolean. When `isTired` is `true`, we add `"You look tired..."`. If it's `false`, we add `"You look great!"`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 function sayHello(name: string, isTired: boolean) {
   if (isTired) {
     console.log(`Hello, ${name}! You look tired...`);
@@ -163,7 +162,7 @@ function sayHello(name: string, isTired: boolean) {
 sayHello("Nael", true);
 sayHello("Emily", false);
 ```
-![A screenshot showing VS Code showing a function with multiple parameters.](/assets/pushing-further/functions/multiple-parameters.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/multiple-parameters.png" alt={"A screenshot showing VS Code showing a function with multiple parameters."} lang="en" />
 
 ## Return
 
@@ -171,13 +170,13 @@ If you hover over the function (or start typing it), you'll see the **function s
 
 It shows `function sayHello(name: string, isTired: boolean): void`. The `: void` at the end indicates that the function does not return anything, which makes sense because we are just logging information to the terminal for now.
 
-![A screenshot showing VS Code showing a function signature.](/assets/pushing-further/functions/function-signature.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/function-signature.png" alt={"A screenshot showing VS Code showing a function signature."} lang="en" />
 
 However, in many cases, you want a function to return something.
 
 For example, let's say you're Canadian and want to visit the Eiffel Tower. You could create a function to convert Canadian dollars to Euros. As of the time of writing this (2025-01-22), the conversion rate is 0.67.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 function convertDollarsToEuros(dollars: number) {
   return dollars * 0.67;
 }
@@ -187,7 +186,7 @@ convertDollarsToEuros(100);
 
 Here, the function uses the keyword `return`. If you hover over the function, you'll see `: number` at the end, which means this function returns a number.
 
-![A screenshot showing VS Code showing a function returning a number.](/assets/pushing-further/functions/return-number.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/return-number.png" alt={"A screenshot showing VS Code showing a function returning a number."} lang="en" />
 
 But if you run the code, it looks like nothing happens!
 
@@ -195,7 +194,7 @@ Actually, the calculations are performed and returned, but returned to nowhere! 
 
 Let's create a variable `euros` to store the returned value of `convertDollarsToEuros(dollars)` and log a proper message.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 function convertDollarsToEuros(dollars: number) {
   return dollars * 0.67;
 }
@@ -206,7 +205,7 @@ const euros = convertDollarsToEuros(dollars);
 console.log(`${dollars} Canadian dollars is ${euros} euros`);
 ```
 
-![A screenshot showing VS Code logging how much dollars are in euros.](/assets/pushing-further/functions/proper-message.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/proper-message.png" alt={"A screenshot showing VS Code logging how much dollars are in euros."} lang="en" />
 
 As with parameters, returned values can be anything: strings, numbers, booleans, objects, or even functions.
 
@@ -214,27 +213,27 @@ Because functions are typed, the variables storing their return values are autom
 
 If you hover over `euros`, you'll see that its type is `number` because the return value of `convertDollarsToEuros` is `number`. When working on more complex algorithms with many functions, this type inference feels magical and helps you stay sane.
 
-![A screenshot showing VS Code showing the type of a variable.](/assets/pushing-further/functions/euros-type.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/euros-type.png" alt={"A screenshot showing VS Code showing the type of a variable."} lang="en" />
 
 ## Exporting and importing
 
-Since `main.ts` is our primary code entry point, we try to keep it lean. Cluttering it with function declarations is not optimal.
+Since `sda/main.ts` is our primary code entry point, we try to keep it lean. Cluttering it with function declarations is not optimal.
 
 Typically, we keep functions in their own files. This makes debugging easier and also makes the functions reusable, as you can `import` them into other files.
 
 We often group such functions into a folder called `helpers`.
 
 In your current repository:
-  1) Create a new folder named `helpers`.
+  1) Create a new folder named `helpers` inside `sda`.
   2) Create a new file named `convertDollarsToEuros.ts` in `helpers`.
   3) Cut and paste the `convertDollarsToEuros` function declaration into it.
 
-Nothing will work for now, but that's okay. You can click on the image below to enlarge it, if needed.
+Nothing will work for now, but that's okay. We still need to export and import the function.
 
-![A screenshot showing VS Code showing two TypeScript files.](/assets/pushing-further/functions/new-file.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/new-file.png" alt={"A screenshot showing VS Code showing two TypeScript files."} lang="en" />
 
 <Callout type="info" emoji="💡">
-    In VS Code, files are opened as tabs. By default, only one tab is shown. If you want to see multiple tabs side by side, right-click on a tab and then click `Split up`, `Split down`, `Split left`, or `Split right`. In the screenshot above, I chose `Split right`.
+    In VS Code, files are opened as tabs. By default, only one tab is shown. If you want to see multiple tabs side by side, right-click on a tab and then click `Split up`, `Split down`, `Split left`, or `Split right`. Try `Split right` to view your main file and helper side by side.
 </Callout>
 
 Now, the `convertDollarsToEuros` function is in a separate file, but it can't be used anywhere else yet. There's a yellow warning about it.
@@ -243,7 +242,7 @@ We need to make it available by **exporting it**.
 
 Update your code in `convertDollarsToEuros.ts` by adding the keywords `export default` on line 1.
 
-```ts showLineNumbers filename="convertDollarsToEuros.ts" /export default/
+```ts showLineNumbers filename="sda/helpers/convertDollarsToEuros.ts" /export default/
 export default function convertDollarsToEuros(dollars: number) {
   return dollars * 0.67;
 }
@@ -251,17 +250,17 @@ export default function convertDollarsToEuros(dollars: number) {
 
 Now that `convertDollarsToEuros` is exported, we can import it anywhere we want!
 
-In our case, we want to use it in `main.ts`. To do this, add the following line at the beginning of the file: `import convertDollarsToEuros from "./helpers/convertDollarsToEuros.ts";`.
+In our case, we want to use it in `sda/main.ts`. To do this, add the following line at the beginning of the file: `import convertDollarsToEuros from "./helpers/convertDollarsToEuros.ts";`.
 
 IntelliSense recognizes that the function is available. If you start typing, it will suggest it to you. Pretty neat! Press `Enter` to accept the suggestion.
 
 Import specifiers use forward slashes (`/`) on every operating system, including Windows.
 
-![A screenshot showing VS Code import suggestion.](/assets/pushing-further/functions/intellisense.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/intellisense.png" alt={"A screenshot showing VS Code import suggestion."} lang="en" />
 
-Here's the code you should have in `main.ts`.
+Here's the code you should have in `sda/main.ts`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 import convertDollarsToEuros from "./helpers/convertDollarsToEuros.ts";
 
 const dollars = 100;
@@ -270,18 +269,18 @@ const euros = convertDollarsToEuros(dollars);
 console.log(`${dollars} Canadian dollars is ${euros} euros`);
 ```
 <Callout type="info" emoji="💡">
-    When you import a file, you need to tell your computer where to find it with a **path**. Here, `./helpers/convertDollarsToEuros.ts` is a **relative path** because it starts with `./`. The `.` tells the computer to start where the current file is. In this case, since we are updating `main.ts`, it starts in the folder where `main.ts` is. Then `/helpers` tells the computer to go inside the `helpers` folder. Finally, `/convertDollarsToEuros.ts` tells it to import the content of this file.
+    When you import a file, you need to tell your computer where to find it with a **path**. Here, `./helpers/convertDollarsToEuros.ts` is a **relative path** because it starts with `./`. The `.` tells the computer to start where the current file is. In this case, since we are updating `sda/main.ts`, it starts in the folder where `sda/main.ts` is. Then `/helpers` tells the computer to go inside the `helpers` folder. Finally, `/convertDollarsToEuros.ts` tells it to import the content of this file.
 </Callout>
 
 And now, everything works! If we had multiple files where `convertDollarsToEuros` was needed, we could easily import the function and reuse it in multiple places!
 
-![A screenshot showing VS Code importing and using a TypeScript function.](/assets/pushing-further/functions/working.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/working.png" alt={"A screenshot showing VS Code importing and using a TypeScript function."} lang="en" />
 
-Also, since we are watching `main.ts` by running `deno run --watch --check`, we are automatically watching all of `main.ts` dependencies. This means that if you update `convertDollarsToEuros.ts` and save it, the terminal will be cleared, and the script will be rerun too. So useful!
+Also, since `npm run sda` watches `sda/main.ts`, we are automatically watching all of `sda/main.ts` dependencies. This means that if you update `convertDollarsToEuros.ts` and save it, the terminal will be cleared, and the script will be rerun too. So useful!
 
-Change `0.67` to `0.65` to see it in action. Notice on the first line in the terminal which file change the `Watcher` detected.
+Change `0.67` to `0.65` to see it in action. Your script reruns and logs the updated result in the terminal.
 
-![A screenshot showing Deno detecting a file change.](/assets/pushing-further/functions/file-change.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/file-change.png" alt={"A screenshot showing Deno detecting a file change."} lang="en" />
 <Callout type="info" emoji="💡">
     You might think that creating multiple files makes it more difficult to navigate your code. But if you press `CMD` on Mac or `CTRL` on PC and click on a function in your code, VS Code will automatically take you to the function’s file by opening a new tab.
 </Callout>
@@ -294,7 +293,7 @@ To create documentation with JSDoc syntax, you need to use `/**` at the beginnin
 
 Here's a basic documentation added at the beginning of `convertDollarsToEuros.ts`. We have a simple description at first, followed by a description of the parameter `dollars`, and finally a description of the returned value.
 
-```ts showLineNumbers filename="convertDollarsToEuros.ts" {1-6}
+```ts showLineNumbers filename="sda/helpers/convertDollarsToEuros.ts" {1-6}
 /**
  * Converts an amount in Canadian dollars to euros.
  *
@@ -310,15 +309,15 @@ export default function convertDollarsToEuros(dollars: number) {
     In this example, I'm being fancy with `@param` and `@returns`, but you can also write regular text inside the JSDoc comment. It will still appear as documentation when you hover over the function.
 </Callout>
 
-The reason why JSDoc is so handy is because VS Code (and many other tools) understands it. If you hover over the function in `main.ts` now, you'll see not only the types but also your documentation popping up!
+The reason why JSDoc is so handy is because VS Code (and many other tools) understands it. If you hover over the function in `sda/main.ts` now, you'll see not only the types but also your documentation popping up!
 
-![A screenshot showing VS Code displaying JSDoc for a function.](/assets/pushing-further/functions/documentation.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/documentation.png" alt={"A screenshot showing VS Code displaying JSDoc for a function."} lang="en" />
 
 We can improve our documentation by adding an example.
 
 To ensure that VS Code recognize the example as code, we use a **fenced code block** with three backticks `` ``` ``. When opening the block, we also specify `ts` so VS Code knows it's TypeScript code and applies the relevant syntax highlighting.
 
-```ts showLineNumbers filename="convertDollarsToEuros.ts" {4-9}
+```ts showLineNumbers filename="sda/helpers/convertDollarsToEuros.ts" {4-9}
 /**
  * Converts an amount in Canadian dollars to euros.
  *
@@ -337,7 +336,7 @@ export default function convertDollarsToEuros(dollars: number): number {
 }
 ```
 
-![A screenshot showing VS Code displaying JSDoc with an example for a function.](/assets/pushing-further/functions/documentation-example.png)
+<OutdatedScreenshot src="/assets/pushing-further/functions/documentation-example.png" alt={"A screenshot showing VS Code displaying JSDoc with an example for a function."} lang="en" />
 
 ## Arrow functions
 

@@ -14,7 +14,7 @@ Dans ce projet, nous allons coder un calculateur de compte épargne. Cela vous p
 
 Voici ce que vous verrez dans votre terminal à la fin de ce projet. Votre calculateur générera des taux d'intérêt annuels aléatoires, alors parfois vous gagnerez 📈, et parfois vous perdrez 📉 !
 
-![Une capture d'écran montrant le terminal VS Code avec un tableau et des chaînes de caractères affichés.](/assets/saving-account-calculator/results.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/results.png" alt={"Une capture d'écran montrant le terminal VS Code avec un tableau et des chaînes de caractères affichés."} lang="fr" />
 
 <NoticeIntro lang="fr"/>
 
@@ -39,17 +39,11 @@ Avec cela en tête, nous pouvons commencer à coder notre calculateur !
 
 ## Environnement de travail
 
-Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
+Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez `npx @nshiab/setup-data-project` dans le terminal. Appuyez sur `Entrée` sans sélectionner de librairie. Vous retrouverez la structure et les outils de la leçon [Installation](/first-steps/setup).
 
-- `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
-- `deno.json`, qui sert à configurer Deno et à activer son extension VS Code. Nous le laisserons vide pour l'instant.
+Remplacez le contenu de `sda/main.ts` par `console.log("Hello!");`, puis exécutez `npm run sda` depuis le dossier du projet. Le script sera réexécuté à chaque enregistrement. Utilisez `npm run all-tests` pour vérifier votre code et `npm run fix` pour le formater et appliquer les corrections automatiques.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez la commande suivante :  
-`deno --watch --check main.ts`
-
-Cette commande efface le terminal et réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
-
-![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/saving-account-calculator/watch.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/watch.png" alt={"Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript."} lang="fr" />
 
 ## Nombre d’années
 
@@ -59,7 +53,7 @@ Cela semble être une tâche parfaite pour une **boucle** !
 
 Commençons par itérer sur les années. Nous pouvons créer une variable `years` pour qu’il soit facile de modifier le nombre d’années souhaité et de relancer le script.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const years = 10;
 
 for (let year = 0; year < years; year++) {
@@ -71,7 +65,7 @@ for (let year = 0; year < years; year++) {
     Vous vous demandez peut-être ce qu’est `{ year }` dans le code ci-dessus. C’est une façon plus courte d’écrire `{ year: year }`. Cela demande à votre ordinateur de créer un objet avec une clé `year` associée à la valeur contenue dans la variable `year`. Court et efficace, n’est-ce pas ?
 </Callout>
 
-![Une capture d'écran montrant VS Code exécutant un fichier TypeScript avec une boucle.](/assets/saving-account-calculator/loop.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/loop.png" alt={"Une capture d'écran montrant VS Code exécutant un fichier TypeScript avec une boucle."} lang="fr" />
 
 Au lieu d’avoir des nombres de `0` à `9`, il serait préférable d’avoir des années.
 
@@ -82,7 +76,7 @@ Voici ce qui se passe maintenant avec notre boucle à la ligne 4 :
 - `year < startingYear + years` signifie que notre boucle s’exécutera tant que `year` sera inférieur à `2025 + 10`.
 - `year++` signifie que `year` augmentera de 1 à chaque itération.
 
-```ts showLineNumbers filename="main.ts" {1, 4}
+```ts showLineNumbers filename="sda/main.ts" {1, 4}
 const startingYear = 2025;
 const years = 10;
 
@@ -91,11 +85,11 @@ for (let year = startingYear; year < startingYear + years; year++) {
 }
 ```
 
-![Une capture d'écran montrant VS Code exécutant un fichier TypeScript avec une boucle pour afficher les années.](/assets/saving-account-calculator/starting-year.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/starting-year.png" alt={"Une capture d'écran montrant VS Code exécutant un fichier TypeScript avec une boucle pour afficher les années."} lang="fr" />
 
 Pendant que nous y sommes, nous pourrions stocker chaque objet pour chaque année dans une liste nommée `results` et tout afficher sous forme de tableau.
 
-```ts showLineNumbers filename="main.ts" {4, 7, 10}
+```ts showLineNumbers filename="sda/main.ts" {4, 7, 10}
 const startingYear = 2025;
 const years = 10;
 
@@ -108,7 +102,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
 console.table(results);
 ```
 
-![Une capture d'écran montrant VS Code affichant un tableau dans le terminal.](/assets/saving-account-calculator/table.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/table.png" alt={"Une capture d'écran montrant VS Code affichant un tableau dans le terminal."} lang="fr" />
 
 ## Taux d’intérêt et solde
 
@@ -119,7 +113,7 @@ Nous pourrions créer trois nouvelles variables :
 - `interestRate` pour stocker le taux d’intérêt annuel. Je l’ai fixé à 2 %.
 - `balance`, qui représente le solde du compte épargne. Cette variable devrait être créée avec `let`, car nous allons la mettre à jour chaque année dans notre boucle. Au départ, `balance` est égal à `initialAmount`.
 
-```ts showLineNumbers filename="main.ts" {1, 2, 6}
+```ts showLineNumbers filename="sda/main.ts" {1, 2, 6}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -140,7 +134,7 @@ Dans notre boucle, nous pouvons maintenant créer la variable `gainsOrLosses` po
 
 Nous pouvons également ajouter `gainsOrLosses` et `balance` à notre liste `results`.
 
-```ts showLineNumbers filename="main.ts" {11-17}
+```ts showLineNumbers filename="sda/main.ts" {11-17}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -167,7 +161,7 @@ console.table(results);
     Notez que `gainsOrLosses` est créé **à l’intérieur** des accolades de la boucle. Il est **scopé** dans le bloc de code délimité par les `{}`, ce qui signifie qu’il n’existe qu’à l’intérieur de ce bloc. Si vous essayez de l’afficher à la ligne 19, vous obtiendrez une erreur. Le **scoping** est une fonctionnalité importante qui aide à éviter les conflits de variables, mais qui permet également à l’ordinateur de libérer de la mémoire lorsqu’une variable n’est plus nécessaire.
 </Callout>
 
-![Une capture d'écran montrant VS Code avec un calculateur de compte épargne de base.](/assets/saving-account-calculator/basics.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/basics.png" alt={"Une capture d'écran montrant VS Code avec un calculateur de compte épargne de base."} lang="fr" />
 
 Ça fonctionne ! Vous avez déjà un calculateur de compte épargne de base ! Voyez-vous les intérêts composés faire fructifier votre argent ? 💵
 
@@ -181,7 +175,7 @@ Pour cela, nous pouvons utiliser l’objet global `Math`. Il est toujours dispon
 
 Ici, nous avons juste besoin d’arrondir `gainsOrLosses`.
 
-```ts showLineNumbers filename="main.ts" {11}
+```ts showLineNumbers filename="sda/main.ts" {11}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -202,7 +196,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
 console.table(results);
 ```
 
-![Une capture d'écran montrant VS Code affichant des valeurs arrondies pour un calculateur de compte épargne.](/assets/saving-account-calculator/round.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/round.png" alt={"Une capture d'écran montrant VS Code affichant des valeurs arrondies pour un calculateur de compte épargne."} lang="fr" />
 
 ## Randomiser les taux d’intérêt
 
@@ -210,11 +204,11 @@ Cela fonctionne plutôt bien, mais dans la vie, les taux d’intérêt fluctuent
 
 Bien sûr, nous ne pouvons pas prédire l’avenir, mais nous pouvons randomiser le taux d’intérêt pour rendre les choses un peu plus intéressantes.
 
-Pour cela, nous pouvons utiliser `Math.random()`, qui renvoie un nombre compris entre `0` et `1`.
+Pour cela, nous pouvons utiliser `Math.random()`, qui renvoie un nombre entre `0` inclus et `1` exclu.
 
 Voyons cela en action en l’appelant dans notre boucle. Nous pouvons commenter `console.table(results)` pour l’instant.
 
-```ts showLineNumbers filename="main.ts" {11, 20}
+```ts showLineNumbers filename="sda/main.ts" {11, 20}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -241,7 +235,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
     Il existe de nombreux algorithmes aléatoires. `Math.random()` renvoie une distribution approximativement uniforme, ce qui signifie que vous avez à peu près la même chance d’obtenir n’importe quel nombre entre 0 et 1. Par ailleurs, ne l’utilisez pas pour quoi que ce soit lié à la sécurité. Ce n’est pas un algorithme sûr cryptographiquement.
 </Callout>
 
-![Une capture d'écran montrant VS Code affichant des valeurs aléatoires.](/assets/saving-account-calculator/random.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/random.png" alt={"Une capture d'écran montrant VS Code affichant des valeurs aléatoires."} lang="fr" />
 
 À moins d’être extraordinairement chanceux, vous n’aurez pas les mêmes nombres que moi d'affichés dans le terminal. La seule certitude est que nous aurons tous les deux des nombres compris entre `0` et `1`.
 
@@ -249,7 +243,7 @@ Pour randomiser notre taux d’intérêt (qui est actuellement `2`), nous aimeri
 
 Pour obtenir un nombre aléatoire positif ou négatif, nous pouvons simplement soustraire `0.5` à nos nombres aléatoires.
 
-```ts showLineNumbers filename="main.ts" {11}
+```ts showLineNumbers filename="sda/main.ts" {11}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -272,7 +266,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
 // console.table(results);
 ```
 
-![Une capture d'écran montrant VS Code affichant des valeurs aléatoires comprises entre -0.5 et 0.5.](/assets/saving-account-calculator/random-shift.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/random-shift.png" alt={"Une capture d'écran montrant VS Code affichant des valeurs aléatoires comprises entre -0.5 et 0.5."} lang="fr" />
 
 Maintenant que nous avons des nombres aléatoires compris entre `-0.5` et `0.5`, nous devons décider de l’amplitude de ces fluctuations.
 
@@ -280,7 +274,7 @@ Nous pouvons créer une nouvelle variable `interestRateRange`. Je l’ai fixée 
 
 Si nous multiplions nos nombres aléatoires par cette amplitude, nous obtenons maintenant des valeurs aléatoires comprises entre `-10` et `10`. Cela ressemble à une excellente fluctuation de taux d’intérêt !
 
-```ts showLineNumbers filename="main.ts" {3, 12-14}
+```ts showLineNumbers filename="sda/main.ts" {3, 12-14}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -306,13 +300,13 @@ for (let year = startingYear; year < startingYear + years; year++) {
 // console.table(results);
 ```
 
-![Une capture d'écran montrant VS Code affichant des valeurs aléatoires comprises entre -10 et 10.](/assets/saving-account-calculator/random-fluctuation.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/random-fluctuation.png" alt={"Une capture d'écran montrant VS Code affichant des valeurs aléatoires comprises entre -10 et 10."} lang="fr" />
 
 Nous pouvons maintenant ajouter cette fluctuation à notre `interestRate`. Comme `interestRate` est défini à 2 % dans mon code, cela me donne un taux d’intérêt de **2 % ± 10 %** pour une année donnée. Cela signifie que le taux d’intérêt tombera aléatoirement entre **-8 %** (une très mauvaise année) et **12 %** (une performance incroyable) !
 
 Mettons à jour notre code et affichons de nouveau notre tableau. Par souci de simplicité, nous pouvons également arrondir notre `randomInterestRate`. Maintenant, à chaque fois que vous sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC), vous verrez des résultats différents !
 
-```ts showLineNumbers filename="main.ts" {14, 16, 22, 28}
+```ts showLineNumbers filename="sda/main.ts" {14, 16, 22, 28}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -343,7 +337,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
 console.table(results);
 ```
 
-![Une capture d'écran montrant VS Code affichant des résultats aléatoires.](/assets/saving-account-calculator/random-results.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/random-results.png" alt={"Une capture d'écran montrant VS Code affichant des résultats aléatoires."} lang="fr" />
 
 ## Répondre à la question
 
@@ -353,7 +347,7 @@ Tout d’abord, récupérons le dernier objet dans notre liste `results`. Cet ob
 
 En l’utilisant, nous pouvons calculer les pertes ou gains finaux et afficher la réponse appropriée.
 
-```ts showLineNumbers filename="main.ts" {28-40}
+```ts showLineNumbers filename="sda/main.ts" {28-40}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -403,7 +397,7 @@ console.table(results);
 
 Ce serait une bonne chose d’ajouter plus de détails, comme les gains ou pertes réalisés, à la fois en chiffres absolus et en pourcentage.
 
-```ts showLineNumbers filename="main.ts" {30-32, 35-40, 42-47}
+```ts showLineNumbers filename="sda/main.ts" {30-32, 35-40, 42-47}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -459,10 +453,10 @@ console.table(results);
 ```
 
 <Callout type="info" emoji="💡">
-   Les lignes ajoutées ici (35-40, 42-47) utilisent des **template literals**. Lorsque vous écrivez du texte avec des backticks (`` ` ``), vous pouvez créer du texte sur plusieurs lignes. Vous pouvez également insérer des variables ou du code dans le texte en utilisant `${}`. Par exemple, `` `Deux multiplié par deux donne ${2 * 2}` `` créera le texte `"Deux multiplié par deux donne 4"`. Les template literals sont très utiles pour créer du texte dynamique qui change en fonction de vos données et des résultats de vos analyses.
+   Le texte sur plusieurs lignes ajouté ici utilise des **template literals**. Lorsque vous écrivez du texte avec des backticks (`` ` ``), vous pouvez créer du texte sur plusieurs lignes. Vous pouvez également insérer des variables ou du code dans le texte en utilisant `${}`. Par exemple, `` `Deux multiplié par deux donne ${2 * 2}` `` créera le texte `"Deux multiplié par deux donne 4"`. Les template literals sont très utiles pour créer du texte dynamique qui change en fonction de vos données et des résultats de vos analyses.
 </Callout>
 
-![Une capture d'écran montrant VS Code affichant les résultats d'un calculateur de compte épargne.](/assets/saving-account-calculator/results.png)
+<OutdatedScreenshot src="/assets/saving-account-calculator/results.png" alt={"Une capture d'écran montrant VS Code affichant les résultats d'un calculateur de compte épargne."} lang="fr" />
 
 ## Félicitations !
 

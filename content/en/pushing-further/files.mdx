@@ -1,6 +1,6 @@
 ---
 title: Writing and Reading Files with TypeScript
-description: Learn how to write and read files using Deno, including handling JSON data and understanding asynchronous operations.
+description: Learn how to write and read files using Node.js, including handling JSON data and understanding asynchronous operations.
 ---
 
 import { Callout } from 'nextra/components'
@@ -18,91 +18,60 @@ If you want to keep some data around, you need to write it to a file, which will
 
 Let's set things up for this lesson.
 
-Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+Create a new project with `npx @nshiab/setup-data-project`, following the [setup lesson](/first-steps/setup). For this lesson, leave all optional libraries unselected. Open the generated project folder in VS Code and use the generated `sda/main.ts` for your code.
 
-- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
-- `deno.json`, used to configure Deno and activate its VS Code extension. We will keep it empty for now.
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project root, the folder containing `package.json`.
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run the following command: `deno run --watch --check main.ts`
+This command reruns your code every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC). Stop it with `CTRL` + `C` on either system.
 
-This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+Node.js runs TypeScript without checking its types. Use `npm run all-tests` to check the project, and `npm run fix` to apply formatting and automatic fixes, as explained in the setup lesson.
 
 You can use this setup to test the code provided in this lesson.
 
-![A screenshot showing VS Code running and watching a TypeScript file.](/assets/pushing-further/files/setup.png)
+<OutdatedScreenshot src="/assets/pushing-further/files/setup.png" alt={"A screenshot showing VS Code running and watching a TypeScript file."} lang="en" />
 
 ## Writing
 
-With Deno, writing files is very easy. You can use the `Deno` global object, which is always available while coding, and call the `.writeTextFile()` method.
+With Node.js, writing files is very easy. Import the `writeFile` function from the built-in `node:fs/promises` module. You don’t need to install anything: this module comes with Node.js.
 
-The method requires a path as the first parameter and a string as the second parameter. In the code below, we want to create a file named `hello.txt` containing `"Hello!"`.
+For text files, pass a path as the first parameter and a string as the second parameter. In the code below, we want to create a file named `hello.txt` containing `"Hello!"`.
 
-The `./` makes this a relative path: it points to the folder where we run the script, which is the folder we created during setup.
+The `./` makes this a relative path: it points to the folder where we run the script, which is the project root containing `package.json`. This is different from imports: their relative paths start from the importing file, here `sda/main.ts`.
 
-Copy, paste, and save this code in `main.ts`. We’ll talk about the `await` keyword in a minute.
+Copy, paste, and save this code in `sda/main.ts`. We’ll talk about the `await` keyword in a minute.
 
-```ts showLineNumbers filename="main.ts"
-await Deno.writeTextFile("./hello.txt", "Hello!");
+```ts showLineNumbers filename="sda/main.ts"
+import { writeFile } from "node:fs/promises";
+
+await writeFile("./hello.txt", "Hello!");
 ```
 
-Oh! Something popped up in the terminal. 🧐
+A new text file has been created with text content in it. You now know how to permanently store data on your computer!
 
-![A screenshot showing VS Code showing a Deno write warning in the terminal.](/assets/pushing-further/files/allow-write.png)
+By the way, be careful: by default, `writeFile` overwrites files if they already exist.
 
-Deno is very strict when it comes to security. By default, it doesn’t allow a script to write files on your computer. Imagine running code from an unknown source that writes dangerous files to your system. That would be terrible! 💣
-
-To allow the script to write a file, you need to explicitly grant permission by adding the `--allow-write` flag to the terminal command.
-
-At the beginning of this lesson, we ran the script with: `deno run --watch --check main.ts`
-
-Stop it by clicking in your terminal and pressing `CTRL + C` (this works on both Mac and PC).
-
-Then rerun it with: `deno run --watch --check --allow-write main.ts`
-
-Now it works! A new text file has been created with text content in it. You now know how to permanently store data on your computer!
-
-By the way, be careful: by default, `writeTextFile` overwrites files if they already exist.
-
-![A screenshot showing VS Code writing a text file with Deno.](/assets/pushing-further/files/write-working.png)
+<OutdatedScreenshot src="/assets/pushing-further/files/write-working.png" alt={"A screenshot showing VS Code writing a text file with Deno."} lang="en" />
 
 ## Reading
 
-To read files, you can use `Deno.readTextFile()`. The method expects a file path.
+To read files, import `readFile` from the same module. Pass a file path and the encoding `"utf8"` to get the contents as a string. Without the encoding, Node.js returns a `Buffer`, which represents raw bytes.
 
-Let’s update `main.ts` to read the file we wrote earlier.
+Let’s update `sda/main.ts` to read the file we wrote earlier.
 
-```ts showLineNumbers filename="main.ts"
-const data = await Deno.readTextFile("./hello.txt");
+```ts showLineNumbers filename="sda/main.ts"
+import { readFile } from "node:fs/promises";
+
+const data = await readFile("./hello.txt", "utf8");
 console.log(data);
 ```
 
-Oh! The warning again! 🚨
+You’ve successfully retrieved the text content from the `hello.txt` file!
 
-By default, Deno doesn’t allow a script to read files on your computer. Again, this is a great security feature. Imagine running an unknown script that reads private files with confidential data! 🕵️
+<OutdatedScreenshot src="/assets/pushing-further/files/read-working.png" alt={"A screenshot showing VS Code reading a text file with Deno."} lang="en" />
 
-![A screenshot showing VS Code showing a Deno read warning in the terminal.](/assets/pushing-further/files/allow-read.png)
+<OutdatedScreenshot src="/assets/pushing-further/files/allow-write.png" alt={"A screenshot showing VS Code showing a Deno write warning in the terminal."} lang="en" />
 
-To allow the script to read a file, you need to explicitly grant permission by adding the `--allow-read` flag to the terminal command.
-
-Stop running your script by clicking in your terminal and pressing `CTRL + C` (this works on both Mac and PC).
-
-Then rerun it with: `deno run --watch --check --allow-read main.ts`
-
-Now it works. You’ve successfully retrieved the text content from the `hello.txt` file!
-
-![A screenshot showing VS Code reading a text file with Deno.](/assets/pushing-further/files/read-working.png)
-
-## All permissions granted 👮
-
-While Deno’s explicit permissions are a great security feature when running unknown code, it’s not very convenient during development.
-
-If you trust the code you are running (and all its dependencies!), you can use the flag `-A` to allow the script to do anything it wants.
-
-Here, it’s fine since we are just running our own code.
-
-Click on your terminal, press `CTRL + C` to stop it, and run: `deno run --watch --check -A main.ts`
-
-Now your script can write, read, and more! We will use this command for the rest of this lesson, as well as for the upcoming lessons.
+<OutdatedScreenshot src="/assets/pushing-further/files/allow-read.png" alt={"A screenshot showing VS Code showing a Deno read warning in the terminal."} lang="en" />
 
 ## JSON
 
@@ -115,66 +84,72 @@ This text file format can store arrays, objects, text, numbers, and booleans, in
 For example, in the script below, we write the array of objects `data` to the file `data.json`.
 
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
+import { writeFile } from "node:fs/promises";
+
 const data = [
   { name: "Nael", age: 25 },
   { name: "John", age: 30 },
 ];
 
-await Deno.writeTextFile(
+await writeFile(
   "data.json",
   JSON.stringify(data),
 );
 ```
 <Callout type="info" emoji="💡">
-    On line 8, we used the `JSON` global object, which is always available while you code, and its `stringify()` method. `writeTextFile` expects a `string`, but `data` is an array of objects. So we **stringify** it to transform `data` into a JSON string. The complementary method is `JSON.parse()`, which can convert stringified arrays, objects, and values back to their original form.
+    We used the `JSON` global object, which is always available while you code, and its `stringify()` method. Here, `writeFile` needs text rather than an array, but `data` is an array of objects. So we **stringify** it to transform `data` into a JSON string. The complementary method is `JSON.parse()`, which can convert stringified arrays, objects, and values back to their original form.
 </Callout>
 
-![A screenshot showing VS Code writing a JSON file with Deno.](/assets/pushing-further/files/json-write.png)
+<OutdatedScreenshot src="/assets/pushing-further/files/json-write.png" alt={"A screenshot showing VS Code writing a JSON file with Deno."} lang="en" />
 
-Because it has the `.json` extension, the file is understood by VS Code and Deno. Its content is displayed with the proper data types. In the screenshot above, the names are highlighted as strings and the ages as numbers. If we wrote everything into a `.txt` file, everything would appear as plain text.
+Because it has the `.json` extension, the file is understood by VS Code and Node.js. Its content is displayed with the proper data types. In the editor, the names are highlighted as strings and the ages as numbers. If we wrote everything into a `.txt` file, everything would appear as plain text.
 
-Additionally, because it’s a JSON file, you can import it like a `.ts` file by adding the `with { type: "json" }` import attribute.
+Additionally, you can import a JSON file by adding the `with { type: "json" }` import attribute. The generated project’s TypeScript settings support JSON imports and let the editor infer their types. The import below uses `../data.json` because it starts in `sda`, then goes up to the project root.
 
-```ts showLineNumbers filename="main.ts"
-import data from "./data.json" with { type: "json" };
+```ts showLineNumbers filename="sda/main.ts"
+import data from "../data.json" with { type: "json" };
 
 console.log(data);
 ```
-![A screenshot showing VS Code reading a JSON file with Deno.](/assets/pushing-further/files/json-read.png)
+<OutdatedScreenshot src="/assets/pushing-further/files/json-read.png" alt={"A screenshot showing VS Code reading a JSON file with Deno."} lang="en" />
 
-And because it’s JSON, the type checking works out of the box, which is wonderful.
+VS Code and `npm run all-tests` can check the imported data’s types, which is wonderful. Node.js itself still doesn’t check types when it runs the code.
 
 If you add a `.` after `data`, VS Code will suggest array methods because it knows the data stored in `data.json` is an array.
 
-![A screenshot showing VS Code suggesting array methods.](/assets/pushing-further/files/json-array-methods.png)
+<OutdatedScreenshot src="/assets/pushing-further/files/json-array-methods.png" alt={"A screenshot showing VS Code suggesting array methods."} lang="en" />
 
 If you select the first object of `data` with `[0]` and type a `.` to access a key, VS Code will suggest the keys that are in the object. Since it’s a JSON file, it can infer the types.
 
-![A screenshot showing VS Code reading a JSON file with Deno.](/assets/pushing-further/files/json-object-methods.png)
+<OutdatedScreenshot src="/assets/pushing-further/files/json-object-methods.png" alt={"A screenshot showing VS Code reading a JSON file with Deno."} lang="en" />
 
-And if you try to access keys that don’t exist in the objects, you’ll get an error. Isn’t that amazing? 😍
+And if you try to access keys that don’t exist in the objects, VS Code and the project checks flag an error. Isn’t that amazing? 😍
 
-![A screenshot showing VS Code reading a JSON file with Deno.](/assets/pushing-further/files/json-object-error.png)
+<OutdatedScreenshot src="/assets/pushing-further/files/json-object-error.png" alt={"A screenshot showing VS Code reading a JSON file with Deno."} lang="en" />
 
-Sometimes, you can’t or don’t want to use the `import` syntax for a JSON file. Instead, you can read it with `Deno.readTextFile()`. However, this gives you a string: the contents of the file as text.
+Sometimes, you can’t or don’t want to use the `import` syntax for a JSON file. Instead, you can read it with `readFile()` and the `"utf8"` encoding. However, this gives you a string: the contents of the file as text.
 
-```ts showLineNumbers filename="main.ts"
-const rawData = await Deno.readTextFile("./data.json");
+```ts showLineNumbers filename="sda/main.ts"
+import { readFile } from "node:fs/promises";
+
+const rawData = await readFile("./data.json", "utf8");
 console.log(rawData);
 ```
 
-![VS Code logging the JSON file contents as raw text.](/assets/pushing-further/files/json-raw-data.png)
+<OutdatedScreenshot src="/assets/pushing-further/files/json-raw-data.png" alt={"VS Code logging the JSON file contents as raw text."} lang="en" />
 
 To turn that text back into an array or object, use `JSON.parse()`.
 
-```ts showLineNumbers filename="main.ts" {2} /data/3
-const rawData = await Deno.readTextFile("./data.json");
+```ts showLineNumbers filename="sda/main.ts" {4} /data/3
+import { readFile } from "node:fs/promises";
+
+const rawData = await readFile("./data.json", "utf8");
 const data = JSON.parse(rawData);
 console.log(data);
 ```
 
-![VS Code logging the array of objects after parsing the JSON text.](/assets/pushing-further/files/json-parsed-data.png)
+<OutdatedScreenshot src="/assets/pushing-further/files/json-parsed-data.png" alt={"VS Code logging the array of objects after parsing the JSON text."} lang="en" />
 
 ## About `await`
 
@@ -186,18 +161,18 @@ When your computer encounters a **synchronous** function, method, or statement, 
 
 However, when your computer encounters an **asynchronous** function or method, it starts executing it *in the background* but **doesn’t wait** for it to finish. While the task is running *in the background*, it immediately jumps to the next instruction. The *background* is an oversimplification, but you get the idea.
 
-Since `writeTextFile` and `readTextFile` are asynchronous, it means you can write or read multiple files **concurrently**, significantly speeding up your script’s processing time (if used correctly 🧑‍🔬).
+Since `writeFile` and `readFile` are asynchronous, it means you can write or read multiple files **concurrently**, significantly speeding up your script’s processing time (if used correctly 🧑‍🔬).
 
 This feature is also powerful for web development. For instance, a website with multiple images can fetch all images concurrently instead of one by one, enhancing speed and user experience.
 
 In our context, it’s easier to add the `await` keyword so the computer processes the code in the intended order.
 
-To identify an asynchronous function or method, hover over it. Asynchronous functions return a `Promise`. Don’t worry, type checking will alert you if `await` is required somewhere.
+To identify an asynchronous function or method, hover over it. Asynchronous functions return a `Promise`. Type checking can catch many cases where you use a `Promise` as if it were the finished result, but it won’t flag every forgotten `await`. Remember to await an operation before using its result.
 
-![A screenshot showing VS Code.](/assets/pushing-further/files/promise.png)
+<OutdatedScreenshot src="/assets/pushing-further/files/promise.png" alt={"A screenshot showing VS Code."} lang="en" />
 
 ## Conclusion
 
-With these new skills, you can now handle file operations in your Deno projects efficiently and securely. Happy coding! 🥳
+With these new skills, you can now handle file operations in your Node.js projects efficiently. Happy coding! 🥳
 
 <NoticeEnd />

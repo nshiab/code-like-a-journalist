@@ -21,7 +21,7 @@ Si vous bloquez à une étape, il peut être utile de revoir les leçons précé
 - [Données géospatiales](/simple-data-analysis/geospatial-data)
 - [Visualiser des données](/simple-data-analysis/dataviz)
 
-Nous utiliserons Deno et VS Code. Consultez la leçon [Installation](/first-steps/setup) au besoin.
+Nous utiliserons Node.js et VS Code. Consultez la leçon [Installation](/first-steps/setup) au besoin.
 
 C'est parti !
 
@@ -46,13 +46,15 @@ Passons au code !
 
 Pour tout configurer, utilisons [setup-data-project](https://github.com/nshiab/setup-data-project), comme dans les leçons précédentes.
 
-Créez un nouveau dossier, ouvrez-le dans VS Code et exécutez : `deno -A jsr:@nshiab/setup-data-project`
+Créez un nouveau dossier, ouvrez-le dans VS Code et exécutez : `npx @nshiab/setup-data-project`
+
+Nous utiliserons aussi les types GeoJSON dans les exemples de cartes. Installez leurs déclarations TypeScript avec `npm install --save-dev @types/geojson`. Elles décrivent les données pour la vérification des types, sans ajouter de code à exécuter.
 
 Quand le programme vous le demande, utilisez la barre d'espace pour sélectionner `simple-data-analysis`, puis appuyez sur `Entrée`. Plot est installé automatiquement avec SDA.
 
-![Une capture d'écran montrant simple-data-analysis sélectionné dans setup-data-project.](/assets/simple-data-analysis/tabular-data/setup.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/setup.png" alt={"Une capture d'écran montrant simple-data-analysis sélectionné dans setup-data-project."} lang="fr" />
 
-Exécutez ensuite `deno task sda` pour surveiller `main.ts` et ses dépendances.
+Exécutez ensuite `npm run sda` pour surveiller `sda/main.ts` et ses dépendances.
 
 ## Téléchargement des données
 
@@ -84,7 +86,7 @@ Pour décompresser les fichiers, ouvrez votre dossier en dehors de VS Code, par 
 
 Surprise ! Vous avez maintenant plus de 27 Go de données à traiter. 😅
 
-![Une capture d'écran de VS Code avec les données décompressées.](/assets/stats-can-census/unzipped.png)
+<OutdatedScreenshot src="/assets/stats-can-census/unzipped.png" alt={"Une capture d'écran de VS Code avec les données décompressées."} lang="fr" />
 
 ## Les données du recensement
 
@@ -111,7 +113,7 @@ await sdb.close();
 
 Hum... Il y a un problème. Cette erreur signifie que les données n'utilisent pas l'encodage `UTF-8`, devenu la norme aujourd'hui.
 
-![Une capture d'écran de VS Code montrant une erreur de caractères Unicode invalides.](/assets/stats-can-census/encoding-error.png)
+<OutdatedScreenshot src="/assets/stats-can-census/encoding-error.png" alt={"Une capture d'écran de VS Code montrant une erreur de caractères Unicode invalides."} lang="fr" />
 
 J'ai demandé à Statistique Canada quel encodage était utilisé. On m'a répondu qu'il s'agissait de [`Windows-1252`](https://en.wikipedia.org/wiki/Windows-1252). Heureusement, SDA offre une option `encoding`. Nous pouvons utiliser `cp1252` pour désigner cet encodage, et SDA convertira automatiquement les données en `UTF-8` en arrière-plan.
 
@@ -134,7 +136,7 @@ await sdb.close();
 
 Génial, ça fonctionne ! 🥳
 
-![Une capture d'écran de VS Code montrant les données des provinces de l'Atlantique.](/assets/stats-can-census/atlantic-data.png)
+<OutdatedScreenshot src="/assets/stats-can-census/atlantic-data.png" alt={"Une capture d'écran de VS Code montrant les données des provinces de l'Atlantique."} lang="fr" />
 <Callout type="info" emoji="💡">
     Si le tableau s'affiche bizarrement dans votre terminal, c'est parce qu'il est plus large que celui-ci. Faites un clic droit dans le terminal et cherchez `Toggle size with content width`. J'utilise aussi souvent le raccourci `OPTION` + `Z` sur Mac ou `ALT` + `Z` sur PC.
 </Callout>
@@ -167,7 +169,7 @@ await sdb
 await sdb.close();
 ```
 
-![Une capture d'écran de VS Code montrant les quatre colonnes du recensement.](/assets/stats-can-census/census-columns.png)
+<OutdatedScreenshot src="/assets/stats-can-census/census-columns.png" alt={"Une capture d'écran de VS Code montrant les quatre colonnes du recensement."} lang="fr" />
 
 La colonne `GEO_LEVEL` affiche actuellement des lignes pour le pays. C'est parce que le fichier téléchargé contient *le Canada, les provinces, les territoires, les divisions de recensement, les subdivisions de recensement et les aires de diffusion*, alors que nous n'avons besoin que des aires de diffusion.
 
@@ -193,7 +195,7 @@ await sdb
 await sdb.close();
 ```
 
-![Une capture d'écran de VS Code montrant seulement les lignes des aires de diffusion.](/assets/stats-can-census/census-condition.png)
+<OutdatedScreenshot src="/assets/stats-can-census/census-condition.png" alt={"Une capture d'écran de VS Code montrant seulement les lignes des aires de diffusion."} lang="fr" />
 
 Nous pouvons maintenant retirer l'option `limit` et charger toutes les données du fichier CSV de l'Atlantique. Avant cela, utilisons la méthode `cache`.
 
@@ -222,14 +224,14 @@ await sdb.close();
 
 Sur mon ordinateur, ce premier chargement a pris environ une minute et créé le dossier `.sda-cache`. Pas mal pour près de 12 millions de lignes ! 👏
 
-![Une capture d'écran de VS Code montrant le premier chargement et le nouveau dossier de cache.](/assets/stats-can-census/atlantic-cache-first-run.png)
+<OutdatedScreenshot src="/assets/stats-can-census/atlantic-cache-first-run.png" alt={"Une capture d'écran de VS Code montrant le premier chargement et le nouveau dossier de cache."} lang="fr" />
 
 Enregistrez `main.ts` de nouveau sans modifier le code à l'intérieur de `cache` (`COMMAND` + `S` sur Mac ou `CTRL` + `S` sur Windows). SDA chargera les données directement depuis `.sda-cache`. Sur mon ordinateur, cela n'a pris que 69 millisecondes, soit environ 910 fois plus rapide. Voilà toute la beauté du cache ! ⚡
 
-![Une capture d'écran de VS Code chargeant les données du recensement depuis le cache.](/assets/stats-can-census/atlantic-cache-hit.png)
+<OutdatedScreenshot src="/assets/stats-can-census/atlantic-cache-hit.png" alt={"Une capture d'écran de VS Code chargeant les données du recensement depuis le cache."} lang="fr" />
 
 <Callout type="info" emoji="💡">
-    Pour vider tout le cache, exécutez `deno task clean`. Cette commande supprime `.sda-cache` et `.tmp`. Vous pouvez aussi supprimer ces dossiers manuellement.
+    Pour vider tout le cache, exécutez `npm run clean`. Cette commande supprime `.sda-cache` et `.tmp`. Vous pouvez aussi supprimer ces dossiers manuellement.
 </Callout>
 
 Il est temps de charger les données du recensement pour l'ensemble des provinces et territoires. Regardez les noms des fichiers CSV : ils suivent tous le modèle `98-401-X2021006_English_CSV_data_[region].csv`.
@@ -267,15 +269,15 @@ await sdb.close();
 
 Sur mon ordinateur, ce premier chargement a pris environ 12 minutes. La majeure partie de ce temps a servi à convertir les données de `Windows-1252` en `UTF-8`, plutôt qu'à lire les fichiers CSV. Le résultat est maintenant en cache. Je n'aurai donc plus à attendre aussi longtemps lorsque je relancerai le même code. Notre table contient maintenant plus de 152 millions de lignes ! 🤭
 
-![Une capture d'écran de VS Code après le chargement et la mise en cache de tous les fichiers CSV du recensement.](/assets/stats-can-census/all-files-cache-first-run.png)
+<OutdatedScreenshot src="/assets/stats-can-census/all-files-cache-first-run.png" alt={"Une capture d'écran de VS Code après le chargement et la mise en cache de tous les fichiers CSV du recensement."} lang="fr" />
 
 <Callout type="info" emoji="💡">
-    Selon la mémoire vive de votre ordinateur, un dossier `.tmp` peut apparaître dans votre projet. Si les données dépassent la mémoire disponible, SDA utilise ce dossier pour stocker des morceaux traités pendant son travail. Ce dossier peut devenir assez volumineux. Vous pouvez supprimer `.tmp` manuellement, même si je ne m'en préoccupe généralement pas. La commande `deno task clean` le supprimera aussi, mais attention : elle effacera également toutes les données en cache dans `.sda-cache`.
+    Selon la mémoire vive de votre ordinateur, un dossier `.tmp` peut apparaître dans votre projet. Si les données dépassent la mémoire disponible, SDA utilise ce dossier pour stocker des morceaux traités pendant son travail. Ce dossier peut devenir assez volumineux. Vous pouvez supprimer `.tmp` manuellement, même si je ne m'en préoccupe généralement pas. La commande `npm run clean` le supprimera aussi, mais attention : elle effacera également toutes les données en cache dans `.sda-cache`.
 </Callout>
 
 Enregistrez `main.ts` de nouveau ou relancez le script sans modifier le code à l'intérieur de `cache`. Sur mon ordinateur, SDA charge maintenant les 152 millions de lignes en seulement 740 millisecondes, soit environ 1 010 fois plus vite qu'au premier lancement. Une vitesse incroyable ! 😎
 
-![Une capture d'écran de VS Code chargeant 152 millions de lignes du recensement depuis le cache.](/assets/stats-can-census/all-files-cache-hit.png)
+<OutdatedScreenshot src="/assets/stats-can-census/all-files-cache-hit.png" alt={"Une capture d'écran de VS Code chargeant 152 millions de lignes du recensement depuis le cache."} lang="fr" />
 
 ### Filtrer les variables du recensement
 
@@ -286,7 +288,7 @@ Pour trouver la variable du revenu total des ménages, ouvrez `98-401-X2021006_E
 
 Dans la capture d'écran ci-dessous, j'ai utilisé la recherche pour le trouver rapidement (`COMMAND` + `F` sur Mac ou `CTRL` + `F` sur Windows).
 
-![Une capture d'écran de VS Code montrant le code de la variable du revenu total.](/assets/stats-can-census/income-code.png)
+<OutdatedScreenshot src="/assets/stats-can-census/income-code.png" alt={"Une capture d'écran de VS Code montrant le code de la variable du revenu total."} lang="fr" />
 
 Nous pouvons utiliser `keepValues` pour ne sélectionner que les lignes où `CHARACTERISTIC_ID` vaut `243`.
 
@@ -315,7 +317,7 @@ await census
 await sdb.close();
 ```
 
-![Une capture d'écran de VS Code montrant les données filtrées.](/assets/stats-can-census/cleaning-filtering.png)
+<OutdatedScreenshot src="/assets/stats-can-census/cleaning-filtering.png" alt={"Une capture d'écran de VS Code montrant les données filtrées."} lang="fr" />
 
 Ça se présente bien ! Nous avons le revenu médian pour chaque aire de diffusion. Il nous reste à ajouter le nom des régions métropolitaines.
 
@@ -367,7 +369,7 @@ await names.log();
 await sdb.close();
 ```
 
-![Une capture d'écran de VS Code montrant les identifiants des aires de diffusion et le nom de leur région métropolitaine.](/assets/stats-can-census/names-data.png)
+<OutdatedScreenshot src="/assets/stats-can-census/names-data.png" alt={"Une capture d'écran de VS Code montrant les identifiants des aires de diffusion et le nom de leur région métropolitaine."} lang="fr" />
 
 Vous avez peut-être remarqué que la table `names` compte environ 38 000 lignes, contre environ 57 000 pour `census`. C'est parce que les aires de diffusion n'appartiennent pas toutes à une région métropolitaine.
 
@@ -414,7 +416,7 @@ await census
 await sdb.close();
 ```
 
-![Une capture d'écran de VS Code montrant les données du recensement jointes aux noms des régions métropolitaines.](/assets/stats-can-census/names-joined.png)
+<OutdatedScreenshot src="/assets/stats-can-census/names-joined.png" alt={"Une capture d'écran de VS Code montrant les données du recensement jointes aux noms des régions métropolitaines."} lang="fr" />
 
 ### Simplifier les géométries
 
@@ -510,7 +512,7 @@ await disseminationAreas.log();
 
 await sdb.close();
 ```
-![Une capture d'écran de VS Code montrant le chargement des données géospatiales.](/assets/stats-can-census/loadGeoData.png)
+<OutdatedScreenshot src="/assets/stats-can-census/loadGeoData.png" alt={"Une capture d'écran de VS Code montrant le chargement des données géospatiales."} lang="fr" />
 
 Les données géospatiales se chargent sans problème. Nous voyons les 57 932 aires de diffusion sous forme de lignes, avec leurs propriétés et leurs géométries.
 
@@ -572,7 +574,7 @@ await disseminationAreas.log();
 await sdb.close();
 ```
 
-![Une capture d'écran de VS Code montrant les géométries des aires de diffusion converties en EPSG:4326.](/assets/stats-can-census/projected-geometries.png)
+<OutdatedScreenshot src="/assets/stats-can-census/projected-geometries.png" alt={"Une capture d'écran de VS Code montrant les géométries des aires de diffusion converties en EPSG:4326."} lang="fr" />
 
 Nous voyons maintenant `GEOM(EPSG:4326)` dans la colonne `geom`, ce qui confirme que les géométries utilisent la bonne projection. Nous avons aussi conservé `DGUID`, l'identifiant unique qui nous permettra d'associer les frontières aux aires de diffusion du recensement.
 
@@ -631,7 +633,7 @@ await disseminationAreas
 await sdb.close();
 ```
 
-![Une capture d'écran de VS Code montrant 37 590 aires de diffusion avec leurs géométries et les valeurs du recensement.](/assets/stats-can-census/joined-dissemination-areas.png)
+<OutdatedScreenshot src="/assets/stats-can-census/joined-dissemination-areas.png" alt={"Une capture d'écran de VS Code montrant 37 590 aires de diffusion avec leurs géométries et les valeurs du recensement."} lang="fr" />
 
 Avant d'aller plus loin, réorganisons le code écrit jusqu'ici. Il sert à créer notre table d'aires de diffusion. Déplaçons-le donc dans une fonction utilitaire nommée `getDisseminationAreas`, dans le dossier `helpers`. Pas d'inquiétude : le cache est assez intelligent pour reconnaître que le code n'a pas changé, même s'il se trouve dans un autre fichier. Nous conservons donc tous les gains de vitesse du cache ! ⚡
 
@@ -697,7 +699,7 @@ const disseminationAreas = await getDisseminationAreas(sdb);
 await sdb.close();
 ```
 
-![Une capture d'écran de VS Code montrant l'appel à la fonction getDisseminationAreas depuis main.ts et la table obtenue.](/assets/stats-can-census/get-dissemination-areas-helper.png)
+<OutdatedScreenshot src="/assets/stats-can-census/get-dissemination-areas-helper.png" alt={"Une capture d'écran de VS Code montrant l'appel à la fonction getDisseminationAreas depuis main.ts et la table obtenue."} lang="fr" />
 
 ## Répondre à la question
 
@@ -719,7 +721,7 @@ Dans `summarize`, nous définissons :
 - `outputTable` à `medians`, le nom de la table produite.
 
 ```ts showLineNumbers filename="helpers/addMedianVariation.ts"
-import { SimpleTable } from "@nshiab/simple-data-analysis";
+import type { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function addMedianVariation(
   disseminationAreas: SimpleTable,
@@ -750,12 +752,12 @@ await addMedianVariation(disseminationAreas);
 await sdb.close();
 ```
 
-![Une capture d'écran de VS Code montrant la fonction addMedianVariation et le revenu médian de 42 régions métropolitaines.](/assets/stats-can-census/median-summary-helper.png)
+<OutdatedScreenshot src="/assets/stats-can-census/median-summary-helper.png" alt={"Une capture d'écran de VS Code montrant la fonction addMedianVariation et le revenu médian de 42 régions métropolitaines."} lang="fr" />
 
 Calculer la médiane pour chaque région métropolitaine a été facile, mais les résultats se trouvent dans une table distincte, `medians`. Nous voulons les ajouter à `disseminationAreas`. Les deux tables possèdent la colonne `CMANAME_RMRNOM`, qui contient les noms des régions métropolitaines. Il suffit donc d'appeler `join`. Chaque aire de diffusion reçoit alors une colonne `median` contenant la médiane de sa région métropolitaine.
 
 ```ts showLineNumbers filename="helpers/addMedianVariation.ts" {15-17}
-import { SimpleTable } from "@nshiab/simple-data-analysis";
+import type { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function addMedianVariation(
   disseminationAreas: SimpleTable,
@@ -775,7 +777,7 @@ export default async function addMedianVariation(
 }
 ```
 
-![Une capture d'écran de VS Code montrant la médiane de chaque région métropolitaine jointe à ses aires de diffusion.](/assets/stats-can-census/medians-joined.png)
+<OutdatedScreenshot src="/assets/stats-can-census/medians-joined.png" alt={"Une capture d'écran de VS Code montrant la médiane de chaque région métropolitaine jointe à ses aires de diffusion."} lang="fr" />
 
 Nous pouvons maintenant calculer la dernière valeur nécessaire pour répondre à notre question ! 🤩
 
@@ -784,7 +786,7 @@ Nous allons ajouter une colonne numérique `percVar` contenant l'écart en pourc
 Pour simplifier le code, j'ai retiré l'appel à `.log()` sur `medians`. Nous connaissons maintenant le contenu de cette table, inutile donc de l'afficher de nouveau dans le terminal.
 
 ```ts showLineNumbers filename="helpers/addMedianVariation.ts" {16-21}
-import { SimpleTable } from "@nshiab/simple-data-analysis";
+import type { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function addMedianVariation(
   disseminationAreas: SimpleTable,
@@ -809,7 +811,7 @@ export default async function addMedianVariation(
 }
 ```
 
-![Une capture d'écran de VS Code montrant l'écart en pourcentage arrondi par rapport à la médiane de chaque région métropolitaine.](/assets/stats-can-census/median-percentage-variation.png)
+<OutdatedScreenshot src="/assets/stats-can-census/median-percentage-variation.png" alt={"Une capture d'écran de VS Code montrant l'écart en pourcentage arrondi par rapport à la médiane de chaque région métropolitaine."} lang="fr" />
 
 Nous avons enfin la réponse à notre question ! Pour chacune des 37 590 aires de diffusion situées dans une région métropolitaine, `percVar` indique si le revenu médian des ménages est supérieur ou inférieur à la médiane de cette région, et de combien de pour cent. Nous sommes prêts à créer une carte pour chaque région métropolitaine ! 🚀
 
@@ -820,7 +822,7 @@ Pour garder notre code bien organisé et notre esprit sain, créons un nouveau f
 La nouvelle fonction reçoit notre table `disseminationAreas` sous forme de `SimpleTable`. Pour l'instant, elle affiche simplement un message dans le terminal.
 
 ```ts showLineNumbers filename="helpers/visualizeData.ts"
-import { SimpleTable } from "@nshiab/simple-data-analysis";
+import type { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function visualizeData(
   disseminationAreas: SimpleTable,
@@ -846,12 +848,12 @@ await visualizeData(disseminationAreas);
 await sdb.close();
 ```
 
-![Une capture d'écran de VS Code montrant l'appel à visualizeData depuis main.ts et son message dans le terminal.](/assets/stats-can-census/visualize-data-helper.png)
+<OutdatedScreenshot src="/assets/stats-can-census/visualize-data-helper.png" alt={"Une capture d'écran de VS Code montrant l'appel à visualizeData depuis main.ts et son message dans le terminal."} lang="fr" />
 
 Nous voulons créer une carte par région métropolitaine. Commençons par récupérer tous les noms de régions métropolitaines uniques avec `getUniques`. L'affichage de `allCMAs` montre la liste que nous utiliserons pour parcourir les régions et créer une carte pour chacune.
 
 ```ts showLineNumbers filename="helpers/visualizeData.ts" {6-7}
-import { SimpleTable } from "@nshiab/simple-data-analysis";
+import type { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function visualizeData(
   disseminationAreas: SimpleTable,
@@ -861,14 +863,14 @@ export default async function visualizeData(
 }
 ```
 
-![Une capture d'écran de VS Code montrant la liste des régions métropolitaines dans le terminal.](/assets/stats-can-census/unique-metropolitan-areas.png)
+<OutdatedScreenshot src="/assets/stats-can-census/unique-metropolitan-areas.png" alt={"Une capture d'écran de VS Code montrant la liste des régions métropolitaines dans le terminal."} lang="fr" />
 
 Nous pouvons maintenant parcourir les régions métropolitaines une à une. Dans le code ci-dessous, nous affichons le nom de la RMR en cours de traitement. Puis nous clonons `disseminationAreas` dans une table temporaire en utilisant `conditions` pour ne garder que les lignes de cette région, et nous affichons le résultat.
 
 À la fin de chaque itération, nous supprimons `tempTable` pour que la suivante reparte à neuf. Pour l'instant, `break` à la ligne 17 arrête la boucle après la première RMR. Une fois que la carte fonctionnera pour une région, nous retirerons cette instruction pour toutes les traiter.
 
 ```ts showLineNumbers filename="helpers/visualizeData.ts" {8-17}
-import { SimpleTable } from "@nshiab/simple-data-analysis";
+import type { SimpleTable } from "@nshiab/simple-data-analysis";
 
 export default async function visualizeData(
   disseminationAreas: SimpleTable,
@@ -891,14 +893,17 @@ export default async function visualizeData(
 
 Comme vous pouvez le voir, la première région métropolitaine traitée est Abbotsford–Mission. La table temporaire ne contient que 292 lignes, toutes pour cette région.
 
-![Une capture d'écran de VS Code montrant les aires de diffusion de la première RMR dans une table temporaire.](/assets/stats-can-census/first-cma-loop.png)
+<OutdatedScreenshot src="/assets/stats-can-census/first-cma-loop.png" alt={"Une capture d'écran de VS Code montrant les aires de diffusion de la première RMR dans une table temporaire."} lang="fr" />
 
 Nous pouvons maintenant dessiner notre première carte. Quand nous avons exécuté `setup-data-project`, Plot a été installé automatiquement. Cette [librairie de visualisation](https://github.com/observablehq/plot) fonctionne bien avec SDA et nous aidera à dessiner la carte.
 
 Avec `writeMap` et les fonctions `plot` et `geo` de Plot, nous dessinons les frontières des aires de diffusion. En donnant la valeur `percVar` à `fill`, nous colorons chaque aire selon son écart en pourcentage par rapport à la médiane de la région métropolitaine.
 
+SDA fournit une FeatureCollection GeoJSON à la fonction de la carte, mais sa définition de type actuelle ne décrit qu’une partie de cette structure. Nous importons le type `FeatureCollection` et utilisons `as FeatureCollection` lorsque nous passons l’objet complet à Plot. Cela indique à TypeScript la structure déjà fournie par SDA, sans modifier les données.
+
 ```ts showLineNumbers filename="helpers/visualizeData.ts" {2,17-27}
-import { SimpleTable } from "@nshiab/simple-data-analysis";
+import type { FeatureCollection } from "geojson";
+import type { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
 export default async function visualizeData(
@@ -918,7 +923,7 @@ export default async function visualizeData(
         (geoData) =>
           plot({
             marks: [
-              geo(geoData, {
+              geo(geoData as FeatureCollection, {
                 fill: "percVar",
               }),
             ],
@@ -932,14 +937,17 @@ export default async function visualizeData(
 }
 ```
 
-![Une capture d'écran de VS Code montrant la première carte d'Abbotsford–Mission, colorée selon l'écart en pourcentage.](/assets/stats-can-census/first-map-plot.png)
+<OutdatedScreenshot src="/assets/stats-can-census/first-map-plot.png" alt={"Une capture d'écran de VS Code montrant la première carte d'Abbotsford–Mission, colorée selon l'écart en pourcentage."} lang="fr" />
 
 C'est laid, mais ça fonctionne !
 
 Nous pouvons maintenant ajouter un titre, un sous-titre, une légende de source, une échelle de couleurs divergente et une projection. Dans certaines aires de diffusion, les revenus dépassent la médiane régionale de 200 %, 300 % ou même 400 %, ce qui peut masquer les écarts plus faibles. En fixant le domaine des couleurs à `[-100, 100]`, nous gardons une échelle utile : les valeurs supérieures à +100 % utilisent la couleur positive la plus intense. Pour en savoir plus sur ces réglages, consultez la leçon [Visualiser des données](/simple-data-analysis/dataviz).
 
+`getUniques` retourne des valeurs dont le type dépend des données. Nous utilisons `String(cma)` pour le titre de la carte, car Plot attend du texte ici.
+
 ```ts showLineNumbers filename="helpers/visualizeData.ts" {20-40}
-import { SimpleTable } from "@nshiab/simple-data-analysis";
+import type { FeatureCollection } from "geojson";
+import type { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
 export default async function visualizeData(
@@ -958,13 +966,13 @@ export default async function visualizeData(
       .writeMap(
         (geoData) =>
           plot({
-            title: cma,
+            title: String(cma),
             subtitle:
               "Variation from the median household total income at the dissemination area level.",
             caption: "2021 Census, Statistics Canada",
             projection: {
               type: "mercator",
-              domain: geoData,
+              domain: geoData as FeatureCollection,
             },
             color: {
               legend: true,
@@ -980,7 +988,7 @@ export default async function visualizeData(
               label: null,
             },
             marks: [
-              geo(geoData, {
+              geo(geoData as FeatureCollection, {
                 fill: "percVar",
               }),
             ],
@@ -994,7 +1002,7 @@ export default async function visualizeData(
 }
 ```
 
-![Une capture d'écran de VS Code montrant la carte stylisée d'Abbotsford–Mission avec une légende de couleurs divergente.](/assets/stats-can-census/styled-map-plot.png)
+<OutdatedScreenshot src="/assets/stats-can-census/styled-map-plot.png" alt={"Une capture d'écran de VS Code montrant la carte stylisée d'Abbotsford–Mission avec une légende de couleurs divergente."} lang="fr" />
 
 C'est déjà beaucoup mieux ! 💅
 
@@ -1007,7 +1015,8 @@ Nous supprimons aussi la table `outline` après avoir écrit la carte, afin d'en
 Si ces étapes vous semblent complexes, je vous encourage à revoir la leçon [Visualiser des données](/simple-data-analysis/dataviz) avant de continuer.
 
 ```ts showLineNumbers filename="helpers/visualizeData.ts" {18-22,52-55,61}
-import { SimpleTable } from "@nshiab/simple-data-analysis";
+import type { FeatureCollection } from "geojson";
+import type { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
 export default async function visualizeData(
@@ -1033,13 +1042,13 @@ export default async function visualizeData(
     await tempTable.writeMap(
       (geoData) =>
         plot({
-          title: cma,
+          title: String(cma),
           subtitle:
             "Variation from the median household total income at the dissemination area level.",
           caption: "2021 Census, Statistics Canada",
           projection: {
             type: "mercator",
-            domain: geoData,
+            domain: geoData as FeatureCollection,
           },
           color: {
             legend: true,
@@ -1055,7 +1064,7 @@ export default async function visualizeData(
             label: null,
           },
           marks: [
-            geo(geoData, {
+            geo(geoData as FeatureCollection, {
               fill: "percVar",
             }),
             geo(geoData.features.filter((d) => d.properties.percVar === null), {
@@ -1074,7 +1083,7 @@ export default async function visualizeData(
 }
 ```
 
-![Une capture d'écran de VS Code montrant la carte stylisée d'Abbotsford–Mission avec un contour noir.](/assets/stats-can-census/outline-map-plot.png)
+<OutdatedScreenshot src="/assets/stats-can-census/outline-map-plot.png" alt={"Une capture d'écran de VS Code montrant la carte stylisée d'Abbotsford–Mission avec un contour noir."} lang="fr" />
 
 La différence est subtile, mais le contour aide à voir les trous dans la géométrie de la région métropolitaine. Il rend aussi la frontière visible quand les aires de diffusion près du bord sont blanches ou presque blanches.
 
@@ -1085,7 +1094,8 @@ Ensuite, nous devons échapper les apostrophes dans les noms de RMR comme `St. J
 Dans le code ci-dessous, nous utilisons `replaceAll` pour ces deux corrections. Puisque c'est une méthode des chaînes de caractères, nous indiquons que `allCMAs` est un tableau de chaînes avec `string[]`. Nous retirons aussi `break` pour que la boucle crée une carte pour chaque région métropolitaine.
 
 ```ts showLineNumbers filename="helpers/visualizeData.ts" {7-9,17,60}
-import { SimpleTable } from "@nshiab/simple-data-analysis";
+import type { FeatureCollection } from "geojson";
+import type { SimpleTable } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
 export default async function visualizeData(
@@ -1119,7 +1129,7 @@ export default async function visualizeData(
           caption: "2021 Census, Statistics Canada",
           projection: {
             type: "mercator",
-            domain: geoData,
+            domain: geoData as FeatureCollection,
           },
           color: {
             legend: true,
@@ -1135,7 +1145,7 @@ export default async function visualizeData(
             label: null,
           },
           marks: [
-            geo(geoData, {
+            geo(geoData as FeatureCollection, {
               fill: "percVar",
             }),
             geo(geoData.features.filter((d) => d.properties.percVar === null), {
@@ -1155,7 +1165,7 @@ export default async function visualizeData(
 
 Cependant, ce code traite les premières régions métropolitaines, puis échoue pour Calgary. Le message d'erreur laisse croire que certaines géométries d'entrée sont invalides. 🤔
 
-![Une capture d'écran de VS Code montrant une erreur de géométrie invalide pendant le traitement des régions métropolitaines.](/assets/stats-can-census/invalid-geometries-error.png)
+<OutdatedScreenshot src="/assets/stats-can-census/invalid-geometries-error.png" alt={"Une capture d'écran de VS Code montrant une erreur de géométrie invalide pendant le traitement des régions métropolitaines."} lang="fr" />
 
 Heureusement, SDA permet de corriger facilement les géométries invalides avec `fixGeo()`. Nous chargeons les frontières des aires de diffusion dans `getDisseminationAreas`. Il suffit donc d'enchaîner cette méthode après `loadGeoData()` à l'intérieur de `cache()`. SDA réparera les géométries pendant leur chargement et conservera le résultat corrigé en cache pour les prochains lancements.
 
@@ -1208,7 +1218,7 @@ export default async function getDisseminationAreas(sdb: SimpleDB) {
 }
 ```
 
-![Une capture d'écran de VS Code montrant les géométries corrigées et les cartes créées pour toutes les régions métropolitaines.](/assets/stats-can-census/fixed-geometries-maps.png)
+<OutdatedScreenshot src="/assets/stats-can-census/fixed-geometries-maps.png" alt={"Une capture d'écran de VS Code montrant les géométries corrigées et les cartes créées pour toutes les régions métropolitaines."} lang="fr" />
 
 Une fois la modification enregistrée, les 43 régions métropolitaines sont traitées et leurs cartes sont créées ! 🥳 Sur mon ordinateur, cette exécution avec le cache n'a pris que sept secondes (merci, le cache !). C'est impressionnant pour autant de cartes.
 

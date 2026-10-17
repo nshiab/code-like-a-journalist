@@ -1,6 +1,6 @@
 ---
 title: Utiliser des bibliothèques TypeScript
-description: Apprenez à installer et utiliser des bibliothèques TypeScript publiées sur NPM et JSR avec Deno.
+description: Apprenez à installer et utiliser des bibliothèques TypeScript publiées sur npm avec Node.js.
 ---
 
 import { Callout } from 'nextra/components'
@@ -18,28 +18,21 @@ Une note sur le vocabulaire : les *bibliothèques* sont aussi souvent appelées 
 
 Préparons maintenant notre environnement de travail avant de plonger dans cette leçon.
 
-Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code et créez deux fichiers :
+Créez un nouveau projet avec `npx @nshiab/setup-data-project`, en suivant la [leçon de configuration](/first-steps/setup). Pour cette leçon, ne sélectionnez aucune bibliothèque facultative. Ouvrez le dossier du projet généré dans VS Code et utilisez le fichier `sda/main.ts` pour votre code.
 
-- `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
-- `deno.json`, qui sert à configurer Deno et à activer son extension VS Code. Nous le laisserons vide pour l'instant.
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis la racine du projet, le dossier contenant `package.json`.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez la commande suivante : `deno run --watch --check main.ts`
+Cette commande réexécute votre code chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC). Pour l’arrêter, appuyez sur `CTRL` + `C` sur les deux systèmes.
 
-Cette commande efface le terminal et réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD + S` sur Mac ou `CTRL + S` sur PC).
+Node.js exécute TypeScript sans vérifier les types. Utilisez `npm run all-tests` pour vérifier le projet et `npm run fix` pour appliquer la mise en forme et les corrections automatiques, comme expliqué dans la leçon de configuration.
 
 Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
 
-![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/pushing-further/libraries/setup.png)
+<OutdatedScreenshot src="/assets/pushing-further/libraries/setup.png" alt={"Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript."} lang="fr" />
 
-## Registres
+## Le registre npm
 
-Les bibliothèques sont publiées sur des registres publics. Les deux principaux registres sont **NPM** et **JSR**.
-
-Certaines bibliothèques sont disponibles sur les deux, tandis que d'autres existent uniquement sur NPM ou JSR.
-
-### NPM
-
-NPM est le registre historique de l'écosystème JavaScript et est exploité par GitHub. Ses pages de paquets affichent des signaux utiles comme la documentation, les responsables, les versions et les téléchargements hebdomadaires.
+Les bibliothèques sont publiées sur des registres publics. Dans ce cours, nous les installerons depuis [npm](https://www.npmjs.com/), le registre utilisé par la commande npm fournie avec Node.js. Les pages des paquets présentent la documentation, les responsables, les versions et les téléchargements pour vous aider à choisir une bibliothèque.
 
 Prenons un exemple et recherchons `d3`, une bibliothèque bien connue pour la visualisation de données que nous utiliserons fréquemment.
 
@@ -61,28 +54,32 @@ Cette page fournit de nombreuses informations utiles :
 
 Ces détails (ainsi que ceux sur la page GitHub) nous aident à déterminer si une bibliothèque est fiable. Soyez toujours prudent avant d'exécuter du code inconnu ! 🦠
 
-Installer `d3` dans un projet Deno est très simple. Cliquez sur votre terminal, arrêtez `main.ts` (`CTRL` + `C`), puis exécutez la commande suivante : `deno add npm:d3`. Le préfixe `npm:` indique clairement le registre. `deno add` est aussi un alias de `deno install` suivi du nom d'un paquet.
+Installer `d3` est très simple. Cliquez sur votre terminal, arrêtez le script (`CTRL` + `C`), puis exécutez ces commandes depuis la racine du projet :
 
-Si vous ouvrez votre `deno.json`, vous verrez quelque chose de nouveau : **imports** ! Ces imports indiquent à Deno quelles bibliothèques (et quelles versions) vous souhaitez utiliser dans ce projet.
+```sh
+npm install d3
+npm install --save-dev @types/d3
+```
 
-Deno crée ou met aussi à jour `deno.lock`, qui contient des informations supplémentaires sur la bibliothèque. Gardez ce fichier, mais ne vous en préoccupez pas : Deno le gère automatiquement.
+La première commande installe la bibliothèque. La seconde installe ses définitions de types TypeScript pour que VS Code et les vérifications du projet comprennent ses fonctions. Certaines bibliothèques incluent leurs types ; `d3` utilise le paquet séparé `@types/d3`.
 
-![Une capture d'écran montrant les imports dans deno.json.](/assets/pushing-further/libraries/d3-add.png)
+Ouvrez `package.json` : `d3` figure maintenant dans **dependencies** et `@types/d3` dans **devDependencies**. Les dépendances sont les paquets utilisés par votre code ; les dépendances de développement servent aux outils, comme la vérification des types.
+
+npm met aussi à jour `package-lock.json`, qui indique les versions exactes installées, et place les paquets dans un dossier `node_modules`. Conservez `package.json` et `package-lock.json` avec votre projet. Si vous partagez votre code, d’autres pourront lancer `npm ci` pour installer les versions du fichier de verrouillage.
+
+<OutdatedScreenshot src="/assets/pushing-further/libraries/d3-add.png" alt={"Une capture d'écran montrant les imports dans deno.json."} lang="fr" />
+
 <Callout type="info" emoji="💡">
-    Comme vous avez tapé `npm:`, Deno va chercher la dernière version de `d3` sur le registre NPM. Il la téléchargera ensuite et la stockera en cache sur votre disque dur. Puisqu'elle est mise en cache, si vous avez besoin de `d3` dans un autre projet et que sa dernière version n'a pas changé, Deno l'utilisera depuis le cache plutôt que de la télécharger à nouveau. Cela accélère les installations futures et évite d'avoir plusieurs versions de la même bibliothèque sur votre ordinateur.
+    Vous n’avez pas besoin de modifier les fichiers dans `node_modules` ni de gérer le cache de téléchargement de npm. npm s’occupe de l’installation. Utilisez `npm install` pour ajouter une bibliothèque et importez-la par son nom, comme `"d3"`.
 </Callout>
-
-Utiliser `d3` est maintenant très simple. Dans vos imports, `"d3": "npm:d3@^7.9.0"` signifie que vous pouvez utiliser le raccourci `d3` pour appeler la bibliothèque.
 
 Reprenons le [fichier CSV des températures de Montréal](https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv) de la leçon [Récupérer des données](/pushing-further/fetch).
 
 Si vous récupérez ces données, vous remarquerez que c'est juste du texte. CSV signifie **Comma-Separated Values** (valeurs séparées par des virgules) et vous ne pouvez pas travailler avec directement. Il serait bien mieux de le convertir en une liste d'objets.
 
-Copiez-collez le code ci-dessous dans `main.ts`, puis exécutez la commande suivante : `deno run --watch --check --allow-net main.ts`
+Copiez-collez le code ci-dessous dans `sda/main.ts`, puis exécutez la commande suivante : `npm run sda`
 
-N'oubliez pas la permission réseau, sinon votre code ne sera pas autorisé à récupérer des données.
-
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
 );
@@ -92,13 +89,13 @@ const data = await response.text();
 console.log(data);
 ```
 
-![Une capture d'écran montrant des données CSV dans le terminal.](/assets/pushing-further/libraries/d3-text.png)
+<OutdatedScreenshot src="/assets/pushing-further/libraries/d3-text.png" alt={"Une capture d'écran montrant des données CSV dans le terminal."} lang="fr" />
 
 C'est notre jour de chance : la fonction `csvParse` de `d3` convertit les données CSV en une liste d'objets !
 
 Mettons à jour notre code pour l'utiliser.
 
-```ts showLineNumbers filename="main.ts" {1, 8, 10}
+```ts showLineNumbers filename="sda/main.ts" {1, 8, 10}
 import { csvParse } from "d3";
 
 const response = await fetch(
@@ -110,66 +107,54 @@ const arrayOfObjects = csvParse(data);
 
 console.log(arrayOfObjects);
 ```
-![Une capture d'écran montrant des données CSV converties en une liste d'objets dans le terminal.](/assets/pushing-further/libraries/d3-parse.png)
+<OutdatedScreenshot src="/assets/pushing-further/libraries/d3-parse.png" alt={"Une capture d'écran montrant des données CSV converties en une liste d'objets dans le terminal."} lang="fr" />
 
 <Callout type="info" emoji="💡">
-    Dans la [leçon sur les fonctions](/pushing-further/functions), nous avons vu que nous pouvons importer des fonctions avec la syntaxe `import myFunction from "./myFunction"`. Ici, c'est un peu différent, car `d3` exporte plusieurs fonctions, et nous choisissons uniquement celle(s) que nous voulons. Pour cela, nous utilisons des accolades avec cette syntaxe : `import { myFunctionA, myFunctionB } from "./allMyFunctions"`.
+    Dans la [leçon sur les fonctions](/pushing-further/functions), nous avons vu que nous pouvons importer des fonctions avec la syntaxe `import myFunction from "./myFunction.ts"`. Ici, c'est un peu différent, car `d3` exporte plusieurs fonctions, et nous choisissons uniquement celle(s) que nous voulons. Pour cela, nous utilisons des accolades avec cette syntaxe : `import { myFunctionA, myFunctionB } from "./allMyFunctions.ts"`.
 </Callout>
 
 Félicitations ! Vous venez d’installer `d3` depuis NPM et d’utiliser l’une de ses fonctions ! 💃🕺
 
-### JSR
+## Une autre bibliothèque : csv-parse
 
-JSR a été lancé en 2024. C’est le petit nouveau et il est maintenu par l’équipe de Deno.
+Plusieurs bibliothèques peuvent souvent résoudre le même problème. Essayons [`csv-parse`](https://csv.js.org/parse/), une bibliothèque spécialisée dans la lecture des fichiers CSV. Sa documentation présente les interfaces disponibles, les options, des exemples et un lien vers le code source.
 
-Il se concentre sur des bibliothèques modernes, conçues avant tout pour TypeScript. Installer une bibliothèque depuis JSR est identique à une installation depuis NPM. Cependant, publier une bibliothèque est beaucoup plus simple sur JSR (mais nous verrons cela dans une autre leçon).
+Arrêtez le script avec `CTRL` + `C`, puis installez-la :
 
-Recherchons une bibliothèque pour convertir notre fichier CSV. Rendez-vous sur [jsr.io](https://jsr.io/) et recherchez `csv`.
+```sh
+npm install csv-parse
+```
 
-![Une capture d'écran montrant les résultats de JSR.](/assets/pushing-further/libraries/jsr-csv.png)
+Ce paquet inclut ses types TypeScript : aucun paquet `@types` supplémentaire n’est nécessaire.
 
-Parmi les résultats, vous verrez une bibliothèque commençant par `@std`. Cela signifie qu’elle fait partie de la **bibliothèque standard** et qu’elle est maintenue par l’équipe de Deno, qui fournit des bibliothèques de haute qualité et bien testées pour des cas d’usage courants.
+Nous utiliserons l’[interface synchrone](https://csv.js.org/parse/api/sync/), pratique quand le fichier CSV tient entièrement en mémoire. Importez `parse` depuis `"csv-parse/sync"`. L’[option `columns: true`](https://csv.js.org/parse/options/columns/) utilise la première ligne comme noms des propriétés au lieu d’en faire une ligne de données.
 
-Utilisons-la ! [Cliquez ici](https://jsr.io/@std/csv).
+Remplacez le code de `sda/main.ts` par ceci, puis relancez `npm run sda` :
 
-![Une capture d'écran montrant la bibliothèque standard JSR.](/assets/pushing-further/libraries/jsr-std.png)
-
-Vous trouverez de nombreuses informations utiles sur cette page :
-- Un lien vers la page GitHub.
-- La documentation et des exemples.
-- La date de publication de la dernière version.
-
-Les pages de paquets JSR affichent maintenant les téléchargements hebdomadaires et un score JSR, en plus du dépôt source, de la documentation, des environnements compatibles, des versions et des dates de publication. Ce sont des signaux utiles, mais vous devriez tout de même examiner un paquet et son code source avant de lui faire confiance.
-
-Pour installer la bibliothèque, arrêtez l’exécution de `main.ts` (`CTRL` + `C`) et exécutez la commande suivante : `deno add jsr:@std/csv`
-
-Vous verrez `@std/csv` être ajoutée à votre `deno.json`.
-
-Comme vous l’avez peut-être remarqué, nous avons utilisé `jsr:` au lieu de `npm:` pour que Deno cherche la bibliothèque sur JSR au lieu de NPM.
-
-![Une capture d'écran montrant un module JSR ajouté.](/assets/pushing-further/libraries/jsr-add.png)
-
-<Callout type="info" emoji="💡">
-    Tout comme les modules NPM, les modules JSR sont mis en cache. Si vous devez vider votre cache, exécutez `deno clean`. Pour installer toutes les bibliothèques listées dans `deno.json` et les vérifier avec `deno.lock`, exécutez `deno install`.
-</Callout>
-
-Mettons maintenant à jour notre code dans `main.ts` pour utiliser `@std` au lieu de `d3`. Une différence clé est que nous devons définir l'option `skipFirstRow` sur `true` pour ignorer la première ligne qui contient les en-têtes des colonnes CSV.
-
-```ts showLineNumbers filename="main.ts" {1, 8}
-import { parse } from "@std/csv";
+```ts showLineNumbers filename="sda/main.ts" {1, 8}
+import { parse } from "csv-parse/sync";
 
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
 );
 
 const data = await response.text();
-const arrayOfObjects = parse(data, { skipFirstRow: true });
+const arrayOfObjects = parse(data, { columns: true });
 
 console.log(arrayOfObjects);
 ```
-![Une capture d'écran montrant un fichier CSV converti en liste d'objets avec la bibliothèque standard.](/assets/pushing-further/libraries/jsr-done.png)
 
-Et... voilà ! Vous avez installé et utilisé une bibliothèque depuis JSR ! 💃🕺
+Comme `csvParse`, cette fonction transforme le texte en liste d’objets. Par défaut, les valeurs restent du texte : convertissez les champs numériques avant de faire des calculs.
+
+<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-csv.png" alt={"Une capture d'écran montrant les résultats de JSR."} lang="fr" />
+
+<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-std.png" alt={"Une capture d'écran montrant la bibliothèque standard JSR."} lang="fr" />
+
+<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-add.png" alt={"Une capture d'écran montrant un module JSR ajouté."} lang="fr" />
+
+<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-done.png" alt={"Une capture d'écran montrant un fichier CSV converti en liste d'objets avec la bibliothèque standard."} lang="fr" />
+
+Et... voilà ! Vous avez installé et utilisé une deuxième bibliothèque ! 💃🕺
 
 ## Conclusion
 

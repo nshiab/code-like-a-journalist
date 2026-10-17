@@ -16,19 +16,19 @@ In this lesson, we'll use these structures to store data about a classroom. Buck
 
 Before diving in, let's set things up.
 
-Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+Use the project you created in [Setup](/first-steps/setup), or create a new empty folder, open it with VS Code, and run `npx @nshiab/setup-data-project` with no libraries selected.
 
-- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
-- `deno.json`, used to configure Deno and activate its VS Code extension. We will keep it empty for now.
+Replace the contents of `sda/main.ts` with `console.log("Hello!");` and save it.
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run the following command:  
-`deno run --watch --check main.ts`
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project folder that contains `package.json`.
 
-This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+Watching reruns the script; it does not check types. Use `npm run all-tests` in a second terminal to check types, formatting, and lint rules and run any tests. Use `npm run fix` for formatting and automatic fixes, then check again. Stop the script watcher with `CTRL` + `C`.
 
-You can use this setup to test the code provided in this lesson. (Yes, I forgot to include the `deno.json` file before taking all the screenshots for this lesson. Learn from my mistake and do better! 🥲)
+`npm run sda` reruns `sda/main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
 
-![A screenshot showing VS Code running and watching a TypeScript file.](/assets/first-steps/data-structures/watch.png)
+You can use this setup to test the code provided in this lesson.
+
+<OutdatedScreenshot src="/assets/first-steps/data-structures/watch.png" alt={"A screenshot showing VS Code running and watching a TypeScript file."} lang="en" />
 
 ## Objects
 
@@ -36,7 +36,7 @@ Objects store data as **key-value pairs** enclosed in curly brackets (`{}`), wit
 
 For example, the object below stores data about a student. The keys are `firstName`, `lastName`, `gender`, and `age`. The corresponding values are `"Nael"`, `"Shiab"`, `"man"`, and `22` (that's Nael from a long time ago 😅):
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const student = {
   firstName: "Nael",
   lastName: "Shiab",
@@ -52,7 +52,7 @@ console.log(student);
 
 To know what's in an object and the types of its values, you can hover over the object name in VS Code.
 
-![A screenshot showing VS Code with a pop-up displaying an object type.](/assets/first-steps/data-structures/object-types.png)
+<OutdatedScreenshot src="/assets/first-steps/data-structures/object-types.png" alt={"A screenshot showing VS Code with a pop-up displaying an object type."} lang="en" />
 
 ### Accessing values
 
@@ -60,7 +60,7 @@ To access the value of a specific key, use a `.` directly after the variable tha
 
 For example, the following code will log `Nael` to your terminal:
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const student = {
   firstName: "Nael",
   lastName: "Shiab",
@@ -80,7 +80,7 @@ You use the same syntax to modify a value in an object as you do to access it, b
 
 As discussed in the [Variables](/first-steps/variables) lesson, you must respect the type of the value when modifying it. For example, if a key's value is initially a `number` (like with `age`), it can only be updated with another `number`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const student = {
   firstName: "Nael",
   lastName: "Shiab",
@@ -94,7 +94,7 @@ student.age = 100;
 console.log(student);
 ```
 
-![A screenshot showing VS Code and a script modifying an object.](/assets/first-steps/data-structures/object-update.png)
+<OutdatedScreenshot src="/assets/first-steps/data-structures/object-update.png" alt={"A screenshot showing VS Code and a script modifying an object."} lang="en" />
 
 ### Autocompletion and checks
 
@@ -102,13 +102,13 @@ When working with objects, you can take advantage of the handy autocompletion fe
 
 If you type `.` after a variable referencing an object, a pop-up will appear showing the list of available keys. You can use the up and down arrow keys to navigate through the keys and see their types. Press **Enter** to select the key you want.
 
-![A screenshot showing VS Code and its IntelliSense feature.](/assets/first-steps/data-structures/object-auto-completion.png)
+<OutdatedScreenshot src="/assets/first-steps/data-structures/object-auto-completion.png" alt={"A screenshot showing VS Code and its IntelliSense feature."} lang="en" />
 
-Additionally, because objects are typed, if you try to access a key that doesn't exist in the object, TypeScript will throw an error before you even run the script. This is shown in the screenshot below.
+Additionally, because objects are typed, if you try to access a key that doesn't exist in the object, VS Code and the project's type check will report an error before you even run the script. For example, try `student.fristName` instead of `student.firstName`. Node.js itself doesn't check these types, so keep using `npm run all-tests`.
 
 Many bugs and errors are caused by simple typos. With this feature, TypeScript helps you catch those mistakes early, saving you time and frustration. 🙏
 
-![A screenshot showing VS Code and an error caused by accessing a key that doesn't exist in an object.](/assets/first-steps/data-structures/object-no-key.png)
+<OutdatedScreenshot src="/assets/first-steps/data-structures/object-no-key.png" alt={"A screenshot showing VS Code and an error caused by accessing a key that doesn't exist in an object."} lang="en" />
 
 ## Arrays
 
@@ -118,14 +118,14 @@ Arrays store data in a specific order, enclosed within square brackets (`[` and 
 
 For example, here is an array of student names.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 console.log(names);
 ```
 
 If you hover over the variable `names`, you'll see that its type is `string[]`, meaning it’s an array composed exclusively of strings. It's generally best to create arrays containing only one data type (or one type and `null`, as we will see later). This keeps the data organized and lets us process all the items in the array the same way.
 
-![A screenshot showing VS Code with a `string[]` type on hovering.](/assets/first-steps/data-structures/string-array-type.png)
+<OutdatedScreenshot src="/assets/first-steps/data-structures/string-array-type.png" alt={"A screenshot showing VS Code with a `string[]` type on hovering."} lang="en" />
 
 ### Indexes
 
@@ -137,7 +137,7 @@ For example:
 
 To access an array value using an index, place the index inside square brackets (`[]`) immediately after the array or the variable referencing the array.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 // Change the index to see what's being logged.
@@ -148,11 +148,11 @@ const student = names[0];
 console.log(student);
 ```
 
-![A screenshot showing VS Code logging a string from an array.](/assets/first-steps/data-structures/names-index.png)
+<OutdatedScreenshot src="/assets/first-steps/data-structures/names-index.png" alt={"A screenshot showing VS Code logging a string from an array."} lang="en" />
 
 You can also modify a value in an array using its index and the `=` operator. Remember that arrays are typed in TypeScript. For example, if the type of `names` is `string[]`, you can only replace a value with another `string`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 // Changing the string
@@ -162,7 +162,7 @@ names[0] = "Nael";
 console.log(names);
 ```
 
-![A screenshot showing VS Code showing a script updating a string value in an array.](/assets/first-steps/data-structures/array-updating.png)
+<OutdatedScreenshot src="/assets/first-steps/data-structures/array-updating.png" alt={"A screenshot showing VS Code showing a script updating a string value in an array."} lang="en" />
 
 ### Properties
 
@@ -170,12 +170,12 @@ Arrays have a property called `length`, which returns the number of items in the
 
 To access a property, type a `.` right after the array or the variable referencing it.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 console.log(names.length);
 ```
 
-![A screenshot showing VS Code logging an array length.](/assets/first-steps/data-structures/array-length.png)
+<OutdatedScreenshot src="/assets/first-steps/data-structures/array-length.png" alt={"A screenshot showing VS Code logging an array length."} lang="en" />
 
 ### Methods
 
@@ -189,7 +189,7 @@ Here are a few examples of commonly used array methods.
 
 The `.push()` method adds one or more items to the end of an array.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 names.push("Nael");
@@ -202,7 +202,7 @@ console.log(names);
 
 The `.slice()` method creates a copy of the array. You can specify a starting index and a stopping index to copy just a portion of the array.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 // Start at index 0 and end at index 2, not included
@@ -218,7 +218,7 @@ The `.sort()` method sorts arrays containing strings in ascending order by defau
 
 It's also possible to pass an argument to sort other data types in a specific manner, but we'll cover that later.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 names.sort();
@@ -231,7 +231,7 @@ console.log(names);
 
 The `.includes()` method checks if a value exists in the array and returns a boolean.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const marks = [33, 45, 78, 98];
 
 console.log(marks.includes(45));
@@ -247,7 +247,7 @@ The `.find()` method searches for a value in the array. If no value matches the 
 
 This method requires a `function` as an argument. We'll cover functions in the next lessons.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const marks = [33, 45, 78, 98];
 
 // Find the first mark greater than 50
@@ -269,7 +269,7 @@ The `.filter()` method creates a new array containing only the items that match 
 
 This method requires a `function` as an argument. We'll cover functions in the next lessons.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const marks = [33, 45, 78, 98];
 
 // Create a new array with
@@ -294,7 +294,7 @@ This method requires a `function` as an argument. We'll cover functions in the n
 
 For example, the code below doubles each mark.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const allMarks = [33, 45, 78, 98];
 
 // Here, we multiply each mark by 2
@@ -315,7 +315,7 @@ console.log(marksMultiplied);
 
 Another advantage of using array methods is that they can be chained. Since they return an array, you can call one method after another.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const allMarks = [33, 45, 78, 98];
 
 // Here we chain the array methods.
@@ -333,7 +333,7 @@ console.log(newMarks);
 ```
 
 <Callout type="info" emoji="💡">
-So far in our code, each line has ended with a `;`. However, from line 8 to line 11, there are no semicolons because we are chaining methods. Everything between these lines is part of the same statement. Technically, you could write it all on one line, but that would make the code less readable. Since TypeScript doesn't care about line breaks or indentation, it's up to the user to format the code as they prefer. In our case, we let the Deno formatter handle that for us.
+So far in our code, each line has ended with a `;`. However, from line 8 to line 11, there are no semicolons because we are chaining methods. Everything between these lines is part of the same statement. Technically, you could write it all on one line, but that would make the code less readable. Since TypeScript doesn't care about line breaks or indentation, it's up to the user to format the code as they prefer. In our case, we let the project formatter handle that for us.
 </Callout>
 
 #### Others
@@ -346,7 +346,7 @@ You can also use *IntelliSense* directly in VS Code. Type `.` right after a vari
 
 Additionally, methods are typed. So, don't worry if you make a typo. It will be caught before you run your code and cause everything to crash. 🤓
 
-![A screenshot showing VS Code displaying methods available for a list.](/assets/first-steps/data-structures/pop-up-methods-arrays.png)
+<OutdatedScreenshot src="/assets/first-steps/data-structures/pop-up-methods-arrays.png" alt={"A screenshot showing VS Code displaying methods available for a list."} lang="en" />
 
 ## Arrays of... objects!
 
@@ -360,7 +360,7 @@ Here's an example using our students' names and marks. Each object stores data a
 
 You can think of each object as a row in a table. In fact, you can switch `console.log` to `console.table` and see a beautiful table displayed in your terminal!
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const students = [
   { name: "James", mark: 33 },
   { name: "John", mark: 45 },
@@ -370,7 +370,7 @@ const students = [
 console.table(students);
 ```
 
-![A screenshot showing VS Code logging an array of objects as a table in the terminal.](/assets/first-steps/data-structures/table.png)
+<OutdatedScreenshot src="/assets/first-steps/data-structures/table.png" alt={"A screenshot showing VS Code logging an array of objects as a table in the terminal."} lang="en" />
 
 Now things are getting interesting. This pattern provides a flexible way to work with data.
 
@@ -378,7 +378,7 @@ For example, you can filter based on a specific key while preserving the rest of
 
 It's the best of both worlds!
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const students = [
   { name: "James", mark: 33 },
   { name: "John", mark: 45 },
@@ -398,7 +398,7 @@ console.table(students);
 console.table(studentAbove50);
 ```
 
-![A screenshot showing VS Code filtering an array of objects.](/assets/first-steps/data-structures/array-objects-filter.png)
+<OutdatedScreenshot src="/assets/first-steps/data-structures/array-objects-filter.png" alt={"A screenshot showing VS Code filtering an array of objects."} lang="en" />
 
 ## Conclusion
 

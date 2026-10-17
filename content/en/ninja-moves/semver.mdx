@@ -7,9 +7,9 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Understanding library versions
 
-You may have noticed that library versions on NPM, JSR and in your `deno.json` (or `package.json`) have numbers attached to them.
+You may have noticed that library versions on npm and in your `package.json` have numbers attached to them.
 
-For example, the [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) library version used in this course is `6.0.1`. This numbering convention is called **semantic versioning**, or **SemVer** for short.
+For example, the [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) library could have a version such as `6.0.1`. This numbering convention is called **semantic versioning**, or **SemVer** for short.
 
 When library maintainers update these numbers, there is (usually 😅) a good reason why, and in this lesson, I’m going to explain what that reason is!
 
@@ -23,7 +23,7 @@ The first number indicates major versions. When this number changes, it means th
 
 So if you plan on updating to a major version, always plan some extra time to adjust your project. And always ask yourself if it's actually worth it!
 
-For example, if you are using `simple-data-analysis@6.0.0` and there is a new version `simple-data-analysis@7.0.0`, check the [release notes](https://github.com/nshiab/simple-data-analysis/releases) to weigh the pros and cons of updating your project with it.
+For example, if you are using `@nshiab/simple-data-analysis@6.0.0` and there is a new version `@nshiab/simple-data-analysis@7.0.0`, check the [release notes](https://github.com/nshiab/simple-data-analysis/releases) to weigh the pros and cons of updating your project with it.
 
 There’s also an extra thing to know about major versions: when it’s a `v0.x.x` version, it usually means that the library is not ready for production. The maintainers will probably introduce a lot of breaking changes before it reaches `v1.0.0`, as they’re trying to figure out the best way to build everything. A lot of bugs are to be expected too.
 
@@ -31,7 +31,7 @@ There’s also an extra thing to know about major versions: when it’s a `v0.x.
 
 Minor versions are usually used to notify about new features.
 
-For example, if you are using `simple-data-analysis@6.0.0` and there’s a new `simple-data-analysis@6.1.0`, it probably means that there is a new class, new methods, or new functions available. The old ones are still there and should still work as before.
+For example, if you are using `@nshiab/simple-data-analysis@6.0.0` and there’s a new `@nshiab/simple-data-analysis@6.1.0`, it probably means that there is a new class, new methods, or new functions available. The old ones are still there and should still work as before.
 
 It's much safer to update to a minor version, since you shouldn't have to recode parts of your project. But this is code, and maintainers are humans (for now 🤖), so there are always some surprises! 😬
 
@@ -49,39 +49,39 @@ These versions are available to anyone to use while the code changes, but at the
 
 ## `^` and `~`
 
-Because it could be annoying to update libraries all the time for `minor` and `patch` versions, some projects prefix the library versions in the `deno.json` or `package.json` with `^` or `~`.
+Because it could be annoying to update libraries all the time for `minor` and `patch` versions, some projects prefix the library versions in the `package.json` with `^` or `~`.
 
 These symbols define a **range** of acceptable versions for a library.
 
 ### `^` (Caret)
 
-The `^` means that a project should stick to a major version, but can use any minor and patch version.
+For versions starting at `1.0.0`, `^` allows compatible minor and patch updates within the same major version.
 
-For example, `simple-data-analysis@^6.0.0` means that the project can use compatible versions before `v7.0.0`. So `simple-data-analysis@6.1.0` and `simple-data-analysis@6.1.1` would be acceptable.
+For example, `@nshiab/simple-data-analysis@^6.0.0` means that the project can use compatible versions before `v7.0.0`. So `@nshiab/simple-data-analysis@6.1.0` and `@nshiab/simple-data-analysis@6.1.1` would be acceptable.
+
+For `0.x.x` releases, caret ranges are narrower: `^0.1.0` allows versions before `0.2.0`, and `^0.0.1` allows only `0.0.1`.
 
 ### `~` (Tilde)
 
 The `~` is stricter, meaning that the project should stick to a major **and** minor version, but can use any patch version.
 
-For example, `simple-data-analysis@~6.1.0` means that the project can use patch releases before `v6.2.0`, like `simple-data-analysis@6.1.1`.
+For example, `@nshiab/simple-data-analysis@~6.1.0` means that the project can use patch releases before `v6.2.0`, like `@nshiab/simple-data-analysis@6.1.1`.
 
 ## Updating dependencies
 
-You can follow maintainers and projects on GitHub to stay up to date with your favorite libraries (check the [GitHub lesson](/git-and-github/github-basics)), but you can also use Deno and NPM directly to check if some of your libraries are outdated.
+You can follow maintainers and projects on GitHub to stay up to date with your favorite libraries (check the [GitHub lesson](/git-and-github/github-basics)), but npm can also check the dependencies in your project.
 
-### Deno
+Run `npm outdated` in the project terminal. Its main columns are:
 
-With Deno, you can run `deno outdated` in your terminal. Deno will automatically check JSR and NPM and let you know what’s available. You can then update the libraries of your choice.
+- `Current`: the version installed locally.
+- `Wanted`: the newest version allowed by your `package.json` range.
+- `Latest`: the version marked `latest` on npm, which may fall outside that range.
 
-There are also [different options](https://docs.deno.com/runtime/reference/cli/outdated/) available with this command.
+Run `npm update` to update installed dependencies within their ranges. This updates `package-lock.json`; by default, it leaves the ranges in `package.json` as they are. See the [npm update documentation](https://docs.npmjs.com/cli/v11/commands/npm-update).
 
-Always double-check that your project is running as expected after updating and that the correct versions are written down in your `deno.json`.
+To deliberately install a release outside the current range, use a command such as `npm install @nshiab/simple-data-analysis@7.0.0`, after reading its release notes. This also updates the dependency entry in `package.json`.
 
-### NPM
-
-NPM does the same thing with the `npm outdated` command. To update libraries, you can use `npm update`.
-
-Again, always double-check that your project is running as expected after updating and that the correct versions are written down in your `package.json`.
+After updating, run `npm run all-tests` and the project itself. Save both `package.json` and `package-lock.json` in Git so collaborators can reproduce the installation with `npm ci`.
 
 ## Conclusion
 

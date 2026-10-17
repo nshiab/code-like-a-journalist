@@ -21,9 +21,9 @@ I strongly encourage you to complete the two previous lessons ([What is Git?](/g
 
 ## Setup
 
-Create a new folder and open it with VS Code.
+Create a new folder, open it with VS Code, and run `npx @nshiab/setup-data-project`. Press `Enter` without selecting a library. Keep the generated `.gitignore`, `package.json`, and `package-lock.json`. Run all terminal commands from the project folder that contains `package.json`, not from inside `sda`. Keep the generated configuration files too: they provide formatting and type checks through `npm run fix` and `npm run all-tests`.
 
-In it, create a `main.ts` file with the code below. Here's what it does:
+Replace `sda/main.ts` with the code below. Here's what it does:
 - It fetches the latest weather data in Montreal from the [Meteorological Service of Canada API](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
 - The data is in XML format. We use the library [`fast-xml-parser`](https://www.npmjs.com/package/fast-xml-parser) to convert it to JSON.
 - Then we extract the temperature and the time from the nested JSON. We also create a variable with the current time of the scrape.
@@ -32,8 +32,9 @@ In it, create a `main.ts` file with the code below. Here's what it does:
 Each time this script runs, a new row is added to the CSV. So the data is accumulated over time.
 
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 import { XMLParser } from "fast-xml-parser";
+import { appendFile } from "node:fs/promises";
 
 const response = await fetch(
   "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
@@ -65,22 +66,19 @@ console.log(temperature);
 const scrapeTime = new Date().toISOString();
 console.log(scrapeTime);
 
-await Deno.writeTextFile(
+await appendFile(
   "./data.csv",
   `\n${scrapeTime},${resultTime},${temperature}`,
-  {
-    append: true,
-  },
 );
 ```
 
-`main.ts` needs a `data.csv` file, so let's create one in the project folder.
+Create `data.csv` in the project folder, alongside `package.json`. The script uses a path relative to the terminal's current folder, so run it from that folder.
 
 ```csv showLineNumbers filename="data.csv"
 scrapeTime,resultTime,temp
 ```
 
-We will push this project to GitHub, so let's add a `README.md` to the project to make it more presentable.
+We will push this project to GitHub, so add this description at the top of the generated `README.md`, above its managed section.
 
 ```md showLineNumbers filename="README.md"
 # Montreal temperature scraper
@@ -93,10 +91,10 @@ and appends a new row to the `data.csv` file.
 Let's take this for a run!
 
 First, install `fast-xml-parser`:
-- `deno add npm:fast-xml-parser`
+- `npm install fast-xml-parser`
 
-Then run `main.ts`:
-- `deno -A main.ts`
+Then run `sda/main.ts` once from the project folder:
+- `node sda/main.ts`
 
 And you should see the temperature being logged and a row added to the `data.csv` file!
 
@@ -105,7 +103,7 @@ And you should see the temperature being logged and a row added to the `data.csv
 Let's initialize a new Git repository and push it to GitHub.
 
 First, we initialize and make a first commit:
-- `git init`
+- `git init -b main`
 - `git add -A`
 - `git commit -m "First commit"`
 
@@ -115,7 +113,7 @@ Then, create a new repository on GitHub.
 
 Give it a name and a description (optional). You can make it private or public, as you wish.
 
-You don't need a `README` because we created one. You don't need a `.gitignore` and you don't need a license for now.
+Leave the options to add a `README` and `.gitignore` unchecked: our local project already has both. You can also leave the license option empty for this exercise.
 
 Then hit `Create repository`.
 
@@ -129,13 +127,13 @@ And run these commands in your project terminal.
 
 Now, if you refresh your GitHub repository page, you'll see your code and the `README.md` below it.
 
-![A fresh repository on GitHub](/assets/git-and-github/github-actions/fresh-repo.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-actions/fresh-repo.png" alt={"A fresh repository on GitHub"} lang="en" />
 
 ## Adding a workflow
 
 While it's called *GitHub Actions*, you are not creating *actions* but **workflows**. And you can see your workflows in the `Actions` section.
 
-![The Actions tab in new GitHub repository.](/assets/git-and-github/github-actions/actions.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-actions/actions.png" alt={"The Actions tab in new GitHub repository."} lang="en" />
 
 Right now, there are no workflows in our repository. GitHub suggests a few for us. Feel free to explore, but we are going to add one manually.
 
@@ -178,7 +176,7 @@ Now we need to describe the **jobs** we want the workflow to accomplish. You can
 
 We tell GitHub we want it to run on a virtual machine with the latest Ubuntu distribution. This means it will run on a cheap virtual machine, which is perfectly fine for us. But you have [choices](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#choosing-github-hosted-runners), if you ever need something different.
 
-Our `main.ts` script writes the freshly scraped data to `data.csv`, so we need to give the workflow permission to write and modify the files of the repository.
+Our `sda/main.ts` script writes the freshly scraped data to `data.csv`, so we need to give the workflow permission to write and modify the files of the repository.
 
 
 ```yml showLineNumbers filename=".github/workflows/scrape.yml" {8-12}
@@ -200,10 +198,11 @@ jobs:
 
 The only thing left to do is to tell GitHub the **steps** of this job. Each step has a name:
 - `Check out the repository` tells the workflow to access the repository. We use the pre-coded `actions/checkout@v7` for that. There are a lot of actions available for you to use, especially for common tasks. It's nice not to have to code everything yourself! 🥳
-- `Set up Deno` installs Deno. We use an available action for that too. We specify that we want version 2 of Deno.
-- `Run main.ts` runs our script, just like we would locally.
+- `Set up Node.js` uses [actions/setup-node](https://github.com/actions/setup-node) to install the latest LTS release, selected by `lts/*`. Setting `check-latest: true` asks the action to check for the latest matching release.
+- `Install dependencies` runs `npm ci`, which installs the exact versions in our committed `package-lock.json`.
+- `Run sda/main.ts` runs the script once with Node.js. We use `node sda/main.ts` here because the workflow needs to finish; `npm run sda` would keep watching for changes.
 
-```yml showLineNumbers filename=".github/workflows/scrape.yml" {13-21}
+```yml showLineNumbers filename=".github/workflows/scrape.yml" {14-26}
 name: Scrape Montreal temperature
 
 on:
@@ -219,23 +218,26 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
-      - name: Set up Deno
-        uses: denoland/setup-deno@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          deno-version: v2.x
-      - name: Run main.ts
-        run: deno -A main.ts
+          node-version: "lts/*"
+          check-latest: true
+      - name: Install dependencies
+        run: npm ci
+      - name: Run sda/main.ts
+        run: node sda/main.ts
 ```
 
 ### Saving the data
 
-Now, if you commit your workflow and push it to GitHub, it will fetch the data and write it to `data.csv`, but... it won't **actually save `data.csv`**!
+With the steps written so far, running the workflow would fetch the data and write it to `data.csv`, but it would not **save the updated file in the repository**.
 
-Remember: this is running on a virtual machine. So it runs, writes a new row to `data.csv`, but then the machine is destroyed and removed. The data saved in memory disappears...
+Remember: this is running on a virtual machine. So it runs, writes a new row to `data.csv`, but then the machine is destroyed and removed. The updated file on that machine disappears with it...
 
 This is why we have a final step to **commit the changes**. We use GitHub's bot identity to commit and push the updated `data.csv`. Isn't that brilliant? 🙌
 
-```yml showLineNumbers filename=".github/workflows/scrape.yml" {22-28}
+```yml showLineNumbers filename=".github/workflows/scrape.yml" {27-34}
 name: Scrape Montreal temperature
 
 on:
@@ -251,12 +253,15 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
-      - name: Set up Deno
-        uses: denoland/setup-deno@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          deno-version: v2.x
-      - name: Run main.ts
-        run: deno -A main.ts
+          node-version: "lts/*"
+          check-latest: true
+      - name: Install dependencies
+        run: npm ci
+      - name: Run sda/main.ts
+        run: node sda/main.ts
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
@@ -281,7 +286,7 @@ If you click on it, you’ll see the jobs. Here, there's just one: `scrape`.
 
 And if you click on the job, you'll see its steps and can click on them. This is useful when something is failing. You'll be able to see the error messages here.
 
-![Success steps.](/assets/git-and-github/github-actions/success-steps.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-actions/success-steps.png" alt={"Success steps."} lang="en" />
 
 If you go back to the home page of the repository, you'll see that the latest commit has been made by `github-actions[bot]`.
 
@@ -306,7 +311,7 @@ The committed data is on GitHub. To retrieve it in your local repo, just `pull` 
 
 Note that I went for lunch before taking this screenshot, so I have three lines! The scraper ran while I was away! 😄
 
-![The pulled data.](/assets/git-and-github/github-actions/pull.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-actions/pull.png" alt={"The pulled data."} lang="en" />
 
 If your repository is public, you can also fetch the CSV data easily. This is useful when you want to work with up-to-date data in another project. Click on the `Raw` button to get a URL to the actual file.
 
@@ -316,7 +321,7 @@ Now you can directly fetch this URL.
 
 ![The link to the raw data.](/assets/git-and-github/github-actions/url.png)
 
-You can use this URL to fetch the latest data and process it, for example, with the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis).
+You can use this URL to fetch the latest data and process it, for example, with the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis). For this next example, create a separate project with `npx @nshiab/setup-data-project` and select `simple-data-analysis` with the space bar before pressing Enter. Put the code in `sda/main.ts` and run it once from the project folder with `node sda/main.ts`.
 
 
 ```ts showLineNumbers

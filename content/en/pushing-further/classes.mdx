@@ -22,18 +22,17 @@ Let's dive into it!
 
 ## Setup
 
-Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+Create a new project with `npx @nshiab/setup-data-project`, following the [setup lesson](/first-steps/setup). For this lesson, leave all optional libraries unselected. Open the generated project folder in VS Code and use the generated `sda/main.ts` for your code.
 
-- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
-- `deno.json`, used to configure Deno and activate its VS Code extension. We will keep it empty for now.
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project root, the folder containing `package.json`.
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run the following command: `deno run --watch --check main.ts`
+This command reruns your code every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC). Stop it with `CTRL` + `C` on either system.
 
-This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+Node.js runs TypeScript without checking its types. Use `npm run all-tests` to check the project, and `npm run fix` to apply formatting and automatic fixes, as explained in the setup lesson.
 
 You can use this setup to test the code provided in this lesson.
 
-![A screenshot showing VS Code running and watching a TypeScript file.](/assets/pushing-further/classes/setup.png)
+<OutdatedScreenshot src="/assets/pushing-further/classes/setup.png" alt={"A screenshot showing VS Code running and watching a TypeScript file."} lang="en" />
 
 ## Creating a class
 
@@ -41,7 +40,7 @@ To create a class, you need to declare it with the `class` keyword, followed by 
 
 Let's create a class named `Person`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 class Person {
 }
 ```
@@ -54,7 +53,7 @@ Below, we instantiate our class `Person` twice. We store the new instances in th
 
 We now have two `Person` instances in our code.
 
-```ts showLineNumbers filename="main.ts" {4, 5}
+```ts showLineNumbers filename="sda/main.ts" {4, 5}
 class Person {
 }
 
@@ -67,7 +66,7 @@ const emily = new Person();
 So far, our class `Person` is empty. We can give our `Person` instances `name` and `age` properties.
 
 
-```ts showLineNumbers filename="main.ts" {2, 3}
+```ts showLineNumbers filename="sda/main.ts" {2, 3}
 class Person {
   name: string;
   age: number;
@@ -76,13 +75,13 @@ class Person {
 const john = new Person();
 const emily = new Person();
 ```
-Now, the class `Person` has two properties, but they are not assigned. It would be great to give `john` and `emily` a `name` and `age` when instantiating them.
+Now, the class `Person` has two properties, but they are not assigned. With the project’s strict TypeScript settings, VS Code and the project checks flag these uninitialized properties. We’ll fix that with a constructor next. It would be great to give `john` and `emily` a `name` and `age` when instantiating them.
 
 To do that, you need to use the class `constructor`. The constructor looks like a function, but without the `function` keyword. It's called when you instantiate the class (and only then).
 
 We can give the `constructor` parameters (here, `name` and `age`). By using the `this` keyword, we can assign the parameters to the properties.
 
-```ts showLineNumbers filename="main.ts" {5-8}
+```ts showLineNumbers filename="sda/main.ts" {5-8}
 class Person {
   name: string;
   age: number;
@@ -97,12 +96,14 @@ const john = new Person();
 const emily = new Person();
 ```
 
-It's now possible to pass arguments when we instantiate the class. We created just one class, but `john` and `emily` now each have their own `name` and `age`. And of course, everything is typed, so the code editor will help you out with autocomplete and will make sure you're passing the right data types. Magic! 🪄✨
+The constructor now expects two arguments. VS Code and the project checks flag the calls without arguments above; let’s fix them by providing a name and an age. Node.js itself doesn’t check these types when it executes the file.
+
+It’s now possible to pass arguments when we instantiate the class. We created just one class, but `john` and `emily` now each have their own `name` and `age`. And of course, everything is typed, so the code editor will help you out with autocomplete and will make sure you're passing the right data types. Magic! 🪄✨
 
 You can access class instance properties just like you would with objects, using a `.`.
 
 
-```ts showLineNumbers filename="main.ts" {14-15} /"john", 30/ /"emily", 35/
+```ts showLineNumbers filename="sda/main.ts" {14-15} /"john", 30/ /"emily", 35/
 class Person {
   name: string;
   age: number;
@@ -120,7 +121,7 @@ console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
 
-![Logging properties.](/assets/pushing-further/classes/properties.png)
+<OutdatedScreenshot src="/assets/pushing-further/classes/properties.png" alt={"Logging properties."} lang="en" />
 
 ## Methods
 
@@ -130,7 +131,7 @@ Methods are written like functions, but without the `function` keyword. You have
 
 For example, let's create a method called `makeOlder`. Each time it's called, it will add `1` to the `age` property.
 
-```ts showLineNumbers filename="main.ts" {10-12}
+```ts showLineNumbers filename="sda/main.ts" {10-12}
 class Person {
   name: string;
   age: number;
@@ -159,7 +160,7 @@ Below, we call the `makeOlder` method three times on `john`. We instantiated him
 And since all instances are independent, `emily` is still `35`! Of course, `emily` also has the `makeOlder` method. Feel free to test it!
 
 
-```ts showLineNumbers filename="main.ts" {18-20}
+```ts showLineNumbers filename="sda/main.ts" {18-20}
 class Person {
   name: string;
   age: number;
@@ -184,14 +185,14 @@ john.makeOlder();
 console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
-![Using methods.](/assets/pushing-further/classes/method.png)
+<OutdatedScreenshot src="/assets/pushing-further/classes/method.png" alt={"Using methods."} lang="en" />
 
 Calling the method `makeOlder` three times is not very convenient. Just like functions, methods can have parameters. Let's update our code to pass a number of years to the method.
 
 And just like function parameters, method parameters are typed, which is very convenient and helps you avoid typos and bugs.
 
 
-```ts showLineNumbers filename="main.ts" {18} /year: number/ /+ year/
+```ts showLineNumbers filename="sda/main.ts" {18} /year: number/ /+ year/
 class Person {
   name: string;
   age: number;
@@ -214,14 +215,14 @@ john.makeOlder(3);
 console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
-![Using methods with parameters.](/assets/pushing-further/classes/method-parameter.png)
+<OutdatedScreenshot src="/assets/pushing-further/classes/method-parameter.png" alt={"Using methods with parameters."} lang="en" />
 
 Instead of using `console.log` and manually passing the instance properties, we could also create another method to log the ages.
 
 As you can see, classes, with their properties and methods, can be a great way to organize your code!
 
 
-```ts showLineNumbers filename="main.ts" {14-16, 24-25}
+```ts showLineNumbers filename="sda/main.ts" {14-16, 24-25}
 class Person {
   name: string;
   age: number;
@@ -248,16 +249,16 @@ john.makeOlder(3);
 emily.log();
 john.log();
 ```
-![Using another method.](/assets/pushing-further/classes/log-method.png)
+<OutdatedScreenshot src="/assets/pushing-further/classes/log-method.png" alt={"Using another method."} lang="en" />
 
 ## Exporting and importing
 
 Just like functions, it's pretty common to keep classes in their own file and export/import them.
 
-Create a new file called `Person.ts` and move your class into it. Don’t forget to add `export default` in front of it to make it available to the rest of your scripts.
+Create a new file called `Person.ts` inside `sda` and move your class into it. Don’t forget to add `export default` in front of it to make it available to the rest of your scripts.
 
 
-```ts showLineNumbers filename="Person.ts" /export default/
+```ts showLineNumbers filename="sda/Person.ts" /export default/
 export default class Person {
   name: string;
   age: number;
@@ -277,10 +278,10 @@ export default class Person {
 }
 ```
 
-And now you can easily import it and use it in `main.ts`, which is now much simpler and easier to understand!
+And now you can easily import it and use it in `sda/main.ts`, which is now much simpler and easier to understand!
 
 
-```ts showLineNumbers filename="main.ts" {1}
+```ts showLineNumbers filename="sda/main.ts" {1}
 import Person from "./Person.ts";
 
 const john = new Person("john", 30);
@@ -299,7 +300,7 @@ Just like functions, you can document your classes using the **JSDoc** syntax.
 Below, I have documented the class as well as all its methods. For each one, I added an example. Now, the documentation will pop up in VS Code when you start typing their names or when hovering over them. Very convenient!
 
 
-```ts showLineNumbers filename="Person.ts" {1-8, 18-27, 32-39}
+```ts showLineNumbers filename="sda/Person.ts" {1-8, 18-27, 32-39}
 /**
  * Represents a person with a name and age.
  *
@@ -344,7 +345,7 @@ export default class Person {
   }
 }
 ```
-![Using documentation.](/assets/pushing-further/classes/documentation.png)
+<OutdatedScreenshot src="/assets/pushing-further/classes/documentation.png" alt={"Using documentation."} lang="en" />
 
 ## Conclusion
 

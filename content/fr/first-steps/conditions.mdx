@@ -16,18 +16,19 @@ C'est la même chose dans votre code. Selon les données, vous pouvez demander �
 
 Préparons notre environnement de travail pour cette leçon.
 
-Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
+Utilisez le projet créé dans [Installation](/first-steps/setup), ou créez un nouveau dossier vide, ouvrez-le avec VS Code et exécutez `npx @nshiab/setup-data-project` sans sélectionner de librairie.
 
-- `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
-- `deno.json`, qui sert à configurer Deno et à activer son extension VS Code. Nous le laisserons vide pour l'instant.
+Remplacez le contenu de `sda/main.ts` par `console.log("Hello!");` et enregistrez.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez la commande suivante : `deno run --watch --check main.ts`
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis le dossier du projet qui contient `package.json`.
 
-Cette commande efface le terminal et réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+La surveillance relance le script ; elle ne vérifie pas les types. Utilisez `npm run all-tests` dans un deuxième terminal pour vérifier les types, le formatage et les règles de qualité du code et exécuter les tests éventuels. Utilisez `npm run fix` pour le formatage et les corrections automatiques, puis vérifiez à nouveau. Arrêtez la surveillance du script avec `CTRL` + `C`.
+
+`npm run sda` réexécute `sda/main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
 
 Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
 
-![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/first-steps/conditions/setup.png)
+<OutdatedScreenshot src="/assets/first-steps/conditions/setup.png" alt={"Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript."} lang="fr" />
 
 ## Instructions conditionnelles
 
@@ -37,7 +38,7 @@ La première condition doit toujours être testée avec `if`. La condition doit 
 
 Par exemple, le code ci-dessous affiche `I am older than you!` dans le terminal uniquement si `myAge` est supérieur à `yourAge`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Modifiez les âges
 // pour tester les différentes possibilités.
 const myAge = 36;
@@ -52,7 +53,7 @@ Si nous voulons tester plus d'une condition, nous utilisons `else if` avec une c
 
 Tester plusieurs conditions n'est pas toujours nécessaire, mais dans l'exemple ci-dessous, nous voulons aussi afficher `You are older than me!` si `myAge` est inférieur à `yourAge`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Modifiez les âges
 // pour tester les différentes possibilités.
 const myAge = 36;
@@ -69,7 +70,7 @@ Si nous voulons exécuter du code lorsque aucune des conditions n'est remplie, n
 
 Par exemple, dans le code ci-dessous, si aucune des conditions n'est remplie, cela signifie que nous avons le même âge. Nous utilisons donc `else` pour afficher `We are the same age!` dans le terminal.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Modifiez les âges
 // pour tester les différentes possibilités.
 const myAge = 36;
@@ -84,7 +85,7 @@ if (myAge > yourAge) {
 }
 ```
 
-![Une capture d'écran montrant VS Code exécutant un fichier TypeScript avec des instructions if, else if, et else.](/assets/first-steps/conditions/conditions-age.png)
+<OutdatedScreenshot src="/assets/first-steps/conditions/conditions-age.png" alt={"Une capture d'écran montrant VS Code exécutant un fichier TypeScript avec des instructions if, else if, et else."} lang="fr" />
 
 <Callout type="info" emoji="💡">
   Avez-vous remarqué l'absence de `;` à la ligne 12 ? C'est parce que lorsque vous utilisez `{}`, vous créez un **bloc de code**. L'accolade fermante indique déjà à l'ordinateur que c'est la fin du bloc, donc un point-virgule supplémentaire à la fin n'est pas nécessaire.
@@ -110,7 +111,7 @@ Voici les principaux opérateurs de comparaison que vous utiliserez au quotidien
 
 Et voici les opérateurs en action. Nous stockons les résultats dans des variables et les affichons :
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Modifiez les âges pour tester les différents opérateurs.
 // Ne vous préoccupez pas de `: number` pour le moment.
 const myAge: number = 36;
@@ -135,7 +136,7 @@ const differentAge = myAge !== yourAge;
 console.log("differentAge =>", differentAge);
 ```
 
-![Une capture d'écran montrant VS Code exécutant un fichier TypeScript avec des opérateurs de comparaison.](/assets/first-steps/conditions/operators.png)
+<OutdatedScreenshot src="/assets/first-steps/conditions/operators.png" alt={"Une capture d'écran montrant VS Code exécutant un fichier TypeScript avec des opérateurs de comparaison."} lang="fr" />
 
 ## Opérateurs logiques
 
@@ -148,7 +149,7 @@ Par exemple, disons que nous avons besoin d'un algorithme pour vérifier si vous
 
 Sans opérateurs logiques, cela pourrait ressembler à ceci, avec des conditions imbriquées. Cela fonctionne, mais les conditions imbriquées peuvent être difficiles à lire et à déboguer.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Modifiez l'âge et la province pour tester les conditions.
 // Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;
@@ -174,7 +175,7 @@ if (myProvince === "Quebec") {
 
 Voici le même code avec l'opérateur logique `&&` pour s'assurer que `myAge` **ET** `myProvince` respectent des conditions spécifiques. Cette approche est plus simple à comprendre et plus facile à déboguer !
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Modifiez l'âge et la province pour tester les conditions.
 // Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;
@@ -196,7 +197,7 @@ if (myProvince === "Quebec" && myAge >= 18) {
 
 Nous pourrions aussi écrire le même algorithme avec un mélange de `&&` et de `||`. Nous pouvons également utiliser des variables pour simplifier le code.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Modifiez l'âge et la province pour tester les conditions.
 // Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;
@@ -225,7 +226,7 @@ C'est idéal pour des conditions simples, vous permettant de remplacer les instr
 
 Voici une autre variation de notre algorithme en utilisant cette syntaxe.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Modifiez l'âge et la province pour tester les conditions.
 // Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;

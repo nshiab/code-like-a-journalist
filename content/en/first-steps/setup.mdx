@@ -1,5 +1,5 @@
 ---
-title: Setup with VSCode, Deno and TypeScript
+title: Setup with VS Code, Node.js and TypeScript
 description: Let's install everything we need.
 ---
 
@@ -31,122 +31,124 @@ Personally, I find the interface to be too small and I always adjust it to be a 
 
 ## Runtime
 
-For your computer to understand TypeScript and execute it, you need a runtime.
+To execute our TypeScript code, we need a runtime. We will use [Node.js](https://nodejs.org/), a free, open-source runtime with a large ecosystem of tools for working with data.
 
-Again, you have many great open-source options out there, but I find [Deno](https://deno.com/) particularly easy to use. Deno is maintained by [Deno Land Inc.](https://deno.com/company), with Ryan Dahl as the CEO. Dahl also created [Node.js](https://nodejs.org/), another open-source runtime that is very popular.
+For this course, install **the latest LTS version of Node.js**. LTS stands for *Long-Term Support*. The LTS version is a good choice for the tools and data libraries we will use throughout this course.
 
-Visit [Deno's homepage](https://deno.com/) and copy the installation command for your operating system (Mac, Windows, or Linux). We'll show you how to run it below.
+Visit the [Node.js download page](https://nodejs.org/en/download), select the latest LTS version and your operating system, and follow the installation instructions. On Windows and Mac, you can use the installer provided on that page. On Linux, follow the instructions for your distribution. The installation should include **npm**, the package manager we will use to download tools and libraries.
 
-![A screenshot of Deno's website.](/assets/first-steps/setup/deno.png)
+<OutdatedScreenshot src="/assets/first-steps/setup/deno.png" alt={"A screenshot of Deno's website."} lang="en" />
 
-Or copy the command for your operating system right here:
+<OutdatedScreenshot src="/assets/first-steps/setup/deno-install.png" alt={"A screenshot showing how to install Deno from VS Code terminal."} lang="en" />
 
-**Mac or Linux:**
+<OutdatedScreenshot src="/assets/first-steps/setup/deno-version.png" alt={"A screenshot showing how to display Deno version."} lang="en" />
 
-```bash
-curl -fsSL https://deno.land/install.sh | sh
+Quit and restart VS Code after installing Node.js. Open the terminal (`View => Terminal`, or `CMD` + `J` on Mac and `CTRL` + `J` on Windows), and run these commands one at a time:
+
+```sh
+node --version
+npm --version
 ```
 
-**Windows (PowerShell):**
+The first command should display the Node.js version you just installed. The second should display an npm version number. If either command is not found, check that installation completed, then restart VS Code again.
 
-```powershell
-irm https://deno.land/install.ps1 | iex
-```
+Other runtimes, including [Bun](https://bun.sh/), can also run TypeScript, and `setup-data-project` supports Bun too. We'll use Node.js and npm for all the examples in this course.
 
-Then, follow these steps:
+## Set up a project
 
-1. Open the terminal in VS Code (`CMD` + `J` on Mac or `CTRL` + `J` on Windows).
-2. Paste the command for your operating system and press enter to run it.
+We will use [@nshiab/setup-data-project](https://github.com/nshiab/setup-data-project), an open-source tool I created, to prepare our projects. It installs and configures TypeScript, formatting, and the tools that check our code. This lets us get straight to learning the language.
 
-The command will download and install Deno on your computer.
-
-![A screenshot showing how to install Deno from VS Code terminal.](/assets/first-steps/setup/deno-install.png)
-
-Now, everything should be properly installed.
-
-Quit and restart VS Code. Then type `deno --version` in your terminal and press enter to display your Deno version. You should see something like this!
-
-![A screenshot showing how to display Deno version.](/assets/first-steps/setup/deno-version.png)
-
-## Extensions
-
-VS Code has a wonderful extensions ecosystem and the Deno team created a very useful one to help you code efficiently.
-
-Follow these steps to install it:
-
-1. Click on the Extensions tab on the left side of VS Code.
-2. Search for the Deno extension.
-3. Install the extension published by **Denoland**. Make sure `Auto update` is checked.
-
-![A screenshot showing how to install Deno extension.](/assets/first-steps/setup/deno-extension.png)
-
-One of the great features of the Deno extension is its formatter. Let's update the VS Code settings so it will automatically format our code when we save a file. This will help keep everything clean and tidy.
-
-- On Mac, go to `Code => Preferences => Settings`.
-- On Windows, go to `File => Preferences => Settings`.
-
-![A screenshot showing VS Code settings.](/assets/first-steps/setup/vscode-settings.png)
-
-<br />
-
-Next, find `Default Formatter` using the search bar and select `Deno` from the dropdown menu.
-
-![A screenshot showing VS Code formatter settings.](/assets/first-steps/setup/vscode-formatter.png)
-
-Then, look for `Format On Save` and check the box to enable it.
-
-![A screenshot showing VS Code format on save settings.](/assets/first-steps/setup/vscode-format-on-save.png)
-
-Finally, find `Word Wrap` and set `Editor: Word Wrap` to `on` if it isn’t already. Long lines will wrap to fit the editor, so you won’t need to scroll sideways to read your code.
-
-![VS Code settings showing Editor: Word Wrap set to on.](/assets/first-steps/setup/vscode-word-wrap.png)
-
-The settings are saved automatically, so you can now close the `Settings` tab. You're all set!
-
-## Let's run a script
-
-To double-check that everything is working as expected, we are going to write a little script and run it.
-
-To start a new project in VS Code, follow these steps:
-
-1. Create a new folder somewhere handy on your computer.
-2. In VS Code, click on the Explorer tab.
-3. Click on `Open Folder` and select the folder you just created. If you are asked whether you trust the authors of the files, say "Yes" to proceed.
+First, create a new, empty folder somewhere handy on your computer. In VS Code, click on the Explorer tab, click `Open Folder`, and select that folder. If you are asked whether you trust the authors of the files, say "Yes" for this project you just created.
 
 ![A screenshot showing how to open a new folder in VS Code.](/assets/first-steps/setup/deno-open-folder.png)
 
-Now that VS Code has opened your folder, we can create a new file.
+Open the terminal (`View => Terminal`, or `CMD` + `J` on Mac and `CTRL` + `J` on Windows). It should open in your new folder. Run:
 
-1. Right-click on the Explorer.
-2. Click on `New file...`.
-3. Name your new file `main.ts`. If the file doesn't open as a new tab, click on it.
-4. In the `main.ts` tab, type `console.log("This is going to be fun!");` and save the file by pressing `CMD` + `S` on Mac or `CTRL` + `S` on PC.
+```sh
+npx @nshiab/setup-data-project
+```
+
+`npx` downloads and runs a tool from npm. If npm asks whether to install `@nshiab/setup-data-project`, type `y` and press Enter.
+
+When the tool asks which libraries to install, **leave everything unselected and press Enter**. We don't need a data library to learn TypeScript fundamentals. We'll select libraries later when we start analyzing data.
+
+Wait until setup finishes and displays `You are all set!`. It may take a few minutes to download and install the tools.
+
+<OutdatedScreenshot src="/assets/first-steps/setup/deno-extension.png" alt={"A screenshot showing how to install Deno extension."} lang="en" />
+
+Several files and folders will appear in the Explorer. Here are the ones you need to recognize for now:
+
+- `sda/main.ts` is where we will write our code. `sda` is a folder, and `main.ts` is a file inside it. The `.ts` extension identifies a TypeScript file.
+- `package.json` describes the project, its dependencies, and the commands we will run with npm.
+- `package-lock.json` records the installed package versions so the project can be installed consistently.
+- `node_modules` holds the downloaded tools and libraries. You won't need to edit it.
+- `tsconfig.json`, `vite.config.ts`, and `.vscode` contain settings prepared by the tool. Keep them in place.
+
+Don't worry if this looks like a lot. The setup tool has done the configuration for us. Most of the time, we will work in `sda/main.ts`.
+
+## Editor settings
+
+The project includes recommended VS Code extensions. When VS Code offers to install them, accept the recommendation for the **Vite+ extension pack**, published by **VoidZero**. You can also open the Extensions tab and search for `@recommended`, or search for `VoidZero.vite-plus-extension-pack` directly.
+
+This pack provides the formatting and code checks configured by the project. The generated VS Code settings enable formatting when you save a file and word wrap for long lines. You don't need to configure a separate formatter.
+
+If you previously installed the Deno extension, disable it for this workspace so it doesn't interfere with the project's TypeScript tools.
+
+<OutdatedScreenshot src="/assets/first-steps/setup/vscode-formatter.png" alt={"A screenshot showing VS Code formatter settings."} lang="en" />
+
+## Let's run a script
+
+In the Explorer, expand the `sda` folder and open `main.ts`. Replace its contents with:
+
+```ts filename="sda/main.ts"
+console.log("This is going to be fun!");
+```
 
 This code tells your computer to log *This is going to be fun!* in your terminal.
 
-![A screenshot showing how to create a new TypeScript file in VS Code.](/assets/first-steps/setup/deno-new-file.png)
+Save the file by pressing `CMD` + `S` on Mac or `CTRL` + `S` on Windows. A dot in the file's tab indicates unsaved changes. Always save before expecting your changes to run.
 
-If you create or change a file without saving it, VS Code will show you that you have unsaved changes in two places:
+In the terminal, from the project folder that contains `package.json`, run:
 
-- A number on the Explorer icon on the left tells you how many files have unsaved changes.
-- In the file's tab, a white dot replaces the cross normally used to close the file.
+```sh
+npm run sda
+```
 
-The two red arrows in the screenshot below point to these indicators. Here, the number `1` means that one file has unsaved changes, and the white dot tells us that file is `main.ts`.
+This runs the project's `sda` command, which starts Node.js and executes `sda/main.ts`. You should see *This is going to be fun!* in your terminal.
 
-Make sure to save the file by clicking in it and then pressing `CMD` + `S` on Mac or `CTRL` + `S` on PC.
+The command keeps watching your script: each time you save a change, Node.js runs it again. Try changing the message and saving! To stop the watcher, click in the terminal and press `CTRL` + `C` on Mac or Windows.
 
-![A screenshot showing an unsaved file in VS Code.](/assets/first-steps/setup/save.png)
+<OutdatedScreenshot src="/assets/first-steps/setup/deno-new-file.png" alt={"A screenshot showing how to create a new TypeScript file in VS Code."} lang="en" />
 
-Once the file is saved, we can run the script.
+<OutdatedScreenshot src="/assets/first-steps/setup/save.png" alt={"A screenshot showing an unsaved file in VS Code."} lang="en" />
 
-1. Show the terminal (click on `View => Terminal`, or toggle the terminal by pressing `CMD` + `J` on Mac or `CTRL` + `J` on Windows).
-2. Type `deno run main.ts` in the terminal and press enter.
-
-This asks your computer to use Deno to run the script `main.ts`. As a result, you should see *This is going to be fun!* in your terminal.
+<OutdatedScreenshot src="/assets/first-steps/setup/deno-run.png" alt={"A screenshot showing how to run a TypeScript file in VS Code."} lang="en" />
 
 Congratulations! You are now ready to write amazing code. 🤩
 
-![A screenshot showing how to run a TypeScript file in VS Code.](/assets/first-steps/setup/deno-run.png)
+## Check and format your code
+
+Node.js can [run TypeScript files directly](https://nodejs.org/docs/latest-v24.x/api/typescript.html) by removing their type annotations before execution. **It does not check the types.** Watching the script only reruns it; a script can run and still contain TypeScript mistakes.
+
+The setup tool installs and configures these checks for us. VS Code can flag mistakes as we type, and this command checks the whole project:
+
+```sh
+npm run all-tests
+```
+
+It checks formatting, lint rules, and TypeScript types, then runs any automated tests in the project. We will learn about tests later. For now, read any reported errors and fix them before trusting your results. A successful check helps, but you still need to verify your data and logic!
+
+If `npm run sda` is still watching in your terminal, use the `+` button in the terminal panel to open a second terminal for the checks, or stop the watcher with `CTRL` + `C` first.
+
+To format the project and apply fixes the tools can make automatically, run:
+
+```sh
+npm run fix
+```
+
+This can change your files. Review the changes, then run `npm run all-tests` again. Errors in your types or logic may need a fix from you.
+
+For each new lesson, you can keep using this project and replace the contents of `sda/main.ts`. If you prefer a separate project, create a new empty folder, open it with VS Code, and run `npx @nshiab/setup-data-project` again with no libraries selected.
 
 ## About AI
 

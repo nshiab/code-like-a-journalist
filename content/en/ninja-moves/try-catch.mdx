@@ -16,30 +16,33 @@ By default, an error stops your script. But sometimes, you know how your code sh
 
 ## Setup
 
-Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+Create a new folder, open it in VS Code, and use the latest Node.js LTS. In the terminal, run `npx @nshiab/setup-data-project` and choose no optional libraries. This creates the same project structure and tools as in the [setup lesson](/first-steps/setup).
 
-- `main.ts`, where we will write our code.
-- `deno.json`, used to configure Deno and activate its VS Code extension. We will keep it empty for now.
-
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run: `deno run --watch --check --allow-read main.ts`
+We will write our script in `sda/main.ts`. Run `npm run sda` to execute it and rerun it automatically when you save changes. Run `npm run all-tests` to check formatting, lint rules, types, and tests; `npm run fix` can apply automatic formatting and lint fixes.
 
 ## Catching an error
 
-The following code tries to read a file that doesn't exist:
+The following code tries to read a file that doesn't exist. The path is relative to the project folder where the command runs:
 
-```ts showLineNumbers filename="main.ts"
-const text = await Deno.readTextFile("./article.txt");
+```ts showLineNumbers filename="sda/main.ts"
+import { readFile } from "node:fs/promises";
+
+const text = await readFile("./article.txt", "utf8");
 
 console.log(text);
 ```
 
-When Deno can't find `article.txt`, it triggers an error and stops the script.
+When Node can't find `article.txt`, it triggers an error and stops the script.
+
+The `"utf8"` argument asks `readFile` to return text instead of a binary buffer. `node:fs/promises` is built into Node, so there is nothing to install.
 
 We can handle that error with `try` and `catch`:
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
+import { readFile } from "node:fs/promises";
+
 try {
-  const text = await Deno.readTextFile("./article.txt");
+  const text = await readFile("./article.txt", "utf8");
   console.log(text);
 } catch (error) {
   console.log("The file could not be read.");
@@ -47,7 +50,7 @@ try {
 }
 ```
 
-Deno first runs the code inside the `try` block. If the code works, the `catch` block is skipped. If an error occurs, Deno stops running the `try` block and moves to `catch`.
+Node first runs the code inside the `try` block. If the code works, the `catch` block is skipped. If an error occurs, Node stops running the `try` block and moves to `catch`.
 
 The `error` parameter contains information about what went wrong. Logging it can help you understand and fix the problem.
 
@@ -57,19 +60,21 @@ The `error` parameter contains information about what went wrong. Logging it can
 
 ## Returning a fallback value
 
-Sometimes, you only need a fallback value when an asynchronous operation fails. In this example, `Deno.stat()` returns information about a file when it exists. If it doesn't, `.catch()` returns `null`:
+Sometimes, you only need a fallback value when an asynchronous operation fails. In this example, `stat()` returns information about a file when it exists. If the operation fails, `.catch()` returns `null`:
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
+import { stat } from "node:fs/promises";
+
 const path = "./article.txt";
-const fileInfo = await Deno.stat(path).catch(() => null);
+const fileInfo = await stat(path).catch(() => null);
 
 if (fileInfo) {
   console.log("The file exists!");
 } else {
-  console.log("The file doesn't exist.");
+  console.log("The file information is unavailable.");
 }
 ```
 
-This shorter `.catch()` syntax is useful when you can replace an error with a simple fallback value. In this case, `null` tells the rest of our code that no file was found.
+This shorter `.catch()` syntax is useful when you can replace an error with a simple fallback value. In this case, `null` tells the rest of our code that file information could not be read. This also catches errors other than a missing file, such as a permissions problem. Use a `try`/`catch` block and inspect the error if you need to distinguish them.
 
 <NoticeEnd />

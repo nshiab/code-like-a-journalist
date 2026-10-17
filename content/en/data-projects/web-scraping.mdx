@@ -22,13 +22,13 @@ Before starting, complete **TypeScript fundamentals**, **Working with TypeScript
 
 To set up, use [setup-data-project](https://github.com/nshiab/setup-data-project), as we did in previous lessons.
 
-Create a new folder, open it with VS Code, and run `deno -A jsr:@nshiab/setup-data-project`.
+Create a new folder, open it with VS Code, and run `npx @nshiab/setup-data-project`.
 
 When prompted, use the space bar to select `simple-data-analysis`, `journalism-web-scraping`, and `journalism-extras`, then press `Enter`.
 
-We will also use Playwright and a Deno file-system helper later in the lesson. Install them by running `deno add npm:playwright-chromium jsr:@std/fs`. Then allow Playwright's installation script to download Chromium by running `deno install --allow-scripts=npm:playwright-chromium --node-modules-dir=auto`.
+We will also use Playwright later in the lesson. Install it with `npm install playwright-chromium`, then run `npx playwright install chromium` to make sure its browser is available. For files, we will use Node’s built-in `node:fs/promises` module, which needs no installation.
 
-![A VS Code screenshot showing a script simulating the stock market](/assets/web-scraping/setup.png)
+<OutdatedScreenshot src="/assets/web-scraping/setup.png" alt={"A VS Code screenshot showing a script simulating the stock market"} lang="en" />
 
 ## Scraping tables
 
@@ -46,7 +46,7 @@ Since these HTML structures are always the same, I published a function to extra
 
 You can pass `getHtmlTable` the URL you want to scrape. Here, we match tables with the `.wikitable` CSS class and use `index: 0` to retrieve the first match. This is more reliable than counting every layout table on the page.
 
-Copy and paste the code below into `sda/main.ts` and run `deno task sda` in your terminal to start running and watching it.
+Copy and paste the code below into `sda/main.ts` and run `npm run sda` in your terminal to start running and watching it.
 
 
 ```ts showLineNumbers filename="sda/main.ts" {2, 6-11}
@@ -64,7 +64,7 @@ console.table(medievalData);
 
 await sdb.close();
 ```
-![A Wikipedia table scraped.](/assets/web-scraping/medieval.png)
+<OutdatedScreenshot src="/assets/web-scraping/medieval.png" alt={"A Wikipedia table scraped."} lang="en" />
 
 <Callout type="info" emoji="💡">
     If the table layout is displayed weirdly in your terminal, it's because the width of the table is bigger than the width of your terminal. Right-click on the terminal and look for `Toggle size with content width`. There is also a handy shortcut that I use all the time to do that: `OPTION` + `Z` on Mac and `ALT` + `Z` on PC.
@@ -101,9 +101,9 @@ await medievalDemography.logLineChart(
 
 await sdb.close();
 ```
-![A Wikipedia table cached.](/assets/web-scraping/medieval-cache.png)
+<OutdatedScreenshot src="/assets/web-scraping/medieval-cache.png" alt={"A Wikipedia table cached."} lang="en" />
 <Callout type="info" emoji="💡">
-    Caching data is very important. If you don't expect the data to change, you can save it to your computer instead of fetching it again and again. Caching is very easy with the SDA library. The `cache` method creates a `.sda-cache` folder storing data in your project. If you want the data to expire after a moment, check the `ttl` option in the [documentation](https://jsr.io/@nshiab/simple-data-analysis-core/doc/~/SimpleTable.prototype.cache). For more about the SDA library, check out the [`3. Data analysis with SDA 🤓`](/simple-data-analysis/tabular-data) section.
+    Caching data is very important. If you don't expect the data to change, you can save it to your computer instead of fetching it again and again. Caching is very easy with the SDA library. The `cache` method creates a `.sda-cache` folder storing data in your project. If you want the data to expire after a moment, check the `ttl` option in the [documentation](https://nshiab.github.io/simple-data-analysis/classes/SimpleTable.html#cache). For more about the SDA library, check out the [`3. Data analysis with SDA 🤓`](/simple-data-analysis/tabular-data) section.
 </Callout>
 
 ### With a `selector`
@@ -129,7 +129,7 @@ console.table(expensesData);
 
 await sdb.close();
 ```
-![MPs expenses extracted from a web table.](/assets/web-scraping/MPS-expenses.png)
+<OutdatedScreenshot src="/assets/web-scraping/MPS-expenses.png" alt={"MPs expenses extracted from a web table."} lang="en" />
 
 As we did with the Wikipedia table, we can cache and process this data with SDA. Here, we compute the average expenses per party.
 
@@ -170,7 +170,7 @@ await MPs.log();
 
 await sdb.close();
 ```
-![MPs expenses extracted and summarized with SDA.](/assets/web-scraping/MPS-summary.png)
+<OutdatedScreenshot src="/assets/web-scraping/MPS-summary.png" alt={"MPs expenses extracted and summarized with SDA."} lang="en" />
 
 ## Scraping pages
 
@@ -206,6 +206,8 @@ Let's start by visiting the page and extracting the URLs. Here's what the code b
 - We log the URLs (line 12).
 - Finally, we close everything related to `chromium` (lines 14-16).
 
+The `HTMLAnchorElement[]` type tells TypeScript that these elements are links, which have an `href` property. This code runs inside the browser, where HTML element types apply.
+
 In your terminal, you should see all the URLs being logged!
 
 ```ts showLineNumbers filename="sda/main.ts"
@@ -218,7 +220,7 @@ const page = await context.newPage();
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
 const urls = await page.locator(".ce-mip-mp-tile-link")
-  .evaluateAll((elements) => elements.map((a) => a.href));
+  .evaluateAll((elements: HTMLAnchorElement[]) => elements.map((a) => a.href));
 
 console.log(urls);
 
@@ -226,7 +228,7 @@ await page.close();
 await context.close();
 await browser.close();
 ```
-![All personal page urls for MPs.](/assets/web-scraping/mps-urls.png)
+<OutdatedScreenshot src="/assets/web-scraping/mps-urls.png" alt={"All personal page urls for MPs."} lang="en" />
 
 Now that we have all the URLs to the MPs' personal pages, we can loop over them and extract information for each MP.
 
@@ -253,7 +255,7 @@ const page = await context.newPage();
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
 const urls = await page.locator(".ce-mip-mp-tile-link")
-  .evaluateAll((elements) => elements.map((a) => a.href));
+  .evaluateAll((elements: HTMLAnchorElement[]) => elements.map((a) => a.href));
 
 for (const url of urls) {
   console.log(`\n${url}`);
@@ -275,7 +277,9 @@ await page.close();
 await context.close();
 await browser.close();
 ```
-![Data being extracted for MPs.](/assets/web-scraping/mps-extraction.png)
+<OutdatedScreenshot src="/assets/web-scraping/mps-extraction.png" alt={"Data being extracted for MPs."} lang="en" />
+
+We’ll store the cached JSON files in the generated `sda/data` folder. File paths start from the project root, where you run `npm run sda`.
 
 When I scrape pages like this, I usually like to add a few more things to the script:
 - A tracker to have an estimated remaining time.
@@ -285,7 +289,7 @@ When I scrape pages like this, I usually like to add a few more things to the sc
 
 ```ts showLineNumbers filename="sda/main.ts" {2-3, 14, 16-19, 21, 23-26, 37-38,  41-42}
 import { chromium } from "playwright-chromium";
-import { exists } from "@std/fs";
+import { stat, writeFile } from "node:fs/promises";
 import { DurationTracker } from "@nshiab/journalism-extras";
 
 const browser = await chromium.launch();
@@ -295,7 +299,7 @@ const page = await context.newPage();
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
 const urls = await page.locator(".ce-mip-mp-tile-link")
-  .evaluateAll((elements) => elements.map((a) => a.href));
+  .evaluateAll((elements: HTMLAnchorElement[]) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
 
@@ -306,7 +310,7 @@ for (let i = 0; i < urls.length; i++) {
 
   console.log(`\nProcessing ${i + 1} of ${urls.length}: ${url}`);
 
-  if (await exists(filePath)) {
+  if (await stat(filePath).catch(() => null)) {
     console.log(`File already exists: ${filePath}`);
   } else {
     tracker.start();
@@ -322,7 +326,7 @@ for (let i = 0; i < urls.length; i++) {
     const data = { name, party, district, province, language };
 
     const json = JSON.stringify(data, null, 2);
-    await Deno.writeTextFile(filePath, json);
+    await writeFile(filePath, json);
 
     await page.waitForTimeout(500);
     tracker.log();
@@ -336,14 +340,14 @@ await browser.close();
 
 Now, when you run the script, you have a better idea of how fast it's going and how long it should take. Also, if it crashes at any time for any reason, you don't have to rescrape everything. The data extracted previously has been saved as JSON files!
 
-![Data being extracted for MPs, with more information about the scrape.](/assets/web-scraping/mps-caching.png)
+<OutdatedScreenshot src="/assets/web-scraping/mps-caching.png" alt={"Data being extracted for MPs, with more information about the scrape."} lang="en" />
 
 By default, Playwright is headless, which means the automated browser is not being opened. But if you want to see your script in action, you can pass the option `{ headless: false }`.
 
 
 ```ts showLineNumbers filename="sda/main.ts" {5}
 import { chromium } from "playwright-chromium";
-import { exists } from "@std/fs";
+import { stat, writeFile } from "node:fs/promises";
 import { DurationTracker } from "@nshiab/journalism-extras";
 
 const browser = await chromium.launch({ headless: false });
@@ -353,7 +357,7 @@ const page = await context.newPage();
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
 const urls = await page.locator(".ce-mip-mp-tile-link")
-  .evaluateAll((elements) => elements.map((a) => a.href));
+  .evaluateAll((elements: HTMLAnchorElement[]) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
 
@@ -364,7 +368,7 @@ for (let i = 0; i < urls.length; i++) {
 
   console.log(`\nProcessing ${i + 1} of ${urls.length}: ${url}`);
 
-  if (await exists(filePath)) {
+  if (await stat(filePath).catch(() => null)) {
     console.log(`File already exists: ${filePath}`);
   } else {
     tracker.start();
@@ -380,7 +384,7 @@ for (let i = 0; i < urls.length; i++) {
     const data = { name, party, district, province, language };
 
     const json = JSON.stringify(data, null, 2);
-    await Deno.writeTextFile(filePath, json);
+    await writeFile(filePath, json);
 
     await page.waitForTimeout(500);
     tracker.log();
@@ -394,13 +398,13 @@ await browser.close();
 
 And now you see your code in action! This can be useful when trying to debug a script that doesn't work as expected.
 
-![Playwright with headless mode to false.](/assets/web-scraping/mps-browser.gif)
+<OutdatedScreenshot src="/assets/web-scraping/mps-browser.gif" alt={"Playwright with headless mode to false."} lang="en" />
 
 Finally, you can load all of these JSON files with SDA and process your data. For example, here, once the scrape is done, we count the number of MPs based on their preferred language.
 
 ```ts showLineNumbers filename="sda/main.ts" {4, 50-60}
 import { chromium } from "playwright-chromium";
-import { exists } from "@std/fs";
+import { stat, writeFile } from "node:fs/promises";
 import { DurationTracker } from "@nshiab/journalism-extras";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
@@ -411,7 +415,7 @@ const page = await context.newPage();
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
 const urls = await page.locator(".ce-mip-mp-tile-link")
-  .evaluateAll((elements) => elements.map((a) => a.href));
+  .evaluateAll((elements: HTMLAnchorElement[]) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
 
@@ -422,7 +426,7 @@ for (let i = 0; i < urls.length; i++) {
 
   console.log(`\nProcessing ${i + 1} of ${urls.length}: ${url}`);
 
-  if (await exists(filePath)) {
+  if (await stat(filePath).catch(() => null)) {
     console.log(`File already exists: ${filePath}`);
   } else {
     tracker.start();
@@ -438,7 +442,7 @@ for (let i = 0; i < urls.length; i++) {
     const data = { name, party, district, province, language };
 
     const json = JSON.stringify(data, null, 2);
-    await Deno.writeTextFile(filePath, json);
+    await writeFile(filePath, json);
 
     await page.waitForTimeout(500);
     tracker.log();
@@ -461,7 +465,7 @@ await MPs.log();
 
 await sdb.close();
 ```
-![Loading and summarizing the scraped data about MPs.](/assets/web-scraping/mps-sda.png)
+<OutdatedScreenshot src="/assets/web-scraping/mps-sda.png" alt={"Loading and summarizing the scraped data about MPs."} lang="en" />
 
 Congratulations! You now know how to use Playwright to scrape web pages!
 
@@ -533,7 +537,7 @@ await page.close();
 await context.close();
 await browser.close();
 ```
-![Iterating over candidates on Elections Canada website.](/assets/web-scraping/complex-website.gif)
+<OutdatedScreenshot src="/assets/web-scraping/complex-website.gif" alt={"Iterating over candidates on Elections Canada website."} lang="en" />
 
 Now that we are able to iterate over the candidates, we can extract data from the table, like the candidate name, district, party, and expenses. We can also track the duration and cache the data.
 
@@ -542,7 +546,7 @@ To avoid problems, make sure to empty your `sda/data` folder before running this
 
 ```ts showLineNumbers filename="sda/main.ts" {2-3, 24, 27, 31, 33-36, 40-69, 72-73}
 import { chromium } from "playwright-chromium";
-import { exists } from "@std/fs";
+import { stat, writeFile } from "node:fs/promises";
 import { DurationTracker } from "@nshiab/journalism-extras";
 
 const browser = await chromium.launch({ headless: false });
@@ -573,7 +577,7 @@ for (let i = 0; i < optionCount; i++) {
 
   const path = `sda/data/${optionValue}.json`;
 
-  if (await exists(path)) {
+  if (await stat(path).catch(() => null)) {
     console.log(`File already exists: ${path}`);
   } else {
     console.log(`\nRetrieving ${optionValue} (${i + 1}/${optionCount})`);
@@ -601,7 +605,7 @@ for (let i = 0; i < optionCount; i++) {
       expenses,
     });
 
-    await Deno.writeTextFile(
+    await writeFile(
       path,
       JSON.stringify([{
         name,
@@ -620,14 +624,14 @@ await page.close();
 await context.close();
 await browser.close();
 ```
-![Caching candidates data on Elections Canada website.](/assets/web-scraping/caching-EC.png)
+<OutdatedScreenshot src="/assets/web-scraping/caching-EC.png" alt={"Caching candidates data on Elections Canada website."} lang="en" />
 
 And finally, as usual, we can use SDA to load all of the scraped data and process it. For example, we could calculate the average expenses per party.
 
 
 ```ts showLineNumbers filename="sda/main.ts" {4, 81-92}
 import { chromium } from "playwright-chromium";
-import { exists } from "@std/fs";
+import { stat, writeFile } from "node:fs/promises";
 import { DurationTracker } from "@nshiab/journalism-extras";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
@@ -659,7 +663,7 @@ for (let i = 0; i < optionCount; i++) {
 
   const path = `sda/data/${optionValue}.json`;
 
-  if (await exists(path)) {
+  if (await stat(path).catch(() => null)) {
     console.log(`File already exists: ${path}`);
   } else {
     console.log(`\nRetrieving ${optionValue} (${i + 1}/${optionCount})`);
@@ -687,7 +691,7 @@ for (let i = 0; i < optionCount; i++) {
       expenses,
     });
 
-    await Deno.writeTextFile(
+    await writeFile(
       path,
       JSON.stringify([{
         name,
@@ -721,7 +725,7 @@ await returns.log({ count: 13 });
 
 await sdb.close();
 ```
-![Summarizing candidates expenses with SDA.](/assets/web-scraping/sda-EC.png)
+<OutdatedScreenshot src="/assets/web-scraping/sda-EC.png" alt={"Summarizing candidates expenses with SDA."} lang="en" />
 
 ## Scraping undocumented APIs
 

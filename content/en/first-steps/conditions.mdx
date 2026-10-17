@@ -16,18 +16,19 @@ It's the same in your code. Depending on the data, you can instruct your program
 
 Let's set things up for this lesson.
 
-Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+Use the project you created in [Setup](/first-steps/setup), or create a new empty folder, open it with VS Code, and run `npx @nshiab/setup-data-project` with no libraries selected.
 
-- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
-- `deno.json`, used to configure Deno and activate its VS Code extension. We will keep it empty for now.
+Replace the contents of `sda/main.ts` with `console.log("Hello!");` and save it.
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run the following command: `deno run --watch --check main.ts`
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project folder that contains `package.json`.
 
-This command clears the terminal and reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+Watching reruns the script; it does not check types. Use `npm run all-tests` in a second terminal to check types, formatting, and lint rules and run any tests. Use `npm run fix` for formatting and automatic fixes, then check again. Stop the script watcher with `CTRL` + `C`.
+
+`npm run sda` reruns `sda/main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
 
 You can use this setup to test the code provided in this lesson.
 
-![A screenshot showing VS Code running and watching a TypeScript file.](/assets/first-steps/conditions/setup.png)
+<OutdatedScreenshot src="/assets/first-steps/conditions/setup.png" alt={"A screenshot showing VS Code running and watching a TypeScript file."} lang="en" />
 
 ## Conditional statements
 
@@ -37,7 +38,7 @@ The first condition should always be tested with `if`. The condition should be e
 
 For example, the code below logs `I am older than you!` in the terminal only if `myAge` is greater than `yourAge`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Change the ages
 // to test the different outcomes.
 const myAge = 36;
@@ -52,7 +53,7 @@ If we want to test more than one condition, we use `else if` with a condition in
 
 Testing multiple conditions isn't always necessary, but in the code example below, we also want to log `You are older than me!` if `myAge` is smaller than `yourAge`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Change the ages
 // to test the different outcomes.
 const myAge = 36;
@@ -69,7 +70,7 @@ If we want to run some code when none of the conditions are met, we use `else`. 
 
 For example, in the code below, if none of the conditions are met, it means that we are the same age, so we use `else` to log `We are the same age!` in the terminal.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Change the ages
 // to test the different outcomes.
 const myAge = 36;
@@ -84,7 +85,7 @@ if (myAge > yourAge) {
 }
 ```
 
-![A screenshot showing VS Code running a TypeScript file with if, else if, and else statements.](/assets/first-steps/conditions/conditions-age.png)
+<OutdatedScreenshot src="/assets/first-steps/conditions/conditions-age.png" alt={"A screenshot showing VS Code running a TypeScript file with if, else if, and else statements."} lang="en" />
 
 <Callout type="info" emoji="💡">
   Have you noticed the absence of `;` on line 12? It's because when you use `{}`, you create a **block of code**. The closing curly bracket already tells the computer that it's the end of the block, so there's no need for an extra semicolon at the end.
@@ -110,7 +111,7 @@ Here are the main comparison operators you'll use in your daily work:
 
 And here are the operators in action. We store the results in variables and log them:
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Change the ages to test the different operators.
 // Don't worry about the `: number` for now.
 const myAge: number = 36;
@@ -135,7 +136,7 @@ const differentAge = myAge !== yourAge;
 console.log("differentAge =>", differentAge);
 ```
 
-![A screenshot showing VS Code running a TypeScript file with comparison operators.](/assets/first-steps/conditions/operators.png)
+<OutdatedScreenshot src="/assets/first-steps/conditions/operators.png" alt={"A screenshot showing VS Code running a TypeScript file with comparison operators."} lang="en" />
 
 ## Logical operators
 
@@ -148,7 +149,7 @@ For example, let's say we need an algorithm to check if you are old enough to ha
 
 Without logical operators, it could look like this, with nested conditions. It works, but nested conditions can be difficult to read and debug.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Change the age and province to test the conditions.
 // Don't worry about the `: number` and `: string` for now.
 const myAge: number = 18;
@@ -174,7 +175,7 @@ if (myProvince === "Quebec") {
 
 Here's the same code with the logical operator `&&` to make sure `myAge` **AND** `myProvince` meet specific conditions. This approach is simpler to understand and easier to debug!
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Change the age and province to test the conditions.
 // Don't worry about the `: number` and `: string` for now.
 const myAge: number = 18;
@@ -196,7 +197,7 @@ if (myProvince === "Quebec" && myAge >= 18) {
 
 We could also write the same algorithm with a mix of `&&` and `||`. Additionally, we can use variables to simplify the code.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Change the age and province to test the conditions.
 // Don't worry about the `: number` and `: string` for now.
 const myAge: number = 18;
@@ -225,7 +226,7 @@ It's great for simple conditions, allowing you to replace `if` and `else` statem
 
 Here's another variation of our algorithm using this syntax.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Change the age and province to test the conditions.
 // Don't worry about the `: number` and `: string` for now.
 const myAge: number = 18;

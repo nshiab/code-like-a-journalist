@@ -22,19 +22,21 @@ Note that you should have already completed **Chapter 1: TypeScript Fundamentals
 
 ## Setup
 
-As we did in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `deno -A jsr:@nshiab/setup-data-project`
+As we did in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `npx @nshiab/setup-data-project`
+
+We will also use the GeoJSON types in our map examples. Install their TypeScript declarations with `npm install --save-dev @types/geojson`. These describe the data for the type checker; they do not add runtime code.
 
 When prompted, use the space bar to select `simple-data-analysis`, then press `Enter`. Plot is installed automatically with SDA.
 
 [setup-data-project](https://github.com/nshiab/setup-data-project) is another open-source library I created. It installs and configures everything you need so you can quickly get to work on a data project.
 
-![A screenshot showing simple-data-analysis selected in setup-data-project.](/assets/simple-data-analysis/tabular-data/setup.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/setup.png" alt={"A screenshot showing simple-data-analysis selected in setup-data-project."} lang="en" />
 
 After running this command, your terminal will display a description of the created files and installed libraries.
 
-Next, run the suggested task to start and watch `sda/main.ts`: `deno task sda`
+Next, run the suggested task to start and watch `sda/main.ts`: `npm run sda`
 
-![VS Code showing the starter code and its table with a single message in the terminal.](/assets/simple-data-analysis/tabular-data/starter-table.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/starter-table.png" alt={"VS Code showing the starter code and its table with a single message in the terminal."} lang="en" />
 
 ## Loading and caching data
 
@@ -59,7 +61,7 @@ await sdb
 await sdb.close();
 ```
 
-![A screenshot showing the 2023 Canadian wildfires data in VS Code terminal.](/assets/simple-data-analysis/geospatial-data/log-fires.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/log-fires.png" alt={"A screenshot showing the 2023 Canadian wildfires data in VS Code terminal."} lang="en" />
 
 As we can see, we have around 7,000 wildfires. The latitude and longitude values are stored in two separate columns. To convert these into geometries that allow us to use geospatial methods, we can use the `createPoints` method.
 
@@ -81,7 +83,7 @@ await sdb
 await sdb.close();
 ```
 
-![A screenshot showing the 2023 Canadian wildfires as point geometries.](/assets/simple-data-analysis/geospatial-data/log-fires-points.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/log-fires-points.png" alt={"A screenshot showing the 2023 Canadian wildfires as point geometries."} lang="en" />
 
 <Callout type="info" emoji="💡">
     In the `geom` column, you can see `EPSG:4326`. This identifies the coordinate reference system, or projection, used for the geometries. When your data uses latitude and longitude, this is what you want to see. In other projects, we will learn more about projections and how to convert geometry coordinates from one projection to another.
@@ -110,11 +112,11 @@ await fires.log();
 await sdb.close();
 ```
 
-![A screenshot showing the wildfire data being fetched and stored in the cache.](/assets/simple-data-analysis/geospatial-data/fires-cache.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/fires-cache.png" alt={"A screenshot showing the wildfire data being fetched and stored in the cache."} lang="en" />
 
 But if you save `main.ts` again (`Command` + `S` on macOS or `Ctrl` + `S` on Windows) to rerun the script, you will see that the next execution loads the data directly from `.sda-cache` instead of fetching it from GitHub. This is much faster, and it avoids making unnecessary requests to GitHub's servers every time the code runs.
 
-![A screenshot showing the wildfire data being loaded from the cache.](/assets/simple-data-analysis/geospatial-data/fires-cache-hit.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/fires-cache-hit.png" alt={"A screenshot showing the wildfire data being loaded from the cache."} lang="en" />
 
 ### Provinces
 
@@ -185,7 +187,7 @@ await provinces.log();
 await sdb.close();
 ```
 
-![A screenshot showing the Canadian provinces data in VS Code terminal.](/assets/simple-data-analysis/geospatial-data/log-provinces.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/log-provinces.png" alt={"A screenshot showing the Canadian provinces data in VS Code terminal."} lang="en" />
 
 As we can see in the screenshot above, each GeoJSON feature has been transformed into a row in the table. The `geometry` coordinates are stored in the `geom` column by default, and all the properties have been restructured as columns. Very handy!
 
@@ -233,7 +235,7 @@ await fires
 await sdb.close();
 ```
 
-![A screenshot showing the result joining fires and provinces.](/assets/simple-data-analysis/geospatial-data/join.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/join.png" alt={"A screenshot showing the result joining fires and provinces."} lang="en" />
 
 <Callout type="info" emoji="💡">
     If the table layout appears distorted in your terminal, it's likely because the table's width exceeds the terminal's width. Right-click on the terminal and look for `Toggle size with content width`. There's also a handy shortcut I use all the time: `OPTION` + `Z` on Mac and `ALT` + `Z` on PC.
@@ -294,11 +296,11 @@ await fires
 await sdb.close();
 ```
 
-![A screenshot showing the number of fires in each Canadian province.](/assets/simple-data-analysis/geospatial-data/summary.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/summary.png" alt={"A screenshot showing the number of fires in each Canadian province."} lang="en" />
 
 We now have the number of fires and the total area burned in each province. Of course, this is an approximation: some fires may have crossed provincial borders, which we haven’t accounted for here.
 
-If we had the fire perimeters as polygons, we could achieve a more precise analysis using the [`intersection`](https://jsr.io/@nshiab/simple-data-analysis-core/doc/~/SimpleTable.prototype.intersection) method to compute the overlap between each fire and each province. Maybe we'll cover that in another lesson later!
+If we had the fire perimeters as polygons, we could achieve a more precise analysis using the [`intersection`](https://nshiab.github.io/simple-data-analysis/classes/SimpleTable.html#intersection) method to compute the overlap between each fire and each province. Maybe we'll cover that in another lesson later!
 
 For now, let's sort the rows by burned area in descending order.
 
@@ -340,7 +342,7 @@ await fires
 await sdb.close();
 ```
 
-![A screenshot showing the provinces sorted by burned area.](/assets/simple-data-analysis/geospatial-data/renamed.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/renamed.png" alt={"A screenshot showing the provinces sorted by burned area."} lang="en" />
 
 ## Visualizing the data
 
@@ -390,7 +392,7 @@ await fires
 await sdb.close();
 ```
 
-![A screenshot showing a bar chart in the terminal.](/assets/simple-data-analysis/geospatial-data/bar-chart.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/bar-chart.png" alt={"A screenshot showing a bar chart in the terminal."} lang="en" />
 
 ### Saving a chart
 
@@ -472,17 +474,20 @@ await sdb.close();
 
 VS Code can open images. Click the new `chart.png` file in the `output` folder to preview it directly in your editor. When you update and save your code, the script runs again and overwrites the file, while the open image tab automatically refreshes to show your changes. Very nice! 😊
 
-![A screenshot showing a Plot bar chart.](/assets/simple-data-analysis/geospatial-data/plot-chart.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/plot-chart.png" alt={"A screenshot showing a Plot bar chart."} lang="en" />
 
 ### Saving a map
 
 Since this is geospatial data, you might want to create a map. You can do that with Plot and the `writeMap` method.
+
+SDA supplies a GeoJSON FeatureCollection to the map function, but its current type definition describes only part of that structure. We import the `FeatureCollection` type and use `as FeatureCollection` when passing the full object to Plot. This tells TypeScript about the structure SDA already provides; it does not change the data.
 
 The code below creates a map with the province boundaries and the wildfires. The size of the fire markers depends on the area burned, and their color corresponds to their cause.
 
 Again, don't worry about the syntax. We’ll go over it in a dedicated lesson on Plot.
 
 ```ts showLineNumbers filename="main.ts" {2, 36-79}
+import type { FeatureCollection } from "geojson";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 import { geo, plot } from "@observablehq/plot";
 
@@ -539,7 +544,7 @@ await fires
         projection: {
           type: "conic-conformal",
           rotate: [100, -60],
-          domain: geoData,
+          domain: geoData as FeatureCollection,
         },
         color: {
           legend: true,
@@ -568,7 +573,7 @@ await sdb.close();
 
 Here's the map we created above. Quite beautiful. 😍
 
-![A screenshot showing a Plot map in VS Code.](/assets/simple-data-analysis/geospatial-data/make-map.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/make-map.png" alt={"A screenshot showing a Plot map in VS Code."} lang="en" />
 
 ## Exporting the data
 
@@ -618,7 +623,7 @@ await firesInsideProvinces.writeData("./sda/output/firesInsideProvinces.csv");
 await sdb.close();
 ```
 
-![A screenshot showing a CSV file.](/assets/simple-data-analysis/geospatial-data/write.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/write.png" alt={"A screenshot showing a CSV file."} lang="en" />
 
 ### Geospatial data
 
@@ -665,13 +670,13 @@ await provinces.writeGeoData("./sda/output/provinces.geojson");
 await sdb.close();
 ```
 
-![A screenshot showing the GeoJSON files created in the output folder.](/assets/simple-data-analysis/geospatial-data/write-geo.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/write-geo.png" alt={"A screenshot showing the GeoJSON files created in the output folder."} lang="en" />
 
 If you saved them as GeoJSON files, you can visualize them directly in VS Code after installing the [Geo Data Viewer extension](https://marketplace.visualstudio.com/items?itemName=RandomFractalsInc.geo-data-viewer).
 
 Right-click on the GeoJSON files and select the `View map` option.
 
-![A screenshot showing GeoJSON files as interactive maps in VS Code.](/assets/simple-data-analysis/geospatial-data/map-viewer.png)
+<OutdatedScreenshot src="/assets/simple-data-analysis/geospatial-data/map-viewer.png" alt={"A screenshot showing GeoJSON files as interactive maps in VS Code."} lang="en" />
 
 ## Conclusion
 

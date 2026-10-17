@@ -40,7 +40,7 @@ Public repositories also have a public page. When you like a project, you can gi
 
 You can also **Watch** a project to see its activity in your feed. I usually watch for the releases of new versions of open-source projects I use, just to stay up to date.
 
-![GitHub repository.](/assets/git-and-github/github-basics/sda-repo.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/sda-repo.png" alt={"GitHub repository."} lang="en" />
 
 ## Creating a repository
 
@@ -48,7 +48,7 @@ Let's create your first repository! Click on the + button in the top right corne
 
 ![Creating a new repository.](/assets/git-and-github/github-basics/new-button.png)
 
-Then give your repository a name and make it private (so you won't be afraid of making mistakes 😉). No need for a `readme` and `.gitignore` for now. We'll talk about those later. Then hit `Create repository` at the bottom.
+Then give your repository a name and make it private (so you won't be afraid of making mistakes 😉). Leave the options to add a `README` and `.gitignore` unchecked: we will create them locally with the project setup tool. Then hit `Create repository` at the bottom.
 
 ![Settings of a new repository.](/assets/git-and-github/github-basics/new-repo-settings.png)
 
@@ -58,18 +58,18 @@ We are going to follow the steps under *pushing an existing repository from the 
 
 ![The steps to connect an existing repo to a new one.](/assets/git-and-github/github-basics/new-repo-steps.png)
 
-Create a new folder with the same name as the repository and open it with VS Code. Add a `main.ts` file with a simple log for now.
+Create a new folder with the same name as the repository and open it with VS Code. Run `npx @nshiab/setup-data-project` and press `Enter` without selecting a library. Replace `sda/main.ts` with this simple log. The generated `.gitignore` keeps `node_modules` and `.env` out of Git; keep `package.json` and `package-lock.json` tracked. Run the terminal commands below from this project folder, which contains `package.json`.
 
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 console.log("Hello!");
 ```
 
 Then initialize a new Git repository in it by running `git init`.
 
-Then track the new file we just created with `git add -A` and then let's commit with `git commit -m "My first commit"`.
+Stage the script and all the generated project files with `git add -A`, then commit them with `git commit -m "My first commit"`. Ignored files such as `node_modules` and `.env` stay out of the commit.
 
-![First commit.](/assets/git-and-github/github-basics/first-commit.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/first-commit.png" alt={"First commit."} lang="en" />
 
 Right now, your code is saved with Git locally, on your computer. It's time to save it remotely, in the cloud, on GitHub!
 
@@ -84,17 +84,17 @@ git push -u origin main
 
 You'll probably be asked to authenticate. Follow the browser or credential-manager prompt shown by Git. GitHub does not accept your account password for Git operations over HTTPS, so never enter it here. If your setup does not open a browser, GitHub recommends authenticating with [GitHub CLI or Git Credential Manager](https://docs.github.com/en/get-started/git-basics/caching-your-github-credentials-in-git).
 
-And if you refresh your repository page on GitHub, you'll see your code synced! Your `main.ts` file is there and you see your latest commit.
+And if you refresh your repository page on GitHub, you'll see your code synced! Your `sda/main.ts` file is there and you see your latest commit.
 
-![The remote repository page.](/assets/git-and-github/github-basics/repo-page-sync.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/repo-page-sync.png" alt={"The remote repository page."} lang="en" />
 
 ## Pushing to the repository
 
-There is no `README.md` in your repository, and GitHub is (strongly) suggesting that we add one. This file's content will be displayed on the repository page. It's usually the first thing people will read before checking the code. So let's do that.
+The setup tool created a `README.md` in your repository. GitHub displays its contents on the repository page, so it’s usually the first thing people read. Let’s add a description of our project above the generated documentation.
 
 As the `.md` extension suggests, it's a Markdown file. Markdown is a convenient and simple syntax often used for documentation. The code will be rendered into good-looking text by the tool or platform you are using. You can focus on the content without worrying about the style, which is nice! We will write some Markdown together, but if you want to know more, check this [cheat sheet](https://www.markdownguide.org/cheat-sheet/).
 
-Create a new `README.md` file in your repo in VS Code and copy and paste this below. As I said at the beginning, our goal will be to fetch the temperature in Montreal.
+Open `README.md` in VS Code and add the following project description at the top, above the generated section. As I said at the beginning, our goal will be to fetch the temperature in Montreal.
 
 The `#` is used for titles. The `[text](link)` syntax allows you to add links to your text, and the use of backticks creates code blocks.
 
@@ -105,25 +105,25 @@ The `#` is used for titles. The `[text](link)` syntax allows you to add links to
 This project retrieves the latest temperature in Montreal from the
 [Meteorological Service of Canada API](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
 
-Here's the command to run the project: `deno -A main.ts`
+Install dependencies with `npm ci`, then run the project with `node sda/main.ts`.
 ```
 
 In VS Code, if you right-click on `.md` files, you can preview them.
 
-![The README.](/assets/git-and-github/github-basics/markdown.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/markdown.png" alt={"The README."} lang="en" />
 
-Our new file is on our computer. Let's push it to GitHub. We first need to commit it:
+Our updated README is on our computer. Let's push the changes to GitHub. We first need to commit them:
 - `git add -A`
-- `git commit -m "Adding README.md"`
+- `git commit -m "Describe the project in README.md"`
 
 And there is an extra command to push:
 - `git push`
 
-![Pushing the README to GitHub.](/assets/git-and-github/github-basics/push.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/push.png" alt={"Pushing the README to GitHub."} lang="en" />
 
 Tada! 🪄 It's now on GitHub! And your README is used to welcome visitors!
 
-![The README on GitHub.](/assets/git-and-github/github-basics/readme.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/readme.png" alt={"The README on GitHub."} lang="en" />
 
 ## Creating issues
 
@@ -181,12 +181,12 @@ git switch 1-return-montreal-temperature
 
 We are now on our new branch. We can safely work on our code!
 
-![Working on the new branch.](/assets/git-and-github/github-basics/new-branch.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/new-branch.png" alt={"Working on the new branch."} lang="en" />
 
-Let's add the code from the previous lesson into our `main.ts`. This script pings the Meteorological Service of Canada API and retrieves data as XML. The `fast-xml-parser` library converts it to JSON. And the rest of the code extracts the temperature and the time before logging them.
+Let's add the code from the previous lesson into our `sda/main.ts`. This script pings the Meteorological Service of Canada API and retrieves data as XML. The `fast-xml-parser` library converts it to JSON. And the rest of the code extracts the temperature and the time before logging them.
 
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
@@ -212,22 +212,22 @@ const temp = elements
 console.log(temp);
 ```
 
-Install the `fast-xml-parser` dependency by running `deno add npm:fast-xml-parser`.
+Install the `fast-xml-parser` dependency by running `npm install fast-xml-parser`.
 
-And now the temperature should be logged in the terminal when you run `deno -A main.ts`.
+And now the temperature should be logged in the terminal when you run `node sda/main.ts`.
 
 Finally, commit and push your work:
 - `git add -A`
 - `git commit -m "Fetching and extracting temperature"`
 - `git push`
 
-![Pushing the new code from the new branch.](/assets/git-and-github/github-basics/branch-push.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/branch-push.png" alt={"Pushing the new code from the new branch."} lang="en" />
 
 Now, if you refresh your repository page on GitHub, you'll see that `main` is selected. Open the branch selector or the `Branches` page to explore both branches.
 
 But we also have a big banner suggesting to create a **pull request**! Interesting... 😏
 
-![GitHub suggesting to create a pull request.](/assets/git-and-github/github-basics/pr-suggestion.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/pr-suggestion.png" alt={"GitHub suggesting to create a pull request."} lang="en" />
 
 ## Creating pull requests
 
@@ -237,7 +237,7 @@ You can then add a title and a description (optional). You can scroll down to se
 
 Click on the `Create pull request`.
 
-![Creating a new PR on Github.](/assets/git-and-github/github-basics/pr-create.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/pr-create.png" alt={"Creating a new PR on Github."} lang="en" />
 
 You created your first PR! This is a great place to review what this request is adding to the project. Here, you can review the commits, the files, and the code. If you work with other people, you can tag them on specific lines to discuss the changes.
 
@@ -245,21 +245,21 @@ GitHub will check that you can actually merge the two branches and that there ar
 
 Here, everything looks good, so you can click on the `Merge pull request` button and then confirm the merge.
 
-![Creating a new PR on Github.](/assets/git-and-github/github-basics/pr-merge.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/pr-merge.png" alt={"Creating a new PR on Github."} lang="en" />
 
 Once the merge is confirmed, the changes are brought to the `main` branch!
 
 GitHub will suggest removing the branch we created. It's safe to delete it now.
 
-![Merged PR and delete branch.](/assets/git-and-github/github-basics/delete-branch.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/delete-branch.png" alt={"Merged PR and delete branch."} lang="en" />
 <Callout type="info" emoji="💡">
    Have you noticed the `Revert` button? If you merged something too fast and want to revert the changes, this is the button for it! In the previous lesson, we did it manually, but with GitHub it's easier thanks to the PR interface.
 </Callout>
 
 
-If we check the main page of the repository, we see that our changes are on `main`. You can check the `main.ts` file if you are curious. The issue we created has been automatically closed when we merged the PR. It's convenient, isn't it? 🥳
+If we check the main page of the repository, we see that our changes are on `main`. You can check the `sda/main.ts` file if you are curious. The issue we created has been automatically closed when we merged the PR. It's convenient, isn't it? 🥳
 
-![The main page of the repo with the changes.](/assets/git-and-github/github-basics/changes-main.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/changes-main.png" alt={"The main page of the repo with the changes."} lang="en" />
 
 This all happened in the cloud, on GitHub's platform. To bring the changes to your local repository, first switch to the `main` branch:
 - `git switch main`
@@ -281,7 +281,7 @@ On your repository page, click on the `<> Code` button. This is where you'll fin
 
 Copy the URL.
 
-![The command to clone a repository.](/assets/git-and-github/github-basics/clone-command.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/clone-command.png" alt={"The command to clone a repository."} lang="en" />
 
 Next, create a new folder with the same name as your repo and open it with VS Code. Then start typing `git clone`, paste the URL you copied (don't forget a space between `clone` and the URL), then add a space and `.`.
 
@@ -292,11 +292,11 @@ The dot at the end is important. It tells Git to clone the repo in the current f
 
 And just like that, you have recovered all of your code.
 
-![A cloned repository.](/assets/git-and-github/github-basics/cloned.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/cloned.png" alt={"A cloned repository."} lang="en" />
 
 Of course, cloning is also great when you are collaborating with other people. They can easily retrieve your latest code, with all the branches and commits.
 
-Once a repository is cloned, the next step is usually to install all dependencies with `deno install`. Deno reads `deno.json` and `deno.lock` to install the project's declared, locked dependency versions.
+After cloning this project, run `npm ci` to install the exact dependency versions in `package-lock.json`. If a different project has no lockfile, use `npm install` instead. For projects created with `setup-data-project`, also run `npm run docs` to restore the local documentation, which is ignored by Git.
 
 And then you are good to go to keep working on your amazing project!
 
@@ -320,7 +320,7 @@ Forking is how a lot of open-source contributions and collaborations happen:
 - The owner checks the PR and, if happy, merges it.
 - The contribution is now part of the project and everyone can benefit from it!
 
-## Adding a `.gitignore`
+## Updating `.gitignore`
 
 People can clone and fork your repositories but... what if you want something locally on your computer but don't want to share it with anyone?
 
@@ -336,20 +336,20 @@ This is a very important password: potato. Don't share it.
 
 If you commit it, it will be in your Git history **forever**. And, of course, you don't want to push it.
 
-For situations like these, you need to add a `.gitignore` file to your project. If you have one, Git will check it and ignore any folders or files listed in it. They will become greyed out in your project, meaning they won't be tracked, committed, and pushed.
+The setup tool already created `.gitignore`, which excludes installed packages, `.env`, and other local files. Git uses its rules to ignore files that have not already been tracked. Those files appear greyed out in VS Code and are excluded from `git add -A`. Adding a file that is already tracked to `.gitignore` does not remove it from Git or its history.
 
-Add `password.txt` to it.
+Open the existing `.gitignore` and add `password.txt` on its own line. Keep all the rules generated by the setup tool.
 
-![Adding a gitignore file.](/assets/git-and-github/github-basics/gitignore.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/gitignore.png" alt={"Adding a gitignore file."} lang="en" />
 
-Now, the file `password.txt` will be ignored, but you still need to commit and push your new `.gitignore` file:
+Now, the file `password.txt` will be ignored, but you still need to commit and push your updated `.gitignore` file:
 - `git add -A`
-- `git commit -m "Adding .gitignore"`
+- `git commit -m "Ignore password.txt"`
 - `git push`
 
-On your repository page, you can now see your `.gitignore`, but the `password.txt` has been ignored and is not part of your project!
+On your repository page, you can now see the updated `.gitignore`, while `password.txt` remains local and is not in the repository!
 
-![A gitignore file has been added to the repository.](/assets/git-and-github/github-basics/repo-gitignore.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/repo-gitignore.png" alt={"A gitignore file has been added to the repository."} lang="en" />
 
 <Callout type="info" emoji="💡">
    If you committed and pushed sensitive information by mistake (like so many of us 😬), [follow these steps](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)!

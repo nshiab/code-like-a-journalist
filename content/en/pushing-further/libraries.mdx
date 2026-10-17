@@ -1,6 +1,6 @@
 ---
 title: Using TypeScript libraries
-description: Learn how to install and use TypeScript libraries published on NPM and JSR with Deno.
+description: Learn how to install and use TypeScript libraries published on npm with Node.js.
 ---
 
 import { Callout } from 'nextra/components'
@@ -18,28 +18,21 @@ A note about vocabulary: *libraries* are also often called *packages* or *module
 
 Now, let's set up before diving into this lesson.
 
-Make a new folder somewhere on your computer, open it with VS Code, and create two files:
+Create a new project with `npx @nshiab/setup-data-project`, following the [setup lesson](/first-steps/setup). For this lesson, leave all optional libraries unselected. Open the generated project folder in VS Code and use the generated `sda/main.ts` for your code.
 
-- `main.ts`, where we will write our code. To start, you can add `console.log("Hello!");` to it.
-- `deno.json`, used to configure Deno and activate its VS Code extension. We will keep it empty for now.
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project root, the folder containing `package.json`.
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run the following command: `deno run --watch --check main.ts`
+This command reruns your code every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC). Stop it with `CTRL` + `C` on either system.
 
-This command clears the terminal and reruns `main.ts` every time you save it (`CMD + S` on Mac or `CTRL + S` on PC).
+Node.js runs TypeScript without checking its types. Use `npm run all-tests` to check the project, and `npm run fix` to apply formatting and automatic fixes, as explained in the setup lesson.
 
 You can use this setup to test the code provided in this lesson.
 
-![A screenshot showing VS Code running and watching a TypeScript file.](/assets/pushing-further/libraries/setup.png)
+<OutdatedScreenshot src="/assets/pushing-further/libraries/setup.png" alt={"A screenshot showing VS Code running and watching a TypeScript file."} lang="en" />
 
-## Registries
+## The npm registry
 
-Libraries are published on public registries. The two main registries today are **NPM** and **JSR**.
-
-Some libraries are available on both, while others exist only on NPM or JSR.
-
-### NPM
-
-NPM is the long-established registry for the JavaScript ecosystem and is operated by GitHub. Its package pages show useful signals such as documentation, maintainers, versions, and weekly downloads.
+Libraries are published on public registries. In this course, we’ll install them from [npm](https://www.npmjs.com/), the registry used by the npm command that comes with Node.js. Package pages include documentation, maintainers, versions, and download counts to help you choose a library.
 
 As an example, let’s search for `d3`, a well-known library for data visualization that we will use frequently.
 
@@ -61,29 +54,32 @@ This page provides a lot of useful information:
 
 These details (along with the GitHub repository) help us decide whether a library is trustworthy. Always be cautious before running unknown code! 🦠
 
-Installing `d3` in a Deno project is very easy. Click on your terminal, stop watching `main.ts` (`CTRL` + `C`), and then run: `deno add npm:d3`. The `npm:` prefix makes the registry explicit; `deno add` is also an alias for `deno install` followed by a package name.
+Installing `d3` is very easy. Click on your terminal, stop watching your code (`CTRL` + `C`), and run these commands from the project root:
 
-If you open your `deno.json`, you'll see something new: **imports**! These tell Deno what libraries (and their versions) you want to use in this project.
+```sh
+npm install d3
+npm install --save-dev @types/d3
+```
 
-Deno also creates or updates `deno.lock`, which contains more information about the library. Keep this file around, but don’t worry about it: Deno manages it automatically.
+The first command installs the library. The second installs its TypeScript type definitions, so VS Code and the project checks understand its functions. Some libraries include their own types; `d3` uses a separate `@types/d3` package.
 
-![A screenshot showing deno.json imports.](/assets/pushing-further/libraries/d3-add.png)
+Open `package.json`: `d3` is now listed in **dependencies**, and `@types/d3` in **devDependencies**. Dependencies are packages your code uses; development dependencies support tools such as type checking.
+
+npm also updates `package-lock.json`, which records the exact versions installed, and puts the packages in a `node_modules` folder. Keep `package.json` and `package-lock.json` with your project. If you share the code, others can run `npm ci` to install the versions recorded in the lockfile.
+
+<OutdatedScreenshot src="/assets/pushing-further/libraries/d3-add.png" alt={"A screenshot showing deno.json imports."} lang="en" />
 
 <Callout type="info" emoji="💡">
-    Because you typed `npm:`, Deno will search the NPM registry to find the latest version of `d3`. Then it will download and store it in its cache on your hard drive. Since it's cached, if you need `d3` again in another project and its latest version hasn't changed, Deno will grab it from the cache instead of downloading it. This makes subsequent installations much faster and prevents duplicate library versions on your computer.
+    You don’t need to edit files inside `node_modules` or manage npm’s download cache yourself. npm handles installation. Use `npm install` when adding a library and import it by its package name, such as `"d3"`.
 </Callout>
-
-Using `d3` is now straightforward. In your imports, `"d3": "npm:d3@^7.9.0"` means that you can use the shortcut `d3` to call the library.
 
 Let's reuse the [Montreal temperature CSV file](https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv) from the [Fetching data lesson](/pushing-further/fetch).
 
 If you fetch this data, you'll notice it's just text. CSV stands for **Comma-Separated Values**. You can't work with it directly. It would be much better to convert it into an array of objects.
 
-Copy and paste the code below into `main.ts`, then run: `deno run --watch --check --allow-net main.ts`
+Copy and paste the code below into `sda/main.ts`, then run: `npm run sda`
 
-Don't forget the network permission, or your code won’t be allowed to fetch data.
-
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
 );
@@ -93,13 +89,13 @@ const data = await response.text();
 console.log(data);
 ```
 
-![A screenshot showing CSV data in the terminal.](/assets/pushing-further/libraries/d3-text.png)
+<OutdatedScreenshot src="/assets/pushing-further/libraries/d3-text.png" alt={"A screenshot showing CSV data in the terminal."} lang="en" />
 
 It’s our lucky day: the `d3` function `csvParse` converts CSV data into an array of objects!
 
 Let’s update our code to use it.
 
-```ts showLineNumbers filename="main.ts" {1, 8, 10}
+```ts showLineNumbers filename="sda/main.ts" {1, 8, 10}
 import { csvParse } from "d3";
 
 const response = await fetch(
@@ -111,66 +107,54 @@ const arrayOfObjects = csvParse(data);
 
 console.log(arrayOfObjects);
 ```
-![A screenshot showing CSV data converted to an array of objects in the terminal.](/assets/pushing-further/libraries/d3-parse.png)
+<OutdatedScreenshot src="/assets/pushing-further/libraries/d3-parse.png" alt={"A screenshot showing CSV data converted to an array of objects in the terminal."} lang="en" />
 
 <Callout type="info" emoji="💡">
-    In the [Functions lesson](/pushing-further/functions), we saw that we can import functions with the syntax `import myFunction from "./myFunction"`. Here, it's a bit different because `d3` exports more than one function, and we pick just the one(s) we want. To do this, we use curly brackets with this syntax: `import { myFunctionA, myFunctionB } from "./allMyFunctions"`.
+    In the [Functions lesson](/pushing-further/functions), we saw that we can import functions with the syntax `import myFunction from "./myFunction.ts"`. Here, it's a bit different because `d3` exports more than one function, and we pick just the one(s) we want. To do this, we use curly brackets with this syntax: `import { myFunctionA, myFunctionB } from "./allMyFunctions.ts"`.
 </Callout>
 
 Congrats! You just installed `d3` from NPM and used one of its functions! 💃🕺
 
-### JSR
+## Another library: csv-parse
 
-JSR was announced in 2024. It’s the new kid on the block and is maintained by the Deno team.
+There’s often more than one library that can solve the same problem. Let’s try [`csv-parse`](https://csv.js.org/parse/), a library dedicated to parsing CSV files. Its documentation describes the available APIs, options, examples, and a link to its source code.
 
-Its focus is on more modern, TypeScript-first libraries. Installing a library from JSR is the same as installing from NPM. However, publishing a library is much easier on JSR (but that’s for another lesson).
+Stop the running script with `CTRL` + `C`, then install it:
 
-Let’s search for a library to parse our CSV file. Go to [jsr.io](https://jsr.io/) and search for `csv`.
+```sh
+npm install csv-parse
+```
 
-![A screenshot showing JSR results.](/assets/pushing-further/libraries/jsr-csv.png)
+This package includes its own TypeScript types, so no separate `@types` package is needed.
 
-Among the results, you’ll find one starting with `@std`. This stands for the **standard library** and means it’s maintained by the Deno team, which provides high-quality, well-tested libraries for common use cases.
+We’ll use the [synchronous API](https://csv.js.org/parse/api/sync/), which is convenient when the whole CSV fits in memory. Import `parse` from `"csv-parse/sync"`. The [`columns: true` option](https://csv.js.org/parse/options/columns/) uses the first row as property names instead of returning it as a data row.
 
-Let’s use it! [Click on it](https://jsr.io/@std/csv).
+Replace the code in `sda/main.ts` with this, then run `npm run sda` again:
 
-![A screenshot showing JSR standard library.](/assets/pushing-further/libraries/jsr-std.png)
-
-You’ll find a lot of useful information on the page:
-- A link to the GitHub repository.
-- Documentation and examples.
-- The latest version’s publication date.
-
-JSR package pages now show weekly downloads and a JSR Score alongside the source repository, documentation, supported runtimes, versions, and publication dates. These are useful signals, but you should still inspect a package and its source before trusting it.
-
-To install the library, stop watching `main.ts` (`CTRL` + `C`) and run: `deno add jsr:@std/csv`
-
-You'll see `@std/csv` being added to your `deno.json`.
-
-As you may have noticed, we used `jsr:` instead of `npm:` so that Deno looks for the library on JSR instead of NPM.
-
-![A screenshot showing a JSR module being added.](/assets/pushing-further/libraries/jsr-add.png)
-
-<Callout type="info" emoji="💡">
-    Just like NPM modules, JSR modules are cached. If you ever need to clear your cache, run `deno clean`. To install all libraries listed in `deno.json` and verify them against `deno.lock`, run `deno install`.
-</Callout>
-
-Now, let’s update our code in `main.ts` to use `@std` instead of `d3`. One key difference is that we need to set the option `skipFirstRow` to `true` to skip the first line, which contains the CSV column headers.
-
-```ts showLineNumbers filename="main.ts" {1, 8}
-import { parse } from "@std/csv";
+```ts showLineNumbers filename="sda/main.ts" {1, 8}
+import { parse } from "csv-parse/sync";
 
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
 );
 
 const data = await response.text();
-const arrayOfObjects = parse(data, { skipFirstRow: true });
+const arrayOfObjects = parse(data, { columns: true });
 
 console.log(arrayOfObjects);
 ```
-![A screenshot showing a CSV being converted to an array of objects with the standard library.](/assets/pushing-further/libraries/jsr-done.png)
 
-And... voilà! You installed and used a library from JSR! 💃🕺
+Like `csvParse`, this turns the text into an array of objects. By default, the field values remain strings, so convert numeric fields before doing calculations.
+
+<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-csv.png" alt={"A screenshot showing JSR results."} lang="en" />
+
+<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-std.png" alt={"A screenshot showing JSR standard library."} lang="en" />
+
+<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-add.png" alt={"A screenshot showing a JSR module being added."} lang="en" />
+
+<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-done.png" alt={"A screenshot showing a CSV being converted to an array of objects with the standard library."} lang="en" />
+
+And... voilà! You’ve installed and used a second library! 💃🕺
 
 ## Conclusion
 

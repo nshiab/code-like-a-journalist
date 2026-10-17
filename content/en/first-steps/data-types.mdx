@@ -16,15 +16,17 @@ This lesson is just an overview to get you started. We'll explore these data typ
 
 First, let's set up things.
 
-Make a new folder somewhere on your computer, open it with VS Code, and create two files:
-- `main.ts` where we will code. You can add `console.log("Hello!");` to it.
-- `deno.json`, used to configure Deno and activate its VS Code extension. We will keep it empty for now.
+Use the project you created in [Setup](/first-steps/setup), or create a new empty folder, open it with VS Code, and run `npx @nshiab/setup-data-project` with no libraries selected.
 
-Toggle the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `deno run --watch --check main.ts`. Deno will clear the terminal and rerun `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+Replace the contents of `sda/main.ts` with `console.log("Hello!");` and save it.
+
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project folder that contains `package.json`.
+
+Watching reruns the script; it does not check types. Use `npm run all-tests` in a second terminal to check types, formatting, and lint rules and run any tests. Use `npm run fix` for formatting and automatic fixes, then check again. Stop the script watcher with `CTRL` + `C`.
 
 You can use this setup to test out the code provided in this lesson.
 
-![A screenshot showing VS Code running and watching a TypeScript file.](/assets/first-steps/data-types/watch.png)
+<OutdatedScreenshot src="/assets/first-steps/data-types/watch.png" alt={"A screenshot showing VS Code running and watching a TypeScript file."} lang="en" />
 
 ## Strings
 
@@ -34,12 +36,11 @@ Strings are always wrapped with quotes. You can use single quotes, double quotes
 
 If you need multiline text, you must use backticks. If you want to use single or double quotes in your text, use backticks as well.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // This works.
 const text1 = "Hello!";
 
-// This works too. Even if the Deno
-// formatter often replaces ' with ".
+// Single quotes work too.
 const text2 = 'How are you doing?';
 
 // And this as well.
@@ -57,18 +58,18 @@ console.log(text1)
 
 To check if something is a string, you can use the `typeof` operator (or hover over the variable to see its type).
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const name = "Nael Shiab"
 console.log(typeof name)
 ```
 
-![A screenshot showing VS Code logging a `typeof` string.](/assets/first-steps/data-types/typeof-string.png)
+<OutdatedScreenshot src="/assets/first-steps/data-types/typeof-string.png" alt={"A screenshot showing VS Code logging a `typeof` string."} lang="en" />
 
 ## Numbers
 
 Numbers don't need to be wrapped. You can use them directly, but there are different ways to write them.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // The number directly.
 const number1 = 1000;
 console.log(number1);
@@ -84,7 +85,7 @@ console.log(number3);
 
 You can write integers and decimals, positive or negative.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const positiveInteger = 1234;
 console.log(positiveInteger);
 
@@ -100,7 +101,7 @@ console.log(negativeDecimal);
 
 There are also special numbers, like `Infinity`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const positiveInfinity = Infinity;
 const negativeInfinity = -Infinity;
 
@@ -113,7 +114,7 @@ console.log(positiveInfinity, negativeInfinity)
 
 `NaN` is a special number too, which paradoxically means *Not A Number*. It can show up when you try to convert a string to a number, for example.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // parseInt is a global function that
 // you can call to convert a string to a number.
 
@@ -125,11 +126,11 @@ console.log(parseInt("42"));
 console.log(parseInt("hello"));
 ```
 
-![A screenshot showing VS Code logging a NaN value.](/assets/first-steps/data-types/nan.png)
+<OutdatedScreenshot src="/assets/first-steps/data-types/nan.png" alt={"A screenshot showing VS Code logging a NaN value."} lang="en" />
 
 To check if something is a number, you can use the `typeof` operator (or hover over the variable to see its type).
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const integer = 1000;
 console.log(integer, "=>", typeof integer);
 
@@ -143,7 +144,7 @@ const notNumber = NaN;
 console.log(notNumber, "=>", typeof notNumber);
 ```
 
-![A screenshot showing VS Code logging a `typeof` number.](/assets/first-steps/data-types/typeof-number.png)
+<OutdatedScreenshot src="/assets/first-steps/data-types/typeof-number.png" alt={"A screenshot showing VS Code logging a `typeof` number."} lang="en" />
 
 ## Booleans
 
@@ -151,7 +152,7 @@ A boolean can be `true` or `false`. That's it!
 
 Booleans are very useful when working with conditions (more on that later).
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const bool1 = true;
 console.log(bool1);
 
@@ -164,11 +165,11 @@ const comparison = 3 > 2
 console.log("Is 3 greater than 2?", comparison);
 ```
 
-![A screenshot showing VS code logging a comparison.](/assets/first-steps/data-types/booleans-comparison.png)
+<OutdatedScreenshot src="/assets/first-steps/data-types/booleans-comparison.png" alt={"A screenshot showing VS code logging a comparison."} lang="en" />
 
 To check if something is a boolean, you can use the `typeof` operator (or hover over the variable to see its type).
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const bool1 = true;
 console.log(typeof bool1);
 
@@ -176,7 +177,7 @@ const bool2 = false;
 console.log(typeof bool2);
 ```
 
-![A screenshot showing VS Code logging a `typeof` boolean.](/assets/first-steps/data-types/typeof-booleans.png)
+<OutdatedScreenshot src="/assets/first-steps/data-types/typeof-booleans.png" alt={"A screenshot showing VS Code logging a `typeof` boolean."} lang="en" />
 
 ## Dates
 
@@ -186,7 +187,7 @@ Dates are represented as the number of milliseconds elapsed since January 1, 197
 
 To create a date object, you need to use the `Date` constructor. Notice the `new` keyword and the parameters passed in the parentheses in the code below. We use `new` because `Date` is a class, which we'll learn about in another lesson.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // Current date and time.
 const currentTime = new Date();
 console.log("currentTime:", currentTime);
@@ -204,7 +205,7 @@ const invalidDate = new Date("Hi! I'm not a date!");
 console.log("invalidDate:", invalidDate);
 ```
 
-![A screenshot showing VS Code logging a date.](/assets/first-steps/data-types/dates.png)
+<OutdatedScreenshot src="/assets/first-steps/data-types/dates.png" alt={"A screenshot showing VS Code logging a date."} lang="en" />
 
 To check if something is a `Date`, you can't use the `typeof` operator because dates are not a type.
 
@@ -212,7 +213,7 @@ Instead, you must use the `instanceof` operator, because dates are instances of 
 
 You can also hover over the variable to see what's in it.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const currentTime = new Date();
 
 // Wrong! Dates are not a type.
@@ -224,13 +225,13 @@ console.log("typeof:", typeof currentTime);
 console.log("instanceof Date:", currentTime instanceof Date);
 ```
 
-![A screenshot showing VS Code checking for dates.](/assets/first-steps/data-types/instanceof-date.png)
+<OutdatedScreenshot src="/assets/first-steps/data-types/instanceof-date.png" alt={"A screenshot showing VS Code checking for dates."} lang="en" />
 
 ## Other types
 
 There are two other data types that you will often encounter in the wild: `undefined` and `null`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // If you create a variable without
 // assigning a value to it, it will
 // be undefined.
@@ -252,7 +253,7 @@ console.log(nullValue);
 
 To check if something is `undefined` or `null`, you can use the strict equality operator (`===`), which we'll learn about in another chapter.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 let undefinedVariable;
 // This logs "true".
 console.log(undefinedVariable === undefined);
@@ -268,7 +269,7 @@ When you type `.` right after a variable, you'll see a list of properties and me
 
 For example, strings have a property called `length`, which returns the number of characters in the string:
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const sentence = "Where is Bryan?";
 
 // This logs 15.
@@ -277,7 +278,7 @@ console.log(sentence.length);
 
 But they also have methods, like `.toUpperCase()`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const sentence = "Where is Bryan?";
 
 // This logs "WHERE IS BRYAN?"
@@ -286,9 +287,9 @@ console.log(sentence.toUpperCase());
 
 Different data types come with their own properties and methods. Don't worry too much about them now. We'll cover the most useful ones in the upcoming lessons and projects.
 
-However, if you're curious, you can type `.` after a variable to see a list of properties and methods available for that specific variable and its data type. Use the up and down arrow keys to navigate through the list and highlight the one that interests you, as shown in the screenshot below with a variable storing a `number`.
+However, if you're curious, you can type `.` after a variable to see a list of properties and methods available for that specific variable and its data type. Use the up and down arrow keys to navigate through the list and highlight the one that interests you, for example with a variable storing a `number`.
 
-![A screenshot showing VS Code displaying a list of properties and methods.](/assets/first-steps/data-types/methods.png)
+<OutdatedScreenshot src="/assets/first-steps/data-types/methods.png" alt={"A screenshot showing VS Code displaying a list of properties and methods."} lang="en" />
 
 ## Conclusion
 

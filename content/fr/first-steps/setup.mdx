@@ -1,5 +1,5 @@
 ---
-title: Installation de VS Code, Deno et TypeScript
+title: Installation de VS Code, Node.js et TypeScript
 description: Installons tout ce dont nous avons besoin.
 ---
 
@@ -31,122 +31,124 @@ Personnellement, je trouve que l'interface est trop petite et je l'ajuste toujou
 
 ## Moteur d'exécution (runtime)
 
-Pour que votre ordinateur comprenne TypeScript et l'exécute, vous avez besoin d'un moteur d'exécution.
+Pour exécuter notre code TypeScript, nous avons besoin d'un moteur d'exécution. Nous utiliserons [Node.js](https://nodejs.org/), un moteur gratuit et en code ouvert qui dispose d'un vaste écosystème d'outils pour travailler avec les données.
 
-Encore une fois, vous avez de nombreuses excellentes options en code ouvert, mais je trouve [Deno](https://deno.com/) particulièrement facile à utiliser. Deno est maintenu par [Deno Land Inc.](https://deno.com/company), avec Ryan Dahl comme PDG. Dahl a également créé [Node.js](https://nodejs.org/), un autre moteur en code ouvert très populaire.
+Pour ce cours, installez **la dernière version LTS de Node.js**. LTS signifie *Long-Term Support*, soit soutien à long terme. La version LTS convient aux outils et aux librairies de données que nous utiliserons tout au long de ce cours.
 
-Visitez la [page d'accueil de Deno](https://deno.com/) et copiez la commande d'installation correspondant à votre système d'exploitation (Mac, Windows ou Linux). Nous allons vous montrer comment l'exécuter ci-dessous.
+Visitez la [page de téléchargement de Node.js](https://nodejs.org/en/download), sélectionnez la dernière version LTS et votre système d'exploitation, puis suivez les instructions d'installation. Sur Windows et Mac, vous pouvez utiliser l'installateur proposé sur cette page. Sur Linux, suivez les instructions pour votre distribution. L'installation doit inclure **npm**, le gestionnaire de paquets que nous utiliserons pour télécharger des outils et des librairies.
 
-![Une capture d'écran du site web de Deno.](/assets/first-steps/setup/deno.png)
+<OutdatedScreenshot src="/assets/first-steps/setup/deno.png" alt={"Une capture d'écran du site web de Deno."} lang="fr" />
 
-Vous pouvez aussi copier la commande correspondant à votre système d'exploitation ici :
+<OutdatedScreenshot src="/assets/first-steps/setup/deno-install.png" alt={"Une capture d'écran montrant comment installer Deno depuis le terminal de VS Code."} lang="fr" />
 
-**Mac ou Linux :**
+<OutdatedScreenshot src="/assets/first-steps/setup/deno-version.png" alt={"Une capture d'écran montrant comment afficher la version de Deno."} lang="fr" />
 
-```bash
-curl -fsSL https://deno.land/install.sh | sh
+Quittez et redémarrez VS Code après l'installation de Node.js. Ouvrez le terminal (`View => Terminal`, ou `CMD` + `J` sur Mac et `CTRL` + `J` sur Windows), puis exécutez ces commandes une à la fois :
+
+```sh
+node --version
+npm --version
 ```
 
-**Windows (PowerShell) :**
+La première commande doit afficher la version de Node.js que vous venez d’installer. La deuxième doit afficher un numéro de version de npm. Si l'une des commandes est introuvable, vérifiez que l'installation est terminée, puis redémarrez VS Code.
 
-```powershell
-irm https://deno.land/install.ps1 | iex
-```
+D'autres moteurs, dont [Bun](https://bun.sh/), peuvent aussi exécuter TypeScript, et `setup-data-project` prend aussi Bun en charge. Nous utiliserons Node.js et npm pour tous les exemples de ce cours.
 
-Ensuite, suivez ces étapes :
+## Configurer un projet
 
-1. Ouvrez le terminal dans VS Code (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows).
-2. Collez la commande correspondant à votre système d'exploitation et appuyez sur la touche Entrée pour l'exécuter.
+Nous utiliserons [@nshiab/setup-data-project](https://github.com/nshiab/setup-data-project), un outil en code ouvert que j'ai créé, pour préparer nos projets. Il installe et configure TypeScript, le formatage et les outils de vérification du code. Nous pouvons ainsi passer directement à l'apprentissage du langage.
 
-La commande téléchargera et installera Deno sur votre ordinateur.
-
-![Une capture d'écran montrant comment installer Deno depuis le terminal de VS Code.](/assets/first-steps/setup/deno-install.png)
-
-Maintenant, tout devrait être correctement installé.
-
-Quittez et redémarrez VS Code. Ensuite, tapez `deno --version` dans votre terminal et appuyez sur Entrée pour afficher votre version de Deno. Vous devriez voir quelque chose comme ceci !
-
-![Une capture d'écran montrant comment afficher la version de Deno.](/assets/first-steps/setup/deno-version.png)
-
-## Extensions
-
-VS Code dispose d'un merveilleux écosystème d'extensions et l'équipe de Deno en a créé une très utile pour vous aider à coder efficacement.
-
-Suivez ces étapes pour l'installer :
-
-1. Cliquez sur l'onglet Extensions sur le côté gauche de VS Code.
-2. Recherchez l'extension Deno.
-3. Installez l'extension publiée par **Denoland**. Assurez-vous que `Auto update` est cochée.
-
-![Une capture d'écran montrant comment installer l'extension Deno.](/assets/first-steps/setup/deno-extension.png)
-
-Une des fonctionnalités très pratiques de l'extension Deno est son formateur de code. Mettons à jour les paramètres de VS Code pour qu'il formate automatiquement notre code à chaque sauvegarde de fichier. Cela aidera à garder tout propre et bien organisé.
-
-- Sur Mac, allez dans `Code => Preferences => Settings`.
-- Sur Windows, allez dans `File => Preferences => Settings`.
-
-![Capture d'écran montrant les paramètres de VS Code.](/assets/first-steps/setup/vscode-settings.png)
-
-<br />
-
-Ensuite, trouvez `Default Formatter` à l’aide de la barre de recherche et sélectionnez `Deno` dans le menu déroulant.
-
-![Capture d'écran montrant les paramètres du formateur de VS Code.](/assets/first-steps/setup/vscode-formatter.png)
-
-Puis, recherchez `Format On Save` et cochez la case pour l'activer.
-
-![Capture d'écran montrant les paramètres du formatage à la sauvegarde de VS Code.](/assets/first-steps/setup/vscode-format-on-save.png)
-
-Enfin, trouvez `Word Wrap` et réglez `Editor: Word Wrap` sur `on` si ce n’est pas déjà le cas. Les longues lignes s’afficheront sur plusieurs lignes pour tenir dans l’éditeur, sans avoir à faire défiler horizontalement pour lire votre code.
-
-![Les paramètres de VS Code montrant Editor: Word Wrap réglé sur on.](/assets/first-steps/setup/vscode-word-wrap.png)
-
-Les paramètres sont enregistrés automatiquement, vous pouvez donc fermer l'onglet `Settings`. Tout est prêt !
-
-## Exécutons un script
-
-Pour vérifier que tout fonctionne comme prévu, nous allons écrire un petit script et l'exécuter.
-
-Pour démarrer un nouveau projet dans VS Code, suivez ces étapes :
-
-1. Créez un nouveau dossier quelque part sur votre ordinateur.
-2. Dans VS Code, cliquez sur l'onglet Explorer.
-3. Cliquez sur `Open Folder` et sélectionnez le dossier que vous venez de créer. Si on vous demande si vous faites confiance aux auteurs des fichiers, répondez "Oui" pour continuer.
+Créez d'abord un nouveau dossier vide à un endroit facile d'accès sur votre ordinateur. Dans VS Code, cliquez sur l'onglet Explorer, puis sur `Open Folder`, et sélectionnez ce dossier. Si l'éditeur vous demande si vous faites confiance aux auteurs des fichiers, répondez « Oui » pour ce projet que vous venez de créer.
 
 ![Une capture d'écran montrant comment ouvrir un nouveau dossier dans VS Code.](/assets/first-steps/setup/deno-open-folder.png)
 
-Maintenant que VS Code a ouvert votre dossier, nous pouvons créer un nouveau fichier.
+Ouvrez le terminal (`View => Terminal`, ou `CMD` + `J` sur Mac et `CTRL` + `J` sur Windows). Il devrait s'ouvrir dans votre nouveau dossier. Exécutez :
 
-1. Faites un clic droit sur l'Explorateur.
-2. Cliquez sur `New file...`.
-3. Nommez votre nouveau fichier `main.ts`. Si le fichier ne s'ouvre pas en tant que nouvel onglet, cliquez dessus.
-4. Dans l'onglet `main.ts`, tapez `console.log("This is going to be fun!");` et enregistrez le fichier en appuyant sur `CMD` + `S` sur Mac ou `CTRL` + `S` sur PC.
+```sh
+npx @nshiab/setup-data-project
+```
+
+`npx` télécharge et exécute un outil depuis npm. Si npm vous demande s'il peut installer `@nshiab/setup-data-project`, tapez `y` et appuyez sur Entrée.
+
+Quand l'outil vous demande quelles librairies installer, **ne sélectionnez rien et appuyez sur Entrée**. Nous n'avons pas besoin d'une librairie de données pour apprendre les fondamentaux de TypeScript. Nous en sélectionnerons plus tard, lorsque nous commencerons à analyser des données.
+
+Attendez la fin de la configuration et le message `You are all set!`. Le téléchargement et l'installation des outils peuvent prendre quelques minutes.
+
+<OutdatedScreenshot src="/assets/first-steps/setup/deno-extension.png" alt={"Une capture d'écran montrant comment installer l'extension Deno."} lang="fr" />
+
+Plusieurs fichiers et dossiers apparaîtront dans l'Explorer. Voici ceux à reconnaître pour l'instant :
+
+- `sda/main.ts` est l'endroit où nous écrirons notre code. `sda` est un dossier et `main.ts` est un fichier à l'intérieur. L'extension `.ts` identifie un fichier TypeScript.
+- `package.json` décrit le projet, ses dépendances et les commandes que nous exécuterons avec npm.
+- `package-lock.json` conserve les versions des paquets installés pour permettre une installation cohérente du projet.
+- `node_modules` contient les outils et les librairies téléchargés. Vous n'aurez pas besoin de le modifier.
+- `tsconfig.json`, `vite.config.ts` et `.vscode` contiennent les paramètres préparés par l'outil. Gardez-les en place.
+
+Ne vous inquiétez pas si cela semble beaucoup. L'outil a fait la configuration pour nous. La plupart du temps, nous travaillerons dans `sda/main.ts`.
+
+## Paramètres de l'éditeur
+
+Le projet inclut des recommandations d'extensions VS Code. Quand VS Code propose de les installer, acceptez la recommandation du **Vite+ extension pack**, publié par **VoidZero**. Vous pouvez aussi ouvrir l'onglet Extensions et chercher `@recommended`, ou rechercher directement `VoidZero.vite-plus-extension-pack`.
+
+Ce groupe d'extensions fournit le formatage et les vérifications configurés par le projet. Les paramètres VS Code générés activent le formatage à la sauvegarde et le retour à la ligne pour les longues lignes. Vous n'avez pas besoin de configurer un autre formateur.
+
+Si vous aviez installé l'extension Deno, désactivez-la pour cet espace de travail afin qu'elle n'interfère pas avec les outils TypeScript du projet.
+
+<OutdatedScreenshot src="/assets/first-steps/setup/vscode-formatter.png" alt={"Capture d'écran montrant les paramètres du formateur de VS Code."} lang="fr" />
+
+## Exécutons un script
+
+Dans l'Explorer, dépliez le dossier `sda` et ouvrez `main.ts`. Remplacez son contenu par :
+
+```ts filename="sda/main.ts"
+console.log("This is going to be fun!");
+```
 
 Ce code dit à votre ordinateur d'afficher *This is going to be fun!* dans votre terminal.
 
-![Une capture d'écran montrant comment créer un nouveau fichier TypeScript dans VS Code.](/assets/first-steps/setup/deno-new-file.png)
+Enregistrez le fichier avec `CMD` + `S` sur Mac ou `CTRL` + `S` sur Windows. Un point dans l'onglet du fichier indique des modifications non enregistrées. Enregistrez toujours avant de vous attendre à voir vos changements s'exécuter.
 
-Si vous créez ou modifiez un fichier sans l'enregistrer, VS Code vous indique à deux endroits que vous avez des modifications non enregistrées :
+Dans le terminal, à partir du dossier du projet qui contient `package.json`, exécutez :
 
-- Un nombre sur l'icône Explorer à gauche indique combien de fichiers ont des modifications non enregistrées.
-- Dans l'onglet du fichier, un point blanc remplace la croix normalement utilisée pour le fermer.
+```sh
+npm run sda
+```
 
-Les deux flèches rouges dans la capture d'écran ci-dessous pointent vers ces indicateurs. Ici, le nombre `1` signifie qu'un fichier a des modifications non enregistrées, et le point blanc nous indique qu'il s'agit de `main.ts`.
+Cela lance la commande `sda` du projet, qui démarre Node.js et exécute `sda/main.ts`. Vous devriez voir *This is going to be fun!* dans votre terminal.
 
-Assurez-vous d'enregistrer le fichier en cliquant dedans, puis en appuyant sur `CMD` + `S` sur Mac ou `CTRL` + `S` sur PC.
+La commande continue de surveiller votre script : chaque fois que vous enregistrez une modification, Node.js l'exécute à nouveau. Essayez de changer le message et d'enregistrer ! Pour arrêter la surveillance, cliquez dans le terminal et appuyez sur `CTRL` + `C`, sur Mac comme sur Windows.
 
-![Capture d'écran montrant un fichier non enregistré dans VS Code.](/assets/first-steps/setup/save.png)
+<OutdatedScreenshot src="/assets/first-steps/setup/deno-new-file.png" alt={"Une capture d'écran montrant comment créer un nouveau fichier TypeScript dans VS Code."} lang="fr" />
 
-Une fois le fichier enregistré, nous pouvons exécuter le script.
+<OutdatedScreenshot src="/assets/first-steps/setup/save.png" alt={"Capture d'écran montrant un fichier non enregistré dans VS Code."} lang="fr" />
 
-1. Affichez le terminal (cliquez sur `View => Terminal`, ou affichez et masquez le terminal en appuyant sur `CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows).
-2. Tapez `deno run main.ts` dans le terminal et appuyez sur Entrée.
-
-Cela demande à votre ordinateur d'utiliser Deno pour exécuter le script `main.ts`. Par conséquent, vous devriez voir *This is going to be fun!* dans votre terminal.
+<OutdatedScreenshot src="/assets/first-steps/setup/deno-run.png" alt={"Une capture d'écran montrant comment exécuter un fichier TypeScript dans VS Code."} lang="fr" />
 
 Félicitations ! Vous êtes maintenant prêt à coder. On va bien s'amuser ! 🤩
 
-![Une capture d'écran montrant comment exécuter un fichier TypeScript dans VS Code.](/assets/first-steps/setup/deno-run.png)
+## Vérifier et formater le code
+
+Node.js peut [exécuter directement des fichiers TypeScript](https://nodejs.org/docs/latest-v24.x/api/typescript.html) en supprimant leurs annotations de types avant l'exécution. **Il ne vérifie pas les types.** La surveillance relance simplement le script ; un script peut s'exécuter tout en contenant des erreurs TypeScript.
+
+L'outil de configuration installe et prépare ces vérifications pour nous. VS Code peut signaler les erreurs pendant la saisie, et cette commande vérifie le projet au complet :
+
+```sh
+npm run all-tests
+```
+
+Elle vérifie le formatage, les règles de qualité du code et les types TypeScript, puis exécute les tests automatisés du projet. Nous apprendrons à écrire des tests plus tard. Pour l'instant, lisez les erreurs signalées et corrigez-les avant de vous fier à vos résultats. Une vérification réussie est utile, mais il faut quand même vérifier vos données et votre logique !
+
+Si `npm run sda` surveille toujours votre script dans le terminal, utilisez le bouton `+` du panneau du terminal pour en ouvrir un deuxième pour les vérifications, ou arrêtez d'abord la surveillance avec `CTRL` + `C`.
+
+Pour formater le projet et appliquer les corrections que les outils peuvent faire automatiquement, exécutez :
+
+```sh
+npm run fix
+```
+
+Cette commande peut modifier vos fichiers. Vérifiez les changements, puis relancez `npm run all-tests`. Les erreurs dans vos types ou votre logique peuvent nécessiter une correction de votre part.
+
+Pour chaque leçon, vous pouvez continuer à utiliser ce projet et remplacer le contenu de `sda/main.ts`. Si vous préférez un projet distinct, créez un nouveau dossier vide, ouvrez-le avec VS Code et relancez `npx @nshiab/setup-data-project` sans sélectionner de librairie.
 
 ## À propos de l'IA
 

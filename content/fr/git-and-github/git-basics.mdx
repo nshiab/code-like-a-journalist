@@ -44,12 +44,14 @@ Tout ce que vous sauvegardez avec Git sera stocké dans un dossier caché `.git`
 
 ## Nouveaux fichiers
 
-Créons un nouveau fichier `main.ts` et allons chercher les données météo les plus récentes à Montréal depuis l'[API du Service météorologique du Canada](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
+Exécutez `npx @nshiab/setup-data-project` dans ce dossier et appuyez sur `Entrée` sans sélectionner de librairie, comme dans la leçon [Installation](/first-steps/setup). L’outil crée `sda/main.ts`, la configuration et un fichier `.gitignore` qui exclut les dépendances installées et les fichiers locaux de Git. Conservez `package.json` et `package-lock.json` dans Git, mais ne suivez jamais `node_modules` ou `.env`. Exécutez toutes les commandes du terminal depuis le dossier du projet qui contient `package.json`, sans entrer dans le dossier `sda`.
+
+Modifions `sda/main.ts` et allons chercher les données météo les plus récentes à Montréal depuis l'[API du Service météorologique du Canada](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
 
 Cette API retourne les données au format XML. Nous les affichons dans le terminal.
 
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const response = await fetch(
   "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
 );
@@ -58,25 +60,25 @@ const xml = await response.text();
 console.log(xml);
 ```
 
-Vous pouvez maintenant voir votre nouveau fichier sous `Changes`. Sa couleur est aussi passée au vert et un `U` est affiché à côté, ce qui signifie `Untracked`. Vous pouvez également voir un `1` dans la barre latérale gauche, à côté du bouton `Source Control`, indiquant qu’un fichier a été modifié.
+Vous pouvez maintenant voir `sda/main.ts` et les fichiers générés sous `Changes`. Les nouveaux fichiers apparaissent en vert avec un `U`, qui signifie `Untracked`. Le nombre à côté de `Source Control` compte les fichiers concernés.
 
-Git vous informe qu’il s’agit d’un nouveau fichier : il ne l’a jamais vu auparavant et ne le suit pas encore.
+Git vous informe qu'il s'agit de nouveaux fichiers : ils n'ont pas encore été enregistrés dans un commit. Les paquets installés dans `node_modules` et le fichier local `.env` sont ignorés et ne devraient pas apparaître dans cette liste.
 
-![Message dans VS Code indiquant qu’un fichier n’est pas suivi.](/assets/git-and-github/git-basics/new-file.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/new-file.png" alt={"Message dans VS Code indiquant qu’un fichier n’est pas suivi."} lang="fr" />
 
-Juste pour vérifier que le code fonctionne, vous pouvez exécuter `deno -A main.ts`. Vous devriez voir les données XML affichées dans le terminal.
+Juste pour vérifier que le code fonctionne, vous pouvez exécuter `node sda/main.ts`. Vous devriez voir les données XML affichées dans le terminal.
 
-![Données XML affichées dans le terminal.](/assets/git-and-github/git-basics/xml-logged.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/xml-logged.png" alt={"Données XML affichées dans le terminal."} lang="fr" />
 
 ## Suivi et enregistrement
 
 Git ne sauvegarde pas automatiquement votre travail. Vous devez lui indiquer quand sauvegarder votre projet. Pour enregistrer vos modifications, vous devez les **valider** (*commit*). Chaque commit possède un identifiant (généré par Git) et un message que vous devez fournir.
 
 Faire un commit se fait en deux étapes :
-- D’abord, vous suivez les fichiers (nouveaux fichiers, fichiers supprimés)
-- Ensuite, vous validez avec un message
+- D'abord, vous préparez les changements à enregistrer : nouveaux fichiers, fichiers modifiés ou supprimés. On appelle cela *staging*.
+- Ensuite, vous validez ces changements avec un message.
 
-Faisons-le. Pour suivre tous les fichiers du projet, exécutez dans votre terminal : `git add -A`
+Faisons-le. Pour préparer tous les changements du projet, sauf les fichiers ignorés, exécutez dans votre terminal : `git add -A`
 
 Puis validez avec cette commande, encore une fois dans votre terminal : `git commit -m "Fetching XML data"`
 
@@ -84,7 +86,7 @@ L’option `-m` indique à Git que vous fournissez un message, que vous écrivez
 
 Et voilà ! Vous pouvez maintenant voir votre commit dans la section `Graph`.
 
-![Premier commit.](/assets/git-and-github/git-basics/first-commit.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/first-commit.png" alt={"Premier commit."} lang="fr" />
 
 ## Mise à jour des fichiers
 
@@ -92,11 +94,11 @@ Nous avons des données XML, ce qui n’est pas très pratique. Il serait préf�
 
 Installons la librairie [`fast-xml-parser`](https://www.npmjs.com/package/fast-xml-parser) depuis NPM pour convertir nos données.
 
-Dans votre terminal, exécutez : `deno add npm:fast-xml-parser`
+Dans votre terminal, exécutez : `npm install fast-xml-parser`
 
-Puis mettez à jour votre fichier `main.ts`.
+Puis mettez à jour votre fichier `sda/main.ts`.
 
-```ts showLineNumbers filename="main.ts" {1, 6-9}
+```ts showLineNumbers filename="sda/main.ts" {1, 6-9}
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
@@ -108,13 +110,13 @@ const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
 console.log(json);
 ```
 
-Vous verrez maintenant d’autres changements. Comme nous avons installé une librairie, Deno a créé les fichiers `deno.json` et `deno.lock`. Ils sont en vert et non suivis.
+Vous verrez maintenant d’autres changements. L’installation a modifié `package.json` et `package-lock.json`, que nous avons enregistrés dans le commit précédent. npm a aussi installé la librairie dans `node_modules`, que `.gitignore` exclut de Git.
 
-Mais `main.ts` est en jaune avec un `M` à côté. Cela signifie que Git indique que ce fichier a été modifié.
+De même, `sda/main.ts` est en jaune avec un `M` à côté. Cela signifie que Git indique que ce fichier a été modifié.
 
-Vous pouvez exécuter `deno -A main.ts` juste pour vous assurer que le code fonctionne.
+Vous pouvez exécuter `node sda/main.ts` juste pour vous assurer que le code fonctionne.
 
-![Des fichiers ont été modifiés.](/assets/git-and-github/git-basics/changes.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/changes.png" alt={"Des fichiers ont été modifiés."} lang="fr" />
 
 Vous pouvez vérifier les changements ligne par ligne dans le fichier. À côté des numéros de ligne, vous verrez des barres colorées :
 - Vert signifie que la ligne est nouvelle
@@ -123,15 +125,15 @@ Vous pouvez vérifier les changements ligne par ligne dans le fichier. À côté
 
 Si vous cliquez sur les barres, vous verrez les détails. Les ajouts sont affichés en vert, les suppressions en rouge. Si vous souhaitez revenir à la version précédente, cliquez sur la flèche de retour.
 
-![Inspection des modifications dans le fichier.](/assets/git-and-github/git-basics/inspecting-changes.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/inspecting-changes.png" alt={"Inspection des modifications dans le fichier."} lang="fr" />
 
-Vous pouvez également voir toutes les différences dans l’onglet `Source Control`. Cliquez sur `main.ts` pour afficher le `Working Tree`.
+Vous pouvez également voir toutes les différences dans l’onglet `Source Control`. Cliquez sur `sda/main.ts` pour afficher le `Working Tree`.
 
 Par exemple, ici, on voit clairement que nous utilisons une nouvelle librairie (lignes vertes à droite) et que nous avons supprimé `console.log(xml)` (en rouge à gauche).
 
 Si vous souhaitez revenir à une version précédente du fichier, vous pouvez aussi cliquer sur la flèche de retour sous `Changes`.
 
-![Inspection des modifications dans le fichier via la working tree.](/assets/git-and-github/git-basics/working-tree.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/working-tree.png" alt={"Inspection des modifications dans le fichier via la working tree."} lang="fr" />
 
 Faisons un commit de ces changements :
 - Exécutez `git add -A`
@@ -139,18 +141,18 @@ Faisons un commit de ces changements :
 
 Vous pouvez maintenant voir votre deuxième commit dans le `Graph`. Et si vous cliquez dessus, vous pouvez voir tous les changements effectués par rapport au commit précédent.
 
-N’oubliez pas de faire défiler pour voir les modifications dans `deno.json`, `deno.lock` et `main.ts`.
+N’oubliez pas de faire défiler pour voir les modifications dans `package.json`, `package-lock.json` et `sda/main.ts`.
 
-![Inspection de toutes les modifications d’un commit.](/assets/git-and-github/git-basics/second-commit.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/second-commit.png" alt={"Inspection de toutes les modifications d’un commit."} lang="fr" />
 
 ## Annuler un commit
 
 L'une des fonctionnalités les plus puissantes de Git est la possibilité de revenir facilement à un commit précédent.
 
-Par exemple, créons une erreur dans notre code. Essayons d’analyser la réponse du `fetch` comme du JSON au lieu de texte dans `main.ts`.
+Par exemple, créons une erreur dans notre code. Essayons d’analyser la réponse du `fetch` comme du JSON au lieu de texte dans `sda/main.ts`.
 
 
-```ts showLineNumbers filename="main.ts" /.json()/
+```ts showLineNumbers filename="sda/main.ts" /.json()/
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
@@ -166,9 +168,9 @@ Faisons un commit de cette modification avant de la tester 😱 :
 - `git add -A`  
 - `git commit -m "Parsing response as JSON"`
 
-Et ensuite, testons notre nouveau code avec `deno -A main.ts`.
+Et ensuite, testons notre nouveau code avec `node sda/main.ts`.
 
-![Un troisième commit.](/assets/git-and-github/git-basics/error.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/error.png" alt={"Un troisième commit."} lang="fr" />
 
 
 Oh non ! Ça plante ! Et nous avons déjà validé ! Comment revenir en arrière ?
@@ -177,15 +179,15 @@ Bien sûr, vous pouvez toujours vérifier les changements et corriger le code ma
 
 Pour récupérer un identifiant de commit, faites un clic droit sur le commit et cliquez sur `Copy Commit ID`. Ici, le commit que nous voulons annuler est le plus récent.
 
-![Copie de l’ID d’un commit.](/assets/git-and-github/git-basics/copy-id.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/copy-id.png" alt={"Copie de l’ID d’un commit."} lang="fr" />
 
 Exécutez `git revert COMMIT_ID --no-edit`, en remplaçant `COMMIT_ID` par l’identifiant copié. L’option `--no-edit` accepte le message proposé par Git afin de créer le commit d’annulation sans ouvrir d’éditeur de texte.
 
 Vous verrez maintenant un quatrième commit, indiquant que vous avez annulé le précédent ! Pour un *vrai* retour en arrière, vous pouvez aussi utiliser [`git reset`](https://git-scm.com/docs/git-reset), mais `revert` est plus sûr et garde une trace de tout, y compris de l’annulation !
 
-Maintenant, si vous exécutez `deno -A main.ts`, tout fonctionne comme avant notre stupide erreur.
+Maintenant, si vous exécutez `node sda/main.ts`, tout fonctionne comme avant notre stupide erreur.
 
-![Un commit annulé.](/assets/git-and-github/git-basics/reverted.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/reverted.png" alt={"Un commit annulé."} lang="fr" />
 
 ## Branches
 
@@ -193,7 +195,7 @@ Un autre concept important dans Git est celui des **branches**.
 
 Par défaut, un dépôt a une branche `main`. Vous pouvez voir votre branche en bas à gauche dans VS Code, ainsi qu’à côté de vos commits. Jusqu’ici, nous avons travaillé sur `main`.
 
-![La branche main dans VS Code.](/assets/git-and-github/git-basics/main-branch.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/main-branch.png" alt={"La branche main dans VS Code."} lang="fr" />
 
 En général, on essaie (😅) de garder `main` propre et on travaille dans des branches séparées.
 
@@ -207,16 +209,16 @@ La commande `switch` indique à Git que vous voulez changer de branche. L’opti
 
 Pour voir la liste de toutes les branches, exécutez `git branch`. Celle avec un `*` devant est celle sur laquelle vous êtes actuellement.
 
-![La branche temperature branch dans VS Code.](/assets/git-and-github/git-basics/new-branch.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/new-branch.png" alt={"La branche temperature branch dans VS Code."} lang="fr" />
 
 ### Travailler dans une branche
 
-Nous pouvons maintenant mettre à jour notre code dans `main.ts`. Les données sont un JSON profondément imbriqué, mais récupérer `resultTime` et `temperature` est simple.
+Nous pouvons maintenant mettre à jour notre code dans `sda/main.ts`. Les données sont un JSON profondément imbriqué, mais récupérer `resultTime` et `temperature` est simple.
 
-Si vous exécutez `deno -A main.ts`, vous devriez voir la température affichée dans le terminal.
+Si vous exécutez `node sda/main.ts`, vous devriez voir la température affichée dans le terminal.
 
 
-```ts showLineNumbers filename="main.ts" {9-23}
+```ts showLineNumbers filename="sda/main.ts" {9-23}
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
@@ -246,7 +248,7 @@ Faisons un commit de cette mise à jour :
 - `git add -A`  
 - `git commit -m "Extracting temp and time"`
 
-![Travail sur la branche temperature.](/assets/git-and-github/git-basics/commit-new-branch.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/commit-new-branch.png" alt={"Travail sur la branche temperature."} lang="fr" />
 
 Ce commit a été fait sur la branche `temperature`. La branche `main`, elle, n’a pas été modifiée. Pour revenir à la branche `main`, utilisez `git switch main`.
 
@@ -254,7 +256,7 @@ Comme vous pouvez le constater, notre nouveau code n’est pas là ! Si jamais
 
 C’est pour cela que les branches sont si pratiques : vous pouvez travailler en toute confiance dessus. Vous pouvez tester et casser des choses sans craindre de perdre vos avancées. Elles sont à l’abri ! Les branches sont aussi très utiles quand plusieurs personnes collaborent. Chacun peut travailler sur sa propre fonctionnalité dans sa propre branche.
 
-![Passer sur la branche main.](/assets/git-and-github/git-basics/checkout-main.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/checkout-main.png" alt={"Passer sur la branche main."} lang="fr" />
 
 ### Fusionner des branches
 
@@ -266,7 +268,7 @@ Assurez-vous d’être sur la branche `main` (`git switch main`), puis exécutez
 
 Et voilà, le nouveau code est sur `main` ! Et vous pouvez voir le commit que nous avons fait dans `temperature`. L’historique a été fusionné.
 
-![Fusion avec la branche main.](/assets/git-and-github/git-basics/merge-main.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/merge-main.png" alt={"Fusion avec la branche main."} lang="fr" />
 
 ### Supprimer une branche
 
@@ -276,7 +278,7 @@ L’option `-d` ne supprime une branche qu’après que Git a confirmé qu’ell
 
 Maintenant, si vous exécutez `git branch`, vous ne verrez plus `temperature`.
 
-![Suppression de la branche temperature.](/assets/git-and-github/git-basics/delete-branch.png)
+<OutdatedScreenshot src="/assets/git-and-github/git-basics/delete-branch.png" alt={"Suppression de la branche temperature."} lang="fr" />
 
 ## Supprimer Git
 
@@ -292,7 +294,7 @@ Comme la suppression de dossiers dans le terminal peut être dangereuse, utilise
 
 Félicitations ! Vous avez appris les commandes Git les plus importantes :
 - `git init -b main` pour démarrer un nouveau dépôt Git avec une branche `main`
-- `git add -A` pour suivre les fichiers
+- `git add -A` pour préparer les fichiers nouveaux, modifiés et supprimés
 - `git commit -m "Un message"` pour enregistrer le projet
 - `git revert COMMIT_ID --no-edit` pour annuler un commit
 - `git switch -c ma-nouvelle-branche` pour créer une nouvelle branche et vous y placer

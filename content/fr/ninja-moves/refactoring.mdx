@@ -22,19 +22,14 @@ Dans cette leçon, nous prendrons le code final du [calculateur de compte éparg
 
 ## Configuration
 
-Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
+Créez un nouveau dossier, ouvrez-le dans VS Code et utilisez la dernière version LTS de Node.js. Dans le terminal, exécutez `npx @nshiab/setup-data-project` et ne sélectionnez aucune librairie optionnelle. Vous obtenez la même structure et les mêmes outils que dans la [leçon d’installation](/first-steps/setup).
 
-- `main.ts`, où nous écrirons notre code.
-- `deno.json`, qui sert à configurer Deno et à activer son extension VS Code. Nous le laisserons vide pour l'instant.
+Nous écrirons notre script dans `sda/main.ts`. Exécutez `npm run sda` pour le lancer et le relancer automatiquement lorsque vous sauvegardez vos modifications. Utilisez `npm run all-tests` pour vérifier la mise en forme, les règles de lint, les types et les tests; `npm run fix` peut appliquer les corrections automatiques de mise en forme et de lint.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez la commande suivante : `deno run --watch --check main.ts`
-
-Cette commande efface le terminal et réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
-
-Maintenant, copiez, collez et sauvegardez ce code dans `main.ts`. Le script ci-dessous calcule les gains ou pertes d'un compte épargne sur 10 ans.
+Maintenant, copiez, collez et sauvegardez ce code dans `sda/main.ts`. Le script ci-dessous calcule les gains ou pertes d'un compte épargne sur 10 ans.
 
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -91,17 +86,17 @@ console.table(results);
 
 Voici ce que vous devriez voir dans votre terminal, avec des valeurs différentes.
 
-![Une capture d'écran montrant le terminal VS Code avec un tableau et des chaînes de caractères affichés.](/assets/ninja-moves/refactoring/results.png)
+<OutdatedScreenshot src="/assets/ninja-moves/refactoring/results.png" alt={"Une capture d'écran montrant le terminal VS Code avec un tableau et des chaînes de caractères affichés."} lang="fr" />
 
 ## Fonctions utilitaires
 
 Le script fonctionne bien, mais lire tout cela d'un coup peut être un peu intimidant. Il pourrait être refactorisé pour être plus facile à lire et à comprendre.
 
-Nous pouvons le faire en déplaçant certaines parties du code dans des fonctions utilitaires. Commencez par créer un nouveau dossier nommé `helpers` dans votre répertoire.
+Nous pouvons le faire en déplaçant certaines parties du code dans des fonctions utilitaires. Commencez par créer un nouveau dossier nommé `helpers` dans `sda` (l’outil de configuration l’a peut-être déjà créé).
 
 Il semble que les lignes 12-14 pourraient facilement être encapsulées dans une fonction. Ces lignes calculent un taux d'intérêt aléatoire. Créons un nouveau fichier nommé `getRandomInterestRate.ts` dans le dossier `helpers` et déplaçons ces lignes dans une fonction.
 
-```ts showLineNumbers filename="getRandomInterestRate.ts"
+```ts showLineNumbers filename="sda/helpers/getRandomInterestRate.ts"
 export default function getRandomInterestRate(
   interestRate: number,
   interestRateRange: number,
@@ -118,7 +113,7 @@ Les lignes 28-50 sont également d'excellentes candidates pour la refactorisatio
 
 J'ai également supprimé le `console.table(results)` puisque nous n'en avons pas vraiment besoin.
 
-```ts showLineNumbers filename="logAnswer.ts"
+```ts showLineNumbers filename="sda/helpers/logAnswer.ts"
 export default function logAnswer(
   initialAmount: number,
   results: { balance: number }[],
@@ -155,13 +150,13 @@ Vous pourriez être perplexe face au type de `results` dans le code ci-dessus.
 
 Cette description de type est importante. Dans notre code, nous utilisons `balance`. Ce type garantit qu’il est présent. Si vous essayez de passer une liste d'objets sans une clé `balance` de type `number`, vous obtiendrez une erreur de type.
 
-Pour trouver le type approprié, j'ai simplement survolé `results` dans `main.ts` et copié le type inféré. Pas besoin de l'écrire vous-même ! J'ai supprimé les clés `year`, `interestRate` et `gainsOrLosses`, car nous ne les utilisons pas dans la fonction.
+Pour trouver le type approprié, j'ai simplement survolé `results` dans `sda/main.ts` et copié le type inféré. Pas besoin de l'écrire vous-même ! J'ai supprimé les clés `year`, `interestRate` et `gainsOrLosses`, car nous ne les utilisons pas dans la fonction.
 
-![Une capture d'écran montrant VS Code affichant les types inférés.](/assets/ninja-moves/refactoring/inferred-types.png)
+<OutdatedScreenshot src="/assets/ninja-moves/refactoring/inferred-types.png" alt={"Une capture d'écran montrant VS Code affichant les types inférés."} lang="fr" />
 
-Nous pouvons maintenant mettre à jour notre `main.ts`. Nous importons nos nouvelles fonctions et les utilisons. Notre script est maintenant plus simple et plus facile à comprendre.
+Nous pouvons maintenant mettre à jour notre `sda/main.ts`. Nous importons nos nouvelles fonctions et les utilisons. Notre script est maintenant plus simple et plus facile à comprendre.
 
-```ts showLineNumbers filename="main.ts" {1-2, 20, 32}
+```ts showLineNumbers filename="sda/main.ts" {1-2, 20, 32}
 import getRandomInterestRate from "./helpers/getRandomInterestRate.ts";
 import logAnswer from "./helpers/logAnswer.ts";
 
@@ -196,7 +191,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
 logAnswer(initialAmount, results);
 ```
 
-Nous pourrions même aller plus loin en enveloppant tout le contenu de `main.ts` dans une fonction nommée `runSimulation`.
+Nous pourrions même aller plus loin en enveloppant tout le contenu de `sda/main.ts` dans une fonction nommée `runSimulation`.
 
 Créons un autre fichier nommé `runSimulation.ts` dans le dossier `helpers` et déplaçons-y tout ce code.
 
@@ -204,7 +199,7 @@ Puisque nous sommes maintenant dans le dossier `helpers`, nous devons mettre à 
 
 De plus, les constantes `initialAmount`, `interestRate`, `interestRateRange`, `startingYear` et `years` deviendront désormais des paramètres pour la fonction `runSimulation`.
 
-```ts showLineNumbers filename="runSimulation.ts"
+```ts showLineNumbers filename="sda/helpers/runSimulation.ts"
 import getRandomInterestRate from "./getRandomInterestRate.ts";
 import logAnswer from "./logAnswer.ts";
 
@@ -241,9 +236,9 @@ export default function runSimulation(
 }
 ```
 
-Nous pouvons maintenant mettre à jour `main.ts` et le rendre... incroyablement simple.
+Nous pouvons maintenant mettre à jour `sda/main.ts` et le rendre... incroyablement simple.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 import runSimulation from "./helpers/runSimulation.ts";
 
 runSimulation(5000, 2, 20, 2025, 10);
@@ -251,7 +246,7 @@ runSimulation(5000, 2, 20, 2025, 10);
 
 Notre code est maintenant très modulaire. Alors que notre script initial ne pouvait exécuter qu'une seule simulation à la fois, nous pouvons désormais en exécuter facilement un millier ou plus !
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 import runSimulation from "./helpers/runSimulation.ts";
 
 for (let i = 1; i <= 1000; i++) {
@@ -260,7 +255,7 @@ for (let i = 1; i <= 1000; i++) {
 }
 ```
 
-![Une capture d'écran montrant VS Code affichant mille simulations.](/assets/ninja-moves/refactoring/run-simulation.png)
+<OutdatedScreenshot src="/assets/ninja-moves/refactoring/run-simulation.png" alt={"Une capture d'écran montrant VS Code affichant mille simulations."} lang="fr" />
 
 <Callout type="info" emoji="💡">
     Vous pourriez penser que créer plusieurs fichiers rend votre code plus difficile à naviguer. Mais si vous appuyez sur `CMD` sur Mac ou `CTRL` sur PC et cliquez sur une fonction dans votre code, VS Code vous amènera automatiquement au fichier de la fonction en ouvrant un nouvel onglet.

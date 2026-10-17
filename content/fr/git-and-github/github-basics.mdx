@@ -40,7 +40,7 @@ Les dépôts publics ont aussi une page publique. Quand vous aimez un projet, vo
 
 Vous pouvez aussi ***Watch*** un projet pour voir son activité dans votre fil. En général, je suis les projets que j'utilise pour être informé des nouvelles versions.
 
-![Dépôt GitHub.](/assets/git-and-github/github-basics/sda-repo.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/sda-repo.png" alt={"Dépôt GitHub."} lang="fr" />
 
 ## Créer un dépôt
 
@@ -48,7 +48,7 @@ Créons votre premier dépôt ! Cliquez sur le bouton + en haut à droite.
 
 ![Créer un nouveau dépôt.](/assets/git-and-github/github-basics/new-button.png)
 
-Puis donnez un nom à votre dépôt et rendez-le privé (comme ça, vous n’aurez pas peur de faire des erreurs 😉). Pas besoin de `readme` ni de `.gitignore` pour l’instant. On en parlera plus tard. Ensuite, cliquez sur `Create repository` en bas.
+Puis donnez un nom à votre dépôt et rendez-le privé (comme ça, vous n’aurez pas peur de faire des erreurs 😉). Ne cochez pas les options pour ajouter un `README` ou un `.gitignore` : nous les créerons localement avec l'outil de configuration du projet. Ensuite, cliquez sur `Create repository` en bas.
 
 ![Paramètres d’un nouveau dépôt.](/assets/git-and-github/github-basics/new-repo-settings.png)
 
@@ -58,18 +58,18 @@ On va suivre les étapes sous *pushing an existing repository from the command l
 
 ![Les étapes pour connecter un dépôt existant à un nouveau.](/assets/git-and-github/github-basics/new-repo-steps.png)
 
-Créez un nouveau dossier avec le même nom que le dépôt et ouvrez-le avec VS Code. Ajoutez-y un fichier `main.ts` avec un simple log pour l’instant.
+Créez un nouveau dossier avec le même nom que le dépôt et ouvrez-le avec VS Code. Exécutez `npx @nshiab/setup-data-project`, puis appuyez sur `Entrée` sans sélectionner de librairie. Remplacez le contenu de `sda/main.ts` par ce simple log. Le fichier `.gitignore` généré exclut `node_modules` et `.env` de Git ; conservez `package.json` et `package-lock.json` dans le dépôt. Exécutez les commandes du terminal ci-dessous depuis ce dossier du projet, qui contient `package.json`.
 
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 console.log("Hello!");
 ```
 
 Initialisez ensuite un nouveau dépôt Git dans ce dossier en exécutant `git init`.
 
-Ensuite, suivez le nouveau fichier qu’on vient de créer avec `git add -A`, puis faisons un commit avec `git commit -m "My first commit"`.
+Préparez le script et tous les fichiers générés du projet avec `git add -A`, puis enregistrez-les avec `git commit -m "My first commit"`. Les fichiers ignorés comme `node_modules` et `.env` ne seront pas inclus dans le commit.
 
-![Premier commit.](/assets/git-and-github/github-basics/first-commit.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/first-commit.png" alt={"Premier commit."} lang="fr" />
 
 À ce stade, votre code est enregistré localement avec Git, sur votre ordinateur. Il est temps de l’enregistrer à distance, dans le nuage, sur GitHub !
 
@@ -85,17 +85,17 @@ git push -u origin main
 
 On vous demandera probablement de vous authentifier. Suivez l’invite du navigateur ou du gestionnaire d’identifiants affichée par Git. GitHub n’accepte pas le mot de passe de votre compte pour les opérations Git par HTTPS : ne le saisissez jamais ici. Si votre configuration n’ouvre pas de navigateur, GitHub recommande de vous authentifier avec [GitHub CLI ou Git Credential Manager](https://docs.github.com/fr/get-started/git-basics/caching-your-github-credentials-in-git).
 
-Et si vous actualisez la page de votre dépôt sur GitHub, vous verrez que votre code est synchronisé ! Le fichier `main.ts` est là et vous voyez votre dernier commit.
+Et si vous actualisez la page de votre dépôt sur GitHub, vous verrez que votre code est synchronisé ! Le fichier `sda/main.ts` est là et vous voyez votre dernier commit.
 
-![Page du dépôt distant.](/assets/git-and-github/github-basics/repo-page-sync.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/repo-page-sync.png" alt={"Page du dépôt distant."} lang="fr" />
 
 ## Pousser vers le dépôt
 
-Il n’y a pas de fichier `README.md` dans votre dépôt, et GitHub vous recommande (fortement) d’en ajouter un. Le contenu de ce fichier sera affiché sur la page du dépôt. C’est généralement la première chose que les gens liront avant de consulter le code. Alors faisons-le.
+L'outil de configuration a créé un fichier `README.md` dans votre dépôt. GitHub affiche son contenu sur la page du dépôt : c'est donc généralement la première chose que les gens lisent. Ajoutons une description de notre projet au-dessus de la documentation générée.
 
 Comme l’indique son extension `.md`, c’est un fichier Markdown. Markdown est une syntaxe simple et pratique souvent utilisée pour la documentation. Le code sera transformé en un joli texte lisible par l’outil ou la plateforme que vous utilisez. Vous pouvez ainsi vous concentrer sur le contenu sans vous soucier du style, ce qui est plutôt sympa ! On va écrire un peu de Markdown ensemble, mais si vous voulez en savoir plus, consultez cette [cheat sheet](https://www.markdownguide.org/cheat-sheet/).
 
-Créez un nouveau fichier `README.md` dans votre dépôt dans VS Code et copiez-collez le contenu ci-dessous. Comme je l’ai dit au début, notre objectif sera de récupérer la température à Montréal.
+Ouvrez `README.md` dans VS Code et ajoutez la description ci-dessous en haut du fichier, avant la section générée. Comme je l'ai dit au début, notre objectif sera de récupérer la température à Montréal.
 
 Le `#` sert à faire des titres. La syntaxe `[texte](lien)` permet d’ajouter des liens dans votre texte, et l’utilisation de backticks permet de créer des blocs de code.
 
@@ -107,25 +107,25 @@ Le `#` sert à faire des titres. La syntaxe `[texte](lien)` permet d’ajouter d
 This project retrieves the latest temperature in Montreal from the
 [Meteorological Service of Canada API](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
 
-Here's the command to run the project: `deno -A main.ts`
+Install dependencies with `npm ci`, then run the project with `node sda/main.ts`.
 ```
 
 Dans VS Code, si vous faites un clic droit sur les fichiers `.md`, vous pouvez les prévisualiser.
 
-![Le README.](/assets/git-and-github/github-basics/markdown.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/markdown.png" alt={"Le README."} lang="fr" />
 
-Notre nouveau fichier est sur notre ordinateur. Poussons-le maintenant vers GitHub. Il faut d'abord le committer :
+Notre README modifié est sur notre ordinateur. Poussons les changements vers GitHub. Il faut d'abord les enregistrer dans un commit :
 - `git add -A`
-- `git commit -m "Adding README.md"`
+- `git commit -m "Describe the project in README.md"`
 
 Et il y a une commande en plus pour le pousser :
 - `git push`
 
-![Pousser le README vers GitHub.](/assets/git-and-github/github-basics/push.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/push.png" alt={"Pousser le README vers GitHub."} lang="fr" />
 
 Tada ! 🪄 C’est maintenant sur GitHub ! Et votre README est utilisé pour accueillir les visiteurs !
 
-![Le README sur GitHub.](/assets/git-and-github/github-basics/readme.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/readme.png" alt={"Le README sur GitHub."} lang="fr" />
 
 ## Créer des *issues*
 
@@ -182,13 +182,13 @@ git switch 1-return-montreal-temperature
 
 Nous sommes maintenant sur notre nouvelle branche. On peut travailler sur notre code en toute sécurité !
 
-![Travailler sur la nouvelle branche.](/assets/git-and-github/github-basics/new-branch.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/new-branch.png" alt={"Travailler sur la nouvelle branche."} lang="fr" />
 
-Ajoutons le code de la leçon précédente dans notre fichier `main.ts`. Ce script interroge l’API du Service météorologique du Canada et récupère les données au format XML. La librairie `fast-xml-parser` les convertit en JSON. Et le reste du code extrait la température et l’heure avant de les afficher dans la console.
+Ajoutons le code de la leçon précédente dans notre fichier `sda/main.ts`. Ce script interroge l’API du Service météorologique du Canada et récupère les données au format XML. La librairie `fast-xml-parser` les convertit en JSON. Et le reste du code extrait la température et l’heure avant de les afficher dans la console.
 
 
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 import { XMLParser } from "fast-xml-parser";
 
 const response = await fetch(
@@ -214,22 +214,22 @@ const temp = elements
 console.log(temp);
 ```
 
-Installez la dépendance `fast-xml-parser` en exécutant `deno add npm:fast-xml-parser`.
+Installez la dépendance `fast-xml-parser` en exécutant `npm install fast-xml-parser`.
 
-Et maintenant, la température devrait s'afficher dans le terminal quand vous exécutez `deno -A main.ts`.
+Et maintenant, la température devrait s'afficher dans le terminal quand vous exécutez `node sda/main.ts`.
 
 Enfin, commitez et poussez votre travail :
 - `git add -A`
 - `git commit -m "Fetching and extracting temperature"`
 - `git push`
 
-![Pousser le nouveau code depuis la nouvelle branche.](/assets/git-and-github/github-basics/branch-push.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/branch-push.png" alt={"Pousser le nouveau code depuis la nouvelle branche."} lang="fr" />
 
 Maintenant, si vous actualisez la page de votre dépôt sur GitHub, vous verrez que `main` est sélectionnée. Ouvrez le sélecteur de branche ou la page `Branches` pour explorer les deux branches.
 
 Mais on a aussi une grande bannière qui suggère de créer une ***pull request*** ! Intéressant... 😏
 
-![GitHub suggère de créer une pull request.](/assets/git-and-github/github-basics/pr-suggestion.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/pr-suggestion.png" alt={"GitHub suggère de créer une pull request."} lang="fr" />
 
 ## Créer une *pull request*
 
@@ -239,7 +239,7 @@ Vous pouvez ensuite ajouter un titre et une description (optionnelle). Vous pouv
 
 Cliquez sur `Create pull request`.
 
-![Créer une nouvelle PR sur GitHub.](/assets/git-and-github/github-basics/pr-create.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/pr-create.png" alt={"Créer une nouvelle PR sur GitHub."} lang="fr" />
 
 Vous avez créé votre première PR ! C’est un excellent endroit pour revoir ce que cette demande ajoute au projet. Ici, vous pouvez revoir les commits, les fichiers et le code. Si vous travaillez avec d’autres personnes, vous pouvez les mentionner sur des lignes spécifiques pour discuter des modifications.
 
@@ -247,21 +247,21 @@ GitHub va vérifier que vous pouvez effectivement fusionner les deux branches et
 
 Ici, tout semble bon, donc vous pouvez cliquer sur le bouton `Merge pull request`, puis confirmer la fusion.
 
-![Créer une nouvelle PR sur GitHub.](/assets/git-and-github/github-basics/pr-merge.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/pr-merge.png" alt={"Créer une nouvelle PR sur GitHub."} lang="fr" />
 
 Une fois la fusion confirmée, les changements sont ajoutés à la branche `main` !
 
 GitHub va suggérer de supprimer la branche qu’on a créée. Vous pouvez la supprimer sans problème maintenant.
 
-![PR fusionnée et supprimer la branche.](/assets/git-and-github/github-basics/delete-branch.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/delete-branch.png" alt={"PR fusionnée et supprimer la branche."} lang="fr" />
 
 <Callout type="info" emoji="💡">
    Vous avez remarqué le bouton `Revert` ? Si vous avez fusionné quelque chose un peu trop vite et que vous voulez revenir en arrière, ce bouton est là pour ça ! Dans la leçon précédente, on l’a fait manuellement, mais avec GitHub, c’est plus simple grâce à l’interface des PR.
 </Callout>
 
-Si on regarde la page principale du dépôt, on voit que nos changements sont bien dans `main`. Vous pouvez consulter le fichier `main.ts` si vous êtes curieux. L’issue qu’on avait créée a été automatiquement fermée quand on a fusionné la PR. Pratique, non ? 🥳
+Si on regarde la page principale du dépôt, on voit que nos changements sont bien dans `main`. Vous pouvez consulter le fichier `sda/main.ts` si vous êtes curieux. L’issue qu’on avait créée a été automatiquement fermée quand on a fusionné la PR. Pratique, non ? 🥳
 
-![La page principale du dépôt avec les changements.](/assets/git-and-github/github-basics/changes-main.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/changes-main.png" alt={"La page principale du dépôt avec les changements."} lang="fr" />
 
 Tout ça s’est passé dans le nuage, sur la plateforme GitHub. Pour récupérer les changements dans votre dépôt local, commencez par vous replacer sur la branche `main` :
 - `git switch main`
@@ -283,7 +283,7 @@ Sur la page de votre dépôt, cliquez sur le bouton `<> Code`. C’est là que v
 
 Copiez l’URL.
 
-![La commande pour cloner un dépôt.](/assets/git-and-github/github-basics/clone-command.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/clone-command.png" alt={"La commande pour cloner un dépôt."} lang="fr" />
 
 Ensuite, créez un nouveau dossier avec le même nom que votre dépôt et ouvrez-le avec VS Code. Commencez à taper `git clone`, collez l’URL copiée (n’oubliez pas l’espace entre `clone` et l’URL), puis ajoutez un espace et un `.`.
 
@@ -294,11 +294,11 @@ Le point à la fin est important. Il indique à Git de cloner le dépôt dans le
 
 Et voilà, vous avez récupéré tout votre code.
 
-![Un dépôt cloné.](/assets/git-and-github/github-basics/cloned.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/cloned.png" alt={"Un dépôt cloné."} lang="fr" />
 
 Bien sûr, cloner est aussi très utile quand on collabore avec d’autres personnes. Elles peuvent facilement récupérer votre dernier code, avec toutes les branches et tous les commits.
 
-Une fois le dépôt cloné, l’étape suivante consiste généralement à installer toutes les dépendances avec `deno install`. Deno lit les fichiers `deno.json` et `deno.lock` pour installer les versions déclarées et verrouillées du projet.
+Après avoir cloné ce projet, exécutez `npm ci` pour installer les versions exactes des dépendances inscrites dans `package-lock.json`. Pour un autre projet sans fichier de verrouillage, utilisez plutôt `npm install`. Dans les projets créés avec `setup-data-project`, exécutez aussi `npm run docs` pour restaurer la documentation locale, qui est ignorée par Git.
 
 Et vous êtes prêt à continuer à travailler sur votre projet incroyable !
 
@@ -322,7 +322,7 @@ Le *forking* est au cœur de nombreuses contributions et collaborations en code 
 - Le propriétaire examine la PR et, s’il est satisfait, la fusionne.
 - La contribution fait désormais partie du projet, et tout le monde peut en bénéficier !
 
-## Ajouter un `.gitignore`
+## Modifier `.gitignore`
 
 Les gens peuvent cloner et *forker* vos dépôts, mais... que faire si vous avez quelque chose sur votre ordinateur que vous ne voulez pas partager ?
 
@@ -338,20 +338,20 @@ This is a very important password: potato. Don't share it.
 
 Si vous le *committer*, il sera dans l’historique Git **pour toujours**. Et bien sûr, vous ne voulez pas non plus le pousser.
 
-Dans ce genre de situations, vous devez ajouter un fichier `.gitignore` à votre projet. Si ce fichier existe, Git va le consulter et ignorer tous les dossiers ou fichiers listés dedans. Ils deviendront grisés dans votre projet, ce qui signifie qu’ils ne seront ni suivis, ni commités, ni poussés.
+L'outil de configuration a déjà créé `.gitignore`, qui exclut les paquets installés, `.env` et d'autres fichiers locaux. Git utilise ses règles pour ignorer les fichiers qui ne sont pas déjà suivis. Ces fichiers apparaissent grisés dans VS Code et sont exclus de `git add -A`. Ajouter un fichier déjà suivi à `.gitignore` ne le retire pas de Git ni de son historique.
 
-Ajoutez `password.txt` dedans.
+Ouvrez le fichier `.gitignore` existant et ajoutez `password.txt` sur sa propre ligne. Conservez toutes les règles générées par l'outil de configuration.
 
-![Ajout d’un fichier gitignore.](/assets/git-and-github/github-basics/gitignore.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/gitignore.png" alt={"Ajout d’un fichier gitignore."} lang="fr" />
 
-Maintenant, le fichier `password.txt` sera bien ignoré, mais il faut quand même *committer* et pousser votre nouveau fichier `.gitignore` :
+Maintenant, le fichier `password.txt` sera bien ignoré, mais il faut quand même *committer* et pousser votre fichier `.gitignore` modifié :
 - `git add -A`
-- `git commit -m "Adding .gitignore"`
+- `git commit -m "Ignore password.txt"`
 - `git push`
 
-Sur la page de votre dépôt, vous pouvez maintenant voir votre `.gitignore`, mais le fichier `password.txt` a bien été ignoré et ne fait pas partie du projet !
+Sur la page de votre dépôt, vous pouvez maintenant voir le `.gitignore` modifié, tandis que `password.txt` reste local et ne fait pas partie du dépôt !
 
-![Un fichier gitignore a été ajouté au dépôt.](/assets/git-and-github/github-basics/repo-gitignore.png)
+<OutdatedScreenshot src="/assets/git-and-github/github-basics/repo-gitignore.png" alt={"Un fichier gitignore a été ajouté au dépôt."} lang="fr" />
 
 <Callout type="info" emoji="💡">
    Si vous avez *committé* et poussé par erreur des informations sensibles (comme beaucoup d’entre nous 😬), [suivez ces étapes](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository) !

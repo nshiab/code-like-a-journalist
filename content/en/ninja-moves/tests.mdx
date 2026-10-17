@@ -19,12 +19,14 @@ In this lesson, we will code a simple function to calculate percentages and we w
 
 ## Setup
 
-We will use Deno and VS Code in this lesson. Let's create a simple file structure.
+Create a new folder, open it in VS Code, and use the latest Node.js LTS. In the terminal, run `npx @nshiab/setup-data-project` and choose no optional libraries. This creates the same project structure and tools as in the [setup lesson](/first-steps/setup).
 
-Create a new folder `helpers` and put the `getPercentage.ts` file inside it with this code. It's the function we want to test. It expects two numbers and returns the percentage as a string.
+We will write our script in `sda/main.ts`. Run `npm run sda` to execute it and rerun it automatically when you save changes. Run `npm run all-tests` to check formatting, lint rules, types, and tests; `npm run fix` can apply automatic formatting and lint fixes.
+
+Use the `sda/helpers` folder (create it if needed) and put the `getPercentage.ts` file inside it with this code. It's the function we want to test. It expects two numbers and returns the percentage as a string.
 
 
-```ts showLineNumbers filename="helpers/getPercentage.ts"
+```ts showLineNumbers filename="sda/helpers/getPercentage.ts"
 export default function getPercentage(
     current: number,
     total: number,
@@ -34,63 +36,63 @@ export default function getPercentage(
 }
 ```
 
-Now create a `main.ts` file and use the function.
+Update `sda/main.ts` to use the function.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 import getPercentage from "./helpers/getPercentage.ts";
 
 console.log(getPercentage(50, 100));
 ```
 
-From here, you can execute the script with `deno main.ts`.
+The running `npm run sda` command executes the script when you save it.
 
 Everything looks fine! The function returns `50%` as expected.
 
-![A main script logging a value in the terminal.](/assets/ninja-moves/tests/setup.png)
+<OutdatedScreenshot src="/assets/ninja-moves/tests/setup.png" alt={"A main script logging a value in the terminal."} lang="en" />
 
 ## Creating tests
 
 Is our function really working as expected? Let's check!
 
-First, install the [@std/assert](https://jsr.io/@std/assert) standard library with: `deno add jsr:@std/assert`. We will use it to compare the returned values of our function with what we expect them to be.
+Our generated project already includes [Vitest](https://vitest.dev/guide/) through Vite+. We will use `test` to describe each test and `expect(...).toBe(...)` to compare what our function returns with what we expect. There is nothing else to install!
 
 Now, let's create the test file. One way to keep tests organized in a project is to keep the same file structure for the tests as for the rest of the code.
 
-Here, we could create a new folder `tests` with a new file `getPercentage.test.ts` in it. Note that this file is a regular TypeScript file since it ends with `.ts`. But because we added `.test` just before the extension, Deno now knows this is a test.
+Here, we could create a folder `sda/tests` with a new file `getPercentage.test.ts` in it. Note that this file is a regular TypeScript file since it ends with `.ts`. The `.test` part lets Vitest recognize it as a test file.
 
 Here's what the code below does:
-- `Deno.test` creates a new test.
+- `test` creates a new test.
 - The first parameter is a description of the test.
-- The second parameter is a function. We run what we want in it (here `getPercentage`) and we check that the result is what we expect with `assertEquals`.
+- The second parameter is a function. We run what we want in it (here `getPercentage`) and we check that the result is what we expect with `expect(...).toBe(...)`.
 - If the result is what is expected, the test will pass. Otherwise, it will fail!
 
-```ts showLineNumbers filename="tests/getPercentage.test.ts"
-import { assertEquals } from "@std/assert";
+```ts showLineNumbers filename="sda/tests/getPercentage.test.ts"
+import { test, expect } from "vitest";
 import getPercentage from "../helpers/getPercentage.ts";
 
-Deno.test("should return 50% for 50 out of 100", () => {
+test("should return 50% for 50 out of 100", () => {
   const result = getPercentage(50, 100);
-  assertEquals(result, "50%");
+  expect(result).toBe("50%");
 });
 ```
 
 ## Running tests
 
-To run tests with Deno, you can simply run `deno test`. Deno will look for all `.test.ts` files in the project and run them.
+Run `npm run all-tests`. This checks formatting, lint rules, and TypeScript types, then runs the project's tests. If a formatting or lint check fails, run `npm run fix`, review the changes, and try again.
 
-You can also run just one test file if you want. For example, here it would be `deno test tests/getPercentage.test.ts`.
+<OutdatedScreenshot src="/assets/ninja-moves/tests/run-tests.png" alt={"Running tests with Deno."} lang="en" />
 
-If you need to fetch something over the internet, or to read/write files, remember to pass the appropriate permissions. To authorize everything, you can use this command: `deno test -A`.
+While writing code, it's convenient to rerun a single test file automatically whenever it or its dependencies change. Use:
 
-![Running tests with Deno.](/assets/ninja-moves/tests/run-tests.png)
+```sh
+npx vp test sda/tests/getPercentage.test.ts --watch
+```
 
-However, it's not convenient to rerun this command every time you update your code. Like we saw in other lessons, it would be better to watch files and rerun the tests automatically.
+Keep that command running for the rest of the lesson. Press `CTRL` + `C` to stop it. The watch command runs tests; `npm run all-tests` also runs the other project checks, so use it again before finishing your changes.
 
-To do so, you can use the watch option: `deno test --watch`. Run this command and keep it running for the rest of the lesson.
+The [Vitest documentation](https://vitest.dev/guide/) explains more options.
 
-There are a lot of other options as explained [in the documentation](https://docs.deno.com/runtime/fundamentals/testing/). Another one that I use a lot is `--fail-fast`, which stops running all the tests as soon as one fails.
-
-![Watching tests with Deno.](/assets/ninja-moves/tests/watch-tests.png)
+<OutdatedScreenshot src="/assets/ninja-moves/tests/watch-tests.png" alt={"Watching tests with Deno."} lang="en" />
 
 ## Adding tests
 
@@ -102,34 +104,34 @@ For example, what is supposed to happen when the first number is `0`? And when t
 
 Copy and paste the code below. When you save the modified file, the tests will be automatically rerun.
 
-```ts showLineNumbers filename="tests/getPercentage.test.ts" {9-17}
-import { assertEquals } from "@std/assert";
+```ts showLineNumbers filename="sda/tests/getPercentage.test.ts" {9-17}
+import { test, expect } from "vitest";
 import getPercentage from "../helpers/getPercentage.ts";
 
-Deno.test("should return 50% for 50 out of 100", () => {
+test("should return 50% for 50 out of 100", () => {
   const result = getPercentage(50, 100);
-  assertEquals(result, "50%");
+  expect(result).toBe("50%");
 });
 
-Deno.test("should return 0% for 0 out of 100", () => {
+test("should return 0% for 0 out of 100", () => {
   const result = getPercentage(0, 100);
-  assertEquals(result, "0%");
+  expect(result).toBe("0%");
 });
 
-Deno.test("should return 0% for 1 out of 0", () => {
+test("should return 0% for 1 out of 0", () => {
   const result = getPercentage(1, 0);
-  assertEquals(result, "0%");
+  expect(result).toBe("0%");
 });
 ```
-![A test failed.](/assets/ninja-moves/tests/fail.png)
+<OutdatedScreenshot src="/assets/ninja-moves/tests/fail.png" alt={"A test failed."} lang="en" />
 
 We can see that the second test passed but the third one failed!
 
-When the `total` is `0`, our function is returning `Infinity` instead of what we want, which is `0%`.
+When the `total` is `0`, our function is returning `Infinity%` instead of what we want, which is `0%`.
 
 Let's update our `getPercentage.ts` to fix that. Copy and paste the code below. When you save the file, the tests will rerun automatically.
 
-```ts showLineNumbers filename="helpers/getPercentage.ts" {5-7, 10}
+```ts showLineNumbers filename="sda/helpers/getPercentage.ts" {5-7, 10}
 export default function getPercentage(
   current: number,
   total: number,
@@ -147,7 +149,7 @@ And now, we can see that the third test passed.
 
 We also know that the previous behavior is still there because the first two tests passed too!
 
-![All tests passed.](/assets/ninja-moves/tests/all-passed.png)
+<OutdatedScreenshot src="/assets/ninja-moves/tests/all-passed.png" alt={"All tests passed."} lang="en" />
 
 ## Automated tests
 

@@ -1,6 +1,6 @@
 ---
 title: Publishing a TypeScript library
-description: In this lesson, we learn how to publish a TypeScript library with Deno and JSR
+description: In this lesson, we learn how to test, compile, and publish a TypeScript library with Node.js and npm.
 ---
 
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
@@ -9,60 +9,58 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 Do you have bits of code that you keep copying and pasting from one project to another? If so, it probably means you should create a library!
 
-In this lesson, I'll show you how to create an open-source library with [Deno](https://deno.com/) and [JSR](https://jsr.io/). It's incredibly easy since Deno and JSR can test, build, and publish both your code and documentation.
+In this lesson, I'll show you how to create an open-source library with Node.js and publish it on [npm](https://www.npmjs.com/). We'll write TypeScript, test it, and compile it into JavaScript with type declarations so other projects can use it.
 
-Note that I’m assuming you've completed the previous lessons, especially these:
+I'm assuming you've completed the previous lessons, especially these:
+
 - [Using libraries](/pushing-further/libraries)
 - [Understanding library versions](/ninja-moves/semver)
 - [Using tests in your projects](/ninja-moves/tests)
 
 <NoticeIntro />
 
-## Creating a JSR account and package
+## Creating an npm account and project
 
-JSR is the TypeScript registry where we will publish our library. It’s [open source](https://github.com/jsr-io/jsr) and free to use. It's maintained by the same team as Deno.
+npm is the package registry where we will publish our library. Start by [creating an npm account](https://www.npmjs.com/signup). For the manual publishing workflow in this lesson, enable [two-factor authentication](https://docs.npmjs.com/configuring-two-factor-authentication) on your account.
 
-First, [create an account on the platform](https://jsr.io/). You can link your GitHub account to it for convenience.
+Our package will be named `@your-username/my-first-library`. The part before the slash is called a **scope**. Replace `your-username` with your npm username throughout this lesson, and choose a package name that is available in your scope.
 
-![JSR homepage.](/assets/ninja-moves/publishing-library/jsr.png)
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/jsr.png" alt={"JSR homepage."} lang="en" />
 
-Next, click on `Publish a package`.
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/publish-button.png" alt={"JSR publish button."} lang="en" />
 
-![JSR publish button.](/assets/ninja-moves/publishing-library/publish-button.png)
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/scope.png" alt={"JSR library name."} lang="en" />
 
-You can then choose a `scope` (by default, it's your GitHub username) and a name for your library. Here I wrote `my-first-library`.
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/config.png" alt={"JSR library config."} lang="en" />
 
-Hit `Create`.
+The project generator used elsewhere in the course prepares data analysis projects. Here, we will configure a small standalone library so we can control the files npm distributes. Create a new folder and open it in VS Code. Use the latest Node.js LTS, then initialize the project in its terminal:
 
-![JSR library name.](/assets/ninja-moves/publishing-library/scope.png)
+```sh
+npm init -y
+npm install --save-dev typescript @types/node vitest
+```
 
-Keep the next page open for now.
-
-![JSR library config.](/assets/ninja-moves/publishing-library/config.png)
+In `package.json`, set `"type": "module"` so our code uses ES modules. We'll finish the rest of this file shortly.
 
 ## Coding the library
 
-It's time to write some code! In this project, we’re going to reuse some of the code from the previous lesson [Using tests in your projects](/ninja-moves/tests).
+It's time to write some code! We'll reuse the percentage function from the [tests lesson](/ninja-moves/tests), with rounding added.
 
-Create a new folder and open it in VS Code.
+Create a `functions` folder and a `getPercentage.ts` file with the code and documentation below. The comment above the function is **JSDoc**: editors can display it when someone uses the function.
 
-Then, create a `functions` folder and a `getPercentage.ts` file with the code and documentation below.
-
-
-```ts showLineNumbers filename="functions/getPercentage.ts"
+````ts showLineNumbers filename="functions/getPercentage.ts"
 /**
- * Calculates a percentage and returns it as a string formatted with a percentage sign ("%").
+ * Calculates a percentage, rounds it, and adds a percentage sign ("%").
  *
  * @example
- * Basic usage
  * ```ts
  * getPercentage(50, 200); // "25%"
- * getPercentage(0, 0);    // "0%"
+ * getPercentage(0, 0);   // "0%"
  * ```
  *
- * @param current - The current value to calculate the percentage for.
+ * @param current - The value to calculate the percentage for.
  * @param total - The total value to calculate the percentage against.
- * @returns A string representing the percentage. If `total` is 0, returns "0%".
+ * @returns The rounded percentage, or "0%" if total is zero.
  */
 export default function getPercentage(
   current: number,
@@ -75,14 +73,11 @@ export default function getPercentage(
     return `${percentage}%`;
   }
 }
-```
+````
 
-Create also an `index.ts` file. This will be the entry point of your library. When someone wants to use your library, this is the file they'll import from.
+Create an `index.ts` file at the root of the project. This will be the entry point of your library. We import our function and re-export it with a name, so people can use `import { getPercentage } from "..."`.
 
-In this file, we’re just going to import our `getPercentage` function and re-export it. This is convenient because if you have many classes, functions, or other items to publish in your library, you can gather and export them all from here.
-
-For example, here are all the functions exported in my [journalism library](https://github.com/nshiab/journalism/blob/main/src/index.ts).
-
+If your library grows, you can gather its public functions and classes here.
 
 ```ts showLineNumbers filename="index.ts"
 import getPercentage from "./functions/getPercentage.ts";
@@ -90,252 +85,272 @@ import getPercentage from "./functions/getPercentage.ts";
 export { getPercentage };
 ```
 
-Testing your code is critical before publishing it. Let’s reuse the test from the [Using tests in your projects](/ninja-moves/tests) lesson.
-
-Create a `tests` folder and add a `getPercentage.test.ts` file inside it.
-
+Testing your code is critical before publishing it. Create a `tests` folder and add a `getPercentage.test.ts` file. We'll import from the entry point to test what the library exports.
 
 ```ts showLineNumbers filename="tests/getPercentage.test.ts"
-import { assertEquals } from "@std/assert";
-import getPercentage from "../functions/getPercentage.ts";
+import { test, expect } from "vitest";
+import { getPercentage } from "../index.ts";
 
-Deno.test("should return 50%", () => {
-  assertEquals(getPercentage(50, 100), "50%");
+test("should return 50%", () => {
+  expect(getPercentage(50, 100)).toBe("50%");
 });
-Deno.test("should return 33%", () => {
-  assertEquals(getPercentage(33.333, 100), "33%");
+test("should round to 33%", () => {
+  expect(getPercentage(33.333, 100)).toBe("33%");
 });
-Deno.test("should return 0%", () => {
-  assertEquals(getPercentage(0, 100), "0%");
+test("should return 0% for a zero current value", () => {
+  expect(getPercentage(0, 100)).toBe("0%");
 });
-Deno.test("should return 0%", () => {
-  assertEquals(getPercentage(1, 0), "0%");
+test("should return 0% for a zero total", () => {
+  expect(getPercentage(1, 0)).toBe("0%");
 });
 ```
 
-Finally, install the [@std/assert](https://jsr.io/@std/assert) standard library with: `deno add jsr:@std/assert`.
+Run `npx vitest run tests/getPercentage.test.ts`. All four tests should pass! We use the same test syntax as in the generated projects.
 
-Now, if you run `deno test`, everything should run smoothly.
+## Configuring TypeScript
 
-We mustn’t forget to add the fields recommended by JSR to our `deno.json`. I copied and pasted them from the web page I told you to keep open earlier.
+Node can run our TypeScript source directly, but it doesn't check the types and doesn't compile our library for distribution. We'll use the TypeScript compiler for those tasks.
 
-Here’s what we are adding:
-- The name of the library
-- The version number (check the lesson [Understanding library versions](/ninja-moves/semver) for more)
-- The license, which is [MIT](https://opensource.org/license/mit) here. It’s a common license for open-source libraries, but you can change it if you want.
-- What the library should export. Since our entry point is `./index.ts`, I just replaced `./mod.ts` with it.
+Create `tsconfig.json` to check our library and its tests:
 
-
-```json showLineNumbers filename="deno.json" {2-5}
+```json showLineNumbers filename="tsconfig.json"
 {
-  "name": "@nshiab/my-first-library",
+  "compilerOptions": {
+    "noEmit": true,
+    "target": "esnext",
+    "module": "nodenext",
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "types": ["node"]
+  },
+  "include": ["index.ts", "functions/**/*.ts", "tests/**/*.ts"]
+}
+```
+
+Run `npx tsc --noEmit`. This checks our source and tests without creating output files.
+
+Now create a second configuration for the build. It extends the first one, enables output, and limits compilation to the code we want to distribute:
+
+```json showLineNumbers filename="tsconfig.build.json"
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "noEmitOnError": true,
+    "declaration": true,
+    "rootDir": ".",
+    "outDir": "./dist"
+  },
+  "include": ["index.ts", "functions/**/*.ts"],
+  "exclude": ["tests", "dist", "node_modules"]
+}
+```
+
+Run `npx tsc -p tsconfig.build.json`. You should see a new `dist` folder containing:
+
+```text
+dist/
+  index.js
+  index.d.ts
+  functions/
+    getPercentage.js
+    getPercentage.d.ts
+```
+
+The `.js` files are the executable code. The `.d.ts` files describe its types for TypeScript users. The compiler preserves our JSDoc in the declarations, so readers still get help from their editor. See [TypeScript's guide to publishing declarations](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html).
+
+The [`rewriteRelativeImportExtensions` option](https://www.typescriptlang.org/tsconfig/rewriteRelativeImportExtensions.html) changes relative `.ts` imports into `.js` imports in the output. Open `dist/index.js` to see the difference!
+
+We publish this compiled output because Node does not strip TypeScript types from packages inside `node_modules`. Our library can also be used by JavaScript projects without making them compile our source.
+
+## Preparing the package
+
+Update `package.json` with the fields below. **Keep the `devDependencies` section created by npm** in addition to these fields; its version numbers depend on when you installed TypeScript, `@types/node`, and Vitest.
+
+```json showLineNumbers filename="package.json"
+{
+  "name": "@your-username/my-first-library",
   "version": "0.1.0",
+  "description": "A small helper for rounded percentages",
+  "type": "module",
   "license": "MIT",
-  "exports": "./index.ts",
-  "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.19"
+  "files": ["dist"],
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "vitest run tests/getPercentage.test.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run check && npm test && npm run build"
   }
 }
 ```
 
-Since this lesson is focused on publishing the library, I won't push this code to GitHub. But in a real-life scenario, **I strongly encourage you to save your code somewhere in the cloud**! Feel free to check the [GitHub lesson](/git-and-github/github-basics) for more.
+Here's what these settings do:
 
-## Publishing the library
+- `name`, `version`, and `description` identify the library. See the [SemVer lesson](/ninja-moves/semver) for version numbers.
+- `license` declares the license. Here we chose [MIT](https://opensource.org/license/mit); add its text in a `LICENSE` file, with your name and the year.
+- `files` limits the published code to `dist`. npm also includes files such as `package.json`, `README.md`, and `LICENSE`.
+- `exports` points imports to our compiled entry point and gives TypeScript the declarations. This example publishes an ES module.
+- `scripts` gives us convenient commands and runs checks, tests, and the build automatically before `npm publish`. See the [npm lifecycle documentation](https://docs.npmjs.com/cli/v11/using-npm/scripts).
 
-Before uploading anything, run `deno publish --dry-run`. Deno will type-check the public API and apply JSR's package validations without publishing. Fix any reported errors before continuing.
+If `npm init` created a `"main": "index.js"` field, remove it: our entry point is described by `exports`. If you copied `"private": true` from an analysis project, remove it too when you intend to publish; that setting blocks publication.
 
-When the dry run succeeds, run `deno publish`!
+Create `README.md` to explain the package and show how to use it. npm displays this file on the package page.
 
-A webpage should automatically open in a web browser. If not, click on the link in the terminal.
+````md showLineNumbers filename="README.md"
+# My first library
 
-![Publishing the library.](/assets/ninja-moves/publishing-library/deno-publish.png)
+A helper created as part of the [Code Like a Journalist](https://www.code-like-a-journalist.com/en) course.
 
-JSR will ask to authorize the publication of the library. It’s also an opportunity to ensure the version is the correct one.
+## Installation
 
-![Authorizing the library.](/assets/ninja-moves/publishing-library/authorization.png)
+```sh
+npm install @your-username/my-first-library
+```
 
-After a few seconds, you’ll be redirected to... your library’s page! It’s now live!
+## Usage
 
-If you click on the `Docs` tab, you’ll see your function `getPercentage`.
+```ts
+import { getPercentage } from "@your-username/my-first-library";
 
-![The library's docs.](/assets/ninja-moves/publishing-library/docs.png)
+getPercentage(50, 200); // "25%"
+getPercentage(0, 0);   // "0%"
+```
+````
 
-If you click on the function, you'll be redirected to its page, with the JSDoc we wrote in its file! Now, anyone can use your code, and JSR automatically published the code and the documentation for the whole world to see! Isn’t that amazing? 🤩
+npm displays the README, but doesn't generate a browsable API reference from JSDoc for us. For a larger library, you can build a separate documentation site.
 
-![The getPercentage documentation.](/assets/ninja-moves/publishing-library/getPercentage.png)
+I strongly encourage you to save the source and both npm configuration files in Git! See the [GitHub lesson](/git-and-github/github-basics). Add `node_modules/` and `dist/` to `.gitignore`: they can be recreated with `npm ci` and `npm run build`.
 
-## Importing and using the library
+## Checking the package locally
 
-With the library now published, we can install it in any project we want, just like any of the others we used in previous lessons!
+Before uploading anything, run:
 
-Create another folder and open it with VS Code.
+```sh
+npm run check
+npm test
+npm run build
+npm pack --dry-run
+```
 
-Then run something similar to `deno add jsr:@nshiab/my-first-library`, but with your username and library name, as suggested on JSR. You’ll see your library imported in a `deno.json`.
+Inspect the file list. It should contain the JavaScript, declarations, package metadata, README, and license. The tests and TypeScript source don't need to be shipped in this example. See the [npm package contents documentation](https://docs.npmjs.com/cli/v11/commands/npm-publish#files-included-in-package).
 
-Create a new `main.ts` with the code below. Again, replace `@nshiab/my-first-library` with yours.
+To try the **actual package** locally, run `npm pack`. This creates an archive such as `your-username-my-first-library-0.1.0.tgz` without publishing it.
 
-Since your library exports `getPercentage` in its entry point, it’s available to be imported!
+Create a separate project folder, initialize it with `npm init -y`, set `"type": "module"` in its `package.json`, and install that archive using its full path:
 
+```sh
+npm install /full/path/to/your-username-my-first-library-0.1.0.tgz
+```
+
+Create `main.ts` with this code:
 
 ```ts showLineNumbers filename="main.ts"
-import { getPercentage } from "@nshiab/my-first-library";
+import { getPercentage } from "@your-username/my-first-library";
 
 const percentage = getPercentage(20, 100);
 console.log(percentage);
 ```
 
-And now, if you run `deno run main.ts`, you'll see your function being called and returning the right output!
+Run `node main.ts`. You should see `20%`! This checks that the compiled entry point works for a consumer, too. You can add the usual TypeScript project configuration here if you want to check the types.
 
-Don't delete this project's folder for now. We'll come back to it.
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/importing.png" alt={"Importing and using the library."} lang="en" />
 
-![Importing and using the library.](/assets/ninja-moves/publishing-library/importing.png)
+## Publishing the library
 
-## Testing before publishing
+Back in the library folder, run `npm login` and follow its browser sign-in flow. `npm whoami` lets you confirm which account you're using. See the [npm login documentation](https://docs.npmjs.com/cli/v11/commands/npm-login).
 
-What we did is already amazing: we created reusable and documented code.
+Preview the publication with `npm publish --dry-run --access public`. It runs the `prepublishOnly` checks but doesn't upload the package.
 
-But it’s very important to run our tests **before** publishing. Trust me: you need to resist the urge to publish too quickly! Too often I told myself, “This is just a tiny change, I can publish directly,” only to end up with a broken version of the library live.
+When you're ready to share it publicly, run:
 
-We already have tests in place. Let’s create a `test-publish` task in `deno.json` to run them before publishing. If you don’t know what tasks are, check the [Running tasks](/pushing-further/tasks) lesson.
-
-While we're at it, we can also chain a few commands to make sure our code is well formatted (`deno fmt --check`) and that our types are correct (`deno check`). Using `--check` verifies formatting without changing files during publication.
-
-So now, instead of running `deno publish` directly, we would run `deno task test-publish`. If there’s a problem with our types or tests, Deno will stop and won’t publish the library.
-
-```json showLineNumbers filename="deno.json" {2-4}
-{
-  "tasks": {
-    "test-publish": "deno fmt --check && deno check index.ts && deno test && deno publish"
-  },
-  "name": "@nshiab/my-first-library",
-  "version": "0.1.0",
-  "license": "MIT",
-  "exports": "./index.ts",
-  "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.19"
-  }
-}
+```sh
+npm publish --access public
 ```
+
+Complete any authentication prompt. The `--access public` flag explicitly publishes our scoped package publicly. This manual workflow uses your account's two-factor authentication; the [npm publishing guide](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages) explains the current requirements.
+
+Once it succeeds, visit `https://www.npmjs.com/package/@your-username/my-first-library` with your actual username. Your code is available for others to install, and your README explains how to use it! 🤩
+
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/deno-publish.png" alt={"Publishing the library."} lang="en" />
+
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/authorization.png" alt={"Authorizing the library."} lang="en" />
+
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/docs.png" alt={"The library's docs."} lang="en" />
+
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/getPercentage.png" alt={"The getPercentage documentation."} lang="en" />
+
+In the consumer project, you can now install from the registry instead of the local archive:
+
+```sh
+npm install @your-username/my-first-library@0.1.0
+```
+
+The import in `main.ts` stays the same. Keep this project: we'll use it again after publishing an update.
 
 ## Publishing a new version
 
-Let’s update our project and publish a new version.
+Trust me: resist the urge to publish too quickly! A tiny change can break a library. Our `prepublishOnly` script helps by running checks and tests before each publication.
 
-Right now, there is nothing on the library’s main page on JSR. We’re missing a `README.md`. This is just some text to tell everyone what the library is about.
+Let's make a small update. Add a sentence to your README explaining that percentages are rounded to the nearest whole number, then increase the version:
 
-Create a new `README.md` file in your project with the following text in it.
-
-```md showLineNumbers filename="README.md"
-This is my first library published on JSR, created as part of the
-[Code Like a Journalist](https://www.code-like-a-journalist.com/en) course.
-
-If you’d like to learn how to publish your own TypeScript library, check out the lesson:
-[Publishing a TypeScript Library](https://www.code-like-a-journalist.com/en/ninja-moves/publishing-library).
+```sh
+npm version patch --no-git-tag-version
 ```
 
-In our `deno.json`, let’s update the version. Since this is a tiny change, I suggest updating it to `0.1.1`.
+This changes `0.1.0` to `0.1.1` in `package.json` and updates `package-lock.json`. Here, `--no-git-tag-version` lets us manage the Git commit and tag separately. You could use `minor` or `major` for larger changes, as explained in the [SemVer lesson](/ninja-moves/semver).
 
-```json showLineNumbers filename="deno.json" /"0.1.1"/
-{
-  "tasks": {
-    "test-publish": "deno fmt --check && deno check index.ts && deno test && deno publish"
-  },
-  "name": "@nshiab/my-first-library",
-  "version": "0.1.1",
-  "license": "MIT",
-  "exports": "./index.ts",
-  "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.19"
-  }
-}
-```
+Run `npm publish --dry-run --access public` and inspect the result. When you're ready, run `npm publish --access public` again. npm runs our checks before uploading the new version! 🥳
 
-And now we use our new task `test-publish` to republish our library: `deno task test-publish`.
+A published name and version cannot be reused, so corrections need a new version number. Your package page should now show `0.1.1` and the updated README.
 
-You can see that the checks and tests are run before publishing now! 🥳
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/new-version.png" alt={"New version published."} lang="en" />
 
-Approve the publication like before, and after a few seconds, you’ll see your library page updated with the content of your `README`!
+## Updating the consumer project
 
-You can also see that the latest version is now `0.1.1`.
+In the project that uses the library, run `npm outdated`. Look at `Current` (installed), `Wanted` (allowed by `package.json`), and `Latest` (marked `latest` on npm).
 
-![New version published.](/assets/ninja-moves/publishing-library/new-version.png)
+If `package.json` allows `^0.1.0`, `npm update @your-username/my-first-library` can install `0.1.1`. It updates the installed package and lockfile while keeping that range. To choose a version explicitly and update the dependency entry, run `npm install @your-username/my-first-library@0.1.1`.
 
-## Updating to a new version in a project
+Check that `node main.ts` still works. In a larger project, run your type checks and tests too. Of course, this particular update only changed documentation, but now you know the whole workflow. 🤓
 
-A new version of our library has been published! It's time to update the project using it.
+## Automating publication
 
-To be totally honest, we wouldn't really need to update in a real-case scenario… it’s just the README that has been added! But I want to show you how to easily update dependencies. 🤓
+If you plan to update your library often, you can automate the checks and publication with GitHub Actions. One possible workflow is:
 
-In the project using the library, run `deno outdated`. Deno will check all JSR and NPM library versions used in your project and let you know if you’re behind on any.
+1. Create an issue for a bug or feature, then work on a branch.
+2. Add tests for the change and open a pull request.
+3. Run type checks, tests, and the build in GitHub Actions before merging.
+4. Update the package version and save that change in Git.
+5. Trigger a publishing workflow for a release or Git tag.
 
-Here’s a description of the columns:
-- `Current` is the version installed in your project
-- `Update` is the version Deno suggests installing. It might not be the latest if you used `^` or `~` for the range of acceptable versions in your `deno.json`. Check the [Understanding library versions](/ninja-moves/semver) lesson for more.
-- `Latest` is the latest available version.
+For the last step, look into [npm trusted publishing](https://docs.npmjs.com/trusted-publishers). It lets supported CI environments authenticate without storing a long-lived npm token. Configure it for your repository and workflow according to npm's documentation.
 
-If you want to update your library, you could do it manually with `deno add jsr:@nshiab/my-first-library@0.1.1`.
+The [GitHub lesson](/git-and-github/github-basics) and [GitHub Actions lesson](/git-and-github/github-actions) will help you get there. Manual publishing is already a useful starting point!
 
-But when you have a lot of libraries to update, run `deno update`. By default, it respects the version ranges in `deno.json`. Use `deno update --latest` only when you intentionally want to move beyond those ranges, including to a new major version.
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/settings.png" alt={"Library settings."} lang="en" />
 
-And done! We just updated and we’re now using our new version!
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/score.png" alt={"The library score."} lang="en" />
 
-## Advanced configuration
+<OutdatedScreenshot src="/assets/ninja-moves/publishing-library/release.png" alt={"Release."} lang="en" />
 
-We used the default JSR settings for our library, but there are some options available if you click on the `Settings` tab.
+## Private packages
 
-In the settings, you can add more information about your library, like a short description for anyone using the JSR search engine. Note that you can also make it unlisted, so it won't be discoverable through search. You can also select which runtime you’ve tested your library on (Deno, Node.js, Bun, etc.).
+Within a company, a private library can be useful for sharing tested code among teammates. npm also supports [private packages](https://docs.npmjs.com/creating-and-publishing-private-packages), with account and access requirements described in its documentation.
 
-If your library is outdated, broken, and you don't want to maintain it anymore, you can archive it.
-
-![Library settings.](/assets/ninja-moves/publishing-library/settings.png)
-
-There is also an option to link the library to a GitHub repository. Doing so enables automatic publishing of your library with GitHub Actions.
-
-It involves a bit more configuration, but it could be interesting if you plan to update your library often and want to automate the process.
-
-If you’d like to go down that route, these lessons will be helpful:
-- [How to use GitHub?](/git-and-github/github-basics)
-- [How to use GitHub Actions?](/git-and-github/github-actions)
-
-For example, here's my workflow to publish a new version of the [Simple-Data-Analysis](https://github.com/nshiab/simple-data-analysis) library:
-
-1. I create a [new issue](https://github.com/nshiab/simple-data-analysis/issues) when there’s a bug to fix or a new feature to add.
-
-2. From the issue, I create a branch and work on it. I make sure to add new [tests](https://github.com/nshiab/simple-data-analysis/tree/main/test/unit/methods) to cover the fix or new feature.
-
-3. I create a pull request to merge the branch into `main`. I have a [GitHub Actions workflow](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml) that runs the tests. If all checks and tests pass, the pull request is accepted and merged.
-
-4. When I’m ready to publish a new version (often after a few pull requests), I run one of the `patch`, `minor`, or `major` tasks locally, as defined in the repository's [`deno.json`](https://github.com/nshiab/simple-data-analysis/blob/main/deno.json).
-
-5. These tasks run all checks, then call the [`@nshiab/bump-version`](https://jsr.io/@nshiab/bump-version) tool. It updates `deno.json`, commits and pushes the change, creates a [Git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), and pushes the tag to GitHub.
-
-6. When a new tag is pushed to GitHub, two workflows are triggered: [one to publish](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/jsr-publish.yml) the library on JSR, and another to [create a release](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/release.yml) on GitHub with a summary of all the changes from the approved pull requests.
-
-I like this workflow because it keeps everything in sync, saves me a lot of typing/clicking, and creates easy-to-read, useful releases. Here's the most recent one, for example, at the time of writing:
-
-![Release.](/assets/ninja-moves/publishing-library/release.png)
-
-Publishing to JSR directly from GitHub also certifies the provenance of the library, which helps increase its score.
-
-To be honest, the score isn’t that important. It mainly promotes best practices. If you plan to be the only user of your library, don’t worry too much about it. Manual publishing might be more than enough!
-
-![The library score.](/assets/ninja-moves/publishing-library/score.png)
-
-## Private registries
-
-Sometimes, you don’t want all your code to be public, even though I’d argue that in most cases, you probably should. But within a company, creating a private library can be incredibly useful for sharing code among teammates and reusing tested classes, functions, and methods across multiple projects.
-
-With NPM, [you can pay to use private registries](https://docs.npmjs.com/creating-and-publishing-private-packages).
-
-With JSR, you can [unlist your library](https://jsr.io/docs/private-registries) so that it doesn’t appear in search results, though it remains publicly accessible. JSR does not currently support private packages.
+A public package is accessible to everyone. Choose the appropriate access setting for the code you intend to share.
 
 ## Conclusion
 
-Publishing a TypeScript library has never been easier. Before moving all my libraries to JSR, I had them published on NPM.
-
-NPM is truly amazing, with millions upon millions of open-source libraries available to anyone. It's a big factor behind the success of JavaScript and TypeScript as programming languages. But publishing on it is more difficult and convoluted.
-
-With Deno and JSR, you can write, test, document, and publish libraries with a minimal and very efficient setup. So stop copying and pasting code and publish your library! 😎
+We now have reusable code, tests, editor documentation, and a package that JavaScript and TypeScript projects can import. So stop copying and pasting the same helper between projects and give it a library of its own! 😎
 
 You've completed the core course path. Use what you've learned to create data projects of your own.
 

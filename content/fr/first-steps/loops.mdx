@@ -13,18 +13,19 @@ Nous utilisons souvent les ordinateurs pour effectuer des tâches répétitives 
 
 Préparons notre environnement de travail pour cette leçon.
 
-Créez un nouveau dossier quelque part sur votre ordinateur, ouvrez-le avec VS Code, et créez deux fichiers :
+Utilisez le projet créé dans [Installation](/first-steps/setup), ou créez un nouveau dossier vide, ouvrez-le avec VS Code et exécutez `npx @nshiab/setup-data-project` sans sélectionner de librairie.
 
-- `main.ts`, où nous écrirons notre code. Pour commencer, vous pouvez ajouter `console.log("Hello!");` dedans.
-- `deno.json`, qui sert à configurer Deno et à activer son extension VS Code. Nous le laisserons vide pour l'instant.
+Remplacez le contenu de `sda/main.ts` par `console.log("Hello!");` et enregistrez.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez la commande suivante : `deno run --watch --check main.ts`
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis le dossier du projet qui contient `package.json`.
 
-Cette commande efface le terminal et réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+La surveillance relance le script ; elle ne vérifie pas les types. Utilisez `npm run all-tests` dans un deuxième terminal pour vérifier les types, le formatage et les règles de qualité du code et exécuter les tests éventuels. Utilisez `npm run fix` pour le formatage et les corrections automatiques, puis vérifiez à nouveau. Arrêtez la surveillance du script avec `CTRL` + `C`.
+
+`npm run sda` réexécute `sda/main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
 
 Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
 
-![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/first-steps/loops/setup.png)
+<OutdatedScreenshot src="/assets/first-steps/loops/setup.png" alt={"Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript."} lang="fr" />
 
 ## Avec les listes
 
@@ -32,7 +33,7 @@ Disons que nous avons dix nombres (de 1 à 10), que nous voulons multiplier chac
 
 Nous pourrions écrire ce code :
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 console.log(1, "=>", 1 * 2);
 console.log(2, "=>", 2 * 2);
 console.log(3, "=>", 3 * 2);
@@ -53,7 +54,7 @@ Pour créer une boucle, vous commencez par `for`, suivi des paramètres de la bo
 
 Réécrivons notre code, mais cette fois avec une liste et une boucle `for`.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 // D'abord, créez une liste de nombres.
 // Ajoutez ou retirez des éléments dans la liste et enregistrez.
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -68,7 +69,7 @@ for (const n of numbers) {
 }
 ```
 
-![Une capture d'écran montrant VS Code exécutant une boucle for-of.](/assets/first-steps/loops/for-of-loop.png)
+<OutdatedScreenshot src="/assets/first-steps/loops/for-of-loop.png" alt={"Une capture d'écran montrant VS Code exécutant une boucle for-of."} lang="fr" />
 
 Si l'ordinateur pouvait parler 🤖, voici ce qu'il dirait en exécutant ce script :
 - Lignes 1-2 : Ce ne sont que des commentaires pour les humains. Je les ignore.
@@ -102,13 +103,13 @@ Ces expressions doivent être séparées par des `;` dans les `()`.
 
 Le résultat est une boucle commençant avec `i = 0` et s'arrêtant lorsque `i` atteint 999 999. Comme `i` s'incrémente de 1 à chaque itération, cette boucle s'exécute 1 000 000 de fois.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 for (let i = 0; i < 1_000_000; i++) {
   console.log(i, "Hello!");
 }
 ```
 
-![Une capture d'écran montrant VS Code exécutant une boucle for.](/assets/first-steps/loops/for-loop.png)
+<OutdatedScreenshot src="/assets/first-steps/loops/for-loop.png" alt={"Une capture d'écran montrant VS Code exécutant une boucle for."} lang="fr" />
 
 Vous venez de demander à votre ordinateur de faire quelque chose UN MILLION DE FOIS ! Et avec seulement 3 lignes de code ! Ressentez-vous le POUVOIR entre vos mains ? 😈
 
@@ -123,7 +124,7 @@ Parfois, vous voulez arrêter votre boucle lorsqu'une condition spécifique est 
 
 Par exemple, dans le code ci-dessous, nous itérons à partir des valeurs de `names`, mais nous interrompons la boucle si l'un des noms commence par J. Comme `"Jerry"` remplit cette condition, c'est le dernier nom qui est affiché.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="sda/main.ts"
 const names = [
   "Tom",
   "Ivan",
@@ -145,7 +146,7 @@ for (const n of names) {
 }
 ```
 
-![Une capture d'écran montrant VS Code exécutant une boucle for avec une instruction break.](/assets/first-steps/loops/break.png)
+<OutdatedScreenshot src="/assets/first-steps/loops/break.png" alt={"Une capture d'écran montrant VS Code exécutant une boucle for avec une instruction break."} lang="fr" />
 
 ## Conclusion
 

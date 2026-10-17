@@ -22,13 +22,13 @@ Avant de commencer, terminez **Fondamentaux de TypeScript**, **Travailler avec T
 
 Pour configurer notre projet, utilisons [setup-data-project](https://github.com/nshiab/setup-data-project), comme dans les leçons précédentes.
 
-Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez `deno -A jsr:@nshiab/setup-data-project`.
+Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez `npx @nshiab/setup-data-project`.
 
 Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`, `journalism-web-scraping` et `journalism-extras`, puis appuyez sur `Entrée`.
 
-Nous utiliserons aussi Playwright et une fonction de la librairie de fichiers de Deno plus tard dans la leçon. Installez-les en exécutant `deno add npm:playwright-chromium jsr:@std/fs`. Autorisez ensuite le script d'installation de Playwright à télécharger Chromium en exécutant `deno install --allow-scripts=npm:playwright-chromium --node-modules-dir=auto`.
+Nous utiliserons aussi Playwright plus tard dans la leçon. Installez-le avec `npm install playwright-chromium`, puis exécutez `npx playwright install chromium` pour vous assurer que son navigateur est disponible. Pour les fichiers, nous utiliserons le module `node:fs/promises`, intégré à Node et qui ne nécessite aucune installation.
 
-![Une capture d'écran de VS Code montrant un script simulant la bourse](/assets/web-scraping/setup.png)
+<OutdatedScreenshot src="/assets/web-scraping/setup.png" alt={"Une capture d'écran de VS Code montrant un script simulant la bourse"} lang="fr" />
 
 ## Extraction de tableaux
 
@@ -46,7 +46,7 @@ Comme ces structures HTML sont toujours les mêmes, j’ai publié une fonction 
 
 Vous pouvez passer à `getHtmlTable` l’URL que vous souhaitez utiliser. Ici, nous ciblons les tableaux ayant la classe CSS `.wikitable` et utilisons `index: 0` pour récupérer le premier résultat. Cette approche est plus fiable que de compter tous les tableaux de mise en page.
 
-Copiez-collez le code ci-dessous dans `sda/main.ts` et exécutez `deno task sda` dans votre terminal pour lancer et surveiller l’exécution.
+Copiez-collez le code ci-dessous dans `sda/main.ts` et exécutez `npm run sda` dans votre terminal pour lancer et surveiller l’exécution.
 
 
 ```ts showLineNumbers filename="sda/main.ts" {2, 6-11}
@@ -64,7 +64,7 @@ console.table(medievalData);
 
 await sdb.close();
 ```
-![Un tableau Wikipédia extrait.](/assets/web-scraping/medieval.png)
+<OutdatedScreenshot src="/assets/web-scraping/medieval.png" alt={"Un tableau Wikipédia extrait."} lang="fr" />
 
 <Callout type="info" emoji="💡">
     Si la mise en page du tableau s'affiche étrangement dans votre terminal, c'est parce que la largeur du tableau dépasse celle du terminal. Faites un clic droit dans le terminal et cherchez l’option `Toggle size with content width`. Il existe aussi un raccourci très pratique que j’utilise tout le temps pour ça : `OPTION` + `Z` sur Mac et `ALT` + `Z` sur PC.
@@ -101,9 +101,9 @@ await medievalDemography.logLineChart(
 
 await sdb.close();
 ```
-![Un tableau Wikipédia mis en cache.](/assets/web-scraping/medieval-cache.png)
+<OutdatedScreenshot src="/assets/web-scraping/medieval-cache.png" alt={"Un tableau Wikipédia mis en cache."} lang="fr" />
 <Callout type="info" emoji="💡">
-    Mettre les données en cache est très important. Si vous ne vous attendez pas à ce que les données changent, vous pouvez les sauvegarder sur votre ordinateur au lieu de les récupérer encore et encore. Avec la librairie SDA, le cache est très simple à gérer. La méthode `cache` crée un dossier `.sda-cache` qui stocke les données dans votre projet. Si vous souhaitez que les données expirent après un certain temps, consultez l’option `ttl` dans la [documentation](https://jsr.io/@nshiab/simple-data-analysis-core/doc/~/SimpleTable.prototype.cache). Pour en savoir plus sur la librairie SDA, consultez la section [`3. Analyse de données avec SDA 🤓`](/simple-data-analysis/tabular-data).
+    Mettre les données en cache est très important. Si vous ne vous attendez pas à ce que les données changent, vous pouvez les sauvegarder sur votre ordinateur au lieu de les récupérer encore et encore. Avec la librairie SDA, le cache est très simple à gérer. La méthode `cache` crée un dossier `.sda-cache` qui stocke les données dans votre projet. Si vous souhaitez que les données expirent après un certain temps, consultez l’option `ttl` dans la [documentation](https://nshiab.github.io/simple-data-analysis/classes/SimpleTable.html#cache). Pour en savoir plus sur la librairie SDA, consultez la section [`3. Analyse de données avec SDA 🤓`](/simple-data-analysis/tabular-data).
 </Callout>
 
 ### Avec un `selector`
@@ -129,7 +129,7 @@ console.table(expensesData);
 
 await sdb.close();
 ```
-![Dépenses des députés extraites d’un tableau web.](/assets/web-scraping/MPS-expenses.png)
+<OutdatedScreenshot src="/assets/web-scraping/MPS-expenses.png" alt={"Dépenses des députés extraites d’un tableau web."} lang="fr" />
 
 Comme nous l’avons fait avec le tableau Wikipédia, nous pouvons mettre en cache et analyser ces données avec SDA. Ici, nous calculons les dépenses moyennes par parti.
 
@@ -169,7 +169,7 @@ await MPs.log();
 
 await sdb.close();
 ```
-![Dépenses des députés extraites et résumées avec SDA.](/assets/web-scraping/MPS-summary.png)
+<OutdatedScreenshot src="/assets/web-scraping/MPS-summary.png" alt={"Dépenses des députés extraites et résumées avec SDA."} lang="fr" />
 
 ## Extraction depuis des pages
 
@@ -205,6 +205,8 @@ Commençons par visiter la page et extraire les URLs. Voici ce que fait le code 
 - On affiche les URLs dans le terminal (ligne 12).
 - Enfin, on ferme tout ce qui est lié à `chromium` (lignes 14–16).
 
+Le type `HTMLAnchorElement[]` indique à TypeScript que ces éléments sont des liens, qui possèdent une propriété `href`. Ce code s’exécute dans le navigateur, où les types des éléments HTML s’appliquent.
+
 Dans votre terminal, vous devriez voir toutes les URLs affichées !
 
 
@@ -218,7 +220,7 @@ const page = await context.newPage();
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
 const urls = await page.locator(".ce-mip-mp-tile-link")
-  .evaluateAll((elements) => elements.map((a) => a.href));
+  .evaluateAll((elements: HTMLAnchorElement[]) => elements.map((a) => a.href));
 
 console.log(urls);
 
@@ -226,7 +228,7 @@ await page.close();
 await context.close();
 await browser.close();
 ```
-![Toutes les URLs des pages personnelles des députés.](/assets/web-scraping/mps-urls.png)
+<OutdatedScreenshot src="/assets/web-scraping/mps-urls.png" alt={"Toutes les URLs des pages personnelles des députés."} lang="fr" />
 
 Maintenant que nous avons toutes les URLs des pages personnelles des députés, nous pouvons itérer sur chacune d’elles et extraire des informations pour chaque député.
 
@@ -253,7 +255,7 @@ const page = await context.newPage();
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
 const urls = await page.locator(".ce-mip-mp-tile-link")
-  .evaluateAll((elements) => elements.map((a) => a.href));
+  .evaluateAll((elements: HTMLAnchorElement[]) => elements.map((a) => a.href));
 
 for (const url of urls) {
   console.log(`\n${url}`);
@@ -275,7 +277,9 @@ await page.close();
 await context.close();
 await browser.close();
 ```
-![Données extraites pour les députés.](/assets/web-scraping/mps-extraction.png)
+<OutdatedScreenshot src="/assets/web-scraping/mps-extraction.png" alt={"Données extraites pour les députés."} lang="fr" />
+
+Nous stockerons les fichiers JSON mis en cache dans le dossier `sda/data` généré. Les chemins des fichiers partent de la racine du projet, où vous lancez `npm run sda`.
 
 Quand j’extrais des données sur des pages comme celle-ci, j’aime généralement ajouter quelques éléments supplémentaires au script :
 - Un compteur pour estimer le temps restant.
@@ -285,7 +289,7 @@ Quand j’extrais des données sur des pages comme celle-ci, j’aime générale
 
 ```ts showLineNumbers filename="sda/main.ts" {2-3, 14, 16-19, 21, 23-26, 37-38,  41-42}
 import { chromium } from "playwright-chromium";
-import { exists } from "@std/fs";
+import { stat, writeFile } from "node:fs/promises";
 import { DurationTracker } from "@nshiab/journalism-extras";
 
 const browser = await chromium.launch();
@@ -295,7 +299,7 @@ const page = await context.newPage();
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
 const urls = await page.locator(".ce-mip-mp-tile-link")
-  .evaluateAll((elements) => elements.map((a) => a.href));
+  .evaluateAll((elements: HTMLAnchorElement[]) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
 
@@ -306,7 +310,7 @@ for (let i = 0; i < urls.length; i++) {
 
   console.log(`\nProcessing ${i + 1} of ${urls.length}: ${url}`);
 
-  if (await exists(filePath)) {
+  if (await stat(filePath).catch(() => null)) {
     console.log(`File already exists: ${filePath}`);
   } else {
     tracker.start();
@@ -322,7 +326,7 @@ for (let i = 0; i < urls.length; i++) {
     const data = { name, party, district, province, language };
 
     const json = JSON.stringify(data, null, 2);
-    await Deno.writeTextFile(filePath, json);
+    await writeFile(filePath, json);
 
     await page.waitForTimeout(500);
     tracker.log();
@@ -336,14 +340,14 @@ await browser.close();
 
 Maintenant, lorsque vous exécutez le script, vous avez une meilleure idée de sa vitesse d’exécution et du temps estimé qu’il lui reste. Et surtout, s’il plante à un moment pour n’importe quelle raison, vous n’avez pas besoin de tout réextraire. Les données précédemment extraites ont été sauvegardées sous forme de fichiers JSON !
 
-![Données extraites pour les députés, avec plus d’informations sur l’extraction.](/assets/web-scraping/mps-caching.png)
+<OutdatedScreenshot src="/assets/web-scraping/mps-caching.png" alt={"Données extraites pour les députés, avec plus d’informations sur l’extraction."} lang="fr" />
 
 Par défaut, Playwright fonctionne en mode `headless`, ce qui signifie que le navigateur automatisé ne s’affiche pas. Mais si vous voulez voir votre script en action, vous pouvez passer l’option `{ headless: false }`.
 
 
 ```ts showLineNumbers filename="sda/main.ts" {5}
 import { chromium } from "playwright-chromium";
-import { exists } from "@std/fs";
+import { stat, writeFile } from "node:fs/promises";
 import { DurationTracker } from "@nshiab/journalism-extras";
 
 const browser = await chromium.launch({ headless: false });
@@ -353,7 +357,7 @@ const page = await context.newPage();
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
 const urls = await page.locator(".ce-mip-mp-tile-link")
-  .evaluateAll((elements) => elements.map((a) => a.href));
+  .evaluateAll((elements: HTMLAnchorElement[]) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
 
@@ -364,7 +368,7 @@ for (let i = 0; i < urls.length; i++) {
 
   console.log(`\nProcessing ${i + 1} of ${urls.length}: ${url}`);
 
-  if (await exists(filePath)) {
+  if (await stat(filePath).catch(() => null)) {
     console.log(`File already exists: ${filePath}`);
   } else {
     tracker.start();
@@ -380,7 +384,7 @@ for (let i = 0; i < urls.length; i++) {
     const data = { name, party, district, province, language };
 
     const json = JSON.stringify(data, null, 2);
-    await Deno.writeTextFile(filePath, json);
+    await writeFile(filePath, json);
 
     await page.waitForTimeout(500);
     tracker.log();
@@ -394,13 +398,13 @@ await browser.close();
 
 Et maintenant, vous voyez votre code en action ! Cela peut être très utile pour déboguer un script qui ne fonctionne pas comme prévu.
 
-![Playwright avec le mode headless désactivé.](/assets/web-scraping/mps-browser.gif)
+<OutdatedScreenshot src="/assets/web-scraping/mps-browser.gif" alt={"Playwright avec le mode headless désactivé."} lang="fr" />
 
 Enfin, vous pouvez charger tous ces fichiers JSON avec SDA et traiter vos données. Par exemple, ici, une fois l’extraction terminée, on compte le nombre de députés selon leur langue d'usage.
 
 ```ts showLineNumbers filename="sda/main.ts" {4, 50-60}
 import { chromium } from "playwright-chromium";
-import { exists } from "@std/fs";
+import { stat, writeFile } from "node:fs/promises";
 import { DurationTracker } from "@nshiab/journalism-extras";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
@@ -411,7 +415,7 @@ const page = await context.newPage();
 await page.goto("https://www.ourcommons.ca/Members/en/search?parliament");
 
 const urls = await page.locator(".ce-mip-mp-tile-link")
-  .evaluateAll((elements) => elements.map((a) => a.href));
+  .evaluateAll((elements: HTMLAnchorElement[]) => elements.map((a) => a.href));
 
 const tracker = new DurationTracker(urls.length, { prefix: "Remaining: " });
 
@@ -422,7 +426,7 @@ for (let i = 0; i < urls.length; i++) {
 
   console.log(`\nProcessing ${i + 1} of ${urls.length}: ${url}`);
 
-  if (await exists(filePath)) {
+  if (await stat(filePath).catch(() => null)) {
     console.log(`File already exists: ${filePath}`);
   } else {
     tracker.start();
@@ -438,7 +442,7 @@ for (let i = 0; i < urls.length; i++) {
     const data = { name, party, district, province, language };
 
     const json = JSON.stringify(data, null, 2);
-    await Deno.writeTextFile(filePath, json);
+    await writeFile(filePath, json);
 
     await page.waitForTimeout(500);
     tracker.log();
@@ -461,7 +465,7 @@ await MPs.log();
 
 await sdb.close();
 ```
-![Chargement et résumé des données extraites sur les députés.](/assets/web-scraping/mps-sda.png)
+<OutdatedScreenshot src="/assets/web-scraping/mps-sda.png" alt={"Chargement et résumé des données extraites sur les députés."} lang="fr" />
 
 Félicitations ! Vous savez maintenant comment utiliser Playwright pour extraire des données de pages web !
 
@@ -532,7 +536,7 @@ await page.close();
 await context.close();
 await browser.close();
 ```
-![Itération sur les candidats sur le site d’Élections Canada.](/assets/web-scraping/complex-website.gif)
+<OutdatedScreenshot src="/assets/web-scraping/complex-website.gif" alt={"Itération sur les candidats sur le site d’Élections Canada."} lang="fr" />
 
 Maintenant que nous sommes capables d’itérer sur les candidats, nous pouvons extraire les données du tableau, comme le nom du candidat, la circonscription, le parti et les dépenses. Nous pouvons aussi mesurer la durée de l’extraction et mettre les données en cache.
 
@@ -540,7 +544,7 @@ Pour éviter les problèmes, assurez-vous de vider votre dossier `sda/data` avan
 
 ```ts showLineNumbers filename="sda/main.ts" {2-3, 24, 27, 31, 33-36, 40-69, 72-73}
 import { chromium } from "playwright-chromium";
-import { exists } from "@std/fs";
+import { stat, writeFile } from "node:fs/promises";
 import { DurationTracker } from "@nshiab/journalism-extras";
 
 const browser = await chromium.launch({ headless: false });
@@ -571,7 +575,7 @@ for (let i = 0; i < optionCount; i++) {
 
   const path = `sda/data/${optionValue}.json`;
 
-  if (await exists(path)) {
+  if (await stat(path).catch(() => null)) {
     console.log(`File already exists: ${path}`);
   } else {
     console.log(`\nRetrieving ${optionValue} (${i + 1}/${optionCount})`);
@@ -599,7 +603,7 @@ for (let i = 0; i < optionCount; i++) {
       expenses,
     });
 
-    await Deno.writeTextFile(
+    await writeFile(
       path,
       JSON.stringify([{
         name,
@@ -618,14 +622,14 @@ await page.close();
 await context.close();
 await browser.close();
 ```
-![Mise en cache des données des candidats sur le site d’Élections Canada.](/assets/web-scraping/caching-EC.png)
+<OutdatedScreenshot src="/assets/web-scraping/caching-EC.png" alt={"Mise en cache des données des candidats sur le site d’Élections Canada."} lang="fr" />
 
 Et enfin, comme d’habitude, on peut utiliser SDA pour charger toutes les données extraites et les analyser. Par exemple, on pourrait calculer les dépenses moyennes par parti.
 
 
 ```ts showLineNumbers filename="sda/main.ts" {4, 81-92}
 import { chromium } from "playwright-chromium";
-import { exists } from "@std/fs";
+import { stat, writeFile } from "node:fs/promises";
 import { DurationTracker } from "@nshiab/journalism-extras";
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
@@ -657,7 +661,7 @@ for (let i = 0; i < optionCount; i++) {
 
   const path = `sda/data/${optionValue}.json`;
 
-  if (await exists(path)) {
+  if (await stat(path).catch(() => null)) {
     console.log(`File already exists: ${path}`);
   } else {
     console.log(`\nRetrieving ${optionValue} (${i + 1}/${optionCount})`);
@@ -685,7 +689,7 @@ for (let i = 0; i < optionCount; i++) {
       expenses,
     });
 
-    await Deno.writeTextFile(
+    await writeFile(
       path,
       JSON.stringify([{
         name,
@@ -719,7 +723,7 @@ await returns.log({ count: 13 });
 
 await sdb.close();
 ```
-![Résumé des dépenses des candidats avec SDA.](/assets/web-scraping/sda-EC.png)
+<OutdatedScreenshot src="/assets/web-scraping/sda-EC.png" alt={"Résumé des dépenses des candidats avec SDA."} lang="fr" />
 
 ## Extraction via des APIs non documentées
 
