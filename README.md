@@ -13,9 +13,14 @@ visualizing, and automating data with SDA. It's available in English and French.
 
 ## Tested course toolchain
 
-The course uses the latest Node.js LTS release and npm. Projects are created
-with `npx @nshiab/setup-data-project` from the first lesson onward. The generated
-`sda`, `all-tests`, and `fix` scripts handle execution, checks, and formatting.
+The first two chapters use VS Code, its built-in TypeScript formatter, and
+Node.js directly: `node main.ts` or `node --watch main.ts`. The libraries and
+tasks lessons introduce npm without a project generator.
+
+Chapter 3 begins with an SDA setup lesson using `npx @nshiab/setup-data-project`.
+Generated projects use `npm run sda` to format, check, and run once, and
+`npm run sda:watch` to repeat those steps on changes. `all-tests` and `fix`
+provide separate checking and formatting commands.
 
 The Node migration was checked on October 16, 2026, with:
 
@@ -30,7 +35,7 @@ current compatible packages selected by `setup-data-project`.
 
 Validation covers the generated starter, representative runtime examples,
 TypeScript checks of lesson examples, library packaging, the production build,
-and all 80 English/French routes. Live scrapes, the full census analysis, and the
+and all 82 English/French routes. Live scrapes, the full census analysis, and the
 one-billion-row workload are not part of this validation.
 
 ## Screenshots awaiting replacement

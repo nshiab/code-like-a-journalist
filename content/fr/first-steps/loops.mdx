@@ -13,15 +13,15 @@ Nous utilisons souvent les ordinateurs pour effectuer des tâches répétitives 
 
 Préparons notre environnement de travail pour cette leçon.
 
-Utilisez le projet créé dans [Installation](/first-steps/setup), ou créez un nouveau dossier vide, ouvrez-le avec VS Code et exécutez `npx @nshiab/setup-data-project` sans sélectionner de librairie.
+Utilisez le dossier et le fichier `main.ts` créés dans [Installation](/first-steps/setup), ou ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`.
 
-Remplacez le contenu de `sda/main.ts` par `console.log("Hello!");` et enregistrez.
+Remplacez le contenu de `main.ts` par `console.log("Hello!");` et enregistrez.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis le dossier du projet qui contient `package.json`.
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `node --watch main.ts` depuis le dossier du projet ouvert dans VS Code.
 
-La surveillance relance le script ; elle ne vérifie pas les types. Utilisez `npm run all-tests` dans un deuxième terminal pour vérifier les types, le formatage et les règles de qualité du code et exécuter les tests éventuels. Utilisez `npm run fix` pour le formatage et les corrections automatiques, puis vérifiez à nouveau. Arrêtez la surveillance du script avec `CTRL` + `C`.
+VS Code signale les erreurs TypeScript pendant la saisie et formate le code quand vous enregistrez. Arrêtez la surveillance du script avec `CTRL` + `C`.
 
-`npm run sda` réexécute `sda/main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+`node --watch main.ts` réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
 
 Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
 
@@ -33,7 +33,7 @@ Disons que nous avons dix nombres (de 1 à 10), que nous voulons multiplier chac
 
 Nous pourrions écrire ce code :
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 console.log(1, "=>", 1 * 2);
 console.log(2, "=>", 2 * 2);
 console.log(3, "=>", 3 * 2);
@@ -54,7 +54,7 @@ Pour créer une boucle, vous commencez par `for`, suivi des paramètres de la bo
 
 Réécrivons notre code, mais cette fois avec une liste et une boucle `for`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // D'abord, créez une liste de nombres.
 // Ajoutez ou retirez des éléments dans la liste et enregistrez.
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -103,7 +103,7 @@ Ces expressions doivent être séparées par des `;` dans les `()`.
 
 Le résultat est une boucle commençant avec `i = 0` et s'arrêtant lorsque `i` atteint 999 999. Comme `i` s'incrémente de 1 à chaque itération, cette boucle s'exécute 1 000 000 de fois.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 for (let i = 0; i < 1_000_000; i++) {
   console.log(i, "Hello!");
 }
@@ -124,7 +124,7 @@ Parfois, vous voulez arrêter votre boucle lorsqu'une condition spécifique est 
 
 Par exemple, dans le code ci-dessous, nous itérons à partir des valeurs de `names`, mais nous interrompons la boucle si l'un des noms commence par J. Comme `"Jerry"` remplit cette condition, c'est le dernier nom qui est affiché.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = [
   "Tom",
   "Ivan",

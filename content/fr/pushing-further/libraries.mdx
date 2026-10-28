@@ -18,13 +18,11 @@ Une note sur le vocabulaire : les *bibliothèques* sont aussi souvent appelées 
 
 Préparons maintenant notre environnement de travail avant de plonger dans cette leçon.
 
-Créez un nouveau projet avec `npx @nshiab/setup-data-project`, en suivant la [leçon de configuration](/first-steps/setup). Pour cette leçon, ne sélectionnez aucune bibliothèque facultative. Ouvrez le dossier du projet généré dans VS Code et utilisez le fichier `sda/main.ts` pour votre code.
+Ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`, comme dans la [leçon d'installation](/first-steps/setup).
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis la racine du projet, le dossier contenant `package.json`.
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `node --watch main.ts` depuis ce dossier. Le code est relancé quand vous enregistrez. Arrêtez la commande avec `CTRL` + `C` sur les deux systèmes.
 
-Cette commande réexécute votre code chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC). Pour l’arrêter, appuyez sur `CTRL` + `C` sur les deux systèmes.
-
-Node.js exécute TypeScript sans vérifier les types. Utilisez `npm run all-tests` pour vérifier le projet et `npm run fix` pour appliquer la mise en forme et les corrections automatiques, comme expliqué dans la leçon de configuration.
+VS Code signale les erreurs TypeScript pendant la saisie et formate le code quand vous enregistrez.
 
 Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
 
@@ -54,6 +52,15 @@ Cette page fournit de nombreuses informations utiles :
 
 Ces détails (ainsi que ceux sur la page GitHub) nous aident à déterminer si une bibliothèque est fiable. Soyez toujours prudent avant d'exécuter du code inconnu ! 🦠
 
+Avant d'installer une librairie, créons un fichier `package.json` pour garder la liste des librairies du projet. Arrêtez la surveillance avec `CTRL` + `C`, puis exécutez ces commandes dans le dossier du projet :
+
+```sh
+npm init -y
+npm pkg set type=module
+```
+
+`npm` est fourni avec Node.js. La première commande crée `package.json` ; la deuxième indique à Node.js que le projet utilise `import` et `export`. Si ce dossier contient déjà un `package.json`, sautez `npm init -y` et gardez son contenu.
+
 Installer `d3` est très simple. Cliquez sur votre terminal, arrêtez le script (`CTRL` + `C`), puis exécutez ces commandes depuis la racine du projet :
 
 ```sh
@@ -61,7 +68,7 @@ npm install d3
 npm install --save-dev @types/d3
 ```
 
-La première commande installe la bibliothèque. La seconde installe ses définitions de types TypeScript pour que VS Code et les vérifications du projet comprennent ses fonctions. Certaines bibliothèques incluent leurs types ; `d3` utilise le paquet séparé `@types/d3`.
+La première commande installe la bibliothèque. La seconde installe ses définitions de types TypeScript pour que VS Code comprenne ses fonctions. Certaines bibliothèques incluent leurs types ; `d3` utilise le paquet séparé `@types/d3`.
 
 Ouvrez `package.json` : `d3` figure maintenant dans **dependencies** et `@types/d3` dans **devDependencies**. Les dépendances sont les paquets utilisés par votre code ; les dépendances de développement servent aux outils, comme la vérification des types.
 
@@ -77,9 +84,9 @@ Reprenons le [fichier CSV des températures de Montréal](https://raw.githubuser
 
 Si vous récupérez ces données, vous remarquerez que c'est juste du texte. CSV signifie **Comma-Separated Values** (valeurs séparées par des virgules) et vous ne pouvez pas travailler avec directement. Il serait bien mieux de le convertir en une liste d'objets.
 
-Copiez-collez le code ci-dessous dans `sda/main.ts`, puis exécutez la commande suivante : `npm run sda`
+Copiez-collez le code ci-dessous dans `main.ts`, puis exécutez la commande suivante : `node --watch main.ts`
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
 );
@@ -95,7 +102,7 @@ C'est notre jour de chance : la fonction `csvParse` de `d3` convertit les donné
 
 Mettons à jour notre code pour l'utiliser.
 
-```ts showLineNumbers filename="sda/main.ts" {1, 8, 10}
+```ts showLineNumbers filename="main.ts" {1, 8, 10}
 import { csvParse } from "d3";
 
 const response = await fetch(
@@ -129,9 +136,9 @@ Ce paquet inclut ses types TypeScript : aucun paquet `@types` supplémentaire n�
 
 Nous utiliserons l’[interface synchrone](https://csv.js.org/parse/api/sync/), pratique quand le fichier CSV tient entièrement en mémoire. Importez `parse` depuis `"csv-parse/sync"`. L’[option `columns: true`](https://csv.js.org/parse/options/columns/) utilise la première ligne comme noms des propriétés au lieu d’en faire une ligne de données.
 
-Remplacez le code de `sda/main.ts` par ceci, puis relancez `npm run sda` :
+Remplacez le code de `main.ts` par ceci, puis relancez `node --watch main.ts` :
 
-```ts showLineNumbers filename="sda/main.ts" {1, 8}
+```ts showLineNumbers filename="main.ts" {1, 8}
 import { parse } from "csv-parse/sync";
 
 const response = await fetch(

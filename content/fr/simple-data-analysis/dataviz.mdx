@@ -16,23 +16,13 @@ Cette leçon suppose que vous avez déjà complété les leçons sur les [Donné
 
 <NoticeIntro lang="fr" />
 
-## Configuration
+## Installation
 
-Comme dans la leçon précédente, créez un nouveau dossier sur votre ordinateur, ouvrez-le avec VS Code et exécutez la commande suivante dans le terminal : `npx @nshiab/setup-data-project`
+Créez un nouveau projet en suivant la [leçon de configuration SDA](/simple-data-analysis/setup) et en sélectionnant `simple-data-analysis`. Plot est installée automatiquement avec SDA.
 
-Nous utiliserons aussi les types GeoJSON dans les exemples de cartes. Installez leurs déclarations TypeScript avec `npm install --save-dev @types/geojson`. Elles décrivent les données pour la vérification des types, sans ajouter de code à exécuter.
+Nous utiliserons aussi les types GeoJSON pour nos exemples de cartes. Dans le terminal du projet, exécutez `npm install --save-dev @types/geojson`. Ils décrivent les données pour le vérificateur de types et n'ajoutent pas de code à exécuter.
 
-[setup-data-project](https://github.com/nshiab/setup-data-project) est une autre librairie libre que j'ai créée. Elle installe et configure tout ce dont vous avez besoin pour commencer rapidement un projet de données.
-
-Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`, puis appuyez sur `Entrée`. Plot est installée automatiquement avec SDA.
-
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/setup.png" alt={"Une capture d'écran montrant simple-data-analysis sélectionnée dans setup-data-project."} lang="fr" />
-
-Après l'exécution de cette commande, votre terminal affichera une description des fichiers créés et des librairies installées.
-
-Ensuite, exécutez la tâche suggérée pour démarrer et surveiller `sda/main.ts` : `npm run sda`
-
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/starter-table.png" alt={"VS Code montrant le code de départ et sa table contenant un seul message dans le terminal."} lang="fr" />
+Exécutez `npm run sda:watch` pour formater, vérifier et exécuter `sda/main.ts` chaque fois que vous enregistrez des modifications. Arrêtez la commande avec `CTRL` + `C` pour en saisir une autre.
 
 ## Création de nos fonctions d'aide
 

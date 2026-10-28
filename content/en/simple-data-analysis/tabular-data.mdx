@@ -22,40 +22,9 @@ Before starting this lesson, make sure you’ve completed **Chapter 1: TypeScrip
 
 ## Setup
 
-The library is published on [NPM](https://www.npmjs.com/package/@nshiab/simple-data-analysis), and you can install it by running `npm install @nshiab/simple-data-analysis`.
+Use the project you created in the [SDA setup lesson](/simple-data-analysis/setup), with `simple-data-analysis` selected. If you're starting a new analysis, follow that lesson to create a new project folder.
 
-But there's a better way. 😏
-
-Create a new folder on your computer and run this instead: `npx @nshiab/setup-data-project`
-
-This uses Node.js to run [setup-data-project](https://github.com/nshiab/setup-data-project), which I created to install and configure everything needed when starting a new data analysis. When prompted, use the space bar to select `simple-data-analysis`.
-
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/setup.png" alt={"A screenshot showing simple-data-analysis selected in setup-data-project."} lang="en" />
-
-After selecting `simple-data-analysis` with the space bar, press `Enter`.
-
-The setup tool will download, install, and create everything we need in this folder for the rest of the lesson.
-
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/setup-complete.png" alt={"VS Code showing the completed setup and the files created by setup-data-project."} lang="en" />
-
-The setup tool created several folders and files. The most important folder is `sda`. Inside it, you’ll find:
-
-- `main.ts`: Our main script. This is where we’ll write our code.
-- `helpers`: A folder for our functions.
-- `data`: A folder for the data we’ll analyze.
-- `output`: A folder for our results.
-
-The `docs` folder and `AGENTS.md` file are intended for AI agents. They provide instructions on how to use the SDA library and organize your code.
-
-There are also other files, such as `.env` and `.gitignore`, and the `sda/tests` folder. Don’t worry about them for now; we’ll use them later.
-
-And, of course, there’s `package.json`. Its `scripts` section includes `sda`, which runs our main script. Its `dependencies` section shows that [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) is installed, along with [Observable Plot](https://github.com/observablehq/plot), a library we’ll use for data visualizations.
-
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/deno-json.png" alt={"VS Code showing the sda task and installed libraries in deno.json."} lang="en" />
-
-Now that you know what's in your folder, let's start working. Run the suggested task: `npm run sda`. This will run `./sda/main.ts` and watch it. Every time you save your code, it will rerun automatically.
-
-As in the introductory lessons, `npm run all-tests` checks formatting, lint rules, types, and tests. `npm run fix` formats the code and applies automatic fixes. The `sda` script runs and watches the code; checking is a separate command.
+Open `sda/main.ts` in VS Code. Run `npm run sda` to format, check, and execute it once, or `npm run sda:watch` to repeat those steps when you save changes. Keep the watcher running while you work through this lesson.
 
 ## Creating a table
 

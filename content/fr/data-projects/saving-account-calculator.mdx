@@ -39,9 +39,9 @@ Avec cela en tête, nous pouvons commencer à coder notre calculateur !
 
 ## Environnement de travail
 
-Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez `npx @nshiab/setup-data-project` dans le terminal. Appuyez sur `Entrée` sans sélectionner de librairie. Vous retrouverez la structure et les outils de la leçon [Installation](/first-steps/setup).
+Créez un nouveau dossier vide, ouvrez-le dans VS Code et créez `main.ts`, comme dans la leçon [Installation](/first-steps/setup).
 
-Remplacez le contenu de `sda/main.ts` par `console.log("Hello!");`, puis exécutez `npm run sda` depuis le dossier du projet. Le script sera réexécuté à chaque enregistrement. Utilisez `npm run all-tests` pour vérifier votre code et `npm run fix` pour le formater et appliquer les corrections automatiques.
+Tapez `console.log("Hello!");` dans `main.ts`, enregistrez le fichier et exécutez `node --watch main.ts` dans le terminal. Votre code est relancé à chaque enregistrement. Arrêtez la commande avec `CTRL` + `C`.
 
 <OutdatedScreenshot src="/assets/saving-account-calculator/watch.png" alt={"Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript."} lang="fr" />
 
@@ -53,7 +53,7 @@ Cela semble être une tâche parfaite pour une **boucle** !
 
 Commençons par itérer sur les années. Nous pouvons créer une variable `years` pour qu’il soit facile de modifier le nombre d’années souhaité et de relancer le script.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const years = 10;
 
 for (let year = 0; year < years; year++) {
@@ -76,7 +76,7 @@ Voici ce qui se passe maintenant avec notre boucle à la ligne 4 :
 - `year < startingYear + years` signifie que notre boucle s’exécutera tant que `year` sera inférieur à `2025 + 10`.
 - `year++` signifie que `year` augmentera de 1 à chaque itération.
 
-```ts showLineNumbers filename="sda/main.ts" {1, 4}
+```ts showLineNumbers filename="main.ts" {1, 4}
 const startingYear = 2025;
 const years = 10;
 
@@ -89,7 +89,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
 
 Pendant que nous y sommes, nous pourrions stocker chaque objet pour chaque année dans une liste nommée `results` et tout afficher sous forme de tableau.
 
-```ts showLineNumbers filename="sda/main.ts" {4, 7, 10}
+```ts showLineNumbers filename="main.ts" {4, 7, 10}
 const startingYear = 2025;
 const years = 10;
 
@@ -113,7 +113,7 @@ Nous pourrions créer trois nouvelles variables :
 - `interestRate` pour stocker le taux d’intérêt annuel. Je l’ai fixé à 2 %.
 - `balance`, qui représente le solde du compte épargne. Cette variable devrait être créée avec `let`, car nous allons la mettre à jour chaque année dans notre boucle. Au départ, `balance` est égal à `initialAmount`.
 
-```ts showLineNumbers filename="sda/main.ts" {1, 2, 6}
+```ts showLineNumbers filename="main.ts" {1, 2, 6}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -134,7 +134,7 @@ Dans notre boucle, nous pouvons maintenant créer la variable `gainsOrLosses` po
 
 Nous pouvons également ajouter `gainsOrLosses` et `balance` à notre liste `results`.
 
-```ts showLineNumbers filename="sda/main.ts" {11-17}
+```ts showLineNumbers filename="main.ts" {11-17}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -175,7 +175,7 @@ Pour cela, nous pouvons utiliser l’objet global `Math`. Il est toujours dispon
 
 Ici, nous avons juste besoin d’arrondir `gainsOrLosses`.
 
-```ts showLineNumbers filename="sda/main.ts" {11}
+```ts showLineNumbers filename="main.ts" {11}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -208,7 +208,7 @@ Pour cela, nous pouvons utiliser `Math.random()`, qui renvoie un nombre entre `0
 
 Voyons cela en action en l’appelant dans notre boucle. Nous pouvons commenter `console.table(results)` pour l’instant.
 
-```ts showLineNumbers filename="sda/main.ts" {11, 20}
+```ts showLineNumbers filename="main.ts" {11, 20}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -243,7 +243,7 @@ Pour randomiser notre taux d’intérêt (qui est actuellement `2`), nous aimeri
 
 Pour obtenir un nombre aléatoire positif ou négatif, nous pouvons simplement soustraire `0.5` à nos nombres aléatoires.
 
-```ts showLineNumbers filename="sda/main.ts" {11}
+```ts showLineNumbers filename="main.ts" {11}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -274,7 +274,7 @@ Nous pouvons créer une nouvelle variable `interestRateRange`. Je l’ai fixée 
 
 Si nous multiplions nos nombres aléatoires par cette amplitude, nous obtenons maintenant des valeurs aléatoires comprises entre `-10` et `10`. Cela ressemble à une excellente fluctuation de taux d’intérêt !
 
-```ts showLineNumbers filename="sda/main.ts" {3, 12-14}
+```ts showLineNumbers filename="main.ts" {3, 12-14}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -306,7 +306,7 @@ Nous pouvons maintenant ajouter cette fluctuation à notre `interestRate`. Comme
 
 Mettons à jour notre code et affichons de nouveau notre tableau. Par souci de simplicité, nous pouvons également arrondir notre `randomInterestRate`. Maintenant, à chaque fois que vous sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC), vous verrez des résultats différents !
 
-```ts showLineNumbers filename="sda/main.ts" {14, 16, 22, 28}
+```ts showLineNumbers filename="main.ts" {14, 16, 22, 28}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -347,7 +347,7 @@ Tout d’abord, récupérons le dernier objet dans notre liste `results`. Cet ob
 
 En l’utilisant, nous pouvons calculer les pertes ou gains finaux et afficher la réponse appropriée.
 
-```ts showLineNumbers filename="sda/main.ts" {28-40}
+```ts showLineNumbers filename="main.ts" {28-40}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -397,7 +397,7 @@ console.table(results);
 
 Ce serait une bonne chose d’ajouter plus de détails, comme les gains ou pertes réalisés, à la fois en chiffres absolus et en pourcentage.
 
-```ts showLineNumbers filename="sda/main.ts" {30-32, 35-40, 42-47}
+```ts showLineNumbers filename="main.ts" {30-32, 35-40, 42-47}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;

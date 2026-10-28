@@ -18,13 +18,11 @@ A note about vocabulary: *libraries* are also often called *packages* or *module
 
 Now, let's set up before diving into this lesson.
 
-Create a new project with `npx @nshiab/setup-data-project`, following the [setup lesson](/first-steps/setup). For this lesson, leave all optional libraries unselected. Open the generated project folder in VS Code and use the generated `sda/main.ts` for your code.
+Open a new empty folder in VS Code and create `main.ts` inside it, as in the [setup lesson](/first-steps/setup).
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project root, the folder containing `package.json`.
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `node --watch main.ts` from that folder. This reruns your code when you save. Stop it with `CTRL` + `C` on either system.
 
-This command reruns your code every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC). Stop it with `CTRL` + `C` on either system.
-
-Node.js runs TypeScript without checking its types. Use `npm run all-tests` to check the project, and `npm run fix` to apply formatting and automatic fixes, as explained in the setup lesson.
+VS Code highlights TypeScript errors as you type and formats your code when you save.
 
 You can use this setup to test the code provided in this lesson.
 
@@ -54,6 +52,15 @@ This page provides a lot of useful information:
 
 These details (along with the GitHub repository) help us decide whether a library is trustworthy. Always be cautious before running unknown code! 🦠
 
+Before installing a library, let's create a `package.json` file to keep track of our project and its libraries. Stop the watcher with `CTRL` + `C`, then run these commands in the project folder:
+
+```sh
+npm init -y
+npm pkg set type=module
+```
+
+`npm` comes with Node.js. The first command creates `package.json`; the second tells Node.js that our project uses `import` and `export`. If this folder already has a `package.json`, skip `npm init -y` and keep its existing contents.
+
 Installing `d3` is very easy. Click on your terminal, stop watching your code (`CTRL` + `C`), and run these commands from the project root:
 
 ```sh
@@ -61,7 +68,7 @@ npm install d3
 npm install --save-dev @types/d3
 ```
 
-The first command installs the library. The second installs its TypeScript type definitions, so VS Code and the project checks understand its functions. Some libraries include their own types; `d3` uses a separate `@types/d3` package.
+The first command installs the library. The second installs its TypeScript type definitions, so VS Code understands its functions. Some libraries include their own types; `d3` uses a separate `@types/d3` package.
 
 Open `package.json`: `d3` is now listed in **dependencies**, and `@types/d3` in **devDependencies**. Dependencies are packages your code uses; development dependencies support tools such as type checking.
 
@@ -77,9 +84,9 @@ Let's reuse the [Montreal temperature CSV file](https://raw.githubusercontent.co
 
 If you fetch this data, you'll notice it's just text. CSV stands for **Comma-Separated Values**. You can't work with it directly. It would be much better to convert it into an array of objects.
 
-Copy and paste the code below into `sda/main.ts`, then run: `npm run sda`
+Copy and paste the code below into `main.ts`, then run: `node --watch main.ts`
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
 );
@@ -95,7 +102,7 @@ It’s our lucky day: the `d3` function `csvParse` converts CSV data into an arr
 
 Let’s update our code to use it.
 
-```ts showLineNumbers filename="sda/main.ts" {1, 8, 10}
+```ts showLineNumbers filename="main.ts" {1, 8, 10}
 import { csvParse } from "d3";
 
 const response = await fetch(
@@ -129,9 +136,9 @@ This package includes its own TypeScript types, so no separate `@types` package 
 
 We’ll use the [synchronous API](https://csv.js.org/parse/api/sync/), which is convenient when the whole CSV fits in memory. Import `parse` from `"csv-parse/sync"`. The [`columns: true` option](https://csv.js.org/parse/options/columns/) uses the first row as property names instead of returning it as a data row.
 
-Replace the code in `sda/main.ts` with this, then run `npm run sda` again:
+Replace the code in `main.ts` with this, then run `node --watch main.ts` again:
 
-```ts showLineNumbers filename="sda/main.ts" {1, 8}
+```ts showLineNumbers filename="main.ts" {1, 8}
 import { parse } from "csv-parse/sync";
 
 const response = await fetch(

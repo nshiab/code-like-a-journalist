@@ -16,13 +16,11 @@ Le Web est omniprésent et une source extraordinaire de données. Dans cette le�
 
 Préparons notre environnement de travail pour cette leçon.
 
-Créez un nouveau projet avec `npx @nshiab/setup-data-project`, en suivant la [leçon de configuration](/first-steps/setup). Pour cette leçon, ne sélectionnez aucune bibliothèque facultative. Ouvrez le dossier du projet généré dans VS Code et utilisez le fichier `sda/main.ts` pour votre code.
+Ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`, comme dans la [leçon d'installation](/first-steps/setup).
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis la racine du projet, le dossier contenant `package.json`.
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `node --watch main.ts` depuis ce dossier. Le code est relancé quand vous enregistrez. Arrêtez la commande avec `CTRL` + `C` sur les deux systèmes.
 
-Cette commande réexécute votre code chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC). Pour l’arrêter, appuyez sur `CTRL` + `C` sur les deux systèmes.
-
-Node.js exécute TypeScript sans vérifier les types. Utilisez `npm run all-tests` pour vérifier le projet et `npm run fix` pour appliquer la mise en forme et les corrections automatiques, comme expliqué dans la leçon de configuration.
+VS Code signale les erreurs TypeScript pendant la saisie et formate le code quand vous enregistrez.
 
 Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
 
@@ -38,7 +36,7 @@ Si vous l'ouvrez, vous remarquerez qu'il s'agit d'une liste d'objets, chaque obj
 
 Pour le récupérer, vous pouvez utiliser la fonction `fetch()`. Elle est disponible globalement, donc vous pouvez l'appeler directement dans votre code. Elle nécessite l'URL correspondante en tant que texte.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
 );
@@ -59,7 +57,7 @@ Wow... Il y a beaucoup d'informations dans cette réponse, et c'est normal. Votr
 
 Dans notre cas, nous savons que c'est un fichier JSON, nous pouvons donc appeler la méthode asynchrone `.json()` pour convertir les données de la réponse en JSON.
 
-```ts showLineNumbers filename="sda/main.ts" {5}
+```ts showLineNumbers filename="main.ts" {5}
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
 );
@@ -75,7 +73,7 @@ Et voilà ! Nous avons récupéré les données, et nous pouvons maintenant tr
 
 Au lieu de les récupérer à chaque fois, nous pourrions écrire les données dans un fichier pour une utilisation future.
 
-```ts showLineNumbers filename="sda/main.ts" {1, 9}
+```ts showLineNumbers filename="main.ts" {1, 9}
 import { writeFile } from "node:fs/promises";
 
 const response = await fetch(
@@ -101,7 +99,7 @@ J’ai téléversé [temp.csv](https://raw.githubusercontent.com/nshiab/data-fet
 
 Voici le code mis à jour pour le récupérer et le sauvegarder. Nous explorerons comment analyser les données des fichiers CSV dans une autre leçon.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import { writeFile } from "node:fs/promises";
 
 const response = await fetch(
@@ -124,7 +122,7 @@ Vous pouvez également récupérer le code source d'une page web. Par exemple, v
 
 Nous explorerons comment extraire des données des pages web (une technique appelée *web scraping*) dans une autre leçon.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const response = await fetch(
   "https://www.code-like-a-journalist.com/en",
 );

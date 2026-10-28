@@ -12,11 +12,11 @@ Let's start your first TypeScript lesson with variables! Along the way, I'll sho
 
 <NoticeIntro/>
 
-Use the project you created in [Setup](/first-steps/setup), or create a new empty folder, open it with VS Code, and run `npx @nshiab/setup-data-project` with no libraries selected.
+Use the folder and `main.ts` file you created in [Setup](/first-steps/setup), or open a new empty folder in VS Code and create `main.ts` inside it.
 
-Replace the contents of `sda/main.ts` with `console.log(2 + 3);` and save it.
+Replace the contents of `main.ts` with `console.log(2 + 3);` and save it.
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project folder that contains `package.json`.
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `node --watch main.ts` from the project folder you opened in VS Code.
 
 `console.log` instructs the computer to log something to the terminal. The "something" here is the calculation `2 + 3`. Your computer runs the calculation and logs the result, which is `5`.
 
@@ -26,17 +26,17 @@ Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm r
     You may have noticed that your code is written with multiple colors. This is called *code highlighting*. In code, each word has a different role and is assigned a color. For example, here `console` is an object, and `log` is one of its methods. Also, while typing, you may see auto-complete suggestions and pop-ups. This is called *IntelliSense*. It's your editor trying to guess what you might want to write and providing documentation for you. For now, you can ignore this, but we will make great use of it later.
 </Callout>
 
-## Watch and type checking
+## Watch mode
 
-Let's see how the project's watch mode and code checks help us work.
+Let's see how watch mode helps us work.
 
-The `npm run sda` command already starts Node.js in watch mode: it automatically reruns our code anytime we save a change. This only reruns the script; it does not check TypeScript types.
+The `node --watch main.ts` command already starts Node.js in watch mode: it automatically reruns our code anytime we save a change. This only reruns the script; it does not check TypeScript types.
 
-If the command is still running, leave it there. Otherwise, run `npm run sda` again. Now, change `3` to `4` in your code and save your file (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+If the command is still running, leave it there. Otherwise, run `node --watch main.ts` again. Now, change `3` to `4` in your code and save your file (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
 
-Node.js will rerun `sda/main.ts` every time you save it. Very convenient!
+Node.js will rerun `main.ts` every time you save it. Very convenient!
 
-To check the types, open a second terminal with the `+` button in the terminal panel and run `npm run all-tests`. It checks types, formatting, and lint rules, then runs any tests. Use `npm run fix` for formatting and automatic fixes, then check again. A successful type check does not guarantee that your logic or data is correct, but it catches many mistakes.
+VS Code checks TypeScript types as you type. Hover over a red squiggle to read the error message. Node.js itself runs the code without checking types.
 
 If you want to stop watching, click in the terminal and press `CTRL` + `C` (it should be the same on Mac and PC). But we will keep it watching for the rest of the lesson.
 
@@ -48,9 +48,9 @@ Now, let's add variables to our code.
 
 Variables are like containers. You can put stuff in them, and when you reference them, Node.js will look at what's inside and use it. This is very convenient because you can reuse the same variable throughout your code.
 
-Let's modify our code to put the first number in the variable `a` and the second number in `b`. We'll also store the result of the calculation in the variable `c`. Copy the code below and paste it into your `sda/main.ts`.
+Let's modify our code to put the first number in the variable `a` and the second number in `b`. We'll also store the result of the calculation in the variable `c`. Copy the code below and paste it into your `main.ts`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const a = 2;
 const b = 4;
 const c = a + b;
@@ -58,7 +58,7 @@ console.log(c);
 ```
 
 <Callout type="info" emoji="💡">
-    Have you noticed all the semicolons? They mark the end of statements. The project formatter tidies your code, but get into the habit of writing them explicitly in your examples.
+    Have you noticed all the semicolons? They mark the end of statements. VS Code formats your code when you save, but get into the habit of writing them explicitly in your examples.
 </Callout>
 
 Your computer will run this code from top to bottom. Line 1 will execute, then line 2, and so on.
@@ -72,7 +72,7 @@ If you save, you'll notice that the result in the terminal is the same. But ther
 If Node.js is still watching in your terminal, this happens automatically when you save. If you stopped it, run this command again to have Node.js rerun your code each time you save:
 
 ```sh
-npm run sda
+node --watch main.ts
 ```
 
 Variables are everywhere in code because they let you abstract and reuse your logic.
@@ -81,7 +81,7 @@ We used `a`, `b`, and `c` for the variable names, but you can use anything as lo
 
 For example, I updated our previous code with different variable names. If you run it, the result is the same in the terminal.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const banana = 2;
 const super_apple = 4;
 const POTATO = banana + super_apple;
@@ -101,7 +101,7 @@ Let's try to overwrite the content in our code without changing `const` to `let`
 
 Update your code ⚠️ **BUT DON'T SAVE IT YET** ⚠️! I want to show you something first.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const a = 3;
 const b = 4;
 const c = a + b;
@@ -129,14 +129,14 @@ As expected, the code crashes, and the error is displayed in the terminal too.
 <OutdatedScreenshot src="/assets/first-steps/variables/const-error.png" alt={"A screenshot showing a VS Code error in the terminal."} lang="en" />
 
 <Callout type="info" emoji="💡">
-    When throwing an error, Node.js will tell you where the problematic code is. For example, `.../sda/main.ts:7:1` means the `sda/main.ts` file, at the seventh line and first character. The exact line and column may vary with your code. If you press `CMD` on Mac or `CTRL` on PC and click on this file path, it will take you directly to it. This is very convenient when you start working with a lot of files.
+    When throwing an error, Node.js will tell you where the problematic code is. For example, `.../main.ts:7:1` means the `main.ts` file, at the seventh line and first character. The exact line and column may vary with your code. If you press `CMD` on Mac or `CTRL` on PC and click on this file path, it will take you directly to it. This is very convenient when you start working with a lot of files.
 </Callout>
 
 But how do we fix this error?
 
 Well, if we want to overwrite the content of a variable, we need to switch `const` to `let` when creating the `c` variable on line 3.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -150,7 +150,7 @@ Now it runs without any problems! If you update your code and save it, you will 
 
 We can also reuse `c` to overwrite... itself! The last two lines in the code below replace `c` with `c` squared (`c` multiplied by itself).
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -179,7 +179,7 @@ Now, let's overwrite `c` with text on line `6`. In TypeScript, text is called a 
 
 Update your code ⚠️ **BUT DON'T SAVE IT YET** ⚠️! Sorry, I screamed again. 😬
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -200,7 +200,7 @@ Once again, the editor caught the error **before running the code**. In TypeScri
 
 <OutdatedScreenshot src="/assets/first-steps/variables/type-error-hover.png" alt={"A screenshot showing a type error in VS Code when hovering."} lang="en" />
 
-**Now save the file and run `npm run all-tests` in your second terminal.** The type check reports that a string cannot be assigned to a variable whose type is `number`.
+**Now save the file.** VS Code still reports that a string cannot be assigned to a variable whose type is `number`.
 
 Node.js behaves differently: it runs the code without checking the types. It logs `7`, then the text, then `NaN`, because multiplying this text by itself does not produce a number. The script does not crash. This is exactly why we use the TypeScript checker alongside Node.js: a script that runs can still produce an invalid result.
 
@@ -220,7 +220,7 @@ While it might seem complicated right now, after a little bit of practice, it wi
 
 And just because I would be a very bad teacher if I let you end a lesson on an error, let's update the code one last time, with comments.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // We create constant variables.
 const a = 3;
 const b = 4;

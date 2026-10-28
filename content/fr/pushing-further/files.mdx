@@ -18,13 +18,11 @@ Si vous voulez conserver certaines données, vous devez les écrire dans un fich
 
 Préparons notre environnement de travail pour cette leçon.
 
-Créez un nouveau projet avec `npx @nshiab/setup-data-project`, en suivant la [leçon de configuration](/first-steps/setup). Pour cette leçon, ne sélectionnez aucune bibliothèque facultative. Ouvrez le dossier du projet généré dans VS Code et utilisez le fichier `sda/main.ts` pour votre code.
+Ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`, comme dans la [leçon d'installation](/first-steps/setup).
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis la racine du projet, le dossier contenant `package.json`.
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `node --watch main.ts` depuis ce dossier. Le code est relancé quand vous enregistrez. Arrêtez la commande avec `CTRL` + `C` sur les deux systèmes.
 
-Cette commande réexécute votre code chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC). Pour l’arrêter, appuyez sur `CTRL` + `C` sur les deux systèmes.
-
-Node.js exécute TypeScript sans vérifier les types. Utilisez `npm run all-tests` pour vérifier le projet et `npm run fix` pour appliquer la mise en forme et les corrections automatiques, comme expliqué dans la leçon de configuration.
+VS Code signale les erreurs TypeScript pendant la saisie et formate le code quand vous enregistrez.
 
 Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
 
@@ -36,11 +34,11 @@ Avec Node.js, écrire des fichiers est très facile. Importez la fonction `write
 
 Pour un fichier texte, passez un chemin d’accès comme premier paramètre et du texte comme deuxième paramètre. Dans le code ci-dessous, nous voulons créer un fichier nommé `hello.txt` contenant `"Hello!"`.
 
-Le `./` indique un chemin relatif : il pointe vers le dossier où nous exécutons le script, la racine du projet contenant `package.json`. Pour les imports, en revanche, les chemins relatifs partent du fichier qui importe, ici `sda/main.ts`.
+Le `./` indique un chemin relatif : il pointe vers le dossier où nous exécutons le script, le dossier du projet ouvert dans VS Code. Pour les imports, en revanche, les chemins relatifs partent du fichier qui importe, ici `main.ts`.
 
-Copiez, collez et sauvegardez ce code dans `sda/main.ts`. Nous parlerons du mot-clé `await` dans un instant.
+Copiez, collez et sauvegardez ce code dans `main.ts`. Nous parlerons du mot-clé `await` dans un instant.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import { writeFile } from "node:fs/promises";
 
 await writeFile("./hello.txt", "Hello!");
@@ -56,9 +54,9 @@ Au fait, soyez prudent : par défaut, `writeFile` écrase les fichiers s'ils e
 
 Pour lire des fichiers, importez `readFile` du même module. Passez un chemin d’accès et l’encodage `"utf8"` pour obtenir le contenu sous forme de texte. Sans cet encodage, Node.js renvoie un `Buffer`, qui représente les octets bruts.
 
-Mettons à jour `sda/main.ts` pour lire le fichier que nous avons écrit plus tôt.
+Mettons à jour `main.ts` pour lire le fichier que nous avons écrit plus tôt.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import { readFile } from "node:fs/promises";
 
 const data = await readFile("./hello.txt", "utf8");
@@ -84,7 +82,7 @@ Ce format de fichier texte peut stocker des listes, des objets, du texte, des no
 Par exemple, dans le script ci-dessous, nous écrivons la liste d'objets `data` dans le fichier `data.json`.
 
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import { writeFile } from "node:fs/promises";
 
 const data = [
@@ -105,16 +103,16 @@ await writeFile(
 
 Comme le fichier a l'extension `.json`, il est compris par VS Code et Node.js. Son contenu est affiché avec les types de données appropriés. Dans l’éditeur, les noms sont mis en évidence comme du texte et les âges comme des nombres. Si nous avions tout écrit dans un fichier `.txt`, tout apparaîtrait comme du texte brut.
 
-De plus, vous pouvez importer un fichier JSON en ajoutant l’attribut d’importation `with { type: "json" }`. Les paramètres TypeScript du projet généré prennent en charge les imports JSON et permettent à l’éditeur d’en déduire les types. L’import ci-dessous utilise `../data.json` parce qu’il part de `sda`, puis remonte à la racine du projet.
+De plus, Node.js peut importer un fichier JSON avec l'attribut d'import `with { type: "json" }`. Ici, `./data.json` désigne le fichier JSON à côté de `main.ts` dans le dossier de notre projet.
 
-```ts showLineNumbers filename="sda/main.ts"
-import data from "../data.json" with { type: "json" };
+```ts showLineNumbers filename="main.ts"
+import data from "./data.json" with { type: "json" };
 
 console.log(data);
 ```
 <OutdatedScreenshot src="/assets/pushing-further/files/json-read.png" alt={"Une capture d'écran montrant VS Code lisant un fichier JSON avec Deno."} lang="fr" />
 
-VS Code et `npm run all-tests` peuvent vérifier les types des données importées, ce qui est formidable. Node.js ne vérifie toujours pas les types quand il exécute le code.
+VS Code peut vérifier les types des données importées, ce qui est formidable. Node.js ne vérifie toujours pas les types quand il exécute le code.
 
 Si vous ajoutez un `.` après `data`, VS Code suggérera des méthodes pour les listes car il sait que les données stockées dans `data.json` sont une liste.
 
@@ -130,7 +128,7 @@ Et si vous essayez d’accéder à des clés qui n’existent pas dans les objet
 
 Parfois, vous ne pouvez pas ou ne voulez pas utiliser la syntaxe `import` pour un fichier JSON. Vous pouvez alors le lire avec `readFile()` et l’encodage `"utf8"`. Cependant, cette méthode renvoie une chaîne de caractères : le contenu du fichier sous forme de texte.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import { readFile } from "node:fs/promises";
 
 const rawData = await readFile("./data.json", "utf8");
@@ -141,7 +139,7 @@ console.log(rawData);
 
 Pour transformer ce texte en tableau ou en objet, utilisez `JSON.parse()`.
 
-```ts showLineNumbers filename="sda/main.ts" {4} /data/3
+```ts showLineNumbers filename="main.ts" {4} /data/3
 import { readFile } from "node:fs/promises";
 
 const rawData = await readFile("./data.json", "utf8");

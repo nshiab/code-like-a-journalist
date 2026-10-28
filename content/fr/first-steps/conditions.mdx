@@ -16,15 +16,15 @@ C'est la même chose dans votre code. Selon les données, vous pouvez demander �
 
 Préparons notre environnement de travail pour cette leçon.
 
-Utilisez le projet créé dans [Installation](/first-steps/setup), ou créez un nouveau dossier vide, ouvrez-le avec VS Code et exécutez `npx @nshiab/setup-data-project` sans sélectionner de librairie.
+Utilisez le dossier et le fichier `main.ts` créés dans [Installation](/first-steps/setup), ou ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`.
 
-Remplacez le contenu de `sda/main.ts` par `console.log("Hello!");` et enregistrez.
+Remplacez le contenu de `main.ts` par `console.log("Hello!");` et enregistrez.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis le dossier du projet qui contient `package.json`.
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `node --watch main.ts` depuis le dossier du projet ouvert dans VS Code.
 
-La surveillance relance le script ; elle ne vérifie pas les types. Utilisez `npm run all-tests` dans un deuxième terminal pour vérifier les types, le formatage et les règles de qualité du code et exécuter les tests éventuels. Utilisez `npm run fix` pour le formatage et les corrections automatiques, puis vérifiez à nouveau. Arrêtez la surveillance du script avec `CTRL` + `C`.
+VS Code signale les erreurs TypeScript pendant la saisie et formate le code quand vous enregistrez. Arrêtez la surveillance du script avec `CTRL` + `C`.
 
-`npm run sda` réexécute `sda/main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+`node --watch main.ts` réexécute `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
 
 Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
 
@@ -38,7 +38,7 @@ La première condition doit toujours être testée avec `if`. La condition doit 
 
 Par exemple, le code ci-dessous affiche `I am older than you!` dans le terminal uniquement si `myAge` est supérieur à `yourAge`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Modifiez les âges
 // pour tester les différentes possibilités.
 const myAge = 36;
@@ -53,7 +53,7 @@ Si nous voulons tester plus d'une condition, nous utilisons `else if` avec une c
 
 Tester plusieurs conditions n'est pas toujours nécessaire, mais dans l'exemple ci-dessous, nous voulons aussi afficher `You are older than me!` si `myAge` est inférieur à `yourAge`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Modifiez les âges
 // pour tester les différentes possibilités.
 const myAge = 36;
@@ -70,7 +70,7 @@ Si nous voulons exécuter du code lorsque aucune des conditions n'est remplie, n
 
 Par exemple, dans le code ci-dessous, si aucune des conditions n'est remplie, cela signifie que nous avons le même âge. Nous utilisons donc `else` pour afficher `We are the same age!` dans le terminal.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Modifiez les âges
 // pour tester les différentes possibilités.
 const myAge = 36;
@@ -111,7 +111,7 @@ Voici les principaux opérateurs de comparaison que vous utiliserez au quotidien
 
 Et voici les opérateurs en action. Nous stockons les résultats dans des variables et les affichons :
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Modifiez les âges pour tester les différents opérateurs.
 // Ne vous préoccupez pas de `: number` pour le moment.
 const myAge: number = 36;
@@ -149,7 +149,7 @@ Par exemple, disons que nous avons besoin d'un algorithme pour vérifier si vous
 
 Sans opérateurs logiques, cela pourrait ressembler à ceci, avec des conditions imbriquées. Cela fonctionne, mais les conditions imbriquées peuvent être difficiles à lire et à déboguer.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Modifiez l'âge et la province pour tester les conditions.
 // Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;
@@ -175,7 +175,7 @@ if (myProvince === "Quebec") {
 
 Voici le même code avec l'opérateur logique `&&` pour s'assurer que `myAge` **ET** `myProvince` respectent des conditions spécifiques. Cette approche est plus simple à comprendre et plus facile à déboguer !
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Modifiez l'âge et la province pour tester les conditions.
 // Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;
@@ -197,7 +197,7 @@ if (myProvince === "Quebec" && myAge >= 18) {
 
 Nous pourrions aussi écrire le même algorithme avec un mélange de `&&` et de `||`. Nous pouvons également utiliser des variables pour simplifier le code.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Modifiez l'âge et la province pour tester les conditions.
 // Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;
@@ -226,7 +226,7 @@ C'est idéal pour des conditions simples, vous permettant de remplacer les instr
 
 Voici une autre variation de notre algorithme en utilisant cette syntaxe.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Modifiez l'âge et la province pour tester les conditions.
 // Ne vous préoccupez pas de `: number` et `: string` pour le moment.
 const myAge: number = 18;

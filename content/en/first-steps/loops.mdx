@@ -13,15 +13,15 @@ We often use computers to perform repetitive tasks quickly and efficiently. And 
 
 Let's set things up for this lesson.
 
-Use the project you created in [Setup](/first-steps/setup), or create a new empty folder, open it with VS Code, and run `npx @nshiab/setup-data-project` with no libraries selected.
+Use the folder and `main.ts` file you created in [Setup](/first-steps/setup), or open a new empty folder in VS Code and create `main.ts` inside it.
 
-Replace the contents of `sda/main.ts` with `console.log("Hello!");` and save it.
+Replace the contents of `main.ts` with `console.log("Hello!");` and save it.
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project folder that contains `package.json`.
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `node --watch main.ts` from the project folder you opened in VS Code.
 
-Watching reruns the script; it does not check types. Use `npm run all-tests` in a second terminal to check types, formatting, and lint rules and run any tests. Use `npm run fix` for formatting and automatic fixes, then check again. Stop the script watcher with `CTRL` + `C`.
+VS Code highlights TypeScript errors as you type and formats your code when you save. Stop the script watcher with `CTRL` + `C`.
 
-`npm run sda` reruns `sda/main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+`node --watch main.ts` reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
 
 You can use this setup to test the code provided in this lesson.
 
@@ -33,7 +33,7 @@ Let's say we have ten numbers (1 to 10), and we want to multiply each of them by
 
 We could write this code:
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 console.log(1, "=>", 1 * 2);
 console.log(2, "=>", 2 * 2);
 console.log(3, "=>", 3 * 2);
@@ -54,7 +54,7 @@ To create a loop, you start with `for`, followed by the loop parameters between 
 
 Let's rewrite our code, but this time with an array and a `for` loop.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // First, create an array of numbers.
 // Add or remove items in the array and save.
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -103,7 +103,7 @@ These expressions must be separated by `;` within the `()`.
 
 The result is a loop starting with `i = 0` and stopping when `i` equals 999,999. Because `i` increments by 1 on each iteration, this loop iterates 1,000,000 times.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 for (let i = 0; i < 1_000_000; i++) {
   console.log(i, "Hello!");
 }
@@ -124,7 +124,7 @@ Sometimes, you might want to stop your loop when a specific condition is met. To
 
 For example, in the code below, we loop over `names`, but we break the loop if one of the names starts with J. Since `"Jerry"` meets this condition, it's the last name being logged.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = [
   "Tom",
   "Ivan",

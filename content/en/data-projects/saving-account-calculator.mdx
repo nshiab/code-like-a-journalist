@@ -39,9 +39,9 @@ With this in mind, we can start coding our calculator!
 
 ## Setup
 
-Create a new folder, open it with VS Code, and run `npx @nshiab/setup-data-project` in the terminal. Press `Enter` without selecting a library. This prepares the same project structure and tools as in the [Setup](/first-steps/setup) lesson.
+Create a new empty folder, open it in VS Code, and create `main.ts`, as in the [Setup](/first-steps/setup) lesson.
 
-Replace the contents of `sda/main.ts` with `console.log("Hello!");`, then run `npm run sda` from the project folder. This runs the script again whenever you save a change. Use `npm run all-tests` to check your code and `npm run fix` to format it and apply automatic fixes.
+Type `console.log("Hello!");` in `main.ts`, save it, and run `node --watch main.ts` in the terminal. Your code reruns each time you save a change. Stop it with `CTRL` + `C`.
 
 <OutdatedScreenshot src="/assets/saving-account-calculator/watch.png" alt={"A screenshot showing VS Code running and watching a TypeScript file."} lang="en" />
 
@@ -53,7 +53,7 @@ This sounds like a perfect job for a **loop**!
 
 Let's start by iterating over the years. We could create a variable `years` so it will be easy to update the number of years we want and rerun the script.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const years = 10;
 
 for (let year = 0; year < years; year++) {
@@ -76,7 +76,7 @@ Here's what's happening with our loop on line 4 now:
 - `year < startingYear + years` means that our loop will run while `year` is smaller than `2025 + 10`.
 - `year++` means that `year` will increment by 1 on each iteration.
 
-```ts showLineNumbers filename="sda/main.ts" {1, 4}
+```ts showLineNumbers filename="main.ts" {1, 4}
 const startingYear = 2025;
 const years = 10;
 
@@ -89,7 +89,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
 
 While we're at it, we could store each object for each year in an array named `results` and log everything as a table.
 
-```ts showLineNumbers filename="sda/main.ts" {4, 7, 10}
+```ts showLineNumbers filename="main.ts" {4, 7, 10}
 const startingYear = 2025;
 const years = 10;
 
@@ -113,7 +113,7 @@ We could create three new variables:
 - `interestRate` to store the annual interest rate. I've set it at 2%.
 - `balance`, which represents the balance of the savings account. This should be created with `let` because we will update it every year in our loop. Initially, `balance` equals `initialAmount`.
 
-```ts showLineNumbers filename="sda/main.ts" {1, 2, 6}
+```ts showLineNumbers filename="main.ts" {1, 2, 6}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -134,7 +134,7 @@ In our loop, we can now create the variable `gainsOrLosses` to store the gains o
 
 We can also add `gainsOrLosses` and `balance` to our `results`.
 
-```ts showLineNumbers filename="sda/main.ts" {11-17}
+```ts showLineNumbers filename="main.ts" {11-17}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -175,7 +175,7 @@ To do so, we can rely on the `Math` built-in global object. It's always availabl
 
 Here, we just need to round `gainsOrLosses`.
 
-```ts showLineNumbers filename="sda/main.ts" {11}
+```ts showLineNumbers filename="main.ts" {11}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -208,7 +208,7 @@ For that, we can use `Math.random()`, which returns a number from `0` inclusive 
 
 Let's see it in action by calling it in our loop. We can comment out `console.table(results)` for now.
 
-```ts showLineNumbers filename="sda/main.ts" {11, 20}
+```ts showLineNumbers filename="main.ts" {11, 20}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -243,7 +243,7 @@ To randomize our interest rate (which is `2` right now), we’d like to have som
 
 To get a random number that’s either positive or negative, we could simply subtract `0.5` from our random numbers.
 
-```ts showLineNumbers filename="sda/main.ts" {11}
+```ts showLineNumbers filename="main.ts" {11}
 const initialAmount = 5000;
 const interestRate = 2;
 const startingYear = 2025;
@@ -274,7 +274,7 @@ We can create a new variable `interestRateRange`. I've set it to `20`.
 
 If we multiply our random numbers by this range, we now have random values between `-10` and `10`. That looks like a great interest rate fluctuation!
 
-```ts showLineNumbers filename="sda/main.ts" {3, 12-14}
+```ts showLineNumbers filename="main.ts" {3, 12-14}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -306,7 +306,7 @@ We can now add this fluctuation to our `interestRate`. Since `interestRate` is s
 
 Let's update our code and bring back our table. For the sake of simplicity, we can also round our `randomInterestRate`. Now, every time you save (`CMD` + `S` on Mac or `CTRL` + `S` on PC), you'll see different results!
 
-```ts showLineNumbers filename="sda/main.ts" {14, 16, 22, 28}
+```ts showLineNumbers filename="main.ts" {14, 16, 22, 28}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -347,7 +347,7 @@ First, let's retrieve the last object in our `results` array. This object stores
 
 Using it, we can calculate the final losses or gains and log the appropriate answer.
 
-```ts showLineNumbers filename="sda/main.ts" {28-40}
+```ts showLineNumbers filename="main.ts" {28-40}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;
@@ -397,7 +397,7 @@ console.table(results);
 
 It would be great to add more details, like the gains or losses made, both in absolute numbers and as a percentage.
 
-```ts showLineNumbers filename="sda/main.ts" {30-32, 35-40, 42-47}
+```ts showLineNumbers filename="main.ts" {30-32, 35-40, 42-47}
 const initialAmount = 5000;
 const interestRate = 2;
 const interestRateRange = 20;

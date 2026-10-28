@@ -22,21 +22,11 @@ Note that you should have already completed **Chapter 1: TypeScript Fundamentals
 
 ## Setup
 
-As we did in the previous lesson, create a new folder on your computer, open it with VS Code, and run the following command in the terminal: `npx @nshiab/setup-data-project`
+Create a new project by following the [SDA setup lesson](/simple-data-analysis/setup), selecting `simple-data-analysis`. Plot is installed automatically with SDA.
 
-We will also use the GeoJSON types in our map examples. Install their TypeScript declarations with `npm install --save-dev @types/geojson`. These describe the data for the type checker; they do not add runtime code.
+We'll also use GeoJSON types for our map examples. In the project terminal, run `npm install --save-dev @types/geojson`. These describe the data for the type checker; they don't add runtime code.
 
-When prompted, use the space bar to select `simple-data-analysis`, then press `Enter`. Plot is installed automatically with SDA.
-
-[setup-data-project](https://github.com/nshiab/setup-data-project) is another open-source library I created. It installs and configures everything you need so you can quickly get to work on a data project.
-
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/setup.png" alt={"A screenshot showing simple-data-analysis selected in setup-data-project."} lang="en" />
-
-After running this command, your terminal will display a description of the created files and installed libraries.
-
-Next, run the suggested task to start and watch `sda/main.ts`: `npm run sda`
-
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/starter-table.png" alt={"VS Code showing the starter code and its table with a single message in the terminal."} lang="en" />
+Run `npm run sda:watch` to format, check, and run `sda/main.ts` whenever you save changes. Stop it with `CTRL` + `C` when you need to enter another command.
 
 ## Loading and caching data
 

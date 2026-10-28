@@ -23,40 +23,9 @@ Avant de commencer cette leçon, assurez-vous d’avoir terminé le **chapitre 1
 
 ## Installation
 
-La librairie est publiée sur [NPM](https://www.npmjs.com/package/@nshiab/simple-data-analysis), et vous pouvez l'installer en exécutant `npm install @nshiab/simple-data-analysis`.
+Utilisez le projet créé dans la [leçon de configuration SDA](/simple-data-analysis/setup), avec `simple-data-analysis` sélectionnée. Pour une nouvelle analyse, suivez cette leçon afin de créer un nouveau dossier de projet.
 
-Mais il y a une meilleure façon. 😏
-
-Créez un nouveau dossier sur votre ordinateur et exécutez plutôt cette commande : `npx @nshiab/setup-data-project`
-
-Cette commande utilise Node.js pour exécuter l'outil [setup-data-project](https://github.com/nshiab/setup-data-project), que j'ai créé pour installer et configurer facilement tout ce dont vous avez besoin pour démarrer une nouvelle analyse de données. Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`.
-
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/setup.png" alt={"Capture d'écran montrant simple-data-analysis sélectionnée dans setup-data-project."} lang="fr" />
-
-Après avoir sélectionné `simple-data-analysis` avec la barre d’espace, appuyez sur `Entrée`.
-
-L’outil de configuration téléchargera, installera et créera tout ce dont nous avons besoin dans ce dossier pour le reste de la leçon.
-
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/setup-complete.png" alt={"VS Code montrant la configuration terminée et les fichiers créés par setup-data-project."} lang="fr" />
-
-L’outil de configuration a créé plusieurs dossiers et fichiers. Le dossier le plus important est `sda`. Vous y trouverez :
-
-- `main.ts` : Notre script principal. C’est ici que nous écrirons notre code.
-- `helpers` : Un dossier pour nos fonctions.
-- `data` : Un dossier pour les données que nous analyserons.
-- `output` : Un dossier pour nos résultats.
-
-Le dossier `docs` et le fichier `AGENTS.md` sont destinés aux agents d’IA. Ils leur fournissent des instructions pour utiliser la librairie SDA et organiser votre code.
-
-Il y a aussi d’autres fichiers, comme `.env` et `.gitignore`, ainsi que le dossier `sda/tests`. Ne vous en préoccupez pas pour l’instant ; nous les utiliserons plus tard.
-
-Et, bien sûr, il y a `package.json`. Sa section `scripts` contient la tâche `sda`, qui exécute notre script principal. Sa section `dependencies` montre que [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) est installée, ainsi qu’[Observable Plot](https://github.com/observablehq/plot), une librairie que nous utiliserons pour les visualisations de données.
-
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/deno-json.png" alt={"VS Code montrant la tâche sda et les librairies installées dans deno.json."} lang="fr" />
-
-Maintenant que vous savez ce qu’il y a dans votre dossier, passons au travail. Exécutez la tâche suggérée : `npm run sda`. Elle exécutera `./sda/main.ts` et le surveillera. Chaque fois que vous enregistrerez votre code, il sera réexécuté automatiquement.
-
-Comme dans les leçons d’introduction, `npm run all-tests` vérifie le formatage, les règles de lint, les types et les tests. `npm run fix` formate le code et applique les corrections automatiques. Le script `sda` exécute et surveille le code ; les vérifications se font avec une commande distincte.
+Ouvrez `sda/main.ts` dans VS Code. Exécutez `npm run sda` pour le formater, le vérifier et l'exécuter une fois, ou `npm run sda:watch` pour répéter ces étapes quand vous enregistrez des modifications. Gardez la surveillance active pendant cette leçon.
 
 ## Création d'une table
 

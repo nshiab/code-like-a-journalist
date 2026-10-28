@@ -18,13 +18,11 @@ If you want to keep some data around, you need to write it to a file, which will
 
 Let's set things up for this lesson.
 
-Create a new project with `npx @nshiab/setup-data-project`, following the [setup lesson](/first-steps/setup). For this lesson, leave all optional libraries unselected. Open the generated project folder in VS Code and use the generated `sda/main.ts` for your code.
+Open a new empty folder in VS Code and create `main.ts` inside it, as in the [setup lesson](/first-steps/setup).
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project root, the folder containing `package.json`.
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `node --watch main.ts` from that folder. This reruns your code when you save. Stop it with `CTRL` + `C` on either system.
 
-This command reruns your code every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC). Stop it with `CTRL` + `C` on either system.
-
-Node.js runs TypeScript without checking its types. Use `npm run all-tests` to check the project, and `npm run fix` to apply formatting and automatic fixes, as explained in the setup lesson.
+VS Code highlights TypeScript errors as you type and formats your code when you save.
 
 You can use this setup to test the code provided in this lesson.
 
@@ -36,11 +34,11 @@ With Node.js, writing files is very easy. Import the `writeFile` function from t
 
 For text files, pass a path as the first parameter and a string as the second parameter. In the code below, we want to create a file named `hello.txt` containing `"Hello!"`.
 
-The `./` makes this a relative path: it points to the folder where we run the script, which is the project root containing `package.json`. This is different from imports: their relative paths start from the importing file, here `sda/main.ts`.
+The `./` makes this a relative path: it points to the folder where we run the script, which is the project folder you opened in VS Code. This is different from imports: their relative paths start from the importing file, here `main.ts`.
 
-Copy, paste, and save this code in `sda/main.ts`. We’ll talk about the `await` keyword in a minute.
+Copy, paste, and save this code in `main.ts`. We’ll talk about the `await` keyword in a minute.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import { writeFile } from "node:fs/promises";
 
 await writeFile("./hello.txt", "Hello!");
@@ -56,9 +54,9 @@ By the way, be careful: by default, `writeFile` overwrites files if they already
 
 To read files, import `readFile` from the same module. Pass a file path and the encoding `"utf8"` to get the contents as a string. Without the encoding, Node.js returns a `Buffer`, which represents raw bytes.
 
-Let’s update `sda/main.ts` to read the file we wrote earlier.
+Let’s update `main.ts` to read the file we wrote earlier.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import { readFile } from "node:fs/promises";
 
 const data = await readFile("./hello.txt", "utf8");
@@ -84,7 +82,7 @@ This text file format can store arrays, objects, text, numbers, and booleans, in
 For example, in the script below, we write the array of objects `data` to the file `data.json`.
 
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import { writeFile } from "node:fs/promises";
 
 const data = [
@@ -105,16 +103,16 @@ await writeFile(
 
 Because it has the `.json` extension, the file is understood by VS Code and Node.js. Its content is displayed with the proper data types. In the editor, the names are highlighted as strings and the ages as numbers. If we wrote everything into a `.txt` file, everything would appear as plain text.
 
-Additionally, you can import a JSON file by adding the `with { type: "json" }` import attribute. The generated project’s TypeScript settings support JSON imports and let the editor infer their types. The import below uses `../data.json` because it starts in `sda`, then goes up to the project root.
+Additionally, Node.js can import a JSON file with the `with { type: "json" }` import attribute. Here, `./data.json` points to the JSON file beside `main.ts` in our project folder.
 
-```ts showLineNumbers filename="sda/main.ts"
-import data from "../data.json" with { type: "json" };
+```ts showLineNumbers filename="main.ts"
+import data from "./data.json" with { type: "json" };
 
 console.log(data);
 ```
 <OutdatedScreenshot src="/assets/pushing-further/files/json-read.png" alt={"A screenshot showing VS Code reading a JSON file with Deno."} lang="en" />
 
-VS Code and `npm run all-tests` can check the imported data’s types, which is wonderful. Node.js itself still doesn’t check types when it runs the code.
+VS Code can check the imported data’s types, which is wonderful. Node.js itself still doesn’t check types when it runs the code.
 
 If you add a `.` after `data`, VS Code will suggest array methods because it knows the data stored in `data.json` is an array.
 
@@ -124,13 +122,13 @@ If you select the first object of `data` with `[0]` and type a `.` to access a k
 
 <OutdatedScreenshot src="/assets/pushing-further/files/json-object-methods.png" alt={"A screenshot showing VS Code reading a JSON file with Deno."} lang="en" />
 
-And if you try to access keys that don’t exist in the objects, VS Code and the project checks flag an error. Isn’t that amazing? 😍
+And if you try to access keys that don’t exist in the objects, VS Code flags an error. Isn’t that amazing? 😍
 
 <OutdatedScreenshot src="/assets/pushing-further/files/json-object-error.png" alt={"A screenshot showing VS Code reading a JSON file with Deno."} lang="en" />
 
 Sometimes, you can’t or don’t want to use the `import` syntax for a JSON file. Instead, you can read it with `readFile()` and the `"utf8"` encoding. However, this gives you a string: the contents of the file as text.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import { readFile } from "node:fs/promises";
 
 const rawData = await readFile("./data.json", "utf8");
@@ -141,7 +139,7 @@ console.log(rawData);
 
 To turn that text back into an array or object, use `JSON.parse()`.
 
-```ts showLineNumbers filename="sda/main.ts" {4} /data/3
+```ts showLineNumbers filename="main.ts" {4} /data/3
 import { readFile } from "node:fs/promises";
 
 const rawData = await readFile("./data.json", "utf8");

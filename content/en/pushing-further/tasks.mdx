@@ -12,11 +12,11 @@ Tasks are a way to avoid rewriting long commands in the terminal. They are very 
 
 <NoticeIntro />
 
-Create a project with `npx @nshiab/setup-data-project`, following the [setup lesson](/first-steps/setup), with no optional libraries selected. Open the generated project folder in VS Code.
+Use the folder from the [Using libraries lesson](/pushing-further/libraries), or open a new empty folder in VS Code and create `main.ts` inside it, as in [Setup](/first-steps/setup).
 
-Copy and paste the following code into `sda/main.ts`. This script comes from the [Fetching data](/pushing-further/fetch) lesson. It fetches a JSON file from GitHub, parses it, and logs it.
+Copy and paste the following code into `main.ts`. This script comes from the [Fetching data](/pushing-further/fetch) lesson. It fetches a JSON file from GitHub, parses it, and logs it.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
 );
@@ -26,50 +26,50 @@ const data = await response.json();
 console.log(data);
 ```
 
-You’ve already used `npm run sda` to execute and watch your code. Let’s see how that command works!
+You've already used `node --watch main.ts` to execute and watch your code. Let's give it a shorter name!
 
-Open `package.json` and find the **scripts** object. Among the generated entries, you’ll see these:
+If your folder doesn't have a `package.json`, create one by running `npm init -y` in the terminal. Stop any running watcher with `CTRL` + `C` first. `npm` comes with Node.js, so you don't need to install it separately.
 
-```json showLineNumbers filename="package.json (scripts excerpt)"
+Open `package.json`. Add or update its **scripts** object so it includes these entries, and set `type` to `module`. The file should look like this, with any existing dependencies and other fields kept in place:
+
+```json showLineNumbers filename="package.json"
 {
+  "type": "module",
   "scripts": {
-    "sda": "node --env-file-if-exists=.env --watch sda/main.ts",
-    "all-tests": "vp check && vp test --passWithNoTests",
-    "fix": "vp check --fix"
+    "watch": "node --watch main.ts",
+    "once": "node main.ts"
   }
 }
 ```
 
-This is an excerpt: keep all the other fields and scripts in your generated file.
+The `type` setting tells Node.js that our project uses `import` and `export`. Don't forget the commas between neighboring entries, and save the file! 🙃
 
-When you run `npm run sda` from the project root, npm finds `sda` inside `scripts` and executes its command. Node.js loads a `.env` file if one exists, runs `sda/main.ts`, and watches for changes so it can restart automatically.
+Now run:
 
-The `all-tests` script runs the project’s checks and then its tests. The `fix` script applies formatting and automatic fixes. Node.js itself doesn’t check TypeScript types when executing your code; use the project checks for that.
-
-What if you want to run the script just once? Let’s add a command called `once`. Add this entry inside the existing `scripts` object, keeping its other entries:
-
-```json filename="package.json (new scripts entry)"
-"once": "node --env-file-if-exists=.env sda/main.ts"
+```sh
+npm run watch
 ```
 
-Don’t forget the comma between neighboring entries, and save the file! 🙃 If `npm run sda` is still running, stop it with `CTRL` + `C`. Then run:
+npm finds `watch` inside `scripts` and executes `node --watch main.ts`. Your code runs again whenever you save it, just as before.
+
+What if you want to run it just once? Stop the watcher with `CTRL` + `C`, then run:
 
 ```sh
 npm run once
 ```
 
-Your code runs once, then exits. If you later change the command stored in `once`, you’ll still use the same shortcut: `npm run once`.
+Your code runs once, then exits. If you later change the command stored in `once`, you'll still use the same shortcut: `npm run once`.
 
 <OutdatedScreenshot src="/assets/pushing-further/tasks/task.png" alt={"A screenshot showing VS Code running a Deno task."} lang="en" />
 
 <Callout type="info" emoji="💡">
-    You can define as many scripts as you need. Run `npm run` without a script name to list the available ones. npm also makes installed command-line tools available to scripts, which is why the generated commands can use `vp` directly.
+    You can define as many scripts as you need. Run `npm run` without a script name to list the available ones. These shortcuts only do what their commands specify: our `watch` script reruns the code, while VS Code provides the type checking and formatting we enabled earlier.
 </Callout>
 
 ## Conclusion
 
-Scripts are useful in all kinds of projects, whether you’re running code, scraping the web, analyzing data, or building and publishing a website. They make these commands convenient to run, and we’ll use them throughout the upcoming lessons and projects.
+Scripts are useful in all kinds of projects, whether you're running code, scraping the web, analyzing data, or building and publishing a website. We'll use them in the next chapter, where a setup tool will prepare the commands and libraries for our data analysis projects.
 
-Congratulations, you’ve reached the end of Chapter 2! Read the [chapter conclusion](/pushing-further/conclusion) for project ideas and other ways to put everything you’ve learned in this chapter into practice. 🥳
+Congratulations, you've reached the end of Chapter 2! Read the [chapter conclusion](/pushing-further/conclusion) for project ideas and other ways to put everything you've learned into practice. 🥳
 
 <NoticeEnd />

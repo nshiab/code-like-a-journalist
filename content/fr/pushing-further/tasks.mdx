@@ -8,15 +8,15 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Exécuter des tâches
 
-Les tâches permettent d’éviter de retaper de longues commandes dans le terminal. Elles sont très pratiques et largement utilisées. Avec npm, on les appelle des **scripts** et on les définit dans `package.json`.
+Les tâches permettent d'éviter de retaper de longues commandes dans le terminal. Elles sont très pratiques et largement utilisées. Avec npm, on les appelle des **scripts** et on les définit dans `package.json`.
 
-<NoticeIntro lang="fr"/>
+<NoticeIntro lang="fr" />
 
-Créez un projet avec `npx @nshiab/setup-data-project`, en suivant la [leçon de configuration](/first-steps/setup), sans sélectionner de bibliothèques facultatives. Ouvrez le dossier du projet généré dans VS Code.
+Utilisez le dossier de la [leçon sur les librairies](/pushing-further/libraries), ou ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`, comme dans [Installation](/first-steps/setup).
 
-Copiez-collez le code suivant dans `sda/main.ts`. Ce script provient de la leçon [Récupérer des données](/pushing-further/fetch). Il récupère un fichier JSON depuis GitHub, le convertit et l’affiche dans la console.
+Copiez-collez le code suivant dans `main.ts`. Ce script provient de la leçon [Récupérer des données](/pushing-further/fetch). Il récupère un fichier JSON depuis GitHub, le convertit et l'affiche dans le terminal.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
 );
@@ -26,50 +26,50 @@ const data = await response.json();
 console.log(data);
 ```
 
-Vous avez déjà utilisé `npm run sda` pour exécuter et surveiller votre code. Voyons comment cette commande fonctionne !
+Vous avez déjà utilisé `node --watch main.ts` pour exécuter et surveiller votre code. Donnons un nom plus court à cette commande !
 
-Ouvrez `package.json` et trouvez l’objet **scripts**. Parmi les entrées générées, vous verrez celles-ci :
+Si votre dossier ne contient pas de `package.json`, créez-en un en exécutant `npm init -y` dans le terminal. Arrêtez d'abord toute surveillance avec `CTRL` + `C`. `npm` est fourni avec Node.js : vous n'avez pas besoin de l'installer séparément.
 
-```json showLineNumbers filename="package.json (extrait des scripts)"
+Ouvrez `package.json`. Ajoutez ou modifiez son objet **scripts** pour inclure ces entrées et définissez `type` sur `module`. Le fichier devrait ressembler à ceci, en conservant les dépendances et les autres champs existants :
+
+```json showLineNumbers filename="package.json"
 {
+  "type": "module",
   "scripts": {
-    "sda": "node --env-file-if-exists=.env --watch sda/main.ts",
-    "all-tests": "vp check && vp test --passWithNoTests",
-    "fix": "vp check --fix"
+    "watch": "node --watch main.ts",
+    "once": "node main.ts"
   }
 }
 ```
 
-Il s’agit d’un extrait : conservez tous les autres champs et scripts de votre fichier généré.
+Le paramètre `type` indique à Node.js que notre projet utilise `import` et `export`. N'oubliez pas les virgules entre les entrées voisines, puis enregistrez le fichier ! 🙃
 
-Quand vous lancez `npm run sda` depuis la racine du projet, npm trouve `sda` dans `scripts` et exécute la commande correspondante. Node.js charge un fichier `.env` s’il existe, exécute `sda/main.ts` et surveille les modifications pour redémarrer automatiquement.
+Exécutez maintenant :
 
-Le script `all-tests` lance les vérifications du projet, puis ses tests. Le script `fix` applique la mise en forme et les corrections automatiques. Node.js ne vérifie pas lui-même les types TypeScript quand il exécute votre code ; utilisez les vérifications du projet pour cela.
-
-Et si vous souhaitez exécuter le script une seule fois ? Ajoutons une commande appelée `once`. Ajoutez cette entrée dans l’objet `scripts` existant, en conservant les autres entrées :
-
-```json filename="package.json (nouvelle entrée de scripts)"
-"once": "node --env-file-if-exists=.env sda/main.ts"
+```sh
+npm run watch
 ```
 
-N’oubliez pas la virgule entre les entrées voisines, puis sauvegardez le fichier ! 🙃 Si `npm run sda` est encore en cours, arrêtez-le avec `CTRL` + `C`. Ensuite, lancez :
+npm trouve `watch` dans `scripts` et exécute `node --watch main.ts`. Votre code est relancé chaque fois que vous l'enregistrez, comme auparavant.
+
+Et si vous voulez l'exécuter une seule fois ? Arrêtez la surveillance avec `CTRL` + `C`, puis exécutez :
 
 ```sh
 npm run once
 ```
 
-Votre code s’exécute une seule fois, puis s’arrête. Si vous changez la commande définie dans `once` plus tard, vous utiliserez toujours le même raccourci : `npm run once`.
+Votre code s'exécute une seule fois, puis s'arrête. Si vous changez la commande définie dans `once` plus tard, vous utiliserez toujours le même raccourci : `npm run once`.
 
 <OutdatedScreenshot src="/assets/pushing-further/tasks/task.png" alt={"Une capture d'écran montrant VS Code exécutant une tâche Deno."} lang="fr" />
 
 <Callout type="info" emoji="💡">
-    Vous pouvez définir autant de scripts que nécessaire. Lancez `npm run` sans nom de script pour afficher ceux qui sont disponibles. npm rend aussi les outils en ligne de commande installés accessibles aux scripts, ce qui permet aux commandes générées d’utiliser directement `vp`.
+    Vous pouvez définir autant de scripts que nécessaire. Lancez `npm run` sans nom de script pour afficher ceux qui sont disponibles. Ces raccourcis font seulement ce que leurs commandes indiquent : notre script `watch` relance le code, tandis que VS Code fournit la vérification des types et le formatage activés plus tôt.
 </Callout>
 
 ## Conclusion
 
-Les scripts sont utiles dans toutes sortes de projets, que ce soit pour exécuter du code, extraire des données du Web, analyser des données ou créer et publier un site web. Ils rendent ces commandes faciles à lancer, et nous les utiliserons dans les prochaines leçons et les prochains projets.
+Les scripts sont utiles dans toutes sortes de projets : exécuter du code, récupérer des données sur le Web, analyser des données ou créer et publier un site. Nous les utiliserons dans le prochain chapitre, où un outil préparera les commandes et les librairies nécessaires à nos projets d'analyse de données.
 
-Félicitations, vous avez atteint la fin du chapitre 2 ! Lisez la [conclusion du chapitre](/pushing-further/conclusion) pour découvrir des idées de projets et d’autres façons de mettre en pratique tout ce que vous avez appris dans ce chapitre. 🥳
+Félicitations, vous avez atteint la fin du chapitre 2 ! Lisez la [conclusion du chapitre](/pushing-further/conclusion) pour trouver des idées de projets et mettre en pratique ce que vous avez appris. 🥳
 
-<NoticeEnd lang="fr"/>
+<NoticeEnd lang="fr" />

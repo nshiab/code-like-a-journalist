@@ -16,13 +16,13 @@ Cette leçon est une introduction pour vous aider à démarrer. Nous explorerons
 
 D'abord, configurons notre environnement.
 
-Utilisez le projet créé dans [Installation](/first-steps/setup), ou créez un nouveau dossier vide, ouvrez-le avec VS Code et exécutez `npx @nshiab/setup-data-project` sans sélectionner de librairie.
+Utilisez le dossier et le fichier `main.ts` créés dans [Installation](/first-steps/setup), ou ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`.
 
-Remplacez le contenu de `sda/main.ts` par `console.log("Hello!");` et enregistrez.
+Remplacez le contenu de `main.ts` par `console.log("Hello!");` et enregistrez.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis le dossier du projet qui contient `package.json`.
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `node --watch main.ts` depuis le dossier du projet ouvert dans VS Code.
 
-La surveillance relance le script ; elle ne vérifie pas les types. Utilisez `npm run all-tests` dans un deuxième terminal pour vérifier les types, le formatage et les règles de qualité du code et exécuter les tests éventuels. Utilisez `npm run fix` pour le formatage et les corrections automatiques, puis vérifiez à nouveau. Arrêtez la surveillance du script avec `CTRL` + `C`.
+VS Code signale les erreurs TypeScript pendant la saisie et formate le code quand vous enregistrez. Arrêtez la surveillance du script avec `CTRL` + `C`.
 
 Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
 
@@ -36,7 +36,7 @@ Les chaînes de caractères sont toujours entourées de guillemets. Vous pouvez 
 
 Si vous avez besoin d'un texte multiligne, vous devez utiliser des backticks. Si vous voulez utiliser des guillemets simples ou doubles dans votre texte, utilisez également des backticks.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Cela fonctionne.
 const text1 = "Hello!";
 
@@ -57,7 +57,7 @@ console.log(text1)
 ```
 Pour vérifier si quelque chose est une chaîne de caractères, vous pouvez utiliser l'opérateur `typeof` (ou passer votre curseur sur la variable).
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const name = "Nael Shiab"
 console.log(typeof name)
 ```
@@ -67,7 +67,7 @@ console.log(typeof name)
 
 Les nombres n'ont pas besoin d'être entourés de quoi que ce soit. Vous pouvez les utiliser directement, mais il existe différentes façons de les écrire.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Le nombre directement.
 const number1 = 1000;
 console.log(number1);
@@ -83,7 +83,7 @@ console.log(number3);
 
 Vous pouvez écrire des entiers et des décimaux, positifs ou négatifs.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const positiveInteger = 1234;
 console.log(positiveInteger);
 
@@ -99,7 +99,7 @@ console.log(negativeDecimal);
 
 Il existe également des nombres spéciaux, comme `Infinity`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const positiveInfinity = Infinity;
 const negativeInfinity = -Infinity;
 
@@ -112,7 +112,7 @@ console.log(positiveInfinity, negativeInfinity)
 
 `NaN` est également un nombre spécial, qui signifie paradoxalement *Not A Number* (Pas un Nombre). Il peut apparaître lorsque vous essayez de convertir une chaîne de caractères en nombre, par exemple.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // parseInt est une fonction globale que
 // vous pouvez appeler pour convertir une
 // chaîne de caractères en nombre.
@@ -131,7 +131,7 @@ console.log(parseInt("hello"));
 
 Pour vérifier si quelque chose est un nombre, vous pouvez utiliser l'opérateur `typeof` (ou passer votre curseur sur la variable).
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const integer = 1000;
 console.log(integer, "=>", typeof integer);
 
@@ -153,7 +153,7 @@ Un booléen peut être `true` ou `false`. C'est tout !
 
 Les booléens sont très utiles lorsque vous travaillez avec des conditions (nous en parlerons plus tard).
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const bool1 = true;
 console.log(bool1);
 
@@ -172,7 +172,7 @@ console.log("Is 3 greater than 2?", comparison);
 
 Pour vérifier si quelque chose est un booléen, vous pouvez utiliser l'opérateur `typeof` (ou passer votre curseur sur la variable).
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const bool1 = true;
 console.log(typeof bool1);
 
@@ -190,7 +190,7 @@ Les dates sont représentées comme le nombre de millisecondes écoulées depuis
 
 Pour créer un objet date, vous devez utiliser le constructeur `Date`. Remarquez le mot-clé `new` et les paramètres passés entre parenthèses dans le code ci-dessous. Nous utilisons `new` parce que `Date` est une classe, un concept que nous aborderons dans une autre leçon.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Date et heure actuelles.
 const currentTime = new Date();
 console.log("currentTime:", currentTime);
@@ -216,7 +216,7 @@ Pour vérifier si quelque chose est une `Date`, vous ne pouvez pas utiliser l'op
 
 Vous pouvez aussi passer votre curseur sur la variable pour voir son type ou sa valeur.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const currentTime = new Date();
 
 // Faux ! Les dates ne sont pas un type.
@@ -234,7 +234,7 @@ console.log("instanceof Date:", currentTime instanceof Date);
 
 Il existe deux autres types de données que vous rencontrerez souvent : `undefined` et `null`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Si vous créez une variable sans lui
 // attribuer de valeur, elle sera
 // undefined.
@@ -257,7 +257,7 @@ console.log(nullValue);
 
 Pour vérifier si quelque chose est `undefined` ou `null`, vous pouvez utiliser l'opérateur d'égalité stricte (`===`), que nous découvrirons dans un autre chapitre.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 let undefinedVariable;
 // Ceci affiche "true".
 console.log(undefinedVariable === undefined);
@@ -273,7 +273,7 @@ Lorsque vous tapez un `.` juste après une variable, vous voyez apparaître une 
 
 Par exemple, les chaînes de caractères ont une propriété appelée `length`, qui renvoie le nombre de caractères dans le texte :
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const sentence = "Where is Bryan?";
 
 // Cela affiche 15 dans le terminal.
@@ -282,7 +282,7 @@ console.log(sentence.length);
 
 Mais les chaînes de caractères ont également des méthodes, comme `.toUpperCase()`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const sentence = "Where is Bryan?";
 
 // Cela affiche "WHERE IS BRYAN?"

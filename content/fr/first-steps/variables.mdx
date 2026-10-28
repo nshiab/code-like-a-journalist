@@ -12,11 +12,11 @@ Commençons votre première leçon de TypeScript avec les variables ! En chemin,
 
 <NoticeIntro lang="fr"/>
 
-Utilisez le projet créé dans [Installation](/first-steps/setup), ou créez un nouveau dossier vide, ouvrez-le avec VS Code et exécutez `npx @nshiab/setup-data-project` sans sélectionner de librairie.
+Utilisez le dossier et le fichier `main.ts` créés dans [Installation](/first-steps/setup), ou ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`.
 
-Remplacez le contenu de `sda/main.ts` par `console.log(2 + 3);` et enregistrez.
+Remplacez le contenu de `main.ts` par `console.log(2 + 3);` et enregistrez.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis le dossier du projet qui contient `package.json`.
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `node --watch main.ts` depuis le dossier du projet ouvert dans VS Code.
 
 `console.log` indique à l'ordinateur d'afficher quelque chose dans le terminal. Ici, le "quelque chose" est le calcul `2 + 3`. Votre ordinateur effectue le calcul et affiche le résultat, qui est `5`.
 
@@ -26,17 +26,17 @@ Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécute
     Vous avez peut-être remarqué que votre code s'affiche avec plusieurs couleurs. Cela s'appelle *code highlighting*. Dans le code, chaque mot a un rôle différent et se voit attribuer une couleur. Par exemple, ici `console` est un objet, et `log` est l'une de ses méthodes. De plus, en tapant, vous pouvez voir des suggestions d'auto-complétion et des infobulles. Cela s'appelle l'*IntelliSense*. C'est votre éditeur qui essaie de deviner ce que vous pourriez vouloir écrire et fournit une documentation. Pour l'instant, vous pouvez ignorer tout cela, mais nous l'utiliserons plus tard.
 </Callout>
 
-## Surveillance et vérification des types
+## Mode surveillance
 
-Voyons comment la surveillance et les vérifications du projet nous aident à travailler.
+Voyons comment la surveillance nous aide à travailler.
 
-La commande `npm run sda` démarre déjà Node.js en mode surveillance : il relance automatiquement notre code chaque fois que nous enregistrons une modification. Cela relance le script ; cela ne vérifie pas les types TypeScript.
+La commande `node --watch main.ts` démarre déjà Node.js en mode surveillance : il relance automatiquement notre code chaque fois que nous enregistrons une modification. Cela relance le script ; cela ne vérifie pas les types TypeScript.
 
-Si la commande est toujours en cours, laissez-la tourner. Sinon, relancez `npm run sda`. Maintenant, changez `3` en `4` dans votre code et enregistrez votre fichier (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+Si la commande est toujours en cours, laissez-la tourner. Sinon, relancez `node --watch main.ts`. Maintenant, changez `3` en `4` dans votre code et enregistrez votre fichier (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
 
-Node.js relancera `sda/main.ts` à chaque fois que vous l'enregistrez. Très pratique !
+Node.js relancera `main.ts` à chaque fois que vous l'enregistrez. Très pratique !
 
-Pour vérifier les types, ouvrez un deuxième terminal avec le bouton `+` du panneau du terminal et exécutez `npm run all-tests`. Cette commande vérifie les types, le formatage et les règles de qualité du code, puis exécute les tests éventuels. Utilisez `npm run fix` pour le formatage et les corrections automatiques, puis vérifiez à nouveau. Une vérification réussie ne garantit pas que votre logique ou vos données sont correctes, mais elle permet de repérer beaucoup d'erreurs.
+VS Code vérifie les types TypeScript pendant la saisie. Survolez un soulignement rouge pour lire le message d'erreur. Node.js exécute le code sans vérifier les types.
 
 Si vous voulez arrêter la surveillance, cliquez dans le terminal et appuyez sur `CTRL` + `C` (ça devrait être la même chose sur PC et sur Mac). Mais nous garderons la surveillance pour le reste de la leçon.
 
@@ -48,9 +48,9 @@ Ajoutons maintenant des variables à notre code.
 
 Les variables sont comme des conteneurs. Vous pouvez y mettre des choses, et lorsque vous les référencez, Node.js regardera ce qu'il y a à l'intérieur et l'utilisera. C'est très pratique, car vous pouvez réutiliser la même variable à différents endroits dans votre code.
 
-Modifions notre code pour mettre le premier nombre dans la variable `a` et le deuxième nombre dans `b`. Nous stockerons également le résultat du calcul dans la variable `c`. Copiez le code ci-dessous et collez-le dans votre fichier `sda/main.ts`.
+Modifions notre code pour mettre le premier nombre dans la variable `a` et le deuxième nombre dans `b`. Nous stockerons également le résultat du calcul dans la variable `c`. Copiez le code ci-dessous et collez-le dans votre fichier `main.ts`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const a = 2;
 const b = 4;
 const c = a + b;
@@ -58,7 +58,7 @@ console.log(c);
 ```
 
 <Callout type="info" emoji="💡">
-    Avez-vous remarqué tous les points-virgules ? Ils marquent la fin des instructions. Le formateur du projet s'occupe de la présentation du code, mais prenez l'habitude de les écrire explicitement dans vos exemples.
+    Avez-vous remarqué tous les points-virgules ? Ils marquent la fin des instructions. Le formateur de VS Code s'occupe de la présentation du code, mais prenez l'habitude de les écrire explicitement dans vos exemples.
 </Callout>
 
 Votre ordinateur exécutera ce code de haut en bas. La ligne 1 sera exécutée, puis la ligne 2, et ainsi de suite.
@@ -72,7 +72,7 @@ Si vous enregistrez, vous remarquerez que le résultat dans le terminal est le m
 Si Node.js surveille toujours votre fichier dans le terminal, cela se fait automatiquement lorsque vous enregistrez. Si vous l'avez arrêté, relancez cette commande pour que Node.js réexécute votre code à chaque enregistrement :
 
 ```sh
-npm run sda
+node --watch main.ts
 ```
 
 Les variables sont omniprésentes dans le code car elles permettent d'abstraire et de réutiliser votre logique.
@@ -81,7 +81,7 @@ Nous avons utilisé `a`, `b` et `c` comme noms de variables, mais vous pouvez ut
 
 Par exemple, j'ai mis à jour notre code précédent avec des noms de variables différents. Si vous l'exécutez, le résultat sera le même dans le terminal.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const banana = 2;
 const super_apple = 4;
 const POTATO = banana + super_apple;
@@ -101,7 +101,7 @@ Essayons de remplacer le contenu dans notre code sans changer `const` en `let`.
 
 Mettez à jour votre code ⚠️ **MAIS NE L'ENREGISTREZ PAS ENCORE** ⚠️ ! Je veux d'abord vous montrer quelque chose.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const a = 3;
 const b = 4;
 const c = a + b;
@@ -129,14 +129,14 @@ Comme prévu, le code plante, et l'erreur s'affiche également dans le terminal.
 <OutdatedScreenshot src="/assets/first-steps/variables/const-error.png" alt={"Une capture d'écran montrant une erreur dans le terminal de VS Code."} lang="fr" />
 
 <Callout type="info" emoji="💡">
-    Lorsqu'une erreur est générée, Node.js vous indique où se trouve le code problématique. Par exemple, `.../sda/main.ts:7:1` désigne le fichier `sda/main.ts`, à la septième ligne et au premier caractère. La ligne et la colonne exactes peuvent varier selon votre code. Si vous appuyez sur `CMD` sur Mac ou `CTRL` sur PC et cliquez sur ce chemin de fichier, cela vous y mènera directement. C'est très pratique lorsque vous commencez à travailler avec beaucoup de fichiers.
+    Lorsqu'une erreur est générée, Node.js vous indique où se trouve le code problématique. Par exemple, `.../main.ts:7:1` désigne le fichier `main.ts`, à la septième ligne et au premier caractère. La ligne et la colonne exactes peuvent varier selon votre code. Si vous appuyez sur `CMD` sur Mac ou `CTRL` sur PC et cliquez sur ce chemin de fichier, cela vous y mènera directement. C'est très pratique lorsque vous commencez à travailler avec beaucoup de fichiers.
 </Callout>
 
 Mais comment corriger cette erreur ?
 
 Si nous voulons remplacer le contenu d'une variable, nous devons remplacer `const` par `let` lors de la création de la variable `c` à la ligne 3.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -150,7 +150,7 @@ Maintenant, le code s'exécute sans problème ! Si vous mettez à jour votre cod
 
 Nous pouvons également réutiliser `c` pour le remplacer... par lui-même ! Les deux dernières lignes du code ci-dessous remplacent `c` par `c` au carré (`c` multiplié par lui-même).
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -179,7 +179,7 @@ Maintenant, remplaçons `c` par du texte à la ligne `6`. En TypeScript, le text
 
 Mettez à jour votre code ⚠️ **MAIS NE L'ENREGISTREZ PAS ENCORE** ⚠️ ! Désolé, j'ai encore crié. 😬
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -200,7 +200,7 @@ Encore une fois, l'éditeur a détecté l'erreur **avant d'exécuter le code**. 
 
 <OutdatedScreenshot src="/assets/first-steps/variables/type-error-hover.png" alt={"Une capture d'écran montrant une erreur de type dans VS Code lors d'un survol."} lang="fr" />
 
-**Enregistrez maintenant le fichier et exécutez `npm run all-tests` dans votre deuxième terminal.** La vérification des types signale qu'une chaîne de caractères ne peut pas être assignée à une variable de type `number`.
+**Enregistrez maintenant le fichier.** VS Code signale toujours qu'une chaîne de caractères ne peut pas être assignée à une variable de type `number`.
 
 Node.js se comporte différemment : il exécute le code sans vérifier les types. Il affiche `7`, puis le texte, puis `NaN`, car multiplier ce texte par lui-même ne produit pas de nombre. Le script ne plante pas. C'est précisément pourquoi nous utilisons le vérificateur TypeScript en plus de Node.js : un script qui s'exécute peut quand même produire un résultat invalide.
 
@@ -220,7 +220,7 @@ Bien que cela puisse sembler compliqué pour l'instant, après un peu de pratiqu
 
 Et comme je serais un très mauvais enseignant si je vous laissais terminer une leçon sur une erreur, mettons à jour le code une dernière fois, avec des commentaires cette fois-ci.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 // Nous créons des variables constantes.
 const a = 3;
 const b = 4;

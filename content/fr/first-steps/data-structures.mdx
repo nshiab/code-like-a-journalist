@@ -16,15 +16,15 @@ Dans cette leçon, nous allons utiliser ces structures pour stocker des données
 
 Avant de plonger dans le vif du sujet, configurons notre environnement de travail.
 
-Utilisez le projet créé dans [Installation](/first-steps/setup), ou créez un nouveau dossier vide, ouvrez-le avec VS Code et exécutez `npx @nshiab/setup-data-project` sans sélectionner de librairie.
+Utilisez le dossier et le fichier `main.ts` créés dans [Installation](/first-steps/setup), ou ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`.
 
-Remplacez le contenu de `sda/main.ts` par `console.log("Hello!");` et enregistrez.
+Remplacez le contenu de `main.ts` par `console.log("Hello!");` et enregistrez.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `npm run sda` depuis le dossier du projet qui contient `package.json`.
+Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `node --watch main.ts` depuis le dossier du projet ouvert dans VS Code.
 
-La surveillance relance le script ; elle ne vérifie pas les types. Utilisez `npm run all-tests` dans un deuxième terminal pour vérifier les types, le formatage et les règles de qualité du code et exécuter les tests éventuels. Utilisez `npm run fix` pour le formatage et les corrections automatiques, puis vérifiez à nouveau. Arrêtez la surveillance du script avec `CTRL` + `C`.
+VS Code signale les erreurs TypeScript pendant la saisie et formate le code quand vous enregistrez. Arrêtez la surveillance du script avec `CTRL` + `C`.
 
-`npm run sda` relance `sda/main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+`node --watch main.ts` relance `main.ts` à chaque fois que vous le sauvegardez (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
 
 Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
 
@@ -37,7 +37,7 @@ Les objets stockent les données sous forme de **paires clé-valeur** encadrées
 Par exemple, l'objet ci-dessous stocke des données sur un étudiant. Les clés sont `firstName`, `lastName`, `gender` et `age`. Les valeurs correspondantes sont `"Nael"`, `"Shiab"`, `"man"`, et `22` (c'est un Nael d'il y a quelques années 😅) :
 
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const student = {
   firstName: "Nael",
   lastName: "Shiab",
@@ -61,7 +61,7 @@ Pour accéder à la valeur d'une clé spécifique, utilisez un `.` directement a
 
 Par exemple, le code suivant affichera `Nael` dans votre terminal :
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const student = {
   firstName: "Nael",
   lastName: "Shiab",
@@ -81,7 +81,7 @@ Vous utilisez la même syntaxe pour modifier une valeur dans un objet que pour y
 
 Comme mentionné dans la leçon sur les [Variables](/first-steps/variables), vous devez respecter le type de la valeur lorsque vous la modifiez. Par exemple, si la valeur d'une clé est initialement un `number` (comme avec `age`), elle ne peut être mise à jour qu'avec un autre `number`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const student = {
   firstName: "Nael",
   lastName: "Shiab",
@@ -105,7 +105,7 @@ Si vous tapez un `.` après une variable faisant référence à un objet, une fe
 
 <OutdatedScreenshot src="/assets/first-steps/data-structures/object-auto-completion.png" alt={"Une capture d'écran montrant VS Code et sa fonctionnalité IntelliSense."} lang="fr" />
 
-De plus, comme les objets sont typés, si vous essayez d'accéder à une clé qui n'existe pas dans l'objet, VS Code et la vérification des types du projet signaleront une erreur avant même que vous n'exécutiez le script. Par exemple, essayez `student.fristName` au lieu de `student.firstName`. Node.js lui-même ne vérifie pas ces types, alors continuez à utiliser `npm run all-tests`.
+De plus, comme les objets sont typés, si vous essayez d'accéder à une clé qui n'existe pas dans l'objet, VS Code signalera une erreur avant même que vous n'exécutiez le script. Par exemple, essayez `student.fristName` au lieu de `student.firstName`. Node.js lui-même ne vérifie pas ces types : faites attention aux erreurs signalées par VS Code.
 
 De nombreux bogues et erreurs sont causés par de simples fautes de frappe. Grâce à cette fonctionnalité, TypeScript vous aide à détecter ces erreurs en amont. 🙏
 
@@ -119,7 +119,7 @@ Les listes stockent des données dans un ordre spécifique, encadrées par des c
 
 Par exemple, voici une liste de noms d'étudiants.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 console.log(names);
 ```
@@ -138,7 +138,7 @@ Par exemple :
 
 Pour accéder à une valeur d'une liste en utilisant un index, placez l’index entre crochets (`[]`) immédiatement après la liste ou la variable référant à la liste.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 // Modifiez l’index pour voir ce qui est affiché dans le terminal.
@@ -152,7 +152,7 @@ console.log(student);
 
 Vous pouvez également modifier une valeur dans une liste en utilisant son index et l'opérateur `=`. Rappelez-vous que les listes sont typées en TypeScript. Par exemple, si le type de `names` est `string[]`, vous ne pouvez remplacer une valeur que par un autre `string`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 // Modification de la chaîne
@@ -170,7 +170,7 @@ Les listes ont une propriété appelée `length`, qui renvoie le nombre d'élém
 
 Pour accéder à une propriété, tapez un `.` juste après la liste ou la variable qui la référence.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 console.log(names.length);
 ```
@@ -189,7 +189,7 @@ Voici quelques exemples de méthodes couramment utilisées pour les listes.
 
 La méthode `.push()` ajoute un ou plusieurs éléments à la fin d'une liste.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 names.push("Nael");
@@ -202,7 +202,7 @@ console.log(names);
 
 La méthode `.slice()` crée une copie de la liste. Vous pouvez spécifier un index de début et un index de fin pour copier seulement une partie de la liste.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 // Commence à l'index 0 et s'arrête à l'index 2, non inclus
@@ -218,7 +218,7 @@ La méthode `.sort()` trie les listes contenant des chaînes de caractères par 
 
 Il est également possible de passer un argument pour trier d'autres types de données d'une manière spécifique, mais nous aborderons cela plus tard.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 names.sort();
@@ -231,7 +231,7 @@ console.log(names);
 
 La méthode `.includes()` vérifie si une valeur existe dans la liste et renvoie un booléen.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const marks = [33, 45, 78, 98];
 
 console.log(marks.includes(45));
@@ -247,7 +247,7 @@ La méthode `.find()` recherche une valeur dans la liste. Si aucune valeur ne co
 
 Cette méthode nécessite une `function` comme argument. Nous aborderons les fonctions dans les prochaines leçons.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const marks = [33, 45, 78, 98];
 
 // Trouve la première note supérieure à 50
@@ -269,7 +269,7 @@ La méthode `.filter()` crée une nouvelle liste contenant uniquement les élém
 
 Cette méthode nécessite une `function` comme argument. Nous aborderons les fonctions dans les prochaines leçons.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const marks = [33, 45, 78, 98];
 
 // Crée une nouvelle liste avec
@@ -294,7 +294,7 @@ Cette méthode nécessite une `function` comme argument. Nous aborderons les fon
 
 Par exemple, le code ci-dessous double chaque note.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const allMarks = [33, 45, 78, 98];
 
 // Ici, nous multiplions chaque note par 2
@@ -315,7 +315,7 @@ console.log(marksMultiplied);
 
 Un autre avantage de l'utilisation des méthodes de liste est qu'elles peuvent être enchaînées. Puisqu'elles renvoient une liste, vous pouvez appeler une méthode après l'autre.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const allMarks = [33, 45, 78, 98];
 
 // Ici, nous enchaînons les méthodes de liste.
@@ -333,7 +333,7 @@ console.log(newMarks);
 ```
 
 <Callout type="info" emoji="💡">
-Jusqu'à présent dans notre code, chaque ligne se terminait par un `;`. Cependant, des lignes 8 à 11, il n'y a pas de point-virgule parce que nous enchaînons des méthodes. Tout ce qui se trouve entre ces lignes fait partie de la même instruction. Techniquement, vous pourriez tout écrire sur une seule ligne, mais cela rendrait le code moins lisible. Comme TypeScript ne prend pas en compte les sauts de ligne ou l'indentation, c'est à l'utilisateur de formater le code comme il le souhaite. Dans notre cas, nous laissons le formateur du projet s'en charger pour nous.
+Jusqu'à présent dans notre code, chaque ligne se terminait par un `;`. Cependant, des lignes 8 à 11, il n'y a pas de point-virgule parce que nous enchaînons des méthodes. Tout ce qui se trouve entre ces lignes fait partie de la même instruction. Techniquement, vous pourriez tout écrire sur une seule ligne, mais cela rendrait le code moins lisible. Comme TypeScript ne prend pas en compte les sauts de ligne ou l'indentation, c'est à l'utilisateur de formater le code comme il le souhaite. Dans notre cas, nous laissons VS Code le formater quand nous enregistrons.
 </Callout>
 
 #### Autres
@@ -360,7 +360,7 @@ Voici un exemple utilisant les noms et notes de nos étudiants. Chaque objet sto
 
 Vous pouvez considérer chaque objet comme une ligne dans un tableur. En fait, vous pouvez remplacer `console.log` par `console.table` et voir un magnifique tableau s'afficher dans votre terminal!
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const students = [
   { name: "James", mark: 33 },
   { name: "John", mark: 45 },
@@ -378,7 +378,7 @@ Par exemple, vous pouvez filtrer en fonction d'une clé spécifique tout en pré
 
 C'est le meilleur des deux mondes !
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const students = [
   { name: "James", mark: 33 },
   { name: "John", mark: 45 },

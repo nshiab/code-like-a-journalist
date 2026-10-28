@@ -9,7 +9,7 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 Tout d'abord, installons tout ce dont nous avons besoin.
 
-Vous pourriez avoir besoin de droits administrateur. Si vous êtes sur votre ordinateur de travail et que vous ne les avez pas, demandez l'aide de votre service informatique.
+Vous pourriez avoir besoin de droits administrateur sur votre ordinateur. Si vous êtes sur votre ordinateur de travail et que vous ne les avez pas, demandez l'aide de votre service informatique.
 
 <NoticeIntro lang="fr" />
 
@@ -25,130 +25,143 @@ Une fois installé, ouvrez-le. Il devrait ressembler à ceci. Ce n'est pas grave
 
 ![Une capture d'écran de l'éditeur de code Visual Studio Code.](/assets/first-steps/setup/vscode.png)
 
-Personnellement, je trouve que l'interface est trop petite et je l'ajuste toujours pour qu'elle soit un peu plus grande lorsque je configure une nouvelle machine. Pour ce faire, cliquez sur le menu `View => Appearance => Zoom In`.
+Personnellement, je trouve que l'interface est trop petite (👴 c'est peut-être un signe que je vieillis), et je l'ajuste toujours pour qu'elle soit un peu plus grande lorsque je configure une nouvelle machine. Pour ce faire, cliquez sur le menu `View => Appearance => Zoom In`.
 
 ![Une capture d'écran du menu Affichage dans VS Code.](/assets/first-steps/setup/vscode-zoom.png)
 
+Ajustons quelques paramètres utiles.
+
+Pour ouvrir les paramètres sur Mac, cliquez sur `Code => Preferences => Settings`, comme ci-dessous. Sur Windows, utilisez `File => Preferences => Settings`. Vous pouvez aussi appuyer sur `Command` + `,` sur Mac ou sur `Control` + `,` sur Windows.
+
+![VS Code sur Mac avec les menus Code et Preferences ouverts et une flèche pointant vers Settings.](/assets/first-steps/setup/vscode-open-settings.png)
+
+Dans la barre de recherche des paramètres, tapez `format`, puis cochez `Editor: Format On Save`.
+
+Avec cette option activée, chaque fois que vous enregistrez, VS Code organise les espaces et les retraits de votre code pour le rendre plus facile à lire.
+
+Vous n'avez pas besoin de cliquer sur un bouton pour enregistrer vos paramètres. Les changements s'appliquent dès que vous les faites.
+
+![Les paramètres de VS Code avec des flèches pointant vers la barre de recherche et la case cochée Editor: Format On Save.](/assets/first-steps/setup/vscode-format-on-save.png)
+
+Pendant que vous êtes dans les paramètres, recherchez `wrap` et réglez `Editor: Word Wrap` sur `on`. Les longues lignes continueront automatiquement à la ligne suivante à l'écran, sans avoir à faire défiler horizontalement pour les lire.
+
+![Les paramètres de VS Code avec des flèches pointant vers la barre de recherche et Editor: Word Wrap réglé sur on.](/assets/first-steps/setup/vscode-word-wrap.png)
+
+Cliquez sur le X en haut à droite de la fenêtre des paramètres pour la fermer.
+
+![Les paramètres de VS Code avec une flèche pointant vers le X en haut à droite pour fermer la fenêtre.](/assets/first-steps/setup/vscode-close-settings.png)
+
 ## Moteur d'exécution (runtime)
 
-Pour exécuter notre code TypeScript, nous avons besoin d'un moteur d'exécution. Nous utiliserons [Node.js](https://nodejs.org/), un moteur gratuit et en code ouvert qui dispose d'un vaste écosystème d'outils pour travailler avec les données.
+Pour exécuter notre code TypeScript, nous avons besoin d'un moteur d'exécution. Nous utiliserons [Node.js](https://nodejs.org/), un moteur gratuit qui existe depuis 2009. Je trouve que c'est l'un des projets en code ouvert les plus impressionnants : des milliers de personnes y ont contribué au fil des années pour le rendre plus rapide, plus fiable et plus sécuritaire.
 
-Pour ce cours, installez **la dernière version LTS de Node.js**. LTS signifie *Long-Term Support*, soit soutien à long terme. La version LTS convient aux outils et aux librairies de données que nous utiliserons tout au long de ce cours.
+Pour ce cours, nous installerons la dernière version LTS. LTS signifie long-term support, soit soutien à long terme : cette version sera maintenue pendant longtemps.
 
-Visitez la [page de téléchargement de Node.js](https://nodejs.org/en/download), sélectionnez la dernière version LTS et votre système d'exploitation, puis suivez les instructions d'installation. Sur Windows et Mac, vous pouvez utiliser l'installateur proposé sur cette page. Sur Linux, suivez les instructions pour votre distribution. L'installation doit inclure **npm**, le gestionnaire de paquets que nous utiliserons pour télécharger des outils et des librairies.
+Visitez la [page de téléchargement de Node.js](https://nodejs.org/en/download), sélectionnez la dernière version LTS et votre système d'exploitation, puis suivez les instructions d'installation.
 
-<OutdatedScreenshot src="/assets/first-steps/setup/deno.png" alt={"Une capture d'écran du site web de Deno."} lang="fr" />
+Ce n'est pas grave si la version LTS qui vous est proposée n'est pas exactement la même que celle de ma capture d'écran.
 
-<OutdatedScreenshot src="/assets/first-steps/setup/deno-install.png" alt={"Une capture d'écran montrant comment installer Deno depuis le terminal de VS Code."} lang="fr" />
+![La page de téléchargement de Node.js, avec des flèches pointant vers la version LTS et l'installateur macOS.](/assets/first-steps/setup/node-download.png)
 
-<OutdatedScreenshot src="/assets/first-steps/setup/deno-version.png" alt={"Une capture d'écran montrant comment afficher la version de Deno."} lang="fr" />
+Après l'installation de Node.js, quittez complètement VS Code et rouvrez-le pour qu'il trouve la nouvelle installation. Sur Mac, appuyez sur `Command` + `Q` ; sur Windows, utilisez `File => Exit`.
 
-Quittez et redémarrez VS Code après l'installation de Node.js. Ouvrez le terminal (`View => Terminal`, ou `CMD` + `J` sur Mac et `CTRL` + `J` sur Windows), puis exécutez ces commandes une à la fois :
+Pour nous assurer que Node.js est bien installé, nous allons vérifier sa version dans le terminal.
+
+Pour ouvrir le terminal dans VS Code, cliquez sur le menu `View`, puis sur `Terminal`, ou appuyez sur `Command` + `J` sur Mac ou sur `Control` + `J` sur Windows.
+
+![VS Code avec le menu View ouvert et des flèches pointant vers View et l'option Terminal.](/assets/first-steps/setup/vscode-terminal.png)
+
+Pour vérifier l'installation, tapez la commande suivante dans le terminal et appuyez sur Entrée :
 
 ```sh
 node --version
-npm --version
 ```
 
-La première commande doit afficher la version de Node.js que vous venez d’installer. La deuxième doit afficher un numéro de version de npm. Si l'une des commandes est introuvable, vérifiez que l'installation est terminée, puis redémarrez VS Code.
+Cette commande doit afficher la version de Node.js que vous venez d'installer.
 
-D'autres moteurs, dont [Bun](https://bun.sh/), peuvent aussi exécuter TypeScript, et `setup-data-project` prend aussi Bun en charge. Nous utiliserons Node.js et npm pour tous les exemples de ce cours.
-
-## Configurer un projet
-
-Nous utiliserons [@nshiab/setup-data-project](https://github.com/nshiab/setup-data-project), un outil en code ouvert que j'ai créé, pour préparer nos projets. Il installe et configure TypeScript, le formatage et les outils de vérification du code. Nous pouvons ainsi passer directement à l'apprentissage du langage.
-
-Créez d'abord un nouveau dossier vide à un endroit facile d'accès sur votre ordinateur. Dans VS Code, cliquez sur l'onglet Explorer, puis sur `Open Folder`, et sélectionnez ce dossier. Si l'éditeur vous demande si vous faites confiance aux auteurs des fichiers, répondez « Oui » pour ce projet que vous venez de créer.
-
-![Une capture d'écran montrant comment ouvrir un nouveau dossier dans VS Code.](/assets/first-steps/setup/deno-open-folder.png)
-
-Ouvrez le terminal (`View => Terminal`, ou `CMD` + `J` sur Mac et `CTRL` + `J` sur Windows). Il devrait s'ouvrir dans votre nouveau dossier. Exécutez :
-
-```sh
-npx @nshiab/setup-data-project
-```
-
-`npx` télécharge et exécute un outil depuis npm. Si npm vous demande s'il peut installer `@nshiab/setup-data-project`, tapez `y` et appuyez sur Entrée.
-
-Quand l'outil vous demande quelles librairies installer, **ne sélectionnez rien et appuyez sur Entrée**. Nous n'avons pas besoin d'une librairie de données pour apprendre les fondamentaux de TypeScript. Nous en sélectionnerons plus tard, lorsque nous commencerons à analyser des données.
-
-Attendez la fin de la configuration et le message `You are all set!`. Le téléchargement et l'installation des outils peuvent prendre quelques minutes.
-
-<OutdatedScreenshot src="/assets/first-steps/setup/deno-extension.png" alt={"Une capture d'écran montrant comment installer l'extension Deno."} lang="fr" />
-
-Plusieurs fichiers et dossiers apparaîtront dans l'Explorer. Voici ceux à reconnaître pour l'instant :
-
-- `sda/main.ts` est l'endroit où nous écrirons notre code. `sda` est un dossier et `main.ts` est un fichier à l'intérieur. L'extension `.ts` identifie un fichier TypeScript.
-- `package.json` décrit le projet, ses dépendances et les commandes que nous exécuterons avec npm.
-- `package-lock.json` conserve les versions des paquets installés pour permettre une installation cohérente du projet.
-- `node_modules` contient les outils et les librairies téléchargés. Vous n'aurez pas besoin de le modifier.
-- `tsconfig.json`, `vite.config.ts` et `.vscode` contiennent les paramètres préparés par l'outil. Gardez-les en place.
-
-Ne vous inquiétez pas si cela semble beaucoup. L'outil a fait la configuration pour nous. La plupart du temps, nous travaillerons dans `sda/main.ts`.
-
-## Paramètres de l'éditeur
-
-Le projet inclut des recommandations d'extensions VS Code. Quand VS Code propose de les installer, acceptez la recommandation du **Vite+ extension pack**, publié par **VoidZero**. Vous pouvez aussi ouvrir l'onglet Extensions et chercher `@recommended`, ou rechercher directement `VoidZero.vite-plus-extension-pack`.
-
-Ce groupe d'extensions fournit le formatage et les vérifications configurés par le projet. Les paramètres VS Code générés activent le formatage à la sauvegarde et le retour à la ligne pour les longues lignes. Vous n'avez pas besoin de configurer un autre formateur.
-
-Si vous aviez installé l'extension Deno, désactivez-la pour cet espace de travail afin qu'elle n'interfère pas avec les outils TypeScript du projet.
-
-<OutdatedScreenshot src="/assets/first-steps/setup/vscode-formatter.png" alt={"Capture d'écran montrant les paramètres du formateur de VS Code."} lang="fr" />
+![Le terminal de VS Code affichant la version installée de Node.js après l'exécution de node --version.](/assets/first-steps/setup/node-version.png)
 
 ## Exécutons un script
 
-Dans l'Explorer, dépliez le dossier `sda` et ouvrez `main.ts`. Remplacez son contenu par :
+Maintenant que la configuration est terminée, il est temps d'exécuter du code ! Au fait, les fichiers qui contiennent du code sont souvent appelés des scripts. 🤓
 
-```ts filename="sda/main.ts"
+D'abord, choisissez où ranger vos fichiers de code. Créez un nouveau dossier vide à un endroit facile d'accès sur votre ordinateur. Ensuite, dans VS Code, cliquez sur l'onglet Explorer en haut à gauche, puis sur le bouton `Open Folder`, et sélectionnez ce dossier.
+
+![VS Code avec des flèches pointant vers l'onglet Explorer et le bouton Open Folder.](/assets/first-steps/setup/vscode-open-folder.png)
+
+Pour cette leçon, j'ai appelé mon nouveau dossier `test`. Je vois maintenant son nom dans l'Explorer à gauche, ce qui indique que c'est le dossier que j'ai ouvert.
+
+Dans mon terminal, je vois aussi `test`. Cela signifie que les commandes que j'y lance s'exécuteront également depuis ce dossier.
+
+Au fait, si l'onglet `Welcome` est encore ouvert, vous pouvez maintenant le fermer en cliquant sur le X à côté de son titre.
+
+![VS Code avec des flèches pointant vers le dossier test dans l'Explorer, test dans l'invite du terminal et le bouton de fermeture de l'onglet Welcome.](/assets/first-steps/setup/vscode-project-folder.png)
+
+Dans l'Explorer à gauche, faites un clic droit dans votre dossier et choisissez `New File`. Nommez le fichier `main.ts` et appuyez sur Entrée. L'extension `.ts` indique que ce fichier contient du code TypeScript. Nous utiliserons ce fichier dans les prochaines leçons.
+
+![VS Code avec le menu contextuel de l'Explorer ouvert et une flèche pointant vers New File.](/assets/first-steps/setup/vscode-new-file.png)
+
+Cliquez sur `main.ts` pour l'ouvrir. Un nouvel onglet apparaît avec le contenu du fichier. Pour l'instant, il est vide. Tapez-y cette ligne :
+
+```ts showLineNumbers filename="main.ts"
 console.log("This is going to be fun!");
 ```
 
-Ce code dit à votre ordinateur d'afficher *This is going to be fun!* dans votre terminal.
+À côté de `main.ts` dans le titre de l'onglet, vous verrez un point blanc. Il indique que le fichier a été modifié, mais qu'il n'a pas encore été enregistré.
 
-Enregistrez le fichier avec `CMD` + `S` sur Mac ou `CTRL` + `S` sur Windows. Un point dans l'onglet du fichier indique des modifications non enregistrées. Enregistrez toujours avant de vous attendre à voir vos changements s'exécuter.
+![VS Code montrant main.ts avec une ligne de code et un point blanc dans le titre de l'onglet indiquant des modifications non enregistrées.](/assets/first-steps/setup/vscode-unsaved-file.png)
 
-Dans le terminal, à partir du dossier du projet qui contient `package.json`, exécutez :
+Pour enregistrer le fichier, assurez-vous d'être dedans et appuyez sur `Command` + `S` sur Mac ou sur `Control` + `S` sur Windows. Le point blanc disparaît et est remplacé par un X quand vous enregistrez.
 
-```sh
-npm run sda
-```
+![VS Code montrant le fichier main.ts enregistré avec un X à la place du point blanc dans le titre de l'onglet.](/assets/first-steps/setup/vscode-saved-file.png)
 
-Cela lance la commande `sda` du projet, qui démarre Node.js et exécute `sda/main.ts`. Vous devriez voir *This is going to be fun!* dans votre terminal.
+Nous avons maintenant du code dans `main.ts`. Ce code est très simple : il va afficher `This is going to be fun!` dans le terminal.
 
-La commande continue de surveiller votre script : chaque fois que vous enregistrez une modification, Node.js l'exécute à nouveau. Essayez de changer le message et d'enregistrer ! Pour arrêter la surveillance, cliquez dans le terminal et appuyez sur `CTRL` + `C`, sur Mac comme sur Windows.
+Pour exécuter le code, nous avons besoin du terminal. Si vous l'avez fermé ou s'il n'est pas ouvert, cliquez sur le menu `View`, puis sur `Terminal`, ou appuyez sur `Command` + `J` sur Mac ou sur `Control` + `J` sur Windows.
 
-<OutdatedScreenshot src="/assets/first-steps/setup/deno-new-file.png" alt={"Une capture d'écran montrant comment créer un nouveau fichier TypeScript dans VS Code."} lang="fr" />
+Exécuter le code est très simple. Tapez d'abord `node` pour indiquer que vous voulez utiliser le moteur d'exécution Node.js, puis le nom du fichier que vous voulez exécuter avec Node.js : `main.ts`.
 
-<OutdatedScreenshot src="/assets/first-steps/setup/save.png" alt={"Capture d'écran montrant un fichier non enregistré dans VS Code."} lang="fr" />
-
-<OutdatedScreenshot src="/assets/first-steps/setup/deno-run.png" alt={"Une capture d'écran montrant comment exécuter un fichier TypeScript dans VS Code."} lang="fr" />
-
-Félicitations ! Vous êtes maintenant prêt à coder. On va bien s'amuser ! 🤩
-
-## Vérifier et formater le code
-
-Node.js peut [exécuter directement des fichiers TypeScript](https://nodejs.org/docs/latest-v24.x/api/typescript.html) en supprimant leurs annotations de types avant l'exécution. **Il ne vérifie pas les types.** La surveillance relance simplement le script ; un script peut s'exécuter tout en contenant des erreurs TypeScript.
-
-L'outil de configuration installe et prépare ces vérifications pour nous. VS Code peut signaler les erreurs pendant la saisie, et cette commande vérifie le projet au complet :
+Tapez cette commande dans le terminal et appuyez sur Entrée :
 
 ```sh
-npm run all-tests
+node main.ts
 ```
 
-Elle vérifie le formatage, les règles de qualité du code et les types TypeScript, puis exécute les tests automatisés du projet. Nous apprendrons à écrire des tests plus tard. Pour l'instant, lisez les erreurs signalées et corrigez-les avant de vous fier à vos résultats. Une vérification réussie est utile, mais il faut quand même vérifier vos données et votre logique !
+Vous devriez maintenant voir `This is going to be fun!` dans le terminal. Félicitations ! Vous venez d'exécuter votre première ligne de TypeScript ! 🎉
 
-Si `npm run sda` surveille toujours votre script dans le terminal, utilisez le bouton `+` du panneau du terminal pour en ouvrir un deuxième pour les vérifications, ou arrêtez d'abord la surveillance avec `CTRL` + `C`.
+![VS Code montrant la commande node main.ts dans le terminal et le message This is going to be fun!.](/assets/first-steps/setup/node-run-main.png)
 
-Pour formater le projet et appliquer les corrections que les outils peuvent faire automatiquement, exécutez :
+## Relancer automatiquement un script à chaque enregistrement
+
+Quand vous travaillez sur un projet, vous voulez généralement exécuter votre script plus d'une fois. Voir le résultat au fur et à mesure que vous écrivez le code vous aide à vérifier que vous allez dans la bonne direction. C'est pourquoi nous codons souvent en mode surveillance, ou « watch mode ».
+
+Pour exécuter votre script en mode surveillance, utilisez cette commande dans le terminal :
 
 ```sh
-npm run fix
+node --watch main.ts
 ```
 
-Cette commande peut modifier vos fichiers. Vérifiez les changements, puis relancez `npm run all-tests`. Les erreurs dans vos types ou votre logique peuvent nécessiter une correction de votre part.
+L'option `--watch` indique à Node.js de continuer à surveiller le fichier. Chaque fois que vous enregistrez une modification, il efface automatiquement le contenu du terminal et relance le code.
 
-Pour chaque leçon, vous pouvez continuer à utiliser ce projet et remplacer le contenu de `sda/main.ts`. Si vous préférez un projet distinct, créez un nouveau dossier vide, ouvrez-le avec VS Code et relancez `npx @nshiab/setup-data-project` sans sélectionner de librairie.
+Quand vous exécutez cette commande, vous verrez que le code est relancé. Une nouvelle ligne bleue apparaît aussi dans le terminal : elle indique que Node.js attend des modifications du fichier avant de redémarrer.
+
+![VS Code montrant node --watch main.ts et un message bleu indiquant que Node.js attend des modifications du fichier avant de redémarrer.](/assets/first-steps/setup/node-watch-main.png)
+
+Essayons ! Remplacez le texte dans `main.ts` par un autre message :
+
+```ts showLineNumbers filename="main.ts"
+console.log("Hello again!");
+```
+
+Enregistrez le fichier (`Command` + `S` sur Mac ou `Control` + `S` sur Windows).
+
+Dès que vous enregistrez, le terminal s'efface et Node.js vous indique qu'il a détecté une modification dans votre script et l'a relancé. Vous pouvez voir `Hello again!` dans le terminal, suivi d'un message indiquant que Node.js continue de surveiller le fichier au cas où vous le modifieriez à nouveau.
+
+![VS Code montrant Hello again! dans main.ts et les messages du terminal confirmant la détection de la modification, le redémarrage du script et l'attente de nouvelles modifications.](/assets/first-steps/setup/node-watch-restart.png)
+
+Vous savez maintenant créer un fichier, écrire du code TypeScript, l'exécuter dans le terminal et utiliser le mode surveillance pendant que vous travaillez. Nous utiliserons cette configuration simple dans les prochaines leçons. Félicitations ! 🎉
+
+Pour arrêter la surveillance, cliquez dans le terminal et appuyez sur `Control` + `C`, sur Mac comme sur Windows. Dans les prochaines leçons, vous pouvez garder ce dossier et remplacer le code dans `main.ts`.
 
 ## À propos de l'IA
 

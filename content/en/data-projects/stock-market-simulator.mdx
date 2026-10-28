@@ -32,9 +32,9 @@ With this in mind, let's start!
 
 ## Setup
 
-Create a new folder, open it with VS Code, and run `npx @nshiab/setup-data-project` in the terminal. Press `Enter` without selecting a library. This prepares the same project structure and tools as in the [Setup](/first-steps/setup) lesson.
+Create a new empty folder, open it in VS Code, and create `main.ts`, as in the [Setup](/first-steps/setup) lesson.
 
-Replace the contents of `sda/main.ts` with `console.log("Hello!");`, then run `npm run sda` from the project folder. This runs the script again whenever you save a change. Use `npm run all-tests` to check your code and `npm run fix` to format it and apply automatic fixes.
+Type `console.log("Hello!");` in `main.ts`, save it, and run `node --watch main.ts` in the terminal. Your code reruns each time you save a change. Stop it with `CTRL` + `C`.
 
 <OutdatedScreenshot src="/assets/stock-market-simulator/setup.png" alt={"A VS Code screenshot showing a script logging \"Hello!\" to the terminal."} lang="en" />
 
@@ -60,7 +60,7 @@ We're going to install my open-source [Journalism Finance](https://github.com/ns
 
 But be careful: `getYahooFinanceData` uses an undocumented Yahoo Finance endpoint and is not affiliated with or endorsed by Yahoo. The same is true of many other open-source libraries you might find for retrieving this kind of data. Before using it, review [Yahoo's terms](https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html) and any applicable [data-provider restrictions](https://help.yahoo.com/kb/finance/SLN2310.html).
 
-For now, let's stop watching and running `sda/main.ts` by clicking in the terminal and pressing `CTRL` + `C`. Then, install the library by running this command in the terminal:
+For now, let's stop watching and running `main.ts` by clicking in the terminal and pressing `CTRL` + `C`. Then, install the library by running this command in the terminal:
 
 `npm install @nshiab/journalism-finance`
 
@@ -68,13 +68,13 @@ The dependency is now listed in `package.json` and installed in `node_modules`. 
 
 <OutdatedScreenshot src="/assets/stock-market-simulator/install-journalism-finance.png" alt={"A screenshot showing the Journalism Finance dependency installed and added to deno.json."} lang="en" />
 
-We'll first gather the data, then use it. To keep the project organized, we'll put reusable helper functions in their own files. Open the generated `sda/helpers` folder and add `getData.ts`. This function will retrieve data for a publicly traded company.
+We'll first gather the data, then use it. To keep the project organized, we'll put reusable helper functions in their own files. Create a `helpers` folder in your project and add `getData.ts` inside it. This function will retrieve data for a publicly traded company.
 
 In this first helper, we import `getYahooFinanceData` from `@nshiab/journalism-finance`, call it with parameters explained below, and return the data. `getData` expects one string parameter, `symbol`. Because the function is general, we can reuse it for any company if needed.
 
-Adding `export default` lets us import the helper where we need it, which in this case will be `sda/main.ts`.
+Adding `export default` lets us import the helper where we need it, which in this case will be `main.ts`.
 
-```ts showLineNumbers filename="sda/helpers/getData.ts"
+```ts showLineNumbers filename="helpers/getData.ts"
 import { getYahooFinanceData } from "@nshiab/journalism-finance";
 
 export default async function getData(symbol: string) {
@@ -105,11 +105,11 @@ Note that `getYahooFinanceData` is asynchronous because it fetches data over the
     Under the hood, `getYahooFinanceData` fetches data from a Yahoo Finance API. An API, or *Application Programming Interface*, allows programs to exchange data. We will explore how to find undocumented APIs in the [Web scraping](/data-projects/web-scraping) project.
 </Callout>
 
-Now, we can update `sda/main.ts` to import and call our new helper, keeping our code clean.
+Now, we can update `main.ts` to import and call our new helper, keeping our code clean.
 
 On line 3, we create the `symbol` variable and assign Apple's stock market symbol, `AAPL`, to it. We pass this variable to `getData`, which expects a `symbol` parameter. Again, we use `await` to make sure we receive all the data before continuing. On line 6, we log the first ten results as a table.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import getData from "./helpers/getData.ts";
 
 const symbol = "AAPL";
@@ -124,24 +124,24 @@ But before running this code, we need to take care of one more thing.
 
 ## Caching
 
-If we were to run `sda/main.ts` right now, the data would be refetched every time the code is executed.
+If we were to run `main.ts` right now, the data would be refetched every time the code is executed.
 
 We don’t want to overwhelm Yahoo’s servers with our requests. We must respect their infrastructure. Also, we don’t want to get blacklisted... 🫣 So let's cache the data.
 
 The idea is pretty simple. The first time we fetch the data, we write it to a file. Then, every time the code runs again, if the file exists (which it will), we use it instead of fetching the data again.
 
-We will store the cached data in the `sda/data` folder created by the setup tool. File paths are relative to the project folder where you run `npm run sda`.
+Create a `data` folder in your project to store the cached data. File paths are relative to the project folder where you run `node --watch main.ts`.
 
 <OutdatedScreenshot src="/assets/stock-market-simulator/create-data-folder.png" alt={"A screenshot showing a new data folder in VS Code."} lang="en" />
 
 Now, we're going to update `getData` to check whether a cached file exists. To do that, we use `stat()` from `node:fs/promises`, which returns information if the file exists. If it doesn't, `catch()` returns `null`. We can then use `if` and `else` branches to read the data from the file if it exists, or fetch fresh data if it doesn't.
 
-```ts showLineNumbers filename="sda/helpers/getData.ts"
+```ts showLineNumbers filename="helpers/getData.ts"
 import { getYahooFinanceData } from "@nshiab/journalism-finance";
 import { readFile, stat, writeFile } from "node:fs/promises";
 
 export default async function getData(symbol: string) {
-  const path = `./sda/data/${symbol}.json`;
+  const path = `./data/${symbol}.json`;
   let dailyStockData;
 
   if (await stat(path).catch(() => null)) {
@@ -175,11 +175,11 @@ Here’s what happens when you run this code:
 - Otherwise, we fetch prices, convert the array to JSON, and save it with `writeFile()`.
 - Finally, the function returns the data from either source.
 
-Now, run and watch `sda/main.ts`:
+Now, run and watch `main.ts`:
 
-`npm run sda`
+`node --watch main.ts`
 
-The first time you run this code, the cache file does not exist. The `else` block fetches the data and writes `AAPL.json` in `sda/data`.
+The first time you run this code, the cache file does not exist. The `else` block fetches the data and writes `AAPL.json` in `data`.
 
 <OutdatedScreenshot src="/assets/stock-market-simulator/data-fetched-aapl.png" alt={"A screenshot showing stock data being fetched and written to AAPL.json."} lang="en" />
 
@@ -187,13 +187,13 @@ The first time you run this code, the cache file does not exist. The `else` bloc
     Wondering what `timestamp` means? This huge number is the number of milliseconds since January 1, 1970. This is how JavaScript tracks dates and times behind the scenes. Here, the library gives us the timestamp directly instead of a date, but as we'll see, JavaScript makes it easy to go back and forth between dates and timestamps.
 </Callout>
 
-Now, rerun `sda/main.ts` by saving it again (`CMD` + `S` on Mac or `CTRL` + `S` on PC). This time, the condition is met because Node.js finds `AAPL.json`. The `if` block runs, while everything under `else` is skipped. We don't need to fetch the data again. We read it from our local file instead. This is faster and doesn't annoy Yahoo's servers with another request.
+Now, rerun `main.ts` by saving it again (`CMD` + `S` on Mac or `CTRL` + `S` on PC). This time, the condition is met because Node.js finds `AAPL.json`. The `if` block runs, while everything under `else` is skipped. We don't need to fetch the data again. We read it from our local file instead. This is faster and doesn't annoy Yahoo's servers with another request.
 
 <OutdatedScreenshot src="/assets/stock-market-simulator/data-cached-aapl.png" alt={"A screenshot showing stock data being read from AAPL.json."} lang="en" />
 
 You can keep cached data for multiple companies. For example, replace `AAPL` in the `symbol` variable with `GOOG` to get the historical stock prices of Alphabet (formerly Google) and run the code.
 
-```ts showLineNumbers filename="sda/main.ts" {3}
+```ts showLineNumbers filename="main.ts" {3}
 import getData from "./helpers/getData.ts";
 
 const symbol = "GOOG";
@@ -202,15 +202,15 @@ const dailyStockData = await getData(symbol);
 console.table(dailyStockData.slice(0, 10));
 ```
 
-You'll see another file, `GOOG.json`, being created in `sda/data`.
+You'll see another file, `GOOG.json`, being created in `data`.
 
 <OutdatedScreenshot src="/assets/stock-market-simulator/data-fetched-goog.png" alt={"A screenshot showing stock data for Alphabet being fetched and written to GOOG.json."} lang="en" />
 
 If you switch back to `AAPL`, the data is still there. No need to fetch it again!
 
-And if you want more up-to-date prices, just delete the files in `sda/data` and rerun your code. Easy!
+And if you want more up-to-date prices, just delete the files in `data` and rerun your code. Easy!
 
-```ts showLineNumbers filename="sda/main.ts" {3}
+```ts showLineNumbers filename="main.ts" {3}
 import getData from "./helpers/getData.ts";
 
 const symbol = "AAPL";
@@ -229,12 +229,12 @@ console.table(dailyStockData.slice(0, 10));
 
 We now have everything we need to calculate returns!
 
-Let's create another function, `calculateFinalAmount`, in `sda/helpers`. This function will need three parameters:
+Let's create another function, `calculateFinalAmount`, in `helpers`. This function will need three parameters:
 - The `amount` invested, which must be a `number`
 - The `startDate`, which is the `Date` of the investment
 - The `dailyStockData` returned by `getYahooFinanceData`, which is an array of objects pairing a `timestamp` with a `value`
 
-```ts showLineNumbers filename="sda/helpers/calculateFinalAmount.ts"
+```ts showLineNumbers filename="helpers/calculateFinalAmount.ts"
 export default function calculateFinalAmount(
   amount: number,
   startDate: Date,
@@ -264,11 +264,11 @@ Here’s what happens when we call this function:
 - Line 15 calculates the rate of return, which can be positive or negative.
 - Line 17 calculates the final amount: the initial amount plus the amount multiplied by the rate of return.
 
-If we run our code now, nothing will happen. We still need to call our new function in `sda/main.ts`.
+If we run our code now, nothing will happen. We still need to call our new function in `main.ts`.
 
 First, we import `calculateFinalAmount`. Then, we create the `amount` and `startDate` variables and pass them, along with `dailyStockData`, to the function. Finally, we store its result in a new variable called `finalAmount`.
 
-```ts showLineNumbers filename="sda/main.ts" {2, 5-6, 10, 12}
+```ts showLineNumbers filename="main.ts" {2, 5-6, 10, 12}
 import getData from "./helpers/getData.ts";
 import calculateFinalAmount from "./helpers/calculateFinalAmount.ts";
 
@@ -291,11 +291,11 @@ And here's the result! It works! You would have approximately $4,639 today (as o
 
 Let's create a function to display the result more clearly.
 
-In `sda/helpers`, create a function called `logResult`.
+In `helpers`, create a function called `logResult`.
 
 To make the message easier to read, we format `startDate` with `.toLocaleDateString("en-US")`. `"en-US"` is what we call a locale. It specifies that the date should be formatted in English for the United States, but you can pass any locale you want, such as `"fr-CA"` for French in Canada. We specify `timeZone: "UTC"` because a date-only string such as `"2020-01-01"` is parsed in UTC; this keeps the displayed date consistent across time zones. We also round `finalAmount` with `Math.round()`.
 
-```ts showLineNumbers filename="sda/helpers/logResult.ts"
+```ts showLineNumbers filename="helpers/logResult.ts"
 export default function logResult(
   amount: number,
   symbol: string,
@@ -311,9 +311,9 @@ export default function logResult(
 }
 ```
 
-We can now use this function in `sda/main.ts`.
+We can now use this function in `main.ts`.
 
-```ts showLineNumbers filename="sda/main.ts" {3, 13}
+```ts showLineNumbers filename="main.ts" {3, 13}
 import getData from "./helpers/getData.ts";
 import calculateFinalAmount from "./helpers/calculateFinalAmount.ts";
 import logResult from "./helpers/logResult.ts";
@@ -347,7 +347,7 @@ Let's squash this bug! 🐛
 
 We can update `calculateFinalAmount`, which already receives both `startDate` and `dailyStockData`. The lines we're adding below compare the investment date with the first available price. If the investment date is earlier, the helper throws an error with a message.
 
-```ts showLineNumbers filename="sda/helpers/calculateFinalAmount.ts" {8-12}
+```ts showLineNumbers filename="helpers/calculateFinalAmount.ts" {8-12}
 export default function calculateFinalAmount(
   amount: number,
   startDate: Date,

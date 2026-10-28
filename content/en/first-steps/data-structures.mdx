@@ -16,15 +16,15 @@ In this lesson, we'll use these structures to store data about a classroom. Buck
 
 Before diving in, let's set things up.
 
-Use the project you created in [Setup](/first-steps/setup), or create a new empty folder, open it with VS Code, and run `npx @nshiab/setup-data-project` with no libraries selected.
+Use the folder and `main.ts` file you created in [Setup](/first-steps/setup), or open a new empty folder in VS Code and create `main.ts` inside it.
 
-Replace the contents of `sda/main.ts` with `console.log("Hello!");` and save it.
+Replace the contents of `main.ts` with `console.log("Hello!");` and save it.
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `npm run sda` from the project folder that contains `package.json`.
+Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `node --watch main.ts` from the project folder you opened in VS Code.
 
-Watching reruns the script; it does not check types. Use `npm run all-tests` in a second terminal to check types, formatting, and lint rules and run any tests. Use `npm run fix` for formatting and automatic fixes, then check again. Stop the script watcher with `CTRL` + `C`.
+VS Code highlights TypeScript errors as you type and formats your code when you save. Stop the script watcher with `CTRL` + `C`.
 
-`npm run sda` reruns `sda/main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+`node --watch main.ts` reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
 
 You can use this setup to test the code provided in this lesson.
 
@@ -36,7 +36,7 @@ Objects store data as **key-value pairs** enclosed in curly brackets (`{}`), wit
 
 For example, the object below stores data about a student. The keys are `firstName`, `lastName`, `gender`, and `age`. The corresponding values are `"Nael"`, `"Shiab"`, `"man"`, and `22` (that's Nael from a long time ago 😅):
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const student = {
   firstName: "Nael",
   lastName: "Shiab",
@@ -60,7 +60,7 @@ To access the value of a specific key, use a `.` directly after the variable tha
 
 For example, the following code will log `Nael` to your terminal:
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const student = {
   firstName: "Nael",
   lastName: "Shiab",
@@ -80,7 +80,7 @@ You use the same syntax to modify a value in an object as you do to access it, b
 
 As discussed in the [Variables](/first-steps/variables) lesson, you must respect the type of the value when modifying it. For example, if a key's value is initially a `number` (like with `age`), it can only be updated with another `number`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const student = {
   firstName: "Nael",
   lastName: "Shiab",
@@ -104,7 +104,7 @@ If you type `.` after a variable referencing an object, a pop-up will appear sho
 
 <OutdatedScreenshot src="/assets/first-steps/data-structures/object-auto-completion.png" alt={"A screenshot showing VS Code and its IntelliSense feature."} lang="en" />
 
-Additionally, because objects are typed, if you try to access a key that doesn't exist in the object, VS Code and the project's type check will report an error before you even run the script. For example, try `student.fristName` instead of `student.firstName`. Node.js itself doesn't check these types, so keep using `npm run all-tests`.
+Additionally, because objects are typed, if you try to access a key that doesn't exist in the object, VS Code will report an error before you even run the script. For example, try `student.fristName` instead of `student.firstName`. Node.js itself doesn't check these types, so pay attention to the errors shown by VS Code.
 
 Many bugs and errors are caused by simple typos. With this feature, TypeScript helps you catch those mistakes early, saving you time and frustration. 🙏
 
@@ -118,7 +118,7 @@ Arrays store data in a specific order, enclosed within square brackets (`[` and 
 
 For example, here is an array of student names.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 console.log(names);
 ```
@@ -137,7 +137,7 @@ For example:
 
 To access an array value using an index, place the index inside square brackets (`[]`) immediately after the array or the variable referencing the array.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 // Change the index to see what's being logged.
@@ -152,7 +152,7 @@ console.log(student);
 
 You can also modify a value in an array using its index and the `=` operator. Remember that arrays are typed in TypeScript. For example, if the type of `names` is `string[]`, you can only replace a value with another `string`.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 // Changing the string
@@ -170,7 +170,7 @@ Arrays have a property called `length`, which returns the number of items in the
 
 To access a property, type a `.` right after the array or the variable referencing it.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 console.log(names.length);
 ```
@@ -189,7 +189,7 @@ Here are a few examples of commonly used array methods.
 
 The `.push()` method adds one or more items to the end of an array.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 names.push("Nael");
@@ -202,7 +202,7 @@ console.log(names);
 
 The `.slice()` method creates a copy of the array. You can specify a starting index and a stopping index to copy just a portion of the array.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 // Start at index 0 and end at index 2, not included
@@ -218,7 +218,7 @@ The `.sort()` method sorts arrays containing strings in ascending order by defau
 
 It's also possible to pass an argument to sort other data types in a specific manner, but we'll cover that later.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const names = ["James", "John", "Patricia", "Jennifer"];
 
 names.sort();
@@ -231,7 +231,7 @@ console.log(names);
 
 The `.includes()` method checks if a value exists in the array and returns a boolean.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const marks = [33, 45, 78, 98];
 
 console.log(marks.includes(45));
@@ -247,7 +247,7 @@ The `.find()` method searches for a value in the array. If no value matches the 
 
 This method requires a `function` as an argument. We'll cover functions in the next lessons.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const marks = [33, 45, 78, 98];
 
 // Find the first mark greater than 50
@@ -269,7 +269,7 @@ The `.filter()` method creates a new array containing only the items that match 
 
 This method requires a `function` as an argument. We'll cover functions in the next lessons.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const marks = [33, 45, 78, 98];
 
 // Create a new array with
@@ -294,7 +294,7 @@ This method requires a `function` as an argument. We'll cover functions in the n
 
 For example, the code below doubles each mark.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const allMarks = [33, 45, 78, 98];
 
 // Here, we multiply each mark by 2
@@ -315,7 +315,7 @@ console.log(marksMultiplied);
 
 Another advantage of using array methods is that they can be chained. Since they return an array, you can call one method after another.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const allMarks = [33, 45, 78, 98];
 
 // Here we chain the array methods.
@@ -333,7 +333,7 @@ console.log(newMarks);
 ```
 
 <Callout type="info" emoji="💡">
-So far in our code, each line has ended with a `;`. However, from line 8 to line 11, there are no semicolons because we are chaining methods. Everything between these lines is part of the same statement. Technically, you could write it all on one line, but that would make the code less readable. Since TypeScript doesn't care about line breaks or indentation, it's up to the user to format the code as they prefer. In our case, we let the project formatter handle that for us.
+So far in our code, each line has ended with a `;`. However, from line 8 to line 11, there are no semicolons because we are chaining methods. Everything between these lines is part of the same statement. Technically, you could write it all on one line, but that would make the code less readable. Since TypeScript doesn't care about line breaks or indentation, it's up to the user to format the code as they prefer. In our case, we let VS Code format it when we save.
 </Callout>
 
 #### Others
@@ -360,7 +360,7 @@ Here's an example using our students' names and marks. Each object stores data a
 
 You can think of each object as a row in a table. In fact, you can switch `console.log` to `console.table` and see a beautiful table displayed in your terminal!
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const students = [
   { name: "James", mark: 33 },
   { name: "John", mark: 45 },
@@ -378,7 +378,7 @@ For example, you can filter based on a specific key while preserving the rest of
 
 It's the best of both worlds!
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 const students = [
   { name: "James", mark: 33 },
   { name: "John", mark: 45 },
