@@ -193,11 +193,9 @@ console.log(typeof bool2);
 
 ## Dates
 
-Dates are objects, and TypeScript has a `Date` type for them. We use them so much in data analysis that I wanted to add them here.
+Dates in JavaScript are represented as a number of milliseconds since January 1, 1970, UTC.
 
-Date objects store a number of milliseconds since January 1, 1970, UTC.
-
-To create a date object, you need to use the `Date` constructor. Notice the `new` keyword and the parameters passed in the parentheses in the code below. We use `new` because `Date` is a class, which we'll learn about in another lesson.
+To create a date, you need to use the `Date` constructor. Notice the `new` keyword and the parameters passed in the parentheses in the code below. We use `new` because `Date` is a class, which we'll learn about in another lesson.
 
 ```ts showLineNumbers filename="main.ts"
 // Current date and time.
@@ -219,7 +217,7 @@ console.log("invalidDate:", invalidDate);
 
 ![VS Code showing the current date, a date created from milliseconds, a date created from a string, and Invalid Date in the terminal.](/assets/first-steps/data-types/dates.png)
 
-To check if something is a `Date`, `typeof` alone won't help: it returns `"object"`.
+To check if something is a `Date`, `typeof` alone won't help: it returns `"object"` (we'll talk about objects in the next lesson).
 
 Instead, use the `instanceof` operator, because dates are instances of the `Date` **class** (more about classes later).
 
