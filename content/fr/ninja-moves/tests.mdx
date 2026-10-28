@@ -104,7 +104,7 @@ Mais pour les besoins de cette leçon, ajoutons quelques tests supplémentaires.
 
 Par exemple, que doit-il se passer si le premier nombre est `0` ? Et si le second est `0` ? Peut-être que nous voulons que notre fonction retourne `0%` dans les deux cas.
 
-Copiez-collez le code ci-dessous. Dès que vous enregistrerez le fichier modifié, les tests se relanceront automatiquement.
+Modifiez le fichier avec le code ci-dessous. Dès que vous enregistrerez le fichier modifié, les tests se relanceront automatiquement.
 
 
 ```ts showLineNumbers filename="sda/tests/getPercentage.test.ts" {9-17}
@@ -132,7 +132,7 @@ On peut voir que le deuxième test est passé, mais que le troisième a échoué
 
 Quand `total` vaut `0`, notre fonction retourne `Infinity%` au lieu de ce que nous voulons, c’est-à-dire `0%`.
 
-Mettons à jour notre fichier `getPercentage.ts` pour corriger cela. Copiez-collez le code ci-dessous. Dès que vous enregistrerez le fichier, les tests se relanceront automatiquement.
+Mettons à jour notre fichier `getPercentage.ts` pour corriger cela. Modifiez le fichier avec le code ci-dessous. Dès que vous enregistrerez le fichier, les tests se relanceront automatiquement.
 
 
 ```ts showLineNumbers filename="sda/helpers/getPercentage.ts" {5-7, 10}

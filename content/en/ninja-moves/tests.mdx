@@ -102,7 +102,7 @@ But for the sake of this lesson, let's add more tests here. Let's test edge case
 
 For example, what is supposed to happen when the first number is `0`? And when the second is `0`? Maybe we want our function to return `0%` in both cases.
 
-Copy and paste the code below. When you save the modified file, the tests will be automatically rerun.
+Update the file with the code below. When you save the modified file, the tests will be automatically rerun.
 
 ```ts showLineNumbers filename="sda/tests/getPercentage.test.ts" {9-17}
 import { test, expect } from "vitest";
@@ -129,7 +129,7 @@ We can see that the second test passed but the third one failed!
 
 When the `total` is `0`, our function is returning `Infinity%` instead of what we want, which is `0%`.
 
-Let's update our `getPercentage.ts` to fix that. Copy and paste the code below. When you save the file, the tests will rerun automatically.
+Let's update our `getPercentage.ts` to fix that. Update the file with the code below. When you save the file, the tests will rerun automatically.
 
 ```ts showLineNumbers filename="sda/helpers/getPercentage.ts" {5-7, 10}
 export default function getPercentage(

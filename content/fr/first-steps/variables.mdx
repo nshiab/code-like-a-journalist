@@ -38,29 +38,15 @@ Cette commande exécute notre code et le relance automatiquement chaque fois que
     Vous avez peut-être remarqué que votre code s'affiche avec plusieurs couleurs. Cela s'appelle *code highlighting*. Dans le code, chaque mot a un rôle différent et se voit attribuer une couleur. Par exemple, ici `console` est un objet, et `log` est l'une de ses méthodes. De plus, en tapant, vous pouvez voir des suggestions d'auto-complétion et des infobulles. Cela s'appelle l'*IntelliSense*. C'est votre éditeur qui essaie de deviner ce que vous pourriez vouloir écrire et fournit une documentation. Pour l'instant, vous pouvez ignorer tout cela, mais nous l'utiliserons plus tard.
 </Callout>
 
-## Mode surveillance
-
-Voyons comment la surveillance nous aide à travailler.
-
-La commande `node --watch main.ts` démarre déjà Node.js en mode surveillance : il relance automatiquement notre code chaque fois que nous enregistrons une modification. Cela relance le script ; cela ne vérifie pas les types TypeScript.
-
-Si la commande est toujours en cours, laissez-la tourner. Sinon, relancez `node --watch main.ts`. Maintenant, remplacez votre ligne de code par `console.log(2 + 4);` et enregistrez votre fichier (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
-
-Node.js relancera `main.ts` à chaque fois que vous l'enregistrez. Très pratique !
-
-VS Code vérifie les types TypeScript pendant la saisie. Survolez un soulignement rouge pour lire le message d'erreur. Node.js exécute le code sans vérifier les types.
-
-Si vous voulez arrêter la surveillance, cliquez dans le terminal et appuyez sur `CTRL` + `C` (ça devrait être la même chose sur PC et sur Mac). Mais nous garderons la surveillance pour le reste de la leçon.
-
-<OutdatedScreenshot src="/assets/first-steps/variables/watch.png" alt={"Une capture d'écran montrant VS Code surveillant main.ts."} lang="fr" />
-
 ## Variables avec `const`
 
 Ajoutons maintenant des variables à notre code.
 
 Les variables sont comme des conteneurs. Vous pouvez y mettre des choses, et lorsque vous les référencez, Node.js regardera ce qu'il y a à l'intérieur et l'utilisera. C'est très pratique, car vous pouvez réutiliser la même variable à différents endroits dans votre code.
 
-Modifions notre code pour mettre le premier nombre dans la variable `a` et le deuxième nombre dans `b`. Nous stockerons également le résultat du calcul dans la variable `c`. Copiez le code ci-dessous et collez-le dans votre fichier `main.ts`.
+Remplaçons notre message de bienvenue par un calcul. Nous mettrons `2` dans la variable `a` et `4` dans `b`, puis nous stockerons leur somme dans la variable `c`. Modifiez `main.ts` avec le code ci-dessous.
+
+Nous créons ces variables avec le mot-clé `const`, ce qui signifie que nous créons des variables constantes. Nous verrons un autre type de variable plus loin dans cette leçon.
 
 ```ts showLineNumbers filename="main.ts"
 const a = 2;
@@ -70,35 +56,34 @@ console.log(c);
 ```
 
 <Callout type="info" emoji="💡">
-    Avez-vous remarqué tous les points-virgules ? Ils marquent la fin des instructions. Le formateur de VS Code s'occupe de la présentation du code, mais prenez l'habitude de les écrire explicitement dans vos exemples.
+    Avez-vous remarqué tous les points-virgules ? Ils marquent la fin d'une instruction que vous donnez à votre ordinateur. Votre code fonctionnera souvent même sans eux, car Node.js peut déduire où ils devraient se trouver, mais nous les inclurons dans nos exemples de code comme bonne habitude de programmation.
 </Callout>
 
 Votre ordinateur exécutera ce code de haut en bas. La ligne 1 sera exécutée, puis la ligne 2, et ainsi de suite.
 
-<OutdatedScreenshot src="/assets/first-steps/variables/const-variables.png" alt={"VS Code montrant les variables a, b et c et le résultat 6 dans le terminal."} lang="fr" />
+Si vous enregistrez, vous verrez `6` dans le terminal. Vous venez d'effectuer un calcul avec des variables !
 
-Si vous enregistrez, vous remarquerez que le résultat dans le terminal est le même. Mais il y a une grande différence dans votre code : vous utilisez des variables !
+![VS Code montrant les variables a, b et c et le résultat 6 dans le terminal.](/assets/first-steps/variables/const-variables.png)
 
 `c` est le résultat de la somme de `a` et `b`, donc si vous changez `a` en `3`, cela changera la valeur dans `c`. Au lieu de `6`, votre ordinateur affichera `7`. Essayez-le !
 
-Si Node.js surveille toujours votre fichier dans le terminal, cela se fait automatiquement lorsque vous enregistrez. Si vous l'avez arrêté, relancez cette commande pour que Node.js réexécute votre code à chaque enregistrement :
-
-```sh
-node --watch main.ts
-```
+![VS Code montrant a défini à 3 et le résultat mis à jour à 7 dans le terminal.](/assets/first-steps/variables/const-variables-seven.png)
 
 Les variables sont omniprésentes dans le code car elles permettent d'abstraire et de réutiliser votre logique.
 
-Nous avons utilisé `a`, `b` et `c` comme noms de variables, mais vous pouvez utiliser n'importe quel nom tant qu'il ne contient pas d'espaces ou de caractères spéciaux. N'oubliez pas que le langage est sensible à la casse.
+Nous avons utilisé `a`, `b` et `c` comme noms de variables, mais vous pouvez choisir d'autres noms, comme ceux ci-dessous.
 
 Par exemple, j'ai mis à jour notre code précédent avec des noms de variables différents. Si vous l'exécutez, le résultat sera le même dans le terminal.
 
 ```ts showLineNumbers filename="main.ts"
-const banana = 2;
+const banana = 3;
 const super_apple = 4;
 const POTATO = banana + super_apple;
 console.log(POTATO);
 ```
+
+![VS Code montrant les variables banana, super_apple et POTATO et le résultat 7 dans le terminal.](/assets/first-steps/variables/variable-names.png)
+
 <Callout type="info" emoji="💡">
     Pour éviter toute confusion dans le code, il est important de nommer les variables de manière réfléchie. Lorsqu'un nom de variable est composé de plusieurs mots, nous utilisons par convention le *camel case*. Cela signifie que le premier mot est en minuscules, suivi des mots suivants avec une majuscule. Par exemple, `first name` deviendrait `firstName`. Différents langages et contextes utilisent différents styles de casse, comme le snake case en Python (`first_name`) ou le délicieux kebab case pour le développement web (`first-name`).
 </Callout>
@@ -106,49 +91,47 @@ console.log(POTATO);
 ## Variables avec `let`
 
 Il existe deux principales manières de créer des variables :
-- Avec `const`, si vous avez l'intention de garder le contenu constant, ce qui devrait être votre premier choix.
+
+- Avec `const`, si vous avez l'intention de garder le contenu constant, comme nous l'avons fait ci-dessus. Cela devrait être votre premier choix.
 - Avec `let`, si vous devez remplacer le contenu.
 
-Essayons de remplacer le contenu dans notre code sans changer `const` en `let`.
+Voyons ce qui se passe quand nous essayons de remplacer la valeur d'une variable créée avec `const`. À la ligne 6, nous essayons de remplacer la valeur de `c` par `10`. À la ligne 7, nous essayons d'afficher sa nouvelle valeur.
 
-Mettez à jour votre code ⚠️ **MAIS NE L'ENREGISTREZ PAS ENCORE** ⚠️ ! Je veux d'abord vous montrer quelque chose.
-
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="main.ts" {6-7}
 const a = 3;
 const b = 4;
 const c = a + b;
 console.log(c);
 
-// Nous voulons mettre 10 dans c et l’afficher.
 c = 10;
 console.log(c);
 ```
 
-En tapant, votre éditeur vérifie votre code. Et maintenant, nous voyons du rouge apparaître un peu partout ! Que se passe-t-il ?
+Modifiez `main.ts` avec ce code et enregistrez le fichier. Voici ce que vous devriez voir :
 
-Pour le savoir, survolez le `c` souligné par une ligne ondulée.
+![VS Code montrant une erreur lors de la tentative de réaffectation de c et une TypeError dans le terminal.](/assets/first-steps/variables/const-error.png)
 
-<OutdatedScreenshot src="/assets/first-steps/variables/const-error-before-save.png" alt={"Une capture d'écran montrant une erreur dans VS Code."} lang="fr" />
+Commençons par le terminal. Il affiche d'abord `7`, grâce à `console.log(c)` à la ligne 4. Tout fonctionne jusque-là.
 
-Oh ! Cela indique que nous essayons de remplacer le contenu d'une variable constante, ce qui est interdit. Merci, éditeur de code. Je suis content que tu aies détecté cela **avant d'exécuter le code**.
-
-Ce que vous voyez ici est une fonctionnalité très pratique de VS Code et TypeScript. L'erreur a été détectée **avant** que nous n'exécutions le code. Lorsque vous travaillez sur des analyses complexes qui peuvent prendre des secondes, des minutes, ou parfois des heures de calculs, vous serez reconnaissant de détecter les erreurs au préalable au lieu de perdre votre temps à attendre un script qui finira inévitablement par planter.
-
-Maintenant, exécutons ce code, juste par curiosité. Enregistrez le fichier.
-
-Comme prévu, le code plante, et l'erreur s'affiche également dans le terminal.
-
-<OutdatedScreenshot src="/assets/first-steps/variables/const-error.png" alt={"Une capture d'écran montrant une erreur dans le terminal de VS Code."} lang="fr" />
+À la ligne 6, `c = 10` provoque l'erreur `TypeError: Assignment to constant variable`, et Node.js arrête l'exécution du code. Remplacer la valeur d'une variable créée avec `const` est interdit. Cela aide à éviter de modifier des valeurs par accident, ce qui est utile en analyse de données.
 
 <Callout type="info" emoji="💡">
-    Lorsqu'une erreur est générée, Node.js vous indique où se trouve le code problématique. Par exemple, `.../main.ts:7:1` désigne le fichier `main.ts`, à la septième ligne et au premier caractère. La ligne et la colonne exactes peuvent varier selon votre code. Si vous appuyez sur `CMD` sur Mac ou `CTRL` sur PC et cliquez sur ce chemin de fichier, cela vous y mènera directement. C'est très pratique lorsque vous commencez à travailler avec beaucoup de fichiers.
+    Lorsqu'une erreur est générée, Node.js vous indique où se trouve le code problématique. Par exemple, `.../main.ts:6:3` désigne le fichier `main.ts`, à la sixième ligne et au troisième caractère. Si vous appuyez sur `CMD` sur Mac ou `CTRL` sur PC et cliquez sur ce chemin de fichier, cela vous y mènera directement. C'est très pratique lorsque vous commencez à travailler avec beaucoup de fichiers.
 </Callout>
+
+Au fait, pendant que vous écriviez ce code, VS Code a souligné `c` en rouge. Le nom du fichier `main.ts` est aussi devenu rouge dans l'Explorer à gauche et dans le titre de l'onglet en haut. Le chiffre `1` indique que TypeScript a trouvé une erreur dans le fichier, sans avoir besoin de l'exécuter.
+
+Survolez le `c` souligné pour voir l'explication : vous ne pouvez pas attribuer une nouvelle valeur à une constante.
+
+Cette vérification en direct permet de repérer des erreurs pendant la saisie. Elle peut vous faire gagner beaucoup de temps, surtout lorsqu'une analyse prend des minutes ou des heures à s'exécuter, comme nous le verrons dans les prochaines leçons.
+
+![VS Code avec des flèches pointant vers les noms de fichier main.ts en rouge et le c souligné, avec une infobulle expliquant que c est une constante.](/assets/first-steps/variables/const-error-hover.png)
 
 Mais comment corriger cette erreur ?
 
 Si nous voulons remplacer le contenu d'une variable, nous devons remplacer `const` par `let` lors de la création de la variable `c` à la ligne 3.
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="main.ts" {3}
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -160,9 +143,11 @@ console.log(c);
 
 Maintenant, le code s'exécute sans problème ! Si vous mettez à jour votre code et l'enregistrez, vous verrez la première valeur de `c` s'afficher dans votre terminal, suivie de la deuxième valeur.
 
+![VS Code montrant c déclaré avec let et les valeurs 7 et 10 affichées dans le terminal.](/assets/first-steps/variables/let-variables.png)
+
 Nous pouvons également réutiliser `c` pour le remplacer... par lui-même ! Les deux dernières lignes du code ci-dessous remplacent `c` par `c` au carré (`c` multiplié par lui-même).
 
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="main.ts" {9-10}
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -177,7 +162,7 @@ console.log(c);
 
 Le code ci-dessus affiche `7`, puis `10`, puis `100`.
 
-<OutdatedScreenshot src="/assets/first-steps/variables/squared.png" alt={"Une capture d'écran montrant un résultat au carré dans le terminal."} lang="fr" />
+![VS Code montrant c multiplié par lui-même et les valeurs 7, 10 et 100 dans le terminal.](/assets/first-steps/variables/squared.png)
 
 ## Variables typées
 
@@ -185,13 +170,11 @@ Il y a autre chose à savoir sur les variables : **le type de données est impor
 
 Par exemple, si vous survolez `c` maintenant, vous verrez qu'il a un type `number`. Cela est dû au fait que la somme de `a` et `b` est un nombre. Le type ici est **inféré**.
 
-<OutdatedScreenshot src="/assets/first-steps/variables/type-number.png" alt={"Une capture d'écran montrant une variable de type number dans VS Code."} lang="fr" />
+![VS Code montrant le type inféré number de c dans une infobulle.](/assets/first-steps/variables/type-number.png)
 
 Maintenant, remplaçons `c` par du texte à la ligne `6`. En TypeScript, le texte est appelé un `string`, car c'est une chaîne (*string* en anglais) de caractères. Pour que votre ordinateur le reconnaisse comme du texte, il doit être entouré de guillemets.
 
-Mettez à jour votre code ⚠️ **MAIS NE L'ENREGISTREZ PAS ENCORE** ⚠️ ! Désolé, j'ai encore crié. 😬
-
-```ts showLineNumbers filename="main.ts"
+```ts showLineNumbers filename="main.ts" {6}
 const a = 3;
 const b = 4;
 let c = a + b;
@@ -204,19 +187,43 @@ c = c * c;
 console.log(c);
 ```
 
-Nous avons une erreur disant que nous essayons de mettre du texte dans `c`, alors que `c` est censé être un nombre ! Et si l'on y réfléchit, c'est effectivement une erreur.
+Modifiez `main.ts` avec ce code et enregistrez le fichier.
 
-Si nous remplaçons `c` par du texte à la ligne 6, que se passe-t-il à la ligne 9 ? Quelle serait la valeur au carré de `"Hey! What's up?"` ? Cela n'a aucun sens de multiplier du texte par lui-même !
+VS Code signale une nouvelle erreur de type : `main.ts` redevient rouge et une ligne rouge ondulée apparaît sous `c`.
 
-Encore une fois, l'éditeur a détecté l'erreur **avant d'exécuter le code**. En TypeScript, **les variables sont typées**, ce qui nous aide à écrire du code fiable et robuste.
+Node.js exécute tout de même le code et affiche `7`, le message, puis `NaN`, qui signifie *not a number*, soit « pas un nombre ». Essayer de multiplier ce message par lui-même à la ligne 9 ne produit pas de nombre.
 
-<OutdatedScreenshot src="/assets/first-steps/variables/type-error-hover.png" alt={"Une capture d'écran montrant une erreur de type dans VS Code lors d'un survol."} lang="fr" />
+![VS Code montrant les noms de fichier main.ts en rouge, c souligné et NaN dans le terminal après la multiplication du message par lui-même.](/assets/first-steps/variables/type-error.png)
 
-**Enregistrez maintenant le fichier.** VS Code signale toujours qu'une chaîne de caractères ne peut pas être assignée à une variable de type `number`.
+Survolez `c` pour voir l'explication : `Type 'string' is not assignable to type 'number'`. Comme `c` contenait un nombre au départ, son type est `number`. Utiliser `let` permet de changer sa valeur, mais celle-ci doit rester un nombre. C'est une règle de TypeScript.
 
-Node.js se comporte différemment : il exécute le code sans vérifier les types. Il affiche `7`, puis le texte, puis `NaN`, car multiplier ce texte par lui-même ne produit pas de nombre. Le script ne plante pas. C'est précisément pourquoi nous utilisons le vérificateur TypeScript en plus de Node.js : un script qui s'exécute peut quand même produire un résultat invalide.
+Ces avertissements et erreurs aident à éviter des erreurs dans de longs scripts, où une valeur peut être réutilisée plus loin.
 
-<OutdatedScreenshot src="/assets/first-steps/variables/type-error.png" alt={"Une capture d'écran montrant une erreur de type dans VS Code."} lang="fr" />
+![VS Code montrant l'infobulle Type 'string' is not assignable to type 'number'.](/assets/first-steps/variables/type-error-hover.png)
+
+<Callout type="info" emoji="💡">
+    Vous avez peut-être remarqué que le terminal n'affiche aucune erreur, même si VS Code signale une erreur de type. Node.js exécute le code sans vérifier les types TypeScript ; VS Code les vérifie pendant la saisie. Dans les prochaines leçons, notre commande dans le terminal vérifiera les types avant d'exécuter le code, pour que les erreurs de type empêchent l'analyse de démarrer. Cela aide à éviter des erreurs dans nos résultats.
+</Callout>
+
+Si vous avez besoin de stocker `"Hey! What's up?"` dans une variable, la solution est simple : créez une nouvelle variable, comme ci-dessous. Ainsi, `c` reste disponible pour nos calculs.
+
+```ts showLineNumbers filename="main.ts" {12-13}
+const a = 3;
+const b = 4;
+let c = a + b;
+console.log(c);
+
+c = 10;
+console.log(c);
+
+c = c * c;
+console.log(c);
+
+const d = "Hey! What's up?";
+console.log(d);
+```
+
+![VS Code montrant le message stocké dans une nouvelle variable d et le terminal affichant 7, 10, 100 et Hey! What's up?.](/assets/first-steps/variables/separate-string-variable.png)
 
 ## Conclusion
 
@@ -224,20 +231,21 @@ Node.js se comporte différemment : il exécute le code sans vérifier les types
 
 Mais croyez-moi : cela vous évitera de pernicieux bogues. En tant que journaliste computationnel d'expérience, j'ai appris cela à mes dépens. 😅
 
-Utiliser `const` vous empêchera d'écraser accidentellement des variables ou des données importantes, et les types garantiront que vous ne mélangez pas `text`, `number`, `Date`, ou d'autres types de données que nous explorerons dans les prochaines leçons.
+Utiliser `const` vous empêchera d'écraser accidentellement des variables ou des données importantes, et les types garantiront que vous ne mélangez pas `string`, `number`, `Date`, ou d'autres types de données que nous explorerons dans les prochaines leçons.
 
 Au bout du compte, vous voulez des résultats valides. Vous voulez éviter à tout prix de publier des informations incorrectes. Alors, quand vous pesterez contre les erreurs TypeScript, prenez une grande inspiration et répétez à voix haute : *C'est pour m'aider, ce n'est pas contre moi !*
 
 Bien que cela puisse sembler compliqué pour l'instant, après un peu de pratique, tout deviendra naturel. Faites-moi confiance. 🙂
 
-Et comme je serais un très mauvais enseignant si je vous laissais terminer une leçon sur une erreur, mettons à jour le code une dernière fois, avec des commentaires cette fois-ci.
+Terminons par un récapitulatif de nos calculs, avec des commentaires expliquant chaque étape.
 
 ```ts showLineNumbers filename="main.ts"
-// Nous créons des variables constantes.
+// Nous créons des variables constantes contenant des nombres.
 const a = 3;
 const b = 4;
 
-// Nous utilisons let pour pouvoir modifier c plus tard.
+// Le type de c est inféré comme number, car a et b sont des nombres.
+// Nous utilisons let pour pouvoir changer sa valeur plus tard.
 let c = a + b;
 console.log(c);
 
@@ -248,6 +256,10 @@ console.log(c);
 // Nous pouvons remplacer c en utilisant c lui-même.
 c = c * c;
 console.log(c);
+
+// Pour un autre type de données, nous créons une nouvelle variable.
+const d = "Hey! What's up?";
+console.log(d);
 ```
 
 <Callout type="info" emoji="💡">
