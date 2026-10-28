@@ -12,7 +12,7 @@ Data types are essential to TypeScript. They are the building blocks that you'll
 
 This lesson is just an overview to get you started. We'll explore these data types in more detail as we go. We'll also have fun with data projects down the road.
 
-Note that I assume you've completed the [Setup lesson](/first-steps/setup) before diving into this one.
+Note that I assume you've completed the [Setup lesson](/first-steps/setup) and the [Variables lesson](/first-steps/variables) before diving into this one.
 
 <NoticeIntro />
 
@@ -42,7 +42,7 @@ Text is called `string` in TypeScript (as in many languages) because it's a *str
 
 Strings are always wrapped with quotes. You can use single quotes, double quotes, or backticks.
 
-If you need multiline text, you must use backticks. If you want to use single or double quotes in your text, use backticks as well.
+Backticks let you write text across multiple lines. They're also convenient when your text contains both single and double quotes.
 
 ```ts showLineNumbers filename="main.ts"
 // This works.
@@ -61,17 +61,17 @@ It's been a while.`;
 
 // Change the variable down here
 // to see the result in your terminal.
-console.log(text1)
+console.log(text1);
 ```
 
 To check if something is a string, you can use the `typeof` operator (or hover over the variable to see its type).
 
 ```ts showLineNumbers filename="main.ts"
-const name = "Nael Shiab"
-console.log(typeof name)
+const fullName = "Nael Shiab";
+console.log(typeof fullName);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-types/typeof-string.png" alt={"A screenshot showing VS Code logging a `typeof` string."} lang="en" />
+![VS Code showing typeof fullName and the result string in the terminal.](/assets/first-steps/data-types/typeof-string.png)
 
 ## Numbers
 
@@ -90,6 +90,8 @@ console.log(number2);
 const number3 = 1e3;
 console.log(number3);
 ```
+
+![VS Code showing 1000, 1_000, and 1e3 all displaying 1000 in the terminal.](/assets/first-steps/data-types/number-notations.png)
 
 You can write integers and decimals, positive or negative.
 
@@ -113,8 +115,10 @@ There are also special numbers, like `Infinity`.
 const positiveInfinity = Infinity;
 const negativeInfinity = -Infinity;
 
-console.log(positiveInfinity, negativeInfinity)
+console.log(positiveInfinity, negativeInfinity);
 ```
+
+![VS Code showing positive and negative Infinity displayed together in the terminal.](/assets/first-steps/data-types/infinity.png)
 
 <Callout type="info" emoji="💡">
     If you want to log multiple things with `console.log`, separate them by a comma, as shown above. When logged, items will be separated by a space.
@@ -134,7 +138,7 @@ console.log(parseInt("42"));
 console.log(parseInt("hello"));
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-types/nan.png" alt={"A screenshot showing VS Code logging a NaN value."} lang="en" />
+![VS Code showing parseInt returning 42 for "42" and NaN for "hello" in the terminal.](/assets/first-steps/data-types/nan.png)
 
 To check if something is a number, you can use the `typeof` operator (or hover over the variable to see its type).
 
@@ -152,7 +156,7 @@ const notNumber = NaN;
 console.log(notNumber, "=>", typeof notNumber);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-types/typeof-number.png" alt={"A screenshot showing VS Code logging a `typeof` number."} lang="en" />
+![VS Code showing typeof returning number for 1000, 10.5, Infinity, and NaN in the terminal.](/assets/first-steps/data-types/typeof-number.png)
 
 ## Booleans
 
@@ -169,11 +173,11 @@ console.log(bool2);
 
 // If you compare things, you'll get a boolean.
 // Here, we check if 3 is greater than 2.
-const comparison = 3 > 2
+const comparison = 3 > 2;
 console.log("Is 3 greater than 2?", comparison);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-types/booleans-comparison.png" alt={"A screenshot showing VS code logging a comparison."} lang="en" />
+![VS Code showing true, false, and the result true for the comparison 3 greater than 2 in the terminal.](/assets/first-steps/data-types/booleans-comparison.png)
 
 To check if something is a boolean, you can use the `typeof` operator (or hover over the variable to see its type).
 
@@ -185,13 +189,13 @@ const bool2 = false;
 console.log(typeof bool2);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-types/typeof-booleans.png" alt={"A screenshot showing VS Code logging a `typeof` boolean."} lang="en" />
+![VS Code showing typeof returning boolean for both true and false in the terminal.](/assets/first-steps/data-types/typeof-booleans.png)
 
 ## Dates
 
-Dates are not a type per se... but we use them so much in data analysis that I wanted to add them here.
+Dates are objects, and TypeScript has a `Date` type for them. We use them so much in data analysis that I wanted to add them here.
 
-Dates are represented as the number of milliseconds elapsed since January 1, 1970, UTC.
+Date objects store a number of milliseconds since January 1, 1970, UTC.
 
 To create a date object, you need to use the `Date` constructor. Notice the `new` keyword and the parameters passed in the parentheses in the code below. We use `new` because `Date` is a class, which we'll learn about in another lesson.
 
@@ -213,27 +217,27 @@ const invalidDate = new Date("Hi! I'm not a date!");
 console.log("invalidDate:", invalidDate);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-types/dates.png" alt={"A screenshot showing VS Code logging a date."} lang="en" />
+![VS Code showing the current date, a date created from milliseconds, a date created from a string, and Invalid Date in the terminal.](/assets/first-steps/data-types/dates.png)
 
-To check if something is a `Date`, you can't use the `typeof` operator because dates are not a type.
+To check if something is a `Date`, `typeof` alone won't help: it returns `"object"`.
 
-Instead, you must use the `instanceof` operator, because dates are instances of the `Date` **class** (more about classes later).
+Instead, use the `instanceof` operator, because dates are instances of the `Date` **class** (more about classes later).
 
-You can also hover over the variable to see what's in it.
+You can also hover over the variable in VS Code to see its type.
 
 ```ts showLineNumbers filename="main.ts"
 const currentTime = new Date();
 
-// Wrong! Dates are not a type.
+// typeof doesn't tell us whether this object is a Date.
 // This will return "object".
 console.log("typeof:", typeof currentTime);
 
-// Correct! Dates are an instance of the Date class.
+// instanceof checks whether this is an instance of Date.
 // This will return true.
 console.log("instanceof Date:", currentTime instanceof Date);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-types/instanceof-date.png" alt={"A screenshot showing VS Code checking for dates."} lang="en" />
+![VS Code showing typeof returning object and instanceof Date returning true for a date.](/assets/first-steps/data-types/instanceof-date.png)
 
 ## Other types
 
@@ -259,6 +263,8 @@ const nullValue = null;
 console.log(nullValue);
 ```
 
+![VS Code showing an unassigned variable and an explicit undefined value both logging undefined, followed by null in the terminal.](/assets/first-steps/data-types/undefined-null.png)
+
 To check if something is `undefined` or `null`, you can use the strict equality operator (`===`), which we'll learn about in another chapter.
 
 ```ts showLineNumbers filename="main.ts"
@@ -271,9 +277,11 @@ const nullVariable = null;
 console.log(nullVariable === null);
 ```
 
+![VS Code showing checks for undefined and null both returning true in the terminal.](/assets/first-steps/data-types/check-undefined-null.png)
+
 ## Properties and methods
 
-When you type `.` right after a variable, you'll see a list of properties and methods available for that variable.
+Different data types have different properties and methods available. You can access them by typing a dot (`.`) right after a variable or a value.
 
 For example, strings have a property called `length`, which returns the number of characters in the string:
 
@@ -284,7 +292,11 @@ const sentence = "Where is Bryan?";
 console.log(sentence.length);
 ```
 
-But they also have methods, like `.toUpperCase()`.
+![VS Code showing sentence.length and the result 15 in the terminal.](/assets/first-steps/data-types/string-length.png)
+
+Strings also have methods, like `.toUpperCase()`. Notice that we access a property without parentheses, as in `sentence.length`, but we need parentheses `()` to call a method.
+
+In the code below, `.toUpperCase()` returns the text in `sentence` in all caps:
 
 ```ts showLineNumbers filename="main.ts"
 const sentence = "Where is Bryan?";
@@ -293,16 +305,20 @@ const sentence = "Where is Bryan?";
 console.log(sentence.toUpperCase());
 ```
 
+![VS Code showing sentence.toUpperCase() and WHERE IS BRYAN? in the terminal.](/assets/first-steps/data-types/upper.png)
+
 Different data types come with their own properties and methods. Don't worry too much about them now. We'll cover the most useful ones in the upcoming lessons and projects.
 
-However, if you're curious, you can type `.` after a variable to see a list of properties and methods available for that specific variable and its data type. Use the up and down arrow keys to navigate through the list and highlight the one that interests you, for example with a variable storing a `number`.
+However, if you're curious, you can type `.` after a variable to see a list of properties and methods available for that specific variable and its data type. Use the up and down arrow keys to navigate through the list and highlight the one that interests you.
 
-<OutdatedScreenshot src="/assets/first-steps/data-types/methods.png" alt={"A screenshot showing VS Code displaying a list of properties and methods."} lang="en" />
+For example, in the screenshot below, we're exploring the properties and methods available for `value`, a variable containing a number.
+
+![VS Code showing the methods available for the numeric variable value, with documentation for toExponential.](/assets/first-steps/data-types/methods.png)
 
 ## Conclusion
 
 Congrats! You are ready to have fun building your first data structures! 👷
 
-PS: There's more to explore, including big integers, objects, and functions. We'll cover them when they become relevant in coding projects.
+PS: There are more data types to explore in the wild, including big integers, objects, and functions. We'll cover them when they become relevant in coding projects.
 
 <NoticeEnd/>
