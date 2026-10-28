@@ -10,11 +10,33 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 Les tâches permettent d'éviter de retaper de longues commandes dans le terminal. Elles sont très pratiques et largement utilisées. Avec npm, on les appelle des **scripts** et on les définit dans `package.json`.
 
+Notez que je suppose que vous avez terminé la [leçon d'installation](/first-steps/setup) avant de vous lancer dans celle-ci.
+
 <NoticeIntro lang="fr" />
 
-Utilisez le dossier de la [leçon sur les librairies](/pushing-further/libraries), ou ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`, comme dans [Installation](/first-steps/setup).
+## Configuration
 
-Copiez-collez le code suivant dans `main.ts`. Ce script provient de la leçon [Récupérer des données](/pushing-further/fetch). Il récupère un fichier JSON depuis GitHub, le convertit et l'affiche dans le terminal.
+Créez un nouveau dossier vide sur votre ordinateur, ouvrez-le avec VS Code et créez-y un fichier nommé `main.ts`.
+
+Tapez ce code dans `main.ts` et enregistrez le fichier :
+
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
+
+Ouvrez le terminal (`Command` + `J` sur Mac ou `Control` + `J` sur Windows) et exécutez cette commande :
+
+```sh
+node --watch main.ts
+```
+
+Cette commande exécute notre code et le relance automatiquement chaque fois que nous enregistrons une modification, pour voir les résultats au fur et à mesure que nous travaillons.
+
+![VS Code montrant console.log("Hello!") dans main.ts et Hello! dans le terminal exécutant node --watch main.ts.](/assets/first-steps/variables/run.png)
+
+## Créer des scripts npm
+
+Remplacez le contenu de `main.ts` par le code suivant et enregistrez le fichier. Ce script provient de la leçon [Récupérer des données](/pushing-further/fetch). Il récupère un fichier JSON depuis GitHub, le convertit et l'affiche dans le terminal.
 
 ```ts showLineNumbers filename="main.ts"
 const response = await fetch(

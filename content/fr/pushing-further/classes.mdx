@@ -18,19 +18,29 @@ Notez que je m’attends à ce que vous ayez complété les leçons précédente
 
 Allons-y !
 
+Notez que je suppose que vous avez terminé la [leçon d'installation](/first-steps/setup) avant de vous lancer dans celle-ci.
+
 <NoticeIntro lang="fr" />
 
 ## Configuration
 
-Ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`, comme dans la [leçon d'installation](/first-steps/setup).
+Créez un nouveau dossier vide sur votre ordinateur, ouvrez-le avec VS Code et créez-y un fichier nommé `main.ts`.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `node --watch main.ts` depuis ce dossier. Le code est relancé quand vous enregistrez. Arrêtez la commande avec `CTRL` + `C` sur les deux systèmes.
+Tapez ce code dans `main.ts` et enregistrez le fichier :
 
-VS Code signale les erreurs TypeScript pendant la saisie et formate le code quand vous enregistrez.
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
 
-Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
+Ouvrez le terminal (`Command` + `J` sur Mac ou `Control` + `J` sur Windows) et exécutez cette commande :
 
-<OutdatedScreenshot src="/assets/pushing-further/classes/setup.png" alt={"Une capture d’écran montrant VS Code en train d’exécuter et de surveiller un fichier TypeScript."} lang="fr" />
+```sh
+node --watch main.ts
+```
+
+Cette commande exécute notre code et le relance automatiquement chaque fois que nous enregistrons une modification, pour voir les résultats au fur et à mesure que nous travaillons.
+
+![VS Code montrant console.log("Hello!") dans main.ts et Hello! dans le terminal exécutant node --watch main.ts.](/assets/first-steps/variables/run.png)
 
 ## Créer une classe
 

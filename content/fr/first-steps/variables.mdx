@@ -10,17 +10,29 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 Commençons votre première leçon de TypeScript avec les variables ! En chemin, je vous montrerai quelques astuces et conseils pour travailler avec TypeScript, VS Code et Node.js.
 
+Notez que je suppose que vous avez terminé la [leçon d'installation](/first-steps/setup) avant de vous lancer dans celle-ci.
+
 <NoticeIntro lang="fr"/>
 
-Utilisez le dossier et le fichier `main.ts` créés dans [Installation](/first-steps/setup), ou ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`.
+## Configuration
 
-Remplacez le contenu de `main.ts` par `console.log(2 + 3);` et enregistrez.
+Créez un nouveau dossier vide sur votre ordinateur, ouvrez-le avec VS Code et créez-y un fichier nommé `main.ts`.
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `node --watch main.ts` depuis le dossier du projet ouvert dans VS Code.
+Tapez ce code dans `main.ts` et enregistrez le fichier :
 
-`console.log` indique à l'ordinateur d'afficher quelque chose dans le terminal. Ici, le "quelque chose" est le calcul `2 + 3`. Votre ordinateur effectue le calcul et affiche le résultat, qui est `5`.
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
 
-<OutdatedScreenshot src="/assets/first-steps/variables/run.png" alt={"Une capture d'écran montrant VS Code avec les fichiers main.ts et deno.json."} lang="fr" />
+Ouvrez le terminal (`Command` + `J` sur Mac ou `Control` + `J` sur Windows) et exécutez cette commande :
+
+```sh
+node --watch main.ts
+```
+
+Cette commande exécute notre code et le relance automatiquement chaque fois que nous enregistrons une modification, pour voir les résultats au fur et à mesure que nous travaillons.
+
+![VS Code montrant console.log("Hello!") dans main.ts et Hello! dans le terminal exécutant node --watch main.ts.](/assets/first-steps/variables/run.png)
 
 <Callout type="info" emoji="💡">
     Vous avez peut-être remarqué que votre code s'affiche avec plusieurs couleurs. Cela s'appelle *code highlighting*. Dans le code, chaque mot a un rôle différent et se voit attribuer une couleur. Par exemple, ici `console` est un objet, et `log` est l'une de ses méthodes. De plus, en tapant, vous pouvez voir des suggestions d'auto-complétion et des infobulles. Cela s'appelle l'*IntelliSense*. C'est votre éditeur qui essaie de deviner ce que vous pourriez vouloir écrire et fournit une documentation. Pour l'instant, vous pouvez ignorer tout cela, mais nous l'utiliserons plus tard.
@@ -32,7 +44,7 @@ Voyons comment la surveillance nous aide à travailler.
 
 La commande `node --watch main.ts` démarre déjà Node.js en mode surveillance : il relance automatiquement notre code chaque fois que nous enregistrons une modification. Cela relance le script ; cela ne vérifie pas les types TypeScript.
 
-Si la commande est toujours en cours, laissez-la tourner. Sinon, relancez `node --watch main.ts`. Maintenant, changez `3` en `4` dans votre code et enregistrez votre fichier (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
+Si la commande est toujours en cours, laissez-la tourner. Sinon, relancez `node --watch main.ts`. Maintenant, remplacez votre ligne de code par `console.log(2 + 4);` et enregistrez votre fichier (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC).
 
 Node.js relancera `main.ts` à chaque fois que vous l'enregistrez. Très pratique !
 

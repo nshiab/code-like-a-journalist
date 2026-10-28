@@ -12,21 +12,29 @@ Les types de données sont essentiels en TypeScript. Ce sont les éléments de b
 
 Cette leçon est une introduction pour vous aider à démarrer. Nous explorerons ces types de données plus en détail au fil du cours. Nous nous amuserons aussi avec des projets de données plus tard.
 
+Notez que je suppose que vous avez terminé la [leçon d'installation](/first-steps/setup) avant de vous lancer dans celle-ci.
+
 <NoticeIntro lang="fr" />
 
-D'abord, configurons notre environnement.
+## Configuration
 
-Utilisez le dossier et le fichier `main.ts` créés dans [Installation](/first-steps/setup), ou ouvrez un nouveau dossier vide dans VS Code et créez-y `main.ts`.
+Créez un nouveau dossier vide sur votre ordinateur, ouvrez-le avec VS Code et créez-y un fichier nommé `main.ts`.
 
-Remplacez le contenu de `main.ts` par `console.log("Hello!");` et enregistrez.
+Tapez ce code dans `main.ts` et enregistrez le fichier :
 
-Ouvrez le terminal (`CMD` + `J` sur Mac ou `CTRL` + `J` sur Windows) et exécutez `node --watch main.ts` depuis le dossier du projet ouvert dans VS Code.
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
 
-VS Code signale les erreurs TypeScript pendant la saisie et formate le code quand vous enregistrez. Arrêtez la surveillance du script avec `CTRL` + `C`.
+Ouvrez le terminal (`Command` + `J` sur Mac ou `Control` + `J` sur Windows) et exécutez cette commande :
 
-Vous pouvez utiliser cette configuration pour tester le code fourni dans cette leçon.
+```sh
+node --watch main.ts
+```
 
-<OutdatedScreenshot src="/assets/first-steps/data-types/watch.png" alt={"Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript."} lang="fr" />
+Cette commande exécute notre code et le relance automatiquement chaque fois que nous enregistrons une modification, pour voir les résultats au fur et à mesure que nous travaillons.
+
+![VS Code montrant console.log("Hello!") dans main.ts et Hello! dans le terminal exécutant node --watch main.ts.](/assets/first-steps/variables/run.png)
 
 ## Texte (`string`)
 

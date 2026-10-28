@@ -9,23 +9,29 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 We often use computers to perform repetitive tasks quickly and efficiently. And this is what *loops* are for: to *iterate*!
 
+Note that I assume you've completed the [Setup lesson](/first-steps/setup) before diving into this one.
+
 <NoticeIntro />
 
-Let's set things up for this lesson.
+## Setup
 
-Use the folder and `main.ts` file you created in [Setup](/first-steps/setup), or open a new empty folder in VS Code and create `main.ts` inside it.
+Create a new, empty folder on your computer, open it with VS Code, and create a file named `main.ts` inside it.
 
-Replace the contents of `main.ts` with `console.log("Hello!");` and save it.
+Type this code in `main.ts` and save the file:
 
-Open the terminal (`CMD` + `J` on Mac or `CTRL` + `J` on Windows) and run `node --watch main.ts` from the project folder you opened in VS Code.
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
 
-VS Code highlights TypeScript errors as you type and formats your code when you save. Stop the script watcher with `CTRL` + `C`.
+Open the terminal (`Command` + `J` on Mac or `Control` + `J` on Windows) and run this command:
 
-`node --watch main.ts` reruns `main.ts` every time you save it (`CMD` + `S` on Mac or `CTRL` + `S` on PC).
+```sh
+node --watch main.ts
+```
 
-You can use this setup to test the code provided in this lesson.
+This runs our code and automatically runs it again each time we save a change, so we can see the results as we work.
 
-<OutdatedScreenshot src="/assets/first-steps/loops/setup.png" alt={"A screenshot showing VS Code running and watching a TypeScript file."} lang="en" />
+![VS Code showing console.log("Hello!") in main.ts and Hello! in the terminal running node --watch main.ts.](/assets/first-steps/variables/run.png)
 
 ## With arrays
 
