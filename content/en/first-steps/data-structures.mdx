@@ -12,7 +12,7 @@ To keep your data tidy and efficiently process it, you need to structure it. The
 
 In this lesson, we'll use these structures to store data about a classroom. Buckle up! There are a lot of fundamental concepts here!
 
-Note that I assume you've completed the [Setup lesson](/first-steps/setup) before diving into this one.
+Note that I assume you've completed the previous lessons in Chapter 1, TypeScript fundamentals, especially the [Setup lesson](/first-steps/setup), before diving into this one.
 
 <NoticeIntro />
 
@@ -58,7 +58,7 @@ console.log(student);
 
 To know what's in an object and the types of its values, you can hover over the object name in VS Code.
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/object-types.png" alt={"A screenshot showing VS Code with a pop-up displaying an object type."} lang="en" />
+![VS Code showing the inferred types of the student object's properties in a hover tooltip and its values in the terminal.](/assets/first-steps/data-structures/object-types.png)
 
 ### Accessing values
 
@@ -76,8 +76,10 @@ const student = {
 console.log(student.firstName);
 ```
 
+![VS Code showing console.log(student.firstName) and Nael in the terminal.](/assets/first-steps/data-structures/student-first-name.png)
+
 <Callout type="info" emoji="💡">
-  If the key `firstName` was written with a space, like `"first name"`, you would need to write `student["first name"]` to access its value. This is why most people prefer to use camel case keys: it's faster and easier to write.
+  If the key `firstName` was written with a space, like `"first name"`, you would need to write `student["first name"]` to access its value. This is why most people prefer to use camel case keys (no spaces, first word lowercase, following words capitalized), which are faster and easier to write.
 </Callout>
 
 ### Modifying values
@@ -100,7 +102,25 @@ student.age = 100;
 console.log(student);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/object-update.png" alt={"A screenshot showing VS Code and a script modifying an object."} lang="en" />
+![VS Code showing student.age set to 100 and the updated student object in the terminal.](/assets/first-steps/data-structures/object-update.png)
+
+For example, changing `age` to the string `"22 years old"` is not allowed in TypeScript: its type was inferred as `number` from the value `22` on line 5. VS Code flags this as a type error.
+
+```ts showLineNumbers filename="main.ts" {9}
+const student = {
+  firstName: "Nael",
+  lastName: "Shiab",
+  gender: "man",
+  age: 22,
+};
+
+// Forbidden because age started as a number.
+student.age = "22 years old";
+
+console.log(student);
+```
+
+![VS Code showing a type error when student.age is assigned the string "22 years old", while Node.js displays the updated object in the terminal.](/assets/first-steps/data-structures/object-age-type-error.png)
 
 ### Autocompletion and checks
 
@@ -108,13 +128,15 @@ When working with objects, you can take advantage of the handy autocompletion fe
 
 If you type `.` after a variable referencing an object, a pop-up will appear showing the list of available keys. You can use the up and down arrow keys to navigate through the keys and see their types. Press **Enter** to select the key you want.
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/object-auto-completion.png" alt={"A screenshot showing VS Code and its IntelliSense feature."} lang="en" />
+As you start typing, you can also press **Tab** to accept the highlighted suggestion and complete the name, helping you write code faster.
 
-Additionally, because objects are typed, if you try to access a key that doesn't exist in the object, VS Code will report an error before you even run the script. For example, try `student.fristName` instead of `student.firstName`. Node.js itself doesn't check these types, so pay attention to the errors shown by VS Code.
+![VS Code showing autocomplete suggestions for the student object's keys and the number type of age.](/assets/first-steps/data-structures/object-auto-completion.png)
+
+Additionally, because objects are typed, if you try to access a key that doesn't exist in the object, VS Code will report an error. For example, try `student.city`.
 
 Many bugs and errors are caused by simple typos. With this feature, TypeScript helps you catch those mistakes early, saving you time and frustration. 🙏
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/object-no-key.png" alt={"A screenshot showing VS Code and an error caused by accessing a key that doesn't exist in an object."} lang="en" />
+![VS Code showing an error explaining that city does not exist on the student object.](/assets/first-steps/data-structures/object-no-key.png)
 
 ## Arrays
 
@@ -131,7 +153,7 @@ console.log(names);
 
 If you hover over the variable `names`, you'll see that its type is `string[]`, meaning it’s an array composed exclusively of strings. It's generally best to create arrays containing only one data type (or one type and `null`, as we will see later). This keeps the data organized and lets us process all the items in the array the same way.
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/string-array-type.png" alt={"A screenshot showing VS Code with a `string[]` type on hovering."} lang="en" />
+![VS Code showing the names array with the inferred type string[] in a hover tooltip and its values in the terminal.](/assets/first-steps/data-structures/string-array-type.png)
 
 ### Indexes
 
@@ -154,7 +176,7 @@ const student = names[0];
 console.log(student);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/names-index.png" alt={"A screenshot showing VS Code logging a string from an array."} lang="en" />
+![VS Code showing names[0] assigned to student and James displayed in the terminal.](/assets/first-steps/data-structures/names-index.png)
 
 You can also modify a value in an array using its index and the `=` operator. Remember that arrays are typed in TypeScript. For example, if the type of `names` is `string[]`, you can only replace a value with another `string`.
 
@@ -168,7 +190,21 @@ names[0] = "Nael";
 console.log(names);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/array-updating.png" alt={"A screenshot showing VS Code showing a script updating a string value in an array."} lang="en" />
+![VS Code showing names[0] changed to "Nael" and the updated array in the terminal.](/assets/first-steps/data-structures/array-updating.png)
+
+For example, here we try to replace the first item with a number. Because `names` was created with only strings on line 1, TypeScript inferred its type as `string[]`. Replacing an item with a number is not allowed, so VS Code reports a type error.
+
+```ts showLineNumbers filename="main.ts" {5}
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+// Trying to replace the string
+// at index 0 with a number.
+names[0] = 22;
+
+console.log(names);
+```
+
+![VS Code showing a type error when names[0] is assigned the number 22 because names is a string array.](/assets/first-steps/data-structures/array-item-type-error.png)
 
 ### Properties
 
@@ -181,7 +217,7 @@ const names = ["James", "John", "Patricia", "Jennifer"];
 console.log(names.length);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/array-length.png" alt={"A screenshot showing VS Code logging an array length."} lang="en" />
+![VS Code showing names.length and the result 4 in the terminal.](/assets/first-steps/data-structures/array-length.png)
 
 ### Methods
 
@@ -326,8 +362,8 @@ const allMarks = [33, 45, 78, 98];
 
 // Here we chain the array methods.
 // First, we multiply each mark by 2.
-// Then we filter out the marks that are
-// less than or equal to 100.
+// Then we keep only the marks
+// greater than 100.
 // Finally, we sort the marks in descending order.
 const newMarks = allMarks
     .map((mark) => mark * 2)
@@ -339,7 +375,7 @@ console.log(newMarks);
 ```
 
 <Callout type="info" emoji="💡">
-So far in our code, each line has ended with a `;`. However, from line 8 to line 11, there are no semicolons because we are chaining methods. Everything between these lines is part of the same statement. Technically, you could write it all on one line, but that would make the code less readable. Since TypeScript doesn't care about line breaks or indentation, it's up to the user to format the code as they prefer. In our case, we let VS Code format it when we save.
+So far in our code, each line has ended with a `;`. However, from line 8 to line 11, there are no semicolons because we are chaining methods. Everything between these lines is part of the same statement. Technically, you could write it all on one line, but that would make the code less readable. You can spread this chain across lines and use spaces and indentation to make it easier to read. It will run the same way.
 </Callout>
 
 #### Others
@@ -350,9 +386,9 @@ If you're curious, you can check out the [W3Schools documentation](https://www.w
 
 You can also use *IntelliSense* directly in VS Code. Type `.` right after a variable referencing an array to see a list of properties and methods pop up. Use your up and down arrow keys to explore.
 
-Additionally, methods are typed. So, don't worry if you make a typo. It will be caught before you run your code and cause everything to crash. 🤓
+Additionally, methods are typed. So, don't worry if you make a typo. It will be caught before it causes everything to crash. 🤓
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/pop-up-methods-arrays.png" alt={"A screenshot showing VS Code displaying methods available for a list."} lang="en" />
+![VS Code displaying available array methods and documentation for includes.](/assets/first-steps/data-structures/pop-up-methods-arrays.png)
 
 ## Arrays of... objects!
 
@@ -376,7 +412,7 @@ const students = [
 console.table(students);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/table.png" alt={"A screenshot showing VS Code logging an array of objects as a table in the terminal."} lang="en" />
+![VS Code displaying student names and marks as a table in the terminal.](/assets/first-steps/data-structures/table.png)
 
 Now things are getting interesting. This pattern provides a flexible way to work with data.
 
@@ -404,7 +440,9 @@ console.table(students);
 console.table(studentAbove50);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/array-objects-filter.png" alt={"A screenshot showing VS Code filtering an array of objects."} lang="en" />
+On line 10, the code inside the parentheses of `.filter()` is called an arrow function. We'll explore these in later lessons, so don't worry about it for now.
+
+![VS Code displaying the original students array and the filtered array containing Patricia and Jennifer.](/assets/first-steps/data-structures/array-objects-filter.png)
 
 ## Conclusion
 

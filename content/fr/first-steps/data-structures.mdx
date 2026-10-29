@@ -12,7 +12,7 @@ Pour organiser vos données et les traiter efficacement, vous devez les structur
 
 Dans cette leçon, nous allons utiliser ces structures pour stocker des données à propos d'étudiants. Préparez-vous, il y a beaucoup de concepts fondamentaux ici !
 
-Notez que je suppose que vous avez terminé la [leçon d'installation](/first-steps/setup) avant de vous lancer dans celle-ci.
+Notez que je suppose que vous avez terminé les leçons précédentes du chapitre 1, Fondamentaux de TypeScript, en particulier la [leçon d'installation](/first-steps/setup), avant de vous lancer dans celle-ci.
 
 <NoticeIntro lang="fr" />
 
@@ -59,7 +59,7 @@ console.log(student);
 
 Pour savoir ce qu'un objet contient et connaître les types de ses valeurs, vous pouvez survoler avec votre curseur le nom de l'objet dans VS Code.
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/object-types.png" alt={"Une capture d'écran montrant VS Code avec une fenêtre contextuelle affichant le type d'un objet."} lang="fr" />
+![VS Code montrant les types inférés des propriétés de l'objet student dans une infobulle et ses valeurs dans le terminal.](/assets/first-steps/data-structures/object-types.png)
 
 ### Accéder aux valeurs
 
@@ -77,8 +77,10 @@ const student = {
 console.log(student.firstName);
 ```
 
+![VS Code montrant console.log(student.firstName) et Nael dans le terminal.](/assets/first-steps/data-structures/student-first-name.png)
+
 <Callout type="info" emoji="💡">
-  Si la clé `firstName` était écrite avec un espace, comme `"first name"`, vous devriez écrire `student["first name"]` pour accéder à sa valeur. C'est pourquoi la plupart des gens préfèrent utiliser des clés en camel case : c'est plus rapide et plus facile à écrire.
+  Si la clé `firstName` était écrite avec un espace, comme `"first name"`, vous devriez écrire `student["first name"]` pour accéder à sa valeur. C'est pourquoi la plupart des gens préfèrent utiliser des clés en camel case (sans espaces, premier mot en minuscules, mots suivants avec une majuscule), qui sont plus rapides et plus faciles à écrire.
 </Callout>
 
 ### Modifier des valeurs
@@ -101,7 +103,25 @@ student.age = 100;
 console.log(student);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/object-update.png" alt={"Une capture d'écran montrant VS Code et un script modifiant un objet."} lang="fr" />
+![VS Code montrant student.age défini à 100 et l'objet student mis à jour dans le terminal.](/assets/first-steps/data-structures/object-update.png)
+
+Par exemple, remplacer `age` par la chaîne `"22 years old"` n'est pas autorisé en TypeScript : son type a été inféré comme `number` à partir de la valeur `22` à la ligne 5. VS Code signale une erreur de type.
+
+```ts showLineNumbers filename="main.ts" {9}
+const student = {
+  firstName: "Nael",
+  lastName: "Shiab",
+  gender: "man",
+  age: 22,
+};
+
+// Interdit, car age contenait un nombre au départ.
+student.age = "22 years old";
+
+console.log(student);
+```
+
+![VS Code signalant une erreur de type lorsque student.age reçoit la chaîne "22 years old", tandis que Node.js affiche l'objet mis à jour dans le terminal.](/assets/first-steps/data-structures/object-age-type-error.png)
 
 ### Autocomplétion et vérifications
 
@@ -109,13 +129,15 @@ Lorsque vous travaillez avec des objets, vous pouvez profiter de la fonctionnali
 
 Si vous tapez un `.` après une variable faisant référence à un objet, une fenêtre contextuelle apparaîtra avec la liste des clés disponibles. Vous pouvez utiliser les flèches haut et bas pour naviguer parmi les clés et voir leurs types. Appuyez sur **Entrée** pour sélectionner la clé souhaitée.
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/object-auto-completion.png" alt={"Une capture d'écran montrant VS Code et sa fonctionnalité IntelliSense."} lang="fr" />
+Dès que vous commencez à taper, vous pouvez aussi appuyer sur **Tab** pour accepter la suggestion sélectionnée et compléter le nom, ce qui vous aide à écrire du code plus vite.
 
-De plus, comme les objets sont typés, si vous essayez d'accéder à une clé qui n'existe pas dans l'objet, VS Code signalera une erreur avant même que vous n'exécutiez le script. Par exemple, essayez `student.fristName` au lieu de `student.firstName`. Node.js lui-même ne vérifie pas ces types : faites attention aux erreurs signalées par VS Code.
+![VS Code montrant les suggestions d'autocomplétion pour les clés de l'objet student et le type number de age.](/assets/first-steps/data-structures/object-auto-completion.png)
+
+De plus, comme les objets sont typés, si vous essayez d'accéder à une clé qui n'existe pas dans l'objet, VS Code signalera une erreur. Par exemple, essayez `student.city`.
 
 De nombreux bogues et erreurs sont causés par de simples fautes de frappe. Grâce à cette fonctionnalité, TypeScript vous aide à détecter ces erreurs en amont. 🙏
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/object-no-key.png" alt={"Une capture d'écran montrant VS Code et une erreur causée par l'accès à une clé inexistante dans un objet."} lang="fr" />
+![VS Code signalant une erreur indiquant que city n'existe pas dans l'objet student.](/assets/first-steps/data-structures/object-no-key.png)
 
 ## Listes
 
@@ -132,7 +154,7 @@ console.log(names);
 
 Si vous survolez la variable `names`, vous verrez que son type est `string[]`, ce qui signifie qu’il s’agit d’une liste composée exclusivement de chaînes de caractères. Il est généralement préférable de créer des listes contenant un seul type de données (ou un type et `null`, comme nous le verrons plus tard). Cela permet de garder les données organisées et de traiter tous les éléments de la liste de la même façon.
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/string-array-type.png" alt={"Une capture d'écran montrant VS Code avec un type `string[]` au survol."} lang="fr" />
+![VS Code montrant la liste names avec le type inféré string[] dans une infobulle et ses valeurs dans le terminal.](/assets/first-steps/data-structures/string-array-type.png)
 
 ### Index
 
@@ -154,7 +176,7 @@ const student = names[0];
 console.log(student);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/names-index.png" alt={"Une capture d'écran montrant VS Code affichant une chaîne de caractères provenant d'une liste."} lang="fr" />
+![VS Code montrant names[0] attribué à student et James affiché dans le terminal.](/assets/first-steps/data-structures/names-index.png)
 
 Vous pouvez également modifier une valeur dans une liste en utilisant son index et l'opérateur `=`. Rappelez-vous que les listes sont typées en TypeScript. Par exemple, si le type de `names` est `string[]`, vous ne pouvez remplacer une valeur que par un autre `string`.
 
@@ -168,7 +190,21 @@ names[0] = "Nael";
 console.log(names);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/array-updating.png" alt={"Une capture d'écran montrant VS Code affichant un script modifiant une valeur de chaîne dans une liste."} lang="fr" />
+![VS Code montrant names[0] remplacé par "Nael" et la liste mise à jour dans le terminal.](/assets/first-steps/data-structures/array-updating.png)
+
+Par exemple, nous essayons ici de remplacer le premier élément par un nombre. Comme `names` a été créé uniquement avec des chaînes de caractères à la ligne 1, TypeScript a inféré son type comme `string[]`. Remplacer un élément par un nombre n'est pas autorisé : VS Code signale donc une erreur de type.
+
+```ts showLineNumbers filename="main.ts" {5}
+const names = ["James", "John", "Patricia", "Jennifer"];
+
+// Tentative de remplacement de la chaîne
+// à l'index 0 par un nombre.
+names[0] = 22;
+
+console.log(names);
+```
+
+![VS Code signalant une erreur de type lorsque names[0] reçoit le nombre 22, car names est une liste de chaînes de caractères.](/assets/first-steps/data-structures/array-item-type-error.png)
 
 ### Propriétés
 
@@ -181,7 +217,7 @@ const names = ["James", "John", "Patricia", "Jennifer"];
 console.log(names.length);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/array-length.png" alt={"Une capture d'écran montrant VS Code affichant la longueur d'une liste."} lang="fr" />
+![VS Code montrant names.length et le résultat 4 dans le terminal.](/assets/first-steps/data-structures/array-length.png)
 
 ### Méthodes
 
@@ -326,8 +362,8 @@ const allMarks = [33, 45, 78, 98];
 
 // Ici, nous enchaînons les méthodes de liste.
 // D'abord, nous multiplions chaque note par 2.
-// Ensuite, nous filtrons les notes inférieures
-// ou égales à 100.
+// Ensuite, nous gardons uniquement les notes
+// supérieures à 100.
 // Enfin, nous trions les notes par ordre décroissant.
 const newMarks = allMarks
     .map((mark) => mark * 2)
@@ -339,7 +375,7 @@ console.log(newMarks);
 ```
 
 <Callout type="info" emoji="💡">
-Jusqu'à présent dans notre code, chaque ligne se terminait par un `;`. Cependant, des lignes 8 à 11, il n'y a pas de point-virgule parce que nous enchaînons des méthodes. Tout ce qui se trouve entre ces lignes fait partie de la même instruction. Techniquement, vous pourriez tout écrire sur une seule ligne, mais cela rendrait le code moins lisible. Comme TypeScript ne prend pas en compte les sauts de ligne ou l'indentation, c'est à l'utilisateur de formater le code comme il le souhaite. Dans notre cas, nous laissons VS Code le formater quand nous enregistrons.
+Jusqu'à présent dans notre code, chaque ligne se terminait par un `;`. Cependant, des lignes 8 à 11, il n'y a pas de point-virgule parce que nous enchaînons des méthodes. Tout ce qui se trouve entre ces lignes fait partie de la même instruction. Techniquement, vous pourriez tout écrire sur une seule ligne, mais cela rendrait le code moins lisible. Vous pouvez répartir cet enchaînement sur plusieurs lignes et utiliser des espaces et de l'indentation pour le rendre plus lisible. Le code fonctionnera de la même façon.
 </Callout>
 
 #### Autres
@@ -350,9 +386,9 @@ Si vous êtes curieux, vous pouvez consulter la [documentation de W3Schools](htt
 
 Vous pouvez également utiliser *IntelliSense* directement dans VS Code. Tapez un `.` juste après une variable faisant référence à une liste pour voir apparaître une liste des propriétés et méthodes disponibles. Utilisez les flèches haut et bas pour explorer.
 
-De plus, les méthodes sont typées. Pas d'inquiétude si vous faites une faute de frappe : elle sera détectée avant l'exécution de votre code et évitera un plantage complet. 🤓
+De plus, les méthodes sont typées. Pas d'inquiétude si vous faites une faute de frappe : elle sera détectée avant de tout faire planter. 🤓
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/pop-up-methods-arrays.png" alt={"Une capture d'écran montrant VS Code affichant les méthodes disponibles pour une liste."} lang="fr" />
+![VS Code affichant les méthodes disponibles pour une liste et la documentation de includes.](/assets/first-steps/data-structures/pop-up-methods-arrays.png)
 
 ## Listes d'objets !
 
@@ -376,7 +412,7 @@ const students = [
 console.table(students);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/table.png" alt={"Une capture d'écran montrant VS Code affichant une liste d'objets sous forme de tableau dans le terminal."} lang="fr" />
+![VS Code affichant les noms et les notes des étudiants sous forme de tableau dans le terminal.](/assets/first-steps/data-structures/table.png)
 
 Les choses deviennent intéressantes. Ce modèle offre une manière flexible de travailler avec des données.
 
@@ -404,7 +440,9 @@ console.table(students);
 console.table(studentAbove50);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/data-structures/array-objects-filter.png" alt={"Une capture d'écran montrant VS Code filtrant une liste d'objets."} lang="fr" />
+À la ligne 10, le code entre les parenthèses de `.filter()` s'appelle une fonction fléchée. Nous verrons cela dans les prochaines leçons, alors ne vous en préoccupez pas pour le moment.
+
+![VS Code affichant la liste originale des étudiants et la liste filtrée contenant Patricia et Jennifer.](/assets/first-steps/data-structures/array-objects-filter.png)
 
 ## Conclusion
 
