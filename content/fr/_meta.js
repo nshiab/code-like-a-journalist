@@ -2,7 +2,7 @@ export default {
     index: "Bienvenue!",
     preamble: "Pourquoi ce cours?",
     "first-steps": "1. Fondamentaux de TypeScript",
-    "pushing-further": "2. Travailler avec TypeScript",
+    "pushing-further": "2. Bâtir avec TypeScript",
     "simple-data-analysis": {
         title: "3. Analyse de données avec SDA",
         theme: { collapsed: false },
