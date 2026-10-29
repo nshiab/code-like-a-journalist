@@ -65,8 +65,8 @@ Let's rewrite our code, but this time with an array and a `for` loop.
 // Add or remove items in the array and save.
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-// Create n as we loop, putting each array value
-// in it one by one.
+// Here we create the variable n. As we loop, each value
+// from numbers is stored in it and processed, one after another.
 for (const n of numbers) {
   // Multiply the current value by 2.
   const multiple = n * 2;
@@ -75,7 +75,9 @@ for (const n of numbers) {
 }
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/loops/for-of-loop.png" alt={"A screenshot showing VS Code running a for-of loop."} lang="en" />
+After running this code in your terminal, you’ll see each number from `numbers` and its doubled value logged one after another. This loop processes the array in order, from the first item to the last.
+
+![VS Code showing a for...of loop logging each number from 1 to 10 and its doubled value in order.](/assets/first-steps/loops/for-of-loop.png)
 
 If the computer could talk 🤖, here's what it would say when running this script: 
 - Lines 1-2: These are just comments for humans. I ignore them.
@@ -107,7 +109,7 @@ The loop requires three expressions between `()` before running the code inside 
 
 These expressions must be separated by `;` within the `()`.
 
-The result is a loop starting with `i = 0` and stopping when `i` equals 999,999. Because `i` increments by 1 on each iteration, this loop iterates 1,000,000 times.
+The loop runs with `i` from 0 to 999,999, then stops when `i` reaches 1,000,000. That’s 1,000,000 iterations.
 
 ```ts showLineNumbers filename="main.ts"
 for (let i = 0; i < 1_000_000; i++) {
@@ -115,11 +117,13 @@ for (let i = 0; i < 1_000_000; i++) {
 }
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/loops/for-loop.png" alt={"A screenshot showing VS Code running a for loop."} lang="en" />
+![VS Code showing a for loop logging Hello! one million times, ending at 999999.](/assets/first-steps/loops/for-loop.png)
 
 You just asked your computer to do something A MILLION TIMES! And with just 3 lines of code! Do you feel the POWER in your hands? 😈
 
-You can play with the expressions. For example, try making these changes and see what happens:
+By the way, logging so many messages in the terminal is relatively slow. When you do calculations without logging every result, things will go much faster.
+
+You can play with the loop expressions in the code above. For example, try making these changes and see what happens:
 - Replace `let i = 0` with `let i = 1000`
 - Replace `i < 1_000_000` with `i <= 1_100`
 - Replace `i++` with `i += 10`
@@ -128,7 +132,7 @@ You can play with the expressions. For example, try making these changes and see
 
 Sometimes, you might want to stop your loop when a specific condition is met. To do this, you can use the `break` statement. It works in any loop.
 
-For example, in the code below, we loop over `names`, but we break the loop if one of the names starts with J. Since `"Jerry"` meets this condition, it's the last name being logged.
+For example, in the code below, we loop over `names`, but we break the loop if one of the names starts with J. Since `"Jerry"` meets this condition, it's the last name being logged. The loop stops there, so any items after it won't be processed.
 
 ```ts showLineNumbers filename="main.ts"
 const names = [
@@ -152,7 +156,7 @@ for (const n of names) {
 }
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/loops/break.png" alt={"A screenshot showing VS Code running a for loop with a break."} lang="en" />
+![VS Code showing a loop stopping at Jerry and logging only Tom, Ivan, and Jerry.](/assets/first-steps/loops/break.png)
 
 ## Conclusion
 

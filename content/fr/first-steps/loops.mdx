@@ -65,8 +65,8 @@ Réécrivons notre code, mais cette fois avec une liste et une boucle `for`.
 // Ajoutez ou retirez des éléments dans la liste et enregistrez.
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-// Créez n au fil de la boucle pour y placer
-// chaque valeur de la liste, une par une.
+// Ici, nous créons la variable n. À chaque tour, une valeur
+// de numbers y est stockée et traitée, une après l’autre.
 for (const n of numbers) {
   // Multipliez la valeur actuelle par 2.
   const multiple = n * 2;
@@ -75,7 +75,9 @@ for (const n of numbers) {
 }
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/loops/for-of-loop.png" alt={"Une capture d'écran montrant VS Code exécutant une boucle for-of."} lang="fr" />
+Après avoir exécuté ce code dans votre terminal, vous verrez chaque nombre de `numbers` et sa valeur doublée s’afficher l’un après l’autre. Cette boucle traite la liste dans l’ordre, du premier élément au dernier.
+
+![VS Code montrant une boucle for...of affichant dans l’ordre chaque nombre de 1 à 10 et sa valeur doublée.](/assets/first-steps/loops/for-of-loop.png)
 
 Si l'ordinateur pouvait parler 🤖, voici ce qu'il dirait en exécutant ce script :
 - Lignes 1-2 : Ce ne sont que des commentaires pour les humains. Je les ignore.
@@ -107,7 +109,7 @@ La boucle nécessite trois expressions entre `()` avant d'exécuter le code à l
 
 Ces expressions doivent être séparées par des `;` dans les `()`.
 
-Le résultat est une boucle commençant avec `i = 0` et s'arrêtant lorsque `i` atteint 999 999. Comme `i` s'incrémente de 1 à chaque itération, cette boucle s'exécute 1 000 000 de fois.
+La boucle s’exécute avec `i` allant de 0 à 999 999, puis s’arrête lorsque `i` atteint 1 000 000. Cela fait 1 000 000 d’itérations.
 
 ```ts showLineNumbers filename="main.ts"
 for (let i = 0; i < 1_000_000; i++) {
@@ -115,11 +117,13 @@ for (let i = 0; i < 1_000_000; i++) {
 }
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/loops/for-loop.png" alt={"Une capture d'écran montrant VS Code exécutant une boucle for."} lang="fr" />
+![VS Code montrant une boucle for affichant Hello! un million de fois, jusqu’à 999999.](/assets/first-steps/loops/for-loop.png)
 
 Vous venez de demander à votre ordinateur de faire quelque chose UN MILLION DE FOIS ! Et avec seulement 3 lignes de code ! Ressentez-vous le POUVOIR entre vos mains ? 😈
 
-Vous pouvez jouer avec les expressions. Par exemple, essayez de faire ces modifications et voyez ce qui se passe :
+Au passage, afficher autant de messages dans le terminal est relativement lent. Quand vous ferez des calculs sans afficher chaque résultat, les choses iront beaucoup plus vite.
+
+Vous pouvez jouer avec les expressions de la boucle dans le code ci-dessus. Par exemple, essayez de faire ces modifications et voyez ce qui se passe :
 - Remplacez `let i = 0` par `let i = 1000`
 - Remplacez `i < 1_000_000` par `i <= 1_100`
 - Remplacez `i++` par `i += 10`
@@ -128,7 +132,7 @@ Vous pouvez jouer avec les expressions. Par exemple, essayez de faire ces modifi
 
 Parfois, vous voulez arrêter votre boucle lorsqu'une condition spécifique est remplie. Pour cela, vous pouvez utiliser l'instruction `break`. Elle fonctionne dans toutes les boucles.
 
-Par exemple, dans le code ci-dessous, nous itérons à partir des valeurs de `names`, mais nous interrompons la boucle si l'un des noms commence par J. Comme `"Jerry"` remplit cette condition, c'est le dernier nom qui est affiché.
+Par exemple, dans le code ci-dessous, nous itérons à partir des valeurs de `names`, mais nous interrompons la boucle si l'un des noms commence par J. Comme `"Jerry"` remplit cette condition, c'est le dernier nom qui est affiché. La boucle s’arrête là : les éléments suivants ne seront donc pas traités.
 
 ```ts showLineNumbers filename="main.ts"
 const names = [
@@ -152,7 +156,7 @@ for (const n of names) {
 }
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/loops/break.png" alt={"Une capture d'écran montrant VS Code exécutant une boucle for avec une instruction break."} lang="fr" />
+![VS Code montrant une boucle s’arrêtant à Jerry et affichant uniquement Tom, Ivan et Jerry.](/assets/first-steps/loops/break.png)
 
 ## Conclusion
 
