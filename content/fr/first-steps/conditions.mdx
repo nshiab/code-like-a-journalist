@@ -12,7 +12,7 @@ Vous utilisez constamment des instructions conditionnelles dans votre vie quotid
 
 C'est la même chose dans votre code. Selon les données, vous pouvez demander à votre programme ou algorithme d'agir différemment.
 
-Notez que je suppose que vous avez terminé la [leçon d'installation](/first-steps/setup) avant de vous lancer dans celle-ci.
+Notez que je suppose que vous avez terminé les leçons précédentes du chapitre 1, Fondamentaux de TypeScript, en particulier la [leçon d'installation](/first-steps/setup), avant de vous lancer dans celle-ci.
 
 <NoticeIntro lang="fr" />
 
@@ -45,8 +45,6 @@ La première condition doit toujours être testée avec `if`. La condition doit 
 Par exemple, le code ci-dessous affiche `I am older than you!` dans le terminal uniquement si `myAge` est supérieur à `yourAge`.
 
 ```ts showLineNumbers filename="main.ts"
-// Modifiez les âges
-// pour tester les différentes possibilités.
 const myAge = 36;
 const yourAge = 25;
 
@@ -55,15 +53,32 @@ if (myAge > yourAge) {
 }
 ```
 
+Comme `36` est supérieur à `25`, la condition est remplie et le message apparaît dans le terminal.
+
+![VS Code montrant myAge supérieur à yourAge et I am older than you! dans le terminal.](/assets/first-steps/conditions/if-age-true.png)
+
+Remplacez maintenant `yourAge` par `55` et enregistrez le fichier :
+
+```ts showLineNumbers filename="main.ts" {2}
+const myAge = 36;
+const yourAge = 55;
+
+if (myAge > yourAge) {
+  console.log("I am older than you!");
+}
+```
+
+Maintenant, `myAge` n’est pas supérieur à `yourAge` : le `console.log` n’est donc pas exécuté et aucun message n’est affiché dans le terminal.
+
+![VS Code montrant yourAge défini à 55 et aucun message affiché dans le terminal.](/assets/first-steps/conditions/if-age-false.png)
+
 Si nous voulons tester plus d'une condition, nous utilisons `else if` avec une condition entre `()` suivie par du code à exécuter à l'intérieur des `{}`.
 
-Tester plusieurs conditions n'est pas toujours nécessaire, mais dans l'exemple ci-dessous, nous voulons aussi afficher `You are older than me!` si `myAge` est inférieur à `yourAge`.
+Dans l'exemple ci-dessous, nous voulons aussi afficher `You are older than me!` si `myAge` est inférieur à `yourAge`.
 
-```ts showLineNumbers filename="main.ts"
-// Modifiez les âges
-// pour tester les différentes possibilités.
+```ts showLineNumbers filename="main.ts" {6-8}
 const myAge = 36;
-const yourAge = 25;
+const yourAge = 55;
 
 if (myAge > yourAge) {
   console.log("I am older than you!");
@@ -72,15 +87,34 @@ if (myAge > yourAge) {
 }
 ```
 
+Si vous exécutez ce code, vous verrez maintenant `You are older than me!` dans le terminal.
+
+![VS Code montrant la condition else if affichant You are older than me! dans le terminal.](/assets/first-steps/conditions/else-if-age.png)
+
+Mais que se passe-t-il si `myAge` et `yourAge` sont exactement identiques ? Définissez les deux âges à `36` et enregistrez :
+
+```ts showLineNumbers filename="main.ts" {2}
+const myAge = 36;
+const yourAge = 36;
+
+if (myAge > yourAge) {
+  console.log("I am older than you!");
+} else if (myAge < yourAge) {
+  console.log("You are older than me!");
+}
+```
+
+De nouveau, rien ne s’affiche : nos conditions couvrent uniquement les âges supérieurs ou inférieurs, pas les âges égaux.
+
+![VS Code montrant les deux âges définis à 36 et aucun message affiché, car aucune des conditions n’est remplie.](/assets/first-steps/conditions/else-if-age-equal.png)
+
 Si nous voulons exécuter du code lorsque aucune des conditions n'est remplie, nous utilisons `else`. Puisque `else` ne teste aucune condition, nous n'avons pas besoin de `()`, mais nous devons fournir le code à exécuter à l'intérieur des `{}`. Bien que terminer avec un `else` ne soit pas obligatoire, cela aide souvent à éviter des bogues.
 
 Par exemple, dans le code ci-dessous, si aucune des conditions n'est remplie, cela signifie que nous avons le même âge. Nous utilisons donc `else` pour afficher `We are the same age!` dans le terminal.
 
-```ts showLineNumbers filename="main.ts"
-// Modifiez les âges
-// pour tester les différentes possibilités.
+```ts showLineNumbers filename="main.ts" {8-10}
 const myAge = 36;
-const yourAge = 25;
+const yourAge = 36;
 
 if (myAge > yourAge) {
   console.log("I am older than you!");
@@ -91,10 +125,10 @@ if (myAge > yourAge) {
 }
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/conditions/conditions-age.png" alt={"Une capture d'écran montrant VS Code exécutant un fichier TypeScript avec des instructions if, else if, et else."} lang="fr" />
+![VS Code montrant les deux âges définis à 36 et le bloc else affichant We are the same age! dans le terminal.](/assets/first-steps/conditions/conditions-age.png)
 
 <Callout type="info" emoji="💡">
-  Avez-vous remarqué l'absence de `;` à la ligne 12 ? C'est parce que lorsque vous utilisez `{}`, vous créez un **bloc de code**. L'accolade fermante indique déjà à l'ordinateur que c'est la fin du bloc, donc un point-virgule supplémentaire à la fin n'est pas nécessaire.
+  Avez-vous remarqué l'absence de `;` à la ligne 10 ? C'est parce que lorsque vous utilisez `{}`, vous créez un **bloc de code**. L'accolade fermante indique déjà à l'ordinateur que c'est la fin du bloc, donc un point-virgule supplémentaire à la fin n'est pas nécessaire.
 </Callout>
 
 ## Opérateurs de comparaison
@@ -142,7 +176,7 @@ const differentAge = myAge !== yourAge;
 console.log("differentAge =>", differentAge);
 ```
 
-<OutdatedScreenshot src="/assets/first-steps/conditions/operators.png" alt={"Une capture d'écran montrant VS Code exécutant un fichier TypeScript avec des opérateurs de comparaison."} lang="fr" />
+![VS Code montrant les opérateurs de comparaison et leurs résultats booléens dans le terminal.](/assets/first-steps/conditions/operators.png)
 
 ## Opérateurs logiques
 
@@ -151,7 +185,7 @@ Parfois, vous voulez vérifier plusieurs conditions dans une seule instruction. 
 - `&&` signifie **ET**
 - `||` signifie **OU**
 
-Par exemple, disons que nous avons besoin d'un algorithme pour vérifier si vous avez l'âge légal pour consommer une boisson dans un bar au Québec (au moins 18 ans) ou en Ontario (au moins 19 ans). Au cas où vous ne le sauriez pas, le Québec et l'Ontario sont deux provinces canadiennes. 🥂🇨🇦
+Par exemple, disons que nous avons besoin d'un algorithme pour vérifier si vous avez l'âge légal pour consommer une boisson dans un bar au Québec (au moins 18 ans) ou en Ontario (au moins 19 ans). 🥂🇨🇦
 
 Sans opérateurs logiques, cela pourrait ressembler à ceci, avec des conditions imbriquées. Cela fonctionne, mais les conditions imbriquées peuvent être difficiles à lire et à déboguer.
 
@@ -164,20 +198,22 @@ const myProvince: string = "Quebec";
 if (myProvince === "Quebec") {
   // Après avoir vérifié la province, nous vérifions aussi l'âge.
   if (myAge >= 18) {
-    console.log("You are allowed!");
+    console.log("You are allowed! 🍺");
   } else {
-    console.log("You are not allowed!");
+    console.log("You are not allowed! 🚫");
   }
 } else if (myProvince === "Ontario") {
   if (myAge >= 19) {
-    console.log("You are allowed!");
+    console.log("You are allowed! 🍺");
   } else {
-    console.log("You are not allowed!");
+    console.log("You are not allowed! 🚫");
   }
 } else {
-  console.log("I don't know this province!");
+  console.log("I don't know this province! 🤷");
 }
 ```
+
+![VS Code montrant des conditions imbriquées autorisant une personne de 18 ans au Québec et affichant You are allowed! 🍺.](/assets/first-steps/conditions/logical-nested.png)
 
 Voici le même code avec l'opérateur logique `&&` pour s'assurer que `myAge` **ET** `myProvince` respectent des conditions spécifiques. Cette approche est plus simple à comprendre et plus facile à déboguer !
 
@@ -187,17 +223,17 @@ Voici le même code avec l'opérateur logique `&&` pour s'assurer que `myAge` **
 const myAge: number = 18;
 const myProvince: string = "Quebec";
 
-// Les deux conditions doivent être vraies : Québec ET au moins 18 ans.
 if (myProvince === "Quebec" && myAge >= 18) {
-  console.log("You are allowed!");
+  // Québec ET au moins 18 ans.
+  console.log("You are allowed! 🍺");
 } else if (myProvince === "Ontario" && myAge >= 19) {
   // Ontario ET au moins 19 ans.
-  console.log("You are allowed!");
+  console.log("You are allowed! 🍺");
 } else if (myProvince !== "Quebec" && myProvince !== "Ontario") {
   // La province n'est ni le Québec ni l'Ontario.
-  console.log("I don't know this province!");
+  console.log("I don't know this province! 🤷");
 } else {
-  console.log("You are not allowed!");
+  console.log("You are not allowed! 🚫");
 }
 ```
 
@@ -212,17 +248,18 @@ const myProvince: string = "Quebec";
 // Stockez chaque condition combinée sous forme de true ou false.
 const isAllowedInQuebec = myProvince === "Quebec" && myAge >= 18;
 const isAllowedInOntario = myProvince === "Ontario" && myAge >= 19;
+const unknownProvince = myProvince !== "Quebec" && myProvince !== "Ontario";
 
-// Au moins une condition doit être vraie.
 if (isAllowedInQuebec || isAllowedInOntario) {
-  console.log("You are allowed!");
-} else if (myProvince !== "Quebec" && myProvince !== "Ontario") {
-  // La province n'est ni le Québec ni l'Ontario.
-  console.log("I don't know this province!");
+  console.log("You are allowed! 🍺");
+} else if (unknownProvince) {
+  console.log("I don't know this province! 🤷");
 } else {
-  console.log("You are not allowed!");
+  console.log("You are not allowed! 🚫");
 }
 ```
+
+Comme en français, il existe plusieurs façons d’exprimer la même logique en code. Gardez votre code facile à lire et à comprendre pour pouvoir le reprendre facilement, même plusieurs mois plus tard, et permettre à vos collègues de comprendre et de réviser rapidement votre travail.
 
 ## Opérateur conditionnel
 
@@ -238,21 +275,21 @@ Voici une autre variation de notre algorithme en utilisant cette syntaxe.
 const myAge: number = 18;
 const myProvince: string = "Quebec";
 
-// Utilisez let pour pouvoir modifier le message ci-dessous.
-let message = "";
+const quebecMessage = myAge >= 18
+  ? "You are allowed! 🍺"
+  : "You are not allowed! 🚫";
+
+const ontarioMessage = myAge >= 19
+  ? "You are allowed! 🍺"
+  : "You are not allowed! 🚫";
 
 if (myProvince === "Quebec") {
-  // Choisissez le premier message si la condition est vraie, sinon le second.
-  message = myAge >= 18 ? "You are allowed!" : "You are not allowed!";
+  console.log(quebecMessage);
 } else if (myProvince === "Ontario") {
-  // Faites le même choix avec l'âge minimum de l'Ontario.
-  message = myAge >= 19 ? "You are allowed!" : "You are not allowed!";
+  console.log(ontarioMessage);
 } else {
-  message = "I don't know this province!";
+  console.log("I don't know this province! 🤷");
 }
-
-// Affichez le message choisi une fois les conditions vérifiées.
-console.log(message);
 ```
 
 ## Conclusion
