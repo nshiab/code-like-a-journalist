@@ -23,6 +23,7 @@ Créez un nouveau dossier vide sur votre ordinateur, ouvrez-le avec VS Code et c
 Tapez ce code dans `main.ts` et enregistrez le fichier :
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 console.log("Hello!");
 ```
 
@@ -36,61 +37,70 @@ Cette commande exécute notre code et le relance automatiquement chaque fois que
 
 ![VS Code montrant console.log("Hello!") dans main.ts et Hello! dans le terminal exécutant node --watch main.ts.](/assets/first-steps/variables/run.png)
 
+## À propos de `await`
+
+Dans les exemples de code qui suivent, vous verrez le mot-clé `await`. Ne vous en préoccupez pas pour le moment. Nous en parlerons à la fin de cette leçon.
+
 ## Écrire
 
 Avec Node.js, écrire des fichiers est très facile. Importez la fonction `writeFile` du module intégré `node:fs/promises`. Vous n’avez rien à installer : ce module est fourni avec Node.js.
 
 Pour un fichier texte, passez un chemin d’accès comme premier paramètre et du texte comme deuxième paramètre. Dans le code ci-dessous, nous voulons créer un fichier nommé `hello.txt` contenant `"Hello!"`.
 
-Le `./` indique un chemin relatif : il pointe vers le dossier où nous exécutons le script, le dossier du projet ouvert dans VS Code. Pour les imports, en revanche, les chemins relatifs partent du fichier qui importe, ici `main.ts`.
+Le `./` indique un chemin relatif : il pointe vers le dossier où nous exécutons le script, le dossier du projet ouvert dans VS Code.
 
-Modifiez `main.ts` avec ce code et enregistrez le fichier. Nous parlerons du mot-clé `await` dans un instant.
+Modifiez `main.ts` avec ce code et enregistrez le fichier.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 import { writeFile } from "node:fs/promises";
 
 await writeFile("./hello.txt", "Hello!");
 ```
 
+<Callout type="info" emoji="💡">
+    Vous vous demandez peut-être à quoi sert `// @ts-ignore` en haut du fichier. Ce commentaire indique à VS Code d’ignorer les erreurs de type sur la ligne suivante. Pour avoir les bons types pour `writeFile`, `readFile` et les autres fonctions de Node.js que nous allons utiliser, nous devons installer les définitions de types de Node.js. Nous le ferons dans une autre leçon. Pour le moment, je veux simplement que vous vous concentriez sur l’écriture et la lecture de fichiers.
+</Callout>
+
 Un nouveau fichier texte a été créé avec son contenu. Vous savez désormais comment stocker des données de façon permanente sur votre ordinateur !
 
 Au fait, soyez prudent : par défaut, `writeFile` écrase les fichiers s'ils existent déjà.
 
-<OutdatedScreenshot src="/assets/pushing-further/files/write-working.png" alt={"Une capture d'écran montrant VS Code écrivant un fichier texte avec Deno."} lang="fr" />
+![VS Code montre writeFile créant hello.txt avec le texte Hello!.](/assets/pushing-further/files/write-hello.png)
 
 ## Lire
 
-Pour lire des fichiers, importez `readFile` du même module. Passez un chemin d’accès et l’encodage `"utf8"` pour obtenir le contenu sous forme de texte. Sans cet encodage, Node.js renvoie un `Buffer`, qui représente les octets bruts.
+Pour lire des fichiers, importez `readFile` du même module. Passez un chemin d’accès et l’encodage `"utf8"` pour obtenir le contenu sous forme de texte. `writeFile` utilise UTF-8 par défaut pour écrire du texte : nous utilisons donc le même encodage pour le lire.
 
 Mettons à jour `main.ts` pour lire le fichier que nous avons écrit plus tôt.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 import { readFile } from "node:fs/promises";
 
 const data = await readFile("./hello.txt", "utf8");
 console.log(data);
 ```
 
+<Callout type="info" emoji="💡">
+    Les ordinateurs stockent les données sous forme de bits : des zéros et des uns. Les humains lisent des caractères, comme des lettres, des chiffres et des émojis. Un encodage est un ensemble de règles pour transformer ces caractères en bits et les lire à nouveau. UTF-8 est un encodage courant qui prend en charge les caractères de nombreuses langues.
+</Callout>
+
 Vous avez réussi à récupérer le contenu texte du fichier `hello.txt` !
 
-<OutdatedScreenshot src="/assets/pushing-further/files/read-working.png" alt={"Une capture d'écran montrant VS Code lisant un fichier texte avec Deno."} lang="fr" />
-
-<OutdatedScreenshot src="/assets/pushing-further/files/allow-write.png" alt={"Une capture d'écran montrant VS Code affichant un avertissement Deno concernant l'écriture dans le terminal."} lang="fr" />
-
-<OutdatedScreenshot src="/assets/pushing-further/files/allow-read.png" alt={"Une capture d'écran montrant VS Code affichant un avertissement Deno concernant la lecture dans le terminal."} lang="fr" />
+![VS Code montre readFile lisant hello.txt avec l’encodage UTF-8 et affichant Hello! dans le terminal.](/assets/pushing-further/files/read-hello.png)
 
 ## JSON
 
 Écrire des données sous forme de texte est assez standard. Par exemple, les fichiers CSV sont simplement des fichiers texte avec des virgules représentant les colonnes.
 
-Cependant, en travaillant avec TypeScript, en particulier pour le Web, vous écrirez souvent vos données sous forme de fichiers **JSON**. JSON signifie *JavaScript Object Notation*, et comme TypeScript est basé sur le JavaScript, c'est un choix naturel.
+Cependant, en travaillant avec TypeScript, en particulier pour le Web, vous écrirez souvent vos données sous forme de fichiers **JSON**. JSON signifie *JavaScript Object Notation*, et comme TypeScript est basé sur le JavaScript, c'est un choix naturel. Ce format de fichier texte peut stocker des listes, des objets, du texte, des nombres et des booléens, au lieu de simples textes bruts.
 
-Ce format de fichier texte peut stocker des listes, des objets, du texte, des nombres et des booléens, au lieu de simples textes bruts.
-
-Par exemple, dans le script ci-dessous, nous écrivons la liste d'objets `data` dans le fichier `data.json`.
+Par exemple, dans le script ci-dessous, nous écrivons la liste d’objets `data` dans le fichier `data.json`. Mais nous devons d’abord la transformer en texte avec `JSON.stringify()` pour pouvoir l’écrire dans un fichier texte. Rappelez-vous : en code, le texte est généralement appelé une **chaîne de caractères**, ou **string** en anglais. Nous stockons cette chaîne dans la variable `dataStringified`.
 
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 import { writeFile } from "node:fs/promises";
 
 const data = [
@@ -98,16 +108,15 @@ const data = [
   { name: "John", age: 30 },
 ];
 
-await writeFile(
-  "data.json",
-  JSON.stringify(data),
-);
+const dataStringified = JSON.stringify(data);
+
+await writeFile("data.json", dataStringified);
 ```
 <Callout type="info" emoji="💡">
-    Nous avons utilisé l'objet global `JSON`, qui est toujours disponible lorsque vous codez, et sa méthode `stringify()`. Ici, `writeFile` attend du texte plutôt qu’une liste, mais `data` est une liste d'objets. Nous utilisons donc **stringify** pour transformer `data` en texte JSON. La méthode complémentaire est `JSON.parse()`, qui rend leur forme originale à des listes, objets et valeurs qui ont été transformés en texte JSON.
+    `JSON` est un objet global : il est toujours disponible dans nos scripts, donc nous n’avons pas besoin de l’importer.
 </Callout>
 
-<OutdatedScreenshot src="/assets/pushing-further/files/json-write.png" alt={"Une capture d'écran montrant VS Code écrivant un fichier JSON avec Deno."} lang="fr" />
+![VS Code montre JSON.stringify convertissant data en dataStringified et writeFile enregistrant le résultat dans data.json, ouvert à côté du script.](/assets/pushing-further/files/write-json.png)
 
 Comme le fichier a l'extension `.json`, il est compris par VS Code et Node.js. Son contenu est affiché avec les types de données appropriés. Dans l’éditeur, les noms sont mis en évidence comme du texte et les âges comme des nombres. Si nous avions tout écrit dans un fichier `.txt`, tout apparaîtrait comme du texte brut.
 
@@ -118,36 +127,36 @@ import data from "./data.json" with { type: "json" };
 
 console.log(data);
 ```
-<OutdatedScreenshot src="/assets/pushing-further/files/json-read.png" alt={"Une capture d'écran montrant VS Code lisant un fichier JSON avec Deno."} lang="fr" />
+![VS Code montre data.json importé avec l’attribut JSON et sa liste d’objets affichée dans le terminal.](/assets/pushing-further/files/import-json.png)
 
-VS Code peut vérifier les types des données importées, ce qui est formidable. Node.js ne vérifie toujours pas les types quand il exécute le code.
+VS Code comprend les types des données importées depuis notre fichier JSON, ce qui est formidable ! Si vous ajoutez un `.` après `data`, VS Code suggérera des méthodes pour les listes, car il sait que `data` est une liste.
 
-Si vous ajoutez un `.` après `data`, VS Code suggérera des méthodes pour les listes car il sait que les données stockées dans `data.json` sont une liste.
-
-<OutdatedScreenshot src="/assets/pushing-further/files/json-array-methods.png" alt={"Une capture d'écran montrant VS Code suggérant des méthodes pour les tableaux."} lang="fr" />
+![VS Code suggère des méthodes pour les listes après un point ajouté à data, importé depuis data.json.](/assets/pushing-further/files/json-array-autocomplete.png)
 
 Si vous sélectionnez le premier objet de `data` avec `[0]` et tapez un `.` pour accéder à une clé, VS Code vous proposera les clés présentes dans l'objet. Comme c'est un fichier JSON, il peut inférer les types.
 
-<OutdatedScreenshot src="/assets/pushing-further/files/json-object-methods.png" alt={"Une capture d'écran montrant VS Code lisant un fichier JSON avec Deno."} lang="fr" />
+![VS Code suggère age et name après data[0]., et indique que age est un nombre.](/assets/pushing-further/files/json-property-autocomplete.png)
 
-Et si vous essayez d’accéder à des clés qui n’existent pas dans les objets, VS Code et les vérifications du projet signalent une erreur. N'est-ce pas incroyable ? 😍
+Et si vous essayez d’accéder à des clés qui n’existent pas dans les objets, VS Code signale une erreur. N'est-ce pas incroyable ? 😍
 
-<OutdatedScreenshot src="/assets/pushing-further/files/json-object-error.png" alt={"Une capture d'écran montrant VS Code lisant un fichier JSON avec Deno."} lang="fr" />
+![VS Code signale que city n’existe pas dans l’objet lors de l’accès à data[0].city.](/assets/pushing-further/files/json-missing-property.png)
 
 Parfois, vous ne pouvez pas ou ne voulez pas utiliser la syntaxe `import` pour un fichier JSON. Vous pouvez alors le lire avec `readFile()` et l’encodage `"utf8"`. Cependant, cette méthode renvoie une chaîne de caractères : le contenu du fichier sous forme de texte.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 import { readFile } from "node:fs/promises";
 
 const rawData = await readFile("./data.json", "utf8");
 console.log(rawData);
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/files/json-raw-data.png" alt={"VS Code affichant le contenu du fichier JSON sous forme de texte brut."} lang="fr" />
+![VS Code montre readFile lisant data.json sous forme de texte UTF-8 et affichant rawData dans le terminal.](/assets/pushing-further/files/read-json-text.png)
 
-Pour transformer ce texte en tableau ou en objet, utilisez `JSON.parse()`.
+Tout comme nous utilisons `JSON.stringify()` pour transformer des listes et des objets en texte JSON, nous pouvons utiliser `JSON.parse()` pour faire l’inverse : transformer du texte JSON en valeurs et structures JavaScript, comme des listes et des objets.
 
-```ts showLineNumbers filename="main.ts" {4} /data/3
+```ts showLineNumbers filename="main.ts" {5} /data/3
+// @ts-ignore
 import { readFile } from "node:fs/promises";
 
 const rawData = await readFile("./data.json", "utf8");
@@ -155,9 +164,13 @@ const data = JSON.parse(rawData);
 console.log(data);
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/files/json-parsed-data.png" alt={"VS Code affichant le tableau d’objets après la conversion du texte JSON."} lang="fr" />
+![VS Code montre JSON.parse convertissant rawData en liste d’objets et affichant le résultat dans le terminal.](/assets/pushing-further/files/parse-json-text.png)
 
-## À propos de `await`
+<Callout type="info" emoji="💡">
+    Un inconvénient de la lecture suivie de l’analyse du JSON est que TypeScript ne déduit plus la structure des données : nous perdons donc les vérifications automatiques de leurs types. Dans les prochaines leçons, nous verrons comment gérer cela en vérifiant les valeurs obtenues ou en donnant un type explicite aux données.
+</Callout>
+
+## Parlons de `await`
 
 Il existe deux types de fonctions et de méthodes : **synchrones** et **asynchrones**.
 
@@ -173,12 +186,10 @@ Cette fonctionnalité est également formidable pour le développement web. Par 
 
 Dans notre contexte, il est plus simple d'ajouter le mot-clé `await` pour que l'ordinateur traite le code dans l'ordre affiché.
 
-Pour identifier une fonction ou une méthode asynchrone, survolez-la. Les fonctions asynchrones retournent une promesse (`Promise`). La vérification des types peut détecter de nombreux cas où vous utilisez une `Promise` comme si elle était le résultat final, mais elle ne signale pas tous les oublis de `await`. Pensez à attendre la fin d’une opération avant d’utiliser son résultat.
-
-<OutdatedScreenshot src="/assets/pushing-further/files/promise.png" alt={"Une capture d'écran montrant VS Code."} lang="fr" />
+Autre chose à savoir : les fonctions asynchrones retournent une promesse (`Promise`). Nous approfondirons cela dans les prochaines leçons.
 
 ## Conclusion
 
-Avec ces nouvelles compétences, vous pouvez maintenant gérer efficacement les opérations sur les fichiers dans vos projets Node.js. Bon codage ! 🥳
+Vous pouvez maintenant sauvegarder des données et les relire dans vos projets, ce qui est très pratique et important lorsque vous travaillez avec des données ! 🥳
 
 <NoticeEnd lang="fr"/>

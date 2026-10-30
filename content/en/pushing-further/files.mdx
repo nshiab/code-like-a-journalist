@@ -23,6 +23,7 @@ Create a new, empty folder on your computer, open it with VS Code, and create a 
 Type this code in `main.ts` and save the file:
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 console.log("Hello!");
 ```
 
@@ -36,61 +37,70 @@ This runs our code and automatically runs it again each time we save a change, s
 
 ![VS Code showing console.log("Hello!") in main.ts and Hello! in the terminal running node --watch main.ts.](/assets/first-steps/variables/run.png)
 
+## About `await`
+
+In the following code examples, you’ll see the keyword `await`. Don’t worry about it for now. We’ll talk about it at the end of this lesson.
+
 ## Writing
 
 With Node.js, writing files is very easy. Import the `writeFile` function from the built-in `node:fs/promises` module. You don’t need to install anything: this module comes with Node.js.
 
 For text files, pass a path as the first parameter and a string as the second parameter. In the code below, we want to create a file named `hello.txt` containing `"Hello!"`.
 
-The `./` makes this a relative path: it points to the folder where we run the script, which is the project folder you opened in VS Code. This is different from imports: their relative paths start from the importing file, here `main.ts`.
+The `./` makes this a relative path: it points to the folder where we run the script, which is the project folder you opened in VS Code.
 
-Update `main.ts` with this code and save the file. We’ll talk about the `await` keyword in a minute.
+Update `main.ts` with this code and save the file.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 import { writeFile } from "node:fs/promises";
 
 await writeFile("./hello.txt", "Hello!");
 ```
 
+<Callout type="info" emoji="💡">
+    You might be wondering what `// @ts-ignore` is doing at the top of the file. It tells VS Code to ignore type errors on the next line. To get proper types for `writeFile`, `readFile`, and the other Node.js functions we’ll use, we need to install Node.js type definitions. We’ll do that in another lesson. For now, I just want you to focus on writing and reading files.
+</Callout>
+
 A new text file has been created with text content in it. You now know how to permanently store data on your computer!
 
 By the way, be careful: by default, `writeFile` overwrites files if they already exist.
 
-<OutdatedScreenshot src="/assets/pushing-further/files/write-working.png" alt={"A screenshot showing VS Code writing a text file with Deno."} lang="en" />
+![VS Code showing writeFile creating hello.txt with the text Hello!.](/assets/pushing-further/files/write-hello.png)
 
 ## Reading
 
-To read files, import `readFile` from the same module. Pass a file path and the encoding `"utf8"` to get the contents as a string. Without the encoding, Node.js returns a `Buffer`, which represents raw bytes.
+To read files, import `readFile` from the same module. Pass a file path and the encoding `"utf8"` to get the contents as a string. `writeFile` uses UTF-8 by default when writing text, so we use the same encoding to read it.
 
 Let’s update `main.ts` to read the file we wrote earlier.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 import { readFile } from "node:fs/promises";
 
 const data = await readFile("./hello.txt", "utf8");
 console.log(data);
 ```
 
+<Callout type="info" emoji="💡">
+    Computers store data as bits: zeros and ones. Humans read characters, like letters, digits, and emojis. An encoding is a set of rules for turning those characters into bits and reading them back. UTF-8 is a common encoding that supports characters from many languages.
+</Callout>
+
 You’ve successfully retrieved the text content from the `hello.txt` file!
 
-<OutdatedScreenshot src="/assets/pushing-further/files/read-working.png" alt={"A screenshot showing VS Code reading a text file with Deno."} lang="en" />
-
-<OutdatedScreenshot src="/assets/pushing-further/files/allow-write.png" alt={"A screenshot showing VS Code showing a Deno write warning in the terminal."} lang="en" />
-
-<OutdatedScreenshot src="/assets/pushing-further/files/allow-read.png" alt={"A screenshot showing VS Code showing a Deno read warning in the terminal."} lang="en" />
+![VS Code showing readFile reading hello.txt with UTF-8 encoding and logging Hello! in the terminal.](/assets/pushing-further/files/read-hello.png)
 
 ## JSON
 
 Writing data as text is pretty standard. For example, CSV files are just text files with commas representing columns.
 
-However, when working in TypeScript, especially for the Web, you’ll often write your data as **JSON files**. JSON stands for *JavaScript Object Notation*, and since TypeScript is based on JavaScript, it’s a natural choice.
+However, when working in TypeScript, especially for the Web, you’ll often write your data as **JSON files**. JSON stands for *JavaScript Object Notation*, and since TypeScript is based on JavaScript, it’s a natural choice. This text file format can store arrays, objects, text, numbers, and booleans, instead of just raw text.
 
-This text file format can store arrays, objects, text, numbers, and booleans, instead of just raw text.
-
-For example, in the script below, we write the array of objects `data` to the file `data.json`.
+For example, in the script below, we write the array of objects `data` to the file `data.json`. But first, we need to turn it into text with `JSON.stringify()` so it can be written to a text file. Remember, in code, text is usually called a **string**. We store that string in the variable `dataStringified`.
 
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 import { writeFile } from "node:fs/promises";
 
 const data = [
@@ -98,16 +108,15 @@ const data = [
   { name: "John", age: 30 },
 ];
 
-await writeFile(
-  "data.json",
-  JSON.stringify(data),
-);
+const dataStringified = JSON.stringify(data);
+
+await writeFile("data.json", dataStringified);
 ```
 <Callout type="info" emoji="💡">
-    We used the `JSON` global object, which is always available while you code, and its `stringify()` method. Here, `writeFile` needs text rather than an array, but `data` is an array of objects. So we **stringify** it to transform `data` into a JSON string. The complementary method is `JSON.parse()`, which can convert stringified arrays, objects, and values back to their original form.
+    `JSON` is a global object: it’s always available in our scripts, so we don’t need to import it.
 </Callout>
 
-<OutdatedScreenshot src="/assets/pushing-further/files/json-write.png" alt={"A screenshot showing VS Code writing a JSON file with Deno."} lang="en" />
+![VS Code showing JSON.stringify converting data to dataStringified and writeFile saving it to data.json, with the JSON file open beside the script.](/assets/pushing-further/files/write-json.png)
 
 Because it has the `.json` extension, the file is understood by VS Code and Node.js. Its content is displayed with the proper data types. In the editor, the names are highlighted as strings and the ages as numbers. If we wrote everything into a `.txt` file, everything would appear as plain text.
 
@@ -118,36 +127,36 @@ import data from "./data.json" with { type: "json" };
 
 console.log(data);
 ```
-<OutdatedScreenshot src="/assets/pushing-further/files/json-read.png" alt={"A screenshot showing VS Code reading a JSON file with Deno."} lang="en" />
+![VS Code showing data.json imported with the JSON import attribute and its array of objects logged in the terminal.](/assets/pushing-further/files/import-json.png)
 
-VS Code can check the imported data’s types, which is wonderful. Node.js itself still doesn’t check types when it runs the code.
+VS Code understands the types of the data imported from our JSON file, which is wonderful! If you add a `.` after `data`, VS Code will suggest array methods because it knows that `data` is an array.
 
-If you add a `.` after `data`, VS Code will suggest array methods because it knows the data stored in `data.json` is an array.
-
-<OutdatedScreenshot src="/assets/pushing-further/files/json-array-methods.png" alt={"A screenshot showing VS Code suggesting array methods."} lang="en" />
+![VS Code suggesting array methods after typing a dot after data imported from data.json.](/assets/pushing-further/files/json-array-autocomplete.png)
 
 If you select the first object of `data` with `[0]` and type a `.` to access a key, VS Code will suggest the keys that are in the object. Since it’s a JSON file, it can infer the types.
 
-<OutdatedScreenshot src="/assets/pushing-further/files/json-object-methods.png" alt={"A screenshot showing VS Code reading a JSON file with Deno."} lang="en" />
+![VS Code suggesting age and name after typing data[0]., with age identified as a number.](/assets/pushing-further/files/json-property-autocomplete.png)
 
 And if you try to access keys that don’t exist in the objects, VS Code flags an error. Isn’t that amazing? 😍
 
-<OutdatedScreenshot src="/assets/pushing-further/files/json-object-error.png" alt={"A screenshot showing VS Code reading a JSON file with Deno."} lang="en" />
+![VS Code reporting that city does not exist on the object when accessing data[0].city.](/assets/pushing-further/files/json-missing-property.png)
 
 Sometimes, you can’t or don’t want to use the `import` syntax for a JSON file. Instead, you can read it with `readFile()` and the `"utf8"` encoding. However, this gives you a string: the contents of the file as text.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 import { readFile } from "node:fs/promises";
 
 const rawData = await readFile("./data.json", "utf8");
 console.log(rawData);
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/files/json-raw-data.png" alt={"VS Code logging the JSON file contents as raw text."} lang="en" />
+![VS Code showing readFile reading data.json as UTF-8 text and logging rawData in the terminal.](/assets/pushing-further/files/read-json-text.png)
 
-To turn that text back into an array or object, use `JSON.parse()`.
+Just as we use `JSON.stringify()` to turn arrays and objects into JSON text, we can use `JSON.parse()` to do the opposite: turn JSON text back into JavaScript values and structures, like arrays and objects.
 
-```ts showLineNumbers filename="main.ts" {4} /data/3
+```ts showLineNumbers filename="main.ts" {5} /data/3
+// @ts-ignore
 import { readFile } from "node:fs/promises";
 
 const rawData = await readFile("./data.json", "utf8");
@@ -155,9 +164,13 @@ const data = JSON.parse(rawData);
 console.log(data);
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/files/json-parsed-data.png" alt={"VS Code logging the array of objects after parsing the JSON text."} lang="en" />
+![VS Code showing JSON.parse converting rawData back into an array of objects and logging it in the terminal.](/assets/pushing-further/files/parse-json-text.png)
 
-## About `await`
+<Callout type="info" emoji="💡">
+    One drawback of reading and parsing JSON is that TypeScript no longer infers the structure of the data, so we lose automatic type checks on it. In later lessons, we’ll see how to handle this by checking the parsed values or giving the data an explicit type.
+</Callout>
+
+## Let’s talk about `await`
 
 There are two types of functions and methods: **synchronous** and **asynchronous**.
 
@@ -173,12 +186,10 @@ This feature is also powerful for web development. For instance, a website with 
 
 In our context, it’s easier to add the `await` keyword so the computer processes the code in the intended order.
 
-To identify an asynchronous function or method, hover over it. Asynchronous functions return a `Promise`. Type checking can catch many cases where you use a `Promise` as if it were the finished result, but it won’t flag every forgotten `await`. Remember to await an operation before using its result.
-
-<OutdatedScreenshot src="/assets/pushing-further/files/promise.png" alt={"A screenshot showing VS Code."} lang="en" />
+Another thing to know: asynchronous functions return a `Promise`. We’ll dive into that in the next lessons.
 
 ## Conclusion
 
-With these new skills, you can now handle file operations in your Node.js projects efficiently. Happy coding! 🥳
+You can now save data and read it back in your projects, which is very convenient and important when working with data! 🥳
 
 <NoticeEnd />
