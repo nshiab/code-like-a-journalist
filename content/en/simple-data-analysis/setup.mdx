@@ -8,7 +8,7 @@ import { Callout } from "nextra/components"
 
 # Setup for data analysis
 
-In the first two chapters, a folder, `main.ts`, and Node.js were enough to learn TypeScript. Data analysis projects need libraries, more folders, and a few configuration files. Let's prepare them with `@nshiab/setup-data-project`.
+Now that we're in Chapter 3, we'll work on bigger and more complex data analysis projects. To get off to a good start, we'll use the `@nshiab/setup-data-project` library to prepare our project folders, install libraries, and create the configuration files we need.
 
 Make sure you've completed the [VS Code and Node.js setup](/first-steps/setup). We'll keep using the same editor and runtime.
 
@@ -18,35 +18,31 @@ Make sure you've completed the [VS Code and Node.js setup](/first-steps/setup). 
 
 When you start a new project, you need to create a few folders and configuration files. To avoid doing this manually every time, I created an open-source library called [@nshiab/setup-data-project](https://github.com/nshiab/setup-data-project) that we can run to do all of this automatically. We'll use it for the data analysis lessons and projects from this chapter onward.
 
-First, create a new, empty folder somewhere handy on your computer. In VS Code, click on the Explorer tab, click `Open Folder`, and select that folder. If you are asked whether you trust the authors of the files, say "Yes" for this project you just created.
+Create a new, empty folder somewhere handy on your computer and open it in VS Code.
 
-![VS Code with arrows pointing to the Explorer tab and the Open Folder button.](/assets/first-steps/setup/vscode-open-folder.png)
-
-Now we're ready to run the `@nshiab/setup-data-project` library in this folder. Open the terminal if it isn't already open (`View => Terminal`, or `CMD` + `J` on Mac and `CTRL` + `J` on Windows). Type the following command and press Enter:
+Then run the `@nshiab/setup-data-project` library in this folder by running this command in the terminal:
 
 ```sh
 npx @nshiab/setup-data-project
 ```
 
-`npx` comes with Node.js. It will fetch, install, and run the library in the folder you created. If you're asked whether to install `@nshiab/setup-data-project`, type `y` and press Enter.
-
-It's okay if the number after `@nshiab/setup-data-project` is different from `4.0.3` in my screenshot. It just means the library has been updated since I took it.
-
-![The VS Code terminal asking for confirmation to install @nshiab/setup-data-project, with an arrow pointing to the prompt.](/assets/first-steps/setup/setup-data-project-install-prompt.png)
+<Callout type="info" emoji="💡">
+    `npx` comes with Node.js. It downloads the library if needed and runs it to set up your project in the current folder. If you're asked whether to install `@nshiab/setup-data-project`, type `y` and press Enter.
+</Callout>
 
 The `@nshiab/setup-data-project` library will ask which libraries you want to install. Use the space bar to select `simple-data-analysis`, then press Enter. This installs SDA and the tools we'll need for data analysis.
 
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/setup.png" alt={"Selecting simple-data-analysis in the setup tool."} lang="en" />
+![VS Code showing npx @nshiab/setup-data-project and the library selection menu, with arrows pointing to the command and simple-data-analysis.](/assets/simple-data-analysis/setup/library-selection.png)
 
-Wait until setup finishes and displays `You are all set!`. It may take a few seconds to download and install the tools. In the Explorer tab on the left, you'll see new files being created.
+Wait until setup finishes and displays `You are all set!`. It may take a few seconds to download and install the tools. You'll see a `main.ts` file in the `sda` folder with basic code using the [Simple Data Analysis (SDA) library](https://github.com/nshiab/simple-data-analysis). This is the library we'll use in the next lessons in this chapter.
 
-![VS Code showing the new project files in Explorer and the setup completion message You are all set! in the terminal.](/assets/first-steps/setup/setup-data-project-complete.png)
+![VS Code showing the new project files in Explorer and the setup completion message You are all set! in the terminal.](/assets/simple-data-analysis/setup/installation-complete.png)
 
 There's no magic here: the setup tool just created files in your folder. You can see them in Finder on Mac or File Explorer on Windows, too. Most are text files in different formats. VS Code gives us handy tools to edit them and run the code inside them.
 
 After a few seconds, you should see a pop-up recommending the Oxc extension. Click `Install`. This extension will help highlight errors in our code as we type.
 
-![VS Code recommending the Oxc extension, with arrows pointing to the pop-up and its Install button.](/assets/first-steps/setup/oxc-install-prompt.png)
+![VS Code recommending the Oxc extension, with arrows pointing to the pop-up and its Install button.](/assets/simple-data-analysis/setup/oxc-install-prompt.png)
 
 <Callout type="info" emoji="💡">
     If you don't see this pop-up, fully quit VS Code. On Mac, press `Command` + `Q`, or right-click its icon in the Dock and choose `Quit`; clicking the red close button only closes the window. On Windows, use `File => Exit`. Then reopen VS Code and your project folder. The pop-up should appear after a few seconds.
@@ -64,13 +60,14 @@ If you're curious about the project files, here's a quick description of the mos
 - `AGENTS.md` contains instructions for AI agents. We won't use them in our lessons, but they're there if you use this setup for another project.
 - `sda/main.ts` is the main script where we'll write our analysis. The `sda` folder also contains `helpers`, `data`, and `output` folders for our functions, input data, and results.
 - `docs` contains the installed libraries' documentation.
-- `package.json` lists the libraries installed in the project and useful commands we'll run regularly. We'll learn more about it in later lessons.
+- `package.json` lists the libraries installed in the project and useful commands we'll run regularly.
 - `package-lock.json` is related to `package.json` and records the exact versions of the installed libraries. You don't need to worry about it for now.
 - `.env` is where we'll put environment variables, such as API keys.
 - `.gitignore` tells Git which files to leave out when tracking changes to your project or sharing it on platforms like GitHub. We'll talk about that later.
 - `tsconfig.json` contains TypeScript options, already filled in with good defaults.
 - `.oxfmtrc.json` contains formatting settings, which help keep our code neatly laid out.
 - `.oxlintrc.json` contains settings for linting our code. Linting means checking code for mistakes and common problems.
+- `.vscode` is a hidden folder containing settings for VS Code in this project, such as using Oxc to format code when you save, applying automatic fixes, and wrapping long lines.
 
 Don't worry if this looks like a lot. The setup tool has done the configuration for us, and you don't need to modify these files unless you really know what you're doing.
 
@@ -80,9 +77,11 @@ Now close the `Extension: Oxc` tab by clicking the white cross next to its title
 
 You should now see your project files in the Explorer again, as shown below.
 
-![VS Code back in the Explorer view, showing the project files and the completed setup in the terminal.](/assets/first-steps/setup/explorer-ready.png)
+![VS Code back in the Explorer view, showing the project files and the completed setup in the terminal.](/assets/simple-data-analysis/setup/installation-complete.png)
 
 ## Run your analysis
+
+In previous lessons and projects, type errors appeared in the editor, where you could hover over them for details. Node.js would still run the code. With this setup, linting and type errors stop the analysis before it runs. Catching these mistakes early is especially useful when complex calculations can take a long time.
 
 The setup tool creates `sda/main.ts` with a short SDA example. Open it in the Explorer. From the terminal in your project folder, run:
 
@@ -90,13 +89,36 @@ The setup tool creates `sda/main.ts` with a short SDA example. Open it in the Ex
 npm run sda
 ```
 
-Node.js can execute TypeScript directly, but it doesn't check types. The `sda` command adds formatting, linting (checks for common code problems), and type checking before running your analysis. If a check fails, fix the reported problem and try again. These checks help catch mistakes; you still need to check your data and results.
+The two blue lines in the terminal show that your code was automatically formatted and checked with linting (checks for common code problems) and type checking before the analysis ran.
+
+![VS Code showing npm run sda, blue formatting and checking messages, and the SDA example's output table.](/assets/simple-data-analysis/setup/run-sda.png)
+
+For example, let's add an error: change `.log()` to `.logData()`. This method doesn't exist on our table.
+
+```ts showLineNumbers filename="sda/main.ts" {6}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+const table = sdb.newTable();
+
+await table.loadArray([{ message: "Hello simple-data-analysis!" }]).logData();
+
+await sdb.close();
+```
+
+Run `npm run sda` again. The terminal tells you exactly what the error is: `logData` does not exist on `SimpleTable`. The error still appears in your code editor, but the checks also prevent the code from running.
+
+![VS Code showing the nonexistent logData method underlined in the editor and npm run sda reporting the type error without running the analysis.](/assets/simple-data-analysis/setup/type-error.png)
+
+Change `.logData()` back to `.log()` before continuing.
 
 To rerun the analysis automatically when you save changes, use:
 
 ```sh
 npm run sda:watch
 ```
+
+![VS Code showing the analysis running in watch mode with formatting, linting, and type checking.](/assets/simple-data-analysis/setup/watch-sda.png)
 
 This watches `sda` and `.env`, formats and checks the code, then runs it again when those files change. It ignores changes to `sda/output` so saving results doesn't start another run. To stop it, click in the terminal and press `Control` + `C` on Mac or Windows.
 
@@ -112,6 +134,8 @@ To check formatting, lint rules, and TypeScript types without running the analys
 npm run all-tests
 ```
 
+![VS Code showing npm run all-tests passing formatting, linting, and type checks.](/assets/simple-data-analysis/setup/all-tests.png)
+
 Despite its name, this command doesn't include automated tests in a fresh project. We'll learn to add tests later.
 
 To format files and apply automatic fixes, use:
@@ -120,8 +144,16 @@ To format files and apply automatic fixes, use:
 npm run fix
 ```
 
+![VS Code showing npm run fix formatting files and applying automatic fixes.](/assets/simple-data-analysis/setup/fix.png)
+
 Some problems will still need a fix from you. Read the messages, make the changes, and run the checks again.
 
-You can keep this project for the [Tabular data lesson](/simple-data-analysis/tabular-data). For a new analysis, create a new folder and repeat this setup, selecting the libraries you need.
+## Conclusion
+
+Setting up a project can be a pain, and it's easy to forget an important setting. With `@nshiab/setup-data-project`, you can get started much faster and jump straight into the fun part.
+
+Wondering why we installed the Oxc extension? It adds automatic formatting and linting to VS Code, alongside the editor's TypeScript checks, to help you while you work. The `npm` commands use the command-line tools to format and check your code before running it. We'll discover more useful extensions in later lessons and projects.
+
+Now it's time to have fun! Head to the [Tabular data lesson](/simple-data-analysis/tabular-data). You can keep your current project setup to work through it.
 
 <NoticeEnd />
