@@ -10,7 +10,7 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
 
 Welcome to this new project! We are going to fetch historical stock market data and use it to estimate how much we would have gained or lost by investing in publicly traded companies.
 
-Before starting, make sure you have completed the **TypeScript fundamentals** and **Building with TypeScript** sections. This project is designed to help you practice everything we've covered so far in this course.
+Before starting, make sure you have completed the [Setup lesson in Chapter 1](/first-steps/setup), as well as the **TypeScript fundamentals** and **Building with TypeScript** sections. This project is designed to help you practice everything we've covered so far in this course.
 
 <NoticeIntro />
 
@@ -32,11 +32,52 @@ With this in mind, let's start!
 
 ## Setup
 
-Create a new empty folder, open it in VS Code, and create `main.ts`, as in the [Setup](/first-steps/setup) lesson.
+Create a new, empty folder on your computer, open it with VS Code, and create a file named `main.ts` inside it.
 
-Type `console.log("Hello!");` in `main.ts`, save it, and run `node --watch main.ts` in the terminal. Your code reruns each time you save a change. Stop it with `CTRL` + `C`.
+Type this code in `main.ts` and save the file:
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/setup.png" alt={"A VS Code screenshot showing a script logging \"Hello!\" to the terminal."} lang="en" />
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
+
+Now let's configure our project.
+
+Create a `package.json` file in your project folder with this content so VS Code knows we'll use modern TypeScript module syntax:
+
+```json filename="package.json"
+{
+  "type": "module"
+}
+```
+
+Then create a `tsconfig.json` file in the same folder so TypeScript checks our code using these modern module rules:
+
+```json filename="tsconfig.json"
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "types": ["node"],
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  }
+}
+```
+
+The last thing we need to do is install the types for Node.js. Open the terminal (`Command` + `J` on Mac or `Control` + `J` on Windows) and run:
+
+```sh
+npm install --save-dev @types/node
+```
+
+Now run this command in the terminal:
+
+```sh
+node --watch main.ts
+```
+
+This runs our code and automatically runs it again each time we save a change, so we can see the results as we work.
+
+![VS Code showing the project configuration files, Node types installation, and main.ts running in watch mode.](/assets/stock-market-simulator/setup.png)
 
 ## The data
 
@@ -62,11 +103,13 @@ But be careful: `getYahooFinanceData` uses an undocumented Yahoo Finance endpoin
 
 For now, let's stop watching and running `main.ts` by clicking in the terminal and pressing `CTRL` + `C`. Then, install the library by running this command in the terminal:
 
-`npm install @nshiab/journalism-finance`
+```sh
+npm install @nshiab/journalism-finance
+```
 
-The dependency is now listed in `package.json` and installed in `node_modules`. npm also updates `package-lock.json`, which records the exact dependency versions. Keep both JSON files with your project.
+The dependency is now listed in `package.json` and installed in `node_modules`. npm also updates `package-lock.json`, which records the exact dependency versions.
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/install-journalism-finance.png" alt={"A screenshot showing the Journalism Finance dependency installed and added to deno.json."} lang="en" />
+![VS Code showing Journalism Finance installed with npm and listed in package.json.](/assets/stock-market-simulator/install-journalism-finance.png)
 
 We'll first gather the data, then use it. To keep the project organized, we'll put reusable helper functions in their own files. Create a `helpers` folder in your project and add `getData.ts` inside it. This function will retrieve data for a publicly traded company.
 
@@ -90,7 +133,7 @@ export default async function getData(symbol: string) {
 }
 ```
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/get-data-helper.png" alt={"A screenshot showing the getData helper function in VS Code."} lang="en" />
+![VS Code showing helpers/getData.ts importing getYahooFinanceData and returning historical stock data.](/assets/stock-market-simulator/get-data-helper.png)
 
 Here are the arguments we pass to `getYahooFinanceData`:
 
@@ -118,7 +161,7 @@ const dailyStockData = await getData(symbol);
 console.table(dailyStockData.slice(0, 10));
 ```
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/main-get-data.png" alt={"A screenshot showing main.ts importing and calling the getData helper."} lang="en" />
+![VS Code showing main.ts importing getData, requesting AAPL data, and displaying the first ten rows with console.table.](/assets/stock-market-simulator/main-get-data.png)
 
 But before running this code, we need to take care of one more thing.
 
@@ -130,21 +173,22 @@ We don’t want to overwhelm Yahoo’s servers with our requests. We must respec
 
 The idea is pretty simple. The first time we fetch the data, we write it to a file. Then, every time the code runs again, if the file exists (which it will), we use it instead of fetching the data again.
 
-Create a `data` folder in your project to store the cached data. File paths are relative to the project folder where you run `node --watch main.ts`.
+Create a `data` folder in your project to store the cached data.
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/create-data-folder.png" alt={"A screenshot showing a new data folder in VS Code."} lang="en" />
+![VS Code showing the new data folder alongside helpers and main.ts, ready to store cached stock data.](/assets/stock-market-simulator/create-data-folder.png)
 
-Now, we're going to update `getData` to check whether a cached file exists. To do that, we use `stat()` from `node:fs/promises`, which returns information if the file exists. If it doesn't, `catch()` returns `null`. We can then use `if` and `else` branches to read the data from the file if it exists, or fetch fresh data if it doesn't.
+Now, we're going to update `getData` to check whether a cached file exists. To do that, we use `existsSync()` from `node:fs`, which returns `true` if the file exists and `false` otherwise. We can then use `if` and `else` branches to read the data from the file if it exists, or fetch fresh data if it doesn't.
 
-```ts showLineNumbers filename="helpers/getData.ts"
+```ts showLineNumbers filename="helpers/getData.ts" {2-3, 6-13, 21-23}
 import { getYahooFinanceData } from "@nshiab/journalism-finance";
-import { readFile, stat, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 
 export default async function getData(symbol: string) {
   const path = `./data/${symbol}.json`;
   let dailyStockData;
 
-  if (await stat(path).catch(() => null)) {
+  if (existsSync(path)) {
     console.log(`=> Cached data found at ${path}. Reading it...`);
     dailyStockData = JSON.parse(await readFile(path, "utf8"));
   } else {
@@ -164,24 +208,22 @@ export default async function getData(symbol: string) {
 }
 ```
 
-<Callout type="info" emoji="💡">
-    `catch()` is a way to capture errors triggered by your code. We will explore it in more detail in the [Handling errors with `try` and `catch`](/ninja-moves/try-catch) lesson. Don't worry about it for now. We'll dive into it later.
-</Callout>
-
 Here’s what happens when you run this code:
 
 - `path` includes the stock symbol so each company has its own cache file.
-- `stat()` checks for the file. If found, `readFile(path, "utf8")` reads it as text and `JSON.parse()` restores the array.
+- `existsSync()` checks for the file. If found, `readFile(path, "utf8")` reads it as text and `JSON.parse()` restores the array.
 - Otherwise, we fetch prices, convert the array to JSON, and save it with `writeFile()`.
 - Finally, the function returns the data from either source.
 
 Now, run and watch `main.ts`:
 
-`node --watch main.ts`
+```sh
+node --watch main.ts
+```
 
 The first time you run this code, the cache file does not exist. The `else` block fetches the data and writes `AAPL.json` in `data`.
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/data-fetched-aapl.png" alt={"A screenshot showing stock data being fetched and written to AAPL.json."} lang="en" />
+![VS Code showing the first run fetching Apple stock data, saving data/AAPL.json, and displaying the first rows in the terminal.](/assets/stock-market-simulator/data-fetched-aapl.png)
 
 <Callout type="info" emoji="💡">
     Wondering what `timestamp` means? This huge number is the number of milliseconds since January 1, 1970. This is how JavaScript tracks dates and times behind the scenes. Here, the library gives us the timestamp directly instead of a date, but as we'll see, JavaScript makes it easy to go back and forth between dates and timestamps.
@@ -189,7 +231,7 @@ The first time you run this code, the cache file does not exist. The `else` bloc
 
 Now, rerun `main.ts` by saving it again (`CMD` + `S` on Mac or `CTRL` + `S` on PC). This time, the condition is met because Node.js finds `AAPL.json`. The `if` block runs, while everything under `else` is skipped. We don't need to fetch the data again. We read it from our local file instead. This is faster and doesn't annoy Yahoo's servers with another request.
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/data-cached-aapl.png" alt={"A screenshot showing stock data being read from AAPL.json."} lang="en" />
+![VS Code showing a subsequent run reading cached Apple stock data from data/AAPL.json and displaying it in the terminal.](/assets/stock-market-simulator/data-cached-aapl.png)
 
 You can keep cached data for multiple companies. For example, replace `AAPL` in the `symbol` variable with `GOOG` to get the historical stock prices of Alphabet (formerly Google) and run the code.
 
@@ -204,7 +246,7 @@ console.table(dailyStockData.slice(0, 10));
 
 You'll see another file, `GOOG.json`, being created in `data`.
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/data-fetched-goog.png" alt={"A screenshot showing stock data for Alphabet being fetched and written to GOOG.json."} lang="en" />
+![VS Code showing GOOG stock data fetched from Yahoo Finance, saved to data/GOOG.json, and displayed in the terminal.](/assets/stock-market-simulator/data-fetched-goog.png)
 
 If you switch back to `AAPL`, the data is still there. No need to fetch it again!
 
@@ -219,7 +261,7 @@ const dailyStockData = await getData(symbol);
 console.table(dailyStockData.slice(0, 10));
 ```
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/switch-back-to-aapl.png" alt={"A screenshot showing the cached Apple data being read after switching back to AAPL."} lang="en" />
+![VS Code showing the symbol changed back to AAPL and Apple stock data read from the existing cache.](/assets/stock-market-simulator/switch-back-to-aapl.png)
 
 <Callout type="info" emoji="💡">
     Here, we are using caching to avoid pinging Yahoo's servers too many times. But caching is also very commonly used to improve performance. Reading a local file is much faster than fetching data over the Internet. For example, a script might perform heavy calculations that take a long time. Instead of repeating them every time the script runs, you can cache the results and read them directly on future runs.
@@ -283,9 +325,9 @@ const finalAmount = calculateFinalAmount(amount, startDate, dailyStockData);
 console.log(finalAmount);
 ```
 
-And here's the result! It works! You would have approximately $4,639 today (as of September 2026) if you had invested $1,000 in Apple in January 2020.
+And here's the result! It works! You would have approximately $4,764 today (as of October 2026) if you had invested $1,000 in Apple in January 2020.
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/final-amount.png" alt={"A screenshot showing the final amount invested."} lang="en" />
+![VS Code showing main.ts calling calculateFinalAmount and the calculated investment amount in the terminal.](/assets/stock-market-simulator/final-amount.png)
 
 ## Displaying the result
 
@@ -329,7 +371,7 @@ const finalAmount = calculateFinalAmount(amount, startDate, dailyStockData);
 logResult(amount, symbol, startDate, finalAmount);
 ```
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/log-result.png" alt={"A VS Code screenshot showing the formatted investment result in the terminal."} lang="en" />
+![VS Code showing main.ts calling logResult and the formatted investment result of $4764 in the terminal.](/assets/stock-market-simulator/log-result.png)
 
 Beautiful, isn't it? 😍
 
@@ -341,7 +383,7 @@ That's impossible! Our code should warn the user.
 
 Update `startDate` to `"1950-01-01"` to test it out... It's returning an amount, but it should be throwing an error! 😱
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/impossible-result.png" alt={"A VS Code screenshot showing an impossible investment result for a date before Apple was publicly traded."} lang="en" />
+![VS Code showing a 1950 investment date and an impossible result before Apple was publicly traded.](/assets/stock-market-simulator/impossible-result.png)
 
 Let's squash this bug! 🐛
 
@@ -374,10 +416,10 @@ export default function calculateFinalAmount(
 }
 ```
 
-<OutdatedScreenshot src="/assets/stock-market-simulator/error.png" alt={"A screenshot showing an error being thrown from calculateFinalAmount."} lang="en" />
+![VS Code showing calculateFinalAmount throwing an error when the investment date is before the company was publicly traded.](/assets/stock-market-simulator/error.png)
 
 <Callout type="info" emoji="💡">
-    Throwing an error stops the script and (hopefully) provides a useful message. The error also shows where it originated. In the screenshot above, `calculateFinalAmount.ts:9:11` means line 9, character 11 of that file. In VS Code, `CMD` + click this reference to jump directly to the error, which is very handy for debugging.
+    Throwing an error stops the script and (hopefully) provides a useful message. The error also shows where it originated. In the screenshot above, `calculateFinalAmount.ts:9:15` means line 9, character 15 of that file. In VS Code, `CMD` + click this reference to jump directly to the error, which is very handy for debugging.
 </Callout>
 
 That's better. We won't return impossible results now! You can safely play with different `startDate` values.
