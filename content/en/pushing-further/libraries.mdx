@@ -62,33 +62,27 @@ This page provides a lot of useful information:
 
 These details (along with the GitHub repository) help us decide whether a library is trustworthy. Always be cautious before running unknown code! 🦠
 
-Before installing a library, let's create a `package.json` file to keep track of our project and its libraries. Stop the watcher with `CTRL` + `C`, then run these commands in the project folder:
+## Installing a library
 
-```sh
-npm init -y
-npm pkg set type=module
-```
-
-`npm` comes with Node.js. The first command creates `package.json`; the second tells Node.js that our project uses `import` and `export`. If this folder already has a `package.json`, skip `npm init -y` and keep its existing contents.
-
-Installing `d3` is very easy. Click on your terminal, stop watching your code (`CTRL` + `C`), and run these commands from the project root:
+Installing a library from npm is very easy. When you installed Node.js, you also installed npm along the way. To install `d3`, you only need to run one command in your terminal. First, don’t forget to stop watching your code (`Control` + `C`).
 
 ```sh
 npm install d3
-npm install --save-dev @types/d3
 ```
 
-The first command installs the library. The second installs its TypeScript type definitions, so VS Code understands its functions. Some libraries include their own types; `d3` uses a separate `@types/d3` package.
+Once the command finishes, you’ll see a few new things in your project. In the example below, the terminal reports that 38 packages were installed: D3 is made up of other modules, which npm installs too.
 
-Open `package.json`: `d3` is now listed in **dependencies**, and `@types/d3` in **devDependencies**. Dependencies are packages your code uses; development dependencies support tools such as type checking.
+In the Explorer panel at the top left, you’ll see a new `node_modules` folder. This is where npm puts D3’s code and its dependencies on your computer for this project.
 
-npm also updates `package-lock.json`, which records the exact versions installed, and puts the packages in a `node_modules` folder. Keep `package.json` and `package-lock.json` with your project. If you share the code, others can run `npm ci` to install the versions recorded in the lockfile.
+You’ll also see `package.json`, which lists your project’s dependencies. Open it, and you’ll find `d3` there. The `package-lock.json` file records extra information about the packages and exact versions installed. You don’t need to worry about it for now.
 
-<OutdatedScreenshot src="/assets/pushing-further/libraries/d3-add.png" alt={"A screenshot showing deno.json imports."} lang="en" />
+![VS Code showing npm install d3 adding 38 packages, the node_modules folder, and d3 listed in package.json.](/assets/pushing-further/libraries/npm-install-d3.png)
 
 <Callout type="info" emoji="💡">
-    You don’t need to edit files inside `node_modules` or manage npm’s download cache yourself. npm handles installation. Use `npm install` when adding a library and import it by its package name, such as `"d3"`.
+    You don’t need to edit `node_modules` or `package-lock.json`, and very often you won’t need to touch `package.json` either. You can leave these to Node.js and npm to manage. It’s just useful to know what they contain.
 </Callout>
+
+## Using a library
 
 Let's reuse the [Montreal temperature CSV file](https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv) from the [Fetching data lesson](/pushing-further/fetch).
 
@@ -97,20 +91,26 @@ If you fetch this data, you'll notice it's just text. CSV stands for **Comma-Sep
 Update `main.ts` with the code below, then run: `node --watch main.ts`
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
 );
 
+// @ts-ignore
 const data = await response.text();
 
 console.log(data);
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/libraries/d3-text.png" alt={"A screenshot showing CSV data in the terminal."} lang="en" />
+![VS Code showing the fetched CSV temperature data logged as text in the terminal.](/assets/pushing-further/libraries/csv-text-output.png)
+
+<Callout type="info" emoji="💡">
+    You might be wondering what `// @ts-ignore` means. It tells VS Code to ignore type errors on the next line. I added it because calling `fetch` with `await` this way requires some extra setup for TypeScript. I don’t want to bother you with that yet: for now, I just want you to focus on `fetch`.
+</Callout>
 
 It’s our lucky day: the `d3` function `csvParse` converts CSV data into an array of objects!
 
-Let’s update our code to use it.
+To import a function from the D3 library, we use `import { csvParse } from "d3"`. The function name goes between curly brackets, and `"d3"` is the name of the package we installed. Let’s update our code to use it.
 
 ```ts showLineNumbers filename="main.ts" {1, 8, 10}
 import { csvParse } from "d3";
@@ -124,7 +124,17 @@ const arrayOfObjects = csvParse(data);
 
 console.log(arrayOfObjects);
 ```
-<OutdatedScreenshot src="/assets/pushing-further/libraries/d3-parse.png" alt={"A screenshot showing CSV data converted to an array of objects in the terminal."} lang="en" />
+![VS Code showing a TypeScript error on the d3 import because its type definitions are missing, with parsed CSV data in the terminal.](/assets/pushing-further/libraries/d3-missing-types.png)
+
+As shown in the screenshot above, our code runs, but we have a TypeScript error. Hover over `"d3"` on line 1 to see the details: D3’s type definitions are missing. The pop-up also tells us how to install them. Stop watching your code (`Control` + `C`), then run this command in your terminal:
+
+```sh
+npm install @types/d3
+```
+
+Now the error is gone, and TypeScript knows the types of D3’s functions. Run `node --watch main.ts` again. As you can see in the terminal below, our CSV data has been parsed into an array of objects, which will be much easier to work with in TypeScript!
+
+![VS Code showing the D3 import without errors and the CSV data parsed into an array of objects in the terminal.](/assets/pushing-further/libraries/d3-parsed-output.png)
 
 <Callout type="info" emoji="💡">
     In the [Functions lesson](/pushing-further/functions), we saw that we can import functions with the syntax `import myFunction from "./myFunction.ts"`. Here, it's a bit different because `d3` exports more than one function, and we pick just the one(s) we want. To do this, we use curly brackets with this syntax: `import { myFunctionA, myFunctionB } from "./allMyFunctions.ts"`.
@@ -134,7 +144,7 @@ Congrats! You just installed `d3` from NPM and used one of its functions! 💃�
 
 ## Another library: csv-parse
 
-There’s often more than one library that can solve the same problem. Let’s try [`csv-parse`](https://csv.js.org/parse/), a library dedicated to parsing CSV files. Its documentation describes the available APIs, options, examples, and a link to its source code.
+There’s often more than one library that can solve the same problem. Let’s try [`csv-parse`](https://www.npmjs.com/package/csv-parse), a library dedicated to parsing CSV files. Its documentation describes the available APIs, options, examples, and a link to its source code.
 
 Stop the running script with `CTRL` + `C`, then install it:
 
@@ -142,9 +152,9 @@ Stop the running script with `CTRL` + `C`, then install it:
 npm install csv-parse
 ```
 
-This package includes its own TypeScript types, so no separate `@types` package is needed.
+If you check your `package.json`, you’ll now see `csv-parse` under `dependencies` as well.
 
-We’ll use the [synchronous API](https://csv.js.org/parse/api/sync/), which is convenient when the whole CSV fits in memory. Import `parse` from `"csv-parse/sync"`. The [`columns: true` option](https://csv.js.org/parse/options/columns/) uses the first row as property names instead of returning it as a data row.
+![VS Code showing csv-parse listed alongside d3 and @types/d3 in package.json dependencies.](/assets/pushing-further/libraries/csv-parse-dependency.png)
 
 Replace the code in `main.ts` with this, then run `node --watch main.ts` again:
 
@@ -161,17 +171,15 @@ const arrayOfObjects = parse(data, { columns: true });
 console.log(arrayOfObjects);
 ```
 
-Like `csvParse`, this turns the text into an array of objects. By default, the field values remain strings, so convert numeric fields before doing calculations.
+<Callout type="info" emoji="💡">
+    The `columns: true` option tells `csv-parse` to use the first row as the property names for each object. By the way, there’s no type error this time: unlike D3, `csv-parse` includes its TypeScript types directly in the library, so we don’t need to install them separately.
+</Callout>
 
-<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-csv.png" alt={"A screenshot showing JSR results."} lang="en" />
+If you check your terminal, you’ll see that this new library has also converted our CSV file into an array of objects.
 
-<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-std.png" alt={"A screenshot showing JSR standard library."} lang="en" />
+![VS Code showing csv-parse converting the CSV data into an array of objects in the terminal.](/assets/pushing-further/libraries/csv-parse-output.png)
 
-<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-add.png" alt={"A screenshot showing a JSR module being added."} lang="en" />
-
-<OutdatedScreenshot src="/assets/pushing-further/libraries/jsr-done.png" alt={"A screenshot showing a CSV being converted to an array of objects with the standard library."} lang="en" />
-
-And... voilà! You’ve installed and used a second library! 💃🕺
+And voilà! You’ve installed and used a second library! 💃🕺
 
 ## Conclusion
 
