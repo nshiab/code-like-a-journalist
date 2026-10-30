@@ -45,43 +45,51 @@ Si vous l'ouvrez, vous remarquerez qu'il s'agit d'une liste d'objets, chaque obj
 Pour le récupérer, vous pouvez utiliser la fonction `fetch()`. Elle est disponible globalement, donc vous pouvez l'appeler directement dans votre code. Elle nécessite l'URL correspondante en tant que texte.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
 );
 
 console.log(response);
 ```
+
 <Callout type="info" emoji="💡">
-    `fetch()` est une fonction **asynchrone**, nous devons donc ajouter `await` devant pour nous assurer que notre ordinateur récupère les ressources avant d'exécuter les lignes suivantes. Pour plus d'informations, consultez la section *À propos de await* dans la leçon [Écrire et lire des fichiers](/pushing-further/files).
+    Vous vous demandez peut-être ce que signifie `// @ts-ignore`. Ce commentaire indique à VS Code d’ignorer les erreurs de type sur la ligne suivante. Je l’ai ajouté parce qu’appeler `fetch` avec `await` de cette façon demande une configuration supplémentaire pour TypeScript. Je ne veux pas vous embêter avec cela pour le moment : je veux simplement que vous vous concentriez sur `fetch`.
 </Callout>
+Comme vous pouvez le voir dans le code ci-dessus, `fetch()` est une fonction **asynchrone**, et nous utilisons `await` pour attendre son résultat.
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/allow-net.png" alt={"Une capture d'écran montrant Deno avertissant d'une connexion réseau."} lang="fr" />
+Comme nous l’avons vu dans la leçon [Écrire et lire des fichiers](/pushing-further/files), les fonctions synchrones terminent leur travail avant que l’instruction suivante soit exécutée. Les fonctions asynchrones permettent à une opération de se poursuivre pendant que le code passe à la suite. Ici, `await` fait attendre notre code jusqu’à l’arrivée de la réponse avant de l’afficher.
 
-La réponse s’affiche maintenant dans le terminal. Cette commande permet directement à Node.js d’accéder au réseau.
+Le fonctionnement asynchrone de `fetch()` est très utile : vous pouvez commencer à récupérer plusieurs fichiers en même temps, au lieu d’attendre que chaque téléchargement se termine avant de lancer le suivant. Faire ces requêtes en parallèle peut rendre votre script beaucoup plus rapide.
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/response.png" alt={"Une capture d'écran montrant une réponse fetch affichée dans le terminal."} lang="fr" />
+Si vous survolez `fetch` dans VS Code, vous verrez que cette fonction retourne une `Promise<Response>`. Une promesse représente un résultat qui sera disponible plus tard ; `await` nous permet de récupérer ce résultat lorsqu’il est prêt.
 
-Wow... Il y a beaucoup d'informations dans cette réponse, et c'est normal. Votre ordinateur et le serveur hébergeant le fichier échangent beaucoup d'informations pour s'assurer que la connexion fonctionne correctement.
+![VS Code affiche la documentation de fetch au survol, avec une promesse de réponse comme type de retour.](/assets/pushing-further/fetch/fetch-promise.png)
 
-Dans notre cas, nous savons que c'est un fichier JSON, nous pouvons donc appeler la méthode asynchrone `.json()` pour convertir les données de la réponse en JSON.
+Maintenant, concentrons-nous sur ce qui apparaît dans le terminal. Comme vous pouvez le voir, cette réponse contient beaucoup d’informations, et c’est normal. Votre ordinateur et le serveur hébergeant le fichier échangent beaucoup d'informations pour s'assurer que la connexion fonctionne correctement.
 
-```ts showLineNumbers filename="main.ts" {5}
+Dans notre cas, nous savons que le contenu que nous cherchons à récupérer est un fichier JSON, nous pouvons donc appeler la méthode asynchrone `.json()` pour convertir les données de la réponse en JSON.
+
+```ts showLineNumbers filename="main.ts" {7}
+// @ts-ignore
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
 );
 
+// @ts-ignore
 const data = await response.json();
 
 console.log(data);
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/json-data.png" alt={"Une capture d'écran montrant un fichier JSON récupéré affiché dans le terminal."} lang="fr" />
+![VS Code montre response.json() analysant la réponse récupérée et les données de température affichées dans le terminal.](/assets/pushing-further/fetch/parsed-response.png)
 
 Et voilà ! Nous avons récupéré les données, et nous pouvons maintenant travailler avec elles !
 
 Au lieu de les récupérer à chaque fois, nous pourrions écrire les données dans un fichier pour une utilisation future.
 
-```ts showLineNumbers filename="main.ts" {1, 9}
+```ts showLineNumbers filename="main.ts" {2, 10}
+// @ts-ignore
 import { writeFile } from "node:fs/promises";
 
 const response = await fetch(
@@ -93,7 +101,7 @@ const data = await response.json();
 await writeFile("./temp.json", JSON.stringify(data));
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/json-write.png" alt={"Une capture d'écran montrant un fichier JSON récupéré écrit dans un fichier."} lang="fr" />
+![VS Code montre writeFile enregistrant les données de température récupérées dans temp.json, ouvert à côté du script.](/assets/pushing-further/fetch/save-json.png)
 
 Félicitations ! Vous savez maintenant comment récupérer et enregistrer des fichiers JSON. C'était facile, n'est-ce pas ? 😄
 
@@ -108,6 +116,7 @@ J’ai téléversé [temp.csv](https://raw.githubusercontent.com/nshiab/data-fet
 Voici le code mis à jour pour le récupérer et le sauvegarder. Nous explorerons comment analyser les données des fichiers CSV dans une autre leçon.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 import { writeFile } from "node:fs/promises";
 
 const response = await fetch(
@@ -122,7 +131,7 @@ await writeFile("./temp.csv", data);
     Pour écrire les données JSON, nous avons dû utiliser `JSON.stringify()` car ici `writeFile` attend du texte plutôt qu’une liste, et les données JSON étaient une liste d'objets. Cependant, les données CSV sont déjà du texte, donc nous pouvons les passer directement à `writeFile`.
 </Callout>
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/csv-write.png" alt={"Une capture d'écran montrant un fichier CSV récupéré écrit dans un fichier."} lang="fr" />
+![VS Code montre response.text() lisant le CSV récupéré et writeFile l’enregistrant dans temp.csv, ouvert à côté du script.](/assets/pushing-further/fetch/save-csv.png)
 
 ## Récupérer le HTML d'une page web
 
@@ -131,16 +140,18 @@ Vous pouvez également récupérer le code source d'une page web. Par exemple, v
 Nous explorerons comment extraire des données des pages web (une technique appelée *web scraping*) dans une autre leçon.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 const response = await fetch(
   "https://www.code-like-a-journalist.com/en",
 );
 
+// @ts-ignore
 const html = await response.text();
 
 console.log(html);
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/html.png" alt={"Une capture d'écran montrant le HTML d'une page web récupéré et affiché dans le terminal."} lang="fr" />
+![VS Code montre fetch récupérant le HTML de la page d’accueil et l’affichant dans le terminal.](/assets/pushing-further/fetch/fetched-html.png)
 
 ## Conclusion
 

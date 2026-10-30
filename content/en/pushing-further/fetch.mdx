@@ -45,43 +45,51 @@ If you open it, you'll notice it's an array of objects, with each object storing
 To fetch it, you can use the `fetch()` function. It's globally available, so you can call it directly in your code. It requires the relevant URL as a string.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
 );
 
 console.log(response);
 ```
+
 <Callout type="info" emoji="💡">
-    `fetch()` is an **asynchronous** function, so we need `await` in front of it to ensure our computer fetches the resources before executing the next lines. For more information, check the *About await* section in the [Writing and reading files](/pushing-further/files) lesson.
+    You might be wondering what `// @ts-ignore` means. It tells VS Code to ignore type errors on the next line. I added it because calling `fetch` with `await` this way requires some extra setup for TypeScript. I don’t want to bother you with that yet: for now, I just want you to focus on `fetch`.
 </Callout>
+As you can see in the code above, `fetch()` is an **asynchronous** function, and we use `await` to wait for its result.
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/allow-net.png" alt={"A screenshot showing Deno warning about a network connection."} lang="en" />
+As we saw in the [Writing and reading files](/pushing-further/files) lesson, synchronous functions finish their work before the next instruction runs. Asynchronous functions let an operation continue while the code moves on. Here, `await` makes our code wait for the response before logging it.
 
-The response is now logged in your terminal. Node.js can access the network directly with this command.
+Having `fetch()` work asynchronously is extremely useful: you can start fetching several files concurrently instead of waiting for each one to finish before starting the next. Letting those requests run in parallel can make your script much faster.
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/response.png" alt={"A screenshot showing a fetch response logged in the terminal."} lang="en" />
+If you hover over `fetch` in VS Code, you’ll see that it returns a `Promise<Response>`. A promise represents a result that will be available later; `await` lets us get that result when it’s ready.
 
-Wow... There is a lot of stuff in this response, and that’s normal. Your computer and the server hosting the file exchange a lot of information to ensure the connection works properly.
+![VS Code showing the fetch hover documentation with a Promise of a Response as its return type.](/assets/pushing-further/fetch/fetch-promise.png)
 
-In our case, we know it’s a JSON file, so we can call the `.json()` asynchronous method to parse the response data as JSON.
+Now, let’s focus on what’s in the terminal. As you can see, there is a lot of stuff in this response, and that’s normal. Your computer and the server hosting the file exchange a lot of information to ensure the connection works properly.
 
-```ts showLineNumbers filename="main.ts" {5}
+In our case, we know the content we’re after is a JSON file, so we can call the `.json()` asynchronous method to parse the response data as JSON.
+
+```ts showLineNumbers filename="main.ts" {7}
+// @ts-ignore
 const response = await fetch(
   "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
 );
 
+// @ts-ignore
 const data = await response.json();
 
 console.log(data);
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/json-data.png" alt={"A screenshot showing a fetched JSON file logged in the terminal."} lang="en" />
+![VS Code showing response.json() parsing the fetched response and the temperature data logged in the terminal.](/assets/pushing-further/fetch/parsed-response.png)
 
 Here we go! We’ve fetched the data, and now we can work with it!
 
 Instead of fetching it every time, we could write the data to a file for future use.
 
-```ts showLineNumbers filename="main.ts" {1, 9}
+```ts showLineNumbers filename="main.ts" {2, 10}
+// @ts-ignore
 import { writeFile } from "node:fs/promises";
 
 const response = await fetch(
@@ -93,7 +101,7 @@ const data = await response.json();
 await writeFile("./temp.json", JSON.stringify(data));
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/json-write.png" alt={"A screenshot showing a fetched JSON file written in a file."} lang="en" />
+![VS Code showing writeFile saving the fetched temperature data to temp.json, with the JSON file open beside the script.](/assets/pushing-further/fetch/save-json.png)
 
 Congrats! You now know how to fetch and save JSON files. That was easy, wasn’t it? 😄
 
@@ -108,6 +116,7 @@ I uploaded [temp.csv](https://raw.githubusercontent.com/nshiab/data-fetch-lesson
 Here’s the updated code to fetch and write it. We’ll explore how to crunch CSV file data in another lesson.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 import { writeFile } from "node:fs/promises";
 
 const response = await fetch(
@@ -122,7 +131,7 @@ await writeFile("./temp.csv", data);
     To write the JSON data, we had to use `JSON.stringify()` because here `writeFile` needs text rather than an array, and the JSON data was an array of objects. However, the CSV data is already text, so we can pass it directly to `writeFile`.
 </Callout>
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/csv-write.png" alt={"A screenshot showing a fetched CSV file written in a file."} lang="en" />
+![VS Code showing response.text() reading the fetched CSV and writeFile saving it to temp.csv, open beside the script.](/assets/pushing-further/fetch/save-csv.png)
 
 ## Fetching a webpage HTML
 
@@ -131,16 +140,18 @@ You can also fetch the source code of a webpage. For example, here’s how to re
 We’ll explore how to extract data from webpages (a technique known as *web scraping*) in another lesson.
 
 ```ts showLineNumbers filename="main.ts"
+// @ts-ignore
 const response = await fetch(
   "https://www.code-like-a-journalist.com/en",
 );
 
+// @ts-ignore
 const html = await response.text();
 
 console.log(html);
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/fetch/html.png" alt={"A screenshot showing a fetched webpage HTML being logged in the terminal."} lang="en" />
+![VS Code showing fetch retrieving the homepage HTML and logging it in the terminal.](/assets/pushing-further/fetch/fetched-html.png)
 
 ## Conclusion
 
