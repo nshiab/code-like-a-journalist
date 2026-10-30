@@ -4,6 +4,6 @@ export default {
     files: "Writing and reading files",
     fetch: "Fetching data",
     libraries: "Using libraries",
-    tasks: "Running tasks",
+    "commands-with-npm": "Commands with npm",
     conclusion: "Conclusion",
 };

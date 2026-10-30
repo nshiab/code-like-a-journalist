@@ -14,8 +14,8 @@ visualizing, and automating data with SDA. It's available in English and French.
 ## Tested course toolchain
 
 The first two chapters use VS Code, its built-in TypeScript formatter, and
-Node.js directly: `node main.ts` or `node --watch main.ts`. The libraries and
-tasks lessons introduce npm without a project generator.
+Node.js directly: `node main.ts` or `node --watch main.ts`. The “Using libraries” and
+“Commands with npm” lessons introduce npm without a project generator.
 
 Chapter 3 begins with an SDA setup lesson using `npx @nshiab/setup-data-project`.
 Generated projects use `npm run sda` to format, check, and run once, and

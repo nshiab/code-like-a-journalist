@@ -43,6 +43,14 @@ await expectResponse(
 await expectResponse("/contact", 307, "/fr/contact", {
     cookie: "NEXT_LOCALE=fr",
 });
+for (const language of ["en", "fr"]) {
+    await expectResponse(
+        "/pushing-further/commands-with-npm",
+        307,
+        `/${language}/pushing-further/commands-with-npm`,
+        { "accept-language": language },
+    );
+}
 await expectResponse("/en/does-not-exist", 404);
 await expectResponse("/de/does-not-exist", 404);
 await expectResponse(
@@ -75,6 +83,7 @@ for (const prefix of ["", "/en", "/fr"]) {
 }
 
 const removedPaths = [
+    "pushing-further/tasks",
     "web-basics/html",
     "web-basics/css",
     "web-basics/javascript",
