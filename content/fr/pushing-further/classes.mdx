@@ -14,11 +14,7 @@ Tout comme les fonctions, les classes sont un pilier de la programmation. Elles 
 
 Pour être honnête, les classes sont un peu avancées, et vous n’en créerez probablement pas tout de suite. Mais vous utiliserez très souvent des classes déjà codées (comme `new Date()`), donc il est important d’avoir une idée générale de leur fonctionnement.
 
-Notez que je m’attends à ce que vous ayez complété les leçons précédentes, en particulier celle sur les **[Fonctions](/pushing-further/functions)**.
-
-Allons-y !
-
-Je suppose que vous avez terminé le chapitre 1 et toutes les leçons précédentes du chapitre 2 avant de vous lancer dans celle-ci. Assurez-vous notamment d’avoir suivi la [leçon d’installation](/first-steps/setup).
+Je suppose que vous avez terminé le chapitre 1 et toutes les leçons précédentes du chapitre 2 avant de vous lancer dans celle-ci, en particulier les leçons sur [l’installation](/first-steps/setup) et les [fonctions](/pushing-further/functions).
 
 <NoticeIntro lang="fr" />
 
@@ -59,7 +55,7 @@ Pour utiliser une classe, il faut créer une **instance** de celle-ci en l’app
 
 Ci-dessous, nous instancions notre classe `Person` deux fois. Nous stockons les nouvelles instances dans les variables `john` et `emily`.
 
-Nous avons maintenant deux instances de `Person` dans notre code.
+Nous avons maintenant deux instances de `Person` dans notre code : John et Emily.
 
 ```ts showLineNumbers filename="main.ts" {4, 5}
 class Person {
@@ -84,9 +80,11 @@ const john = new Person();
 const emily = new Person();
 ```
 
-La classe `Person` a maintenant deux propriétés, mais elles ne sont pas encore assignées. Avec les paramètres stricts du projet, VS Code et les vérifications signalent ces propriétés non initialisées. Nous allons corriger cela avec un constructeur. Ce serait pratique de pouvoir donner un `name` et un `age` à `john` et `emily` lors de leur instanciation.
+La classe `Person` a maintenant deux propriétés, mais nous ne leur avons pas donné de valeurs. VS Code signale deux erreurs TypeScript : chaque `Person` doit avoir un `name` et un `age`, mais aucune valeur ne leur est assignée lorsque nous créons John et Emily. Nous allons corriger cela avec un constructeur.
 
-Pour faire cela, vous devez utiliser le `constructor` de la classe. Le constructeur ressemble à une fonction, mais sans le mot-clé `function`. Il est appelé lorsque vous instanciez la classe (et uniquement à ce moment-là).
+![VS Code signale deux erreurs parce que name et age n’ont pas de valeurs.](/assets/pushing-further/classes/uninitialized-properties.png)
+
+Habituellement, lorsque vous créez une classe, vous utilisez son `constructor` pour donner aux propriétés leurs valeurs initiales. Le constructeur ressemble à une fonction, mais sans le mot-clé `function`. Il est appelé lorsque vous instanciez la classe (et uniquement à ce moment-là).
 
 On peut donner au `constructor` des paramètres (ici, `name` et `age`). En utilisant le mot-clé `this`, on peut assigner ces paramètres aux propriétés.
 
@@ -105,9 +103,13 @@ const john = new Person();
 const emily = new Person();
 ```
 
-Le constructeur attend maintenant deux arguments. VS Code et les vérifications du projet signalent les appels sans arguments ci-dessus : corrigeons-les en fournissant un nom et un âge. Node.js ne vérifie pas lui-même ces types pendant l’exécution.
+Maintenant, dans VS Code, les erreurs se sont déplacées ! La classe elle-même ne contient plus d’erreurs, mais les lignes où nous créons John et Emily en contiennent. Notre constructeur attend deux arguments : nous devons donc maintenant donner un nom et un âge à chaque personne lorsque nous instancions la classe avec `new Person`.
 
-Il est maintenant possible de passer des arguments lors de l’instanciation de la classe. Nous avons créé une seule classe, mais `john` et `emily` ont maintenant chacun leur propre `name` et `age`. Et bien sûr, tout est typé, donc l’éditeur de code vous aide avec l’autocomplétion et s’assure que vous passez les bons types de données. Magique ! 🪄✨
+![VS Code signale deux erreurs sur new Person() parce que le constructeur attend un nom et un âge.](/assets/pushing-further/classes/constructor-arguments.png)
+
+C’est très utile : TypeScript nous aide à repérer les parties du code à mettre à jour jusqu’à ce que tout fonctionne bien ensemble.
+
+Nous avons créé une seule classe, mais `john` et `emily` auront chacun leur propre `name` et `age`, comme le montre le code ci-dessous. Et bien sûr, tout est typé, donc l’éditeur de code vous aide avec l’autocomplétion et s’assure que vous passez les bons types de données. Magique ! 🪄✨
 
 Vous pouvez accéder aux propriétés d’une instance de classe comme vous le feriez avec des objets, en utilisant un `.`.
 
@@ -129,7 +131,7 @@ console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/classes/properties.png" alt={"Affichage des propriétés."} lang="fr" />
+![VS Code montre John et Emily instanciés avec leurs propres noms et âges, et le terminal affiche john 30 et emily 35.](/assets/pushing-further/classes/instance-properties.png)
 
 ## Méthodes
 
@@ -194,7 +196,7 @@ john.makeOlder();
 console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
-<OutdatedScreenshot src="/assets/pushing-further/classes/method.png" alt={"Utilisation des méthodes."} lang="fr" />
+![VS Code montre trois appels à john.makeOlder(), avec john 33 et emily 35 dans le terminal.](/assets/pushing-further/classes/make-older.png)
 
 Appeler la méthode `makeOlder` trois fois n’est pas très pratique. Comme les fonctions, les méthodes peuvent avoir des paramètres. Mettons à jour notre code pour passer un nombre d’années à la méthode.
 
@@ -224,11 +226,13 @@ john.makeOlder(3);
 console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
-<OutdatedScreenshot src="/assets/pushing-further/classes/method-parameter.png" alt={"Utilisation des méthodes avec paramètres."} lang="fr" />
+![VS Code montre makeOlder(year: number) et john.makeOlder(3), avec john 33 et emily 35 dans le terminal.](/assets/pushing-further/classes/make-older-parameter.png)
 
 Au lieu d’utiliser `console.log` et de passer manuellement les propriétés de l’instance, on pourrait aussi créer une autre méthode pour afficher les âges.
 
 Comme vous pouvez le voir, les classes, avec leurs propriétés et méthodes, peuvent être un excellent moyen d’organiser votre code !
+
+Vous pouvez aussi créer des fonctions utilitaires dans un dossier `helpers` ailleurs dans votre projet, les importer dans le fichier de votre classe et les appeler depuis vos méthodes. Cela permet de garder votre classe bien organisée, même lorsqu’elle fait des choses très complexes.
 
 
 ```ts showLineNumbers filename="main.ts" {14-16, 24-25}
@@ -258,7 +262,7 @@ john.makeOlder(3);
 emily.log();
 john.log();
 ```
-<OutdatedScreenshot src="/assets/pushing-further/classes/log-method.png" alt={"Utilisation d’une autre méthode."} lang="fr" />
+![VS Code montre la méthode log et les appels à emily.log() et john.log(), avec leurs noms et âges dans le terminal.](/assets/pushing-further/classes/log-output.png)
 
 ## Exporter et importer
 
@@ -300,6 +304,8 @@ john.makeOlder(3);
 emily.log();
 john.log();
 ```
+
+![VS Code montre main.ts important la classe Person depuis Person.ts, avec les deux fichiers côte à côte et le résultat dans le terminal.](/assets/pushing-further/classes/import-person.png)
 
 ## Documentation
 
@@ -353,13 +359,13 @@ export default class Person {
   }
 }
 ```
-<OutdatedScreenshot src="/assets/pushing-further/classes/documentation.png" alt={"Utilisation de la documentation."} lang="fr" />
+![VS Code affiche la documentation JSDoc de makeOlder au survol de john.makeOlder(3), à côté de sa définition documentée dans Person.ts.](/assets/pushing-further/classes/documentation-hover.png)
 
 ## Conclusion
 
 Félicitations ! Vous avez écrit votre première classe ! Même si vous n’en créerez peut-être pas beaucoup pour vos analyses et projets futurs, vous en utiliserez beaucoup ! Et comme vous venez de le voir, les utiliser est très simple. 🤗
 
-Il y a encore beaucoup de choses à apprendre sur les classes, comme l’héritage, par exemple. Mais si un jour vous avez besoin d’aller plus loin, c’est que vous serez devenu un très bon codeur TypeScript ! Et à ce moment-là, vous serez capable de lire de la [documentation plus technique](https://www.typescripttutorial.net/typescript-tutorial/typescript-inheritance/) et de la comprendre.
+Il y a encore beaucoup de choses à apprendre sur les classes, comme l’héritage, par exemple. Mais si un jour vous avez besoin d’aller plus loin, c’est que vous serez devenu un très bon codeur TypeScript ! Et à ce moment-là, vous serez capable de lire de la [documentation plus technique](https://www.typescripttutorial.net/typescript-tutorial/typescript-inheritance/) et de la comprendre, ou de demander à votre LLM de vous l’expliquer.
 
 Et sinon, eh bien, vous pouvez toujours [me contacter](/fr/contact). Je serai ravi d’écrire une autre leçon ! 😁
 

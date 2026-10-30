@@ -14,11 +14,7 @@ Just like functions, classes are another staple of programming. They are very co
 
 To be honest, classes are a bit advanced, and you probably won't create classes right away. But you'll use pre-coded classes quite often (just like `new Date()`), so it's important to have a rough idea of how they work.
 
-Note that I expect you to have completed the previous lessons, especially the one about **[Functions](/pushing-further/functions)**.
-
-Let's dive into it!
-
-I assume you've completed Chapter 1 and all previous lessons in Chapter 2 before diving into this one. In particular, make sure you've followed the [Setup lesson](/first-steps/setup).
+I assume you've completed Chapter 1 and all previous lessons in Chapter 2 before diving into this one, especially the [Setup](/first-steps/setup) and [Functions](/pushing-further/functions) lessons.
 
 <NoticeIntro />
 
@@ -59,7 +55,7 @@ To use the class, we need to create an **instance** of it by calling it with the
 
 Below, we instantiate our class `Person` twice. We store the new instances in the variables `john` and `emily`.
 
-We now have two `Person` instances in our code.
+We now have two `Person` instances in our code: John and Emily.
 
 ```ts showLineNumbers filename="main.ts" {4, 5}
 class Person {
@@ -83,9 +79,11 @@ class Person {
 const john = new Person();
 const emily = new Person();
 ```
-Now, the class `Person` has two properties, but they are not assigned. With the project’s strict TypeScript settings, VS Code flags these uninitialized properties. We’ll fix that with a constructor next. It would be great to give `john` and `emily` a `name` and `age` when instantiating them.
+The class `Person` now has two properties, but we haven't given them any values. VS Code reports two TypeScript errors: each `Person` should have a `name` and an `age`, but neither is assigned when we create John and Emily. We'll fix that with a constructor next.
 
-To do that, you need to use the class `constructor`. The constructor looks like a function, but without the `function` keyword. It's called when you instantiate the class (and only then).
+![VS Code reports two errors because name and age have no values.](/assets/pushing-further/classes/uninitialized-properties.png)
+
+Usually, when you create a class, you use its `constructor` to give the properties their initial values. The constructor looks like a function, but without the `function` keyword. It's called when you instantiate the class (and only then).
 
 We can give the `constructor` parameters (here, `name` and `age`). By using the `this` keyword, we can assign the parameters to the properties.
 
@@ -104,9 +102,13 @@ const john = new Person();
 const emily = new Person();
 ```
 
-The constructor now expects two arguments. VS Code flags the calls without arguments above; let’s fix them by providing a name and an age. Node.js itself doesn’t check these types when it executes the file.
+Now, in VS Code, the errors have moved! The class itself no longer has any errors, but the lines where we create John and Emily do. Our constructor expects two arguments, so we now need to give each person a name and an age when we instantiate the class with `new Person`.
 
-It’s now possible to pass arguments when we instantiate the class. We created just one class, but `john` and `emily` now each have their own `name` and `age`. And of course, everything is typed, so the code editor will help you out with autocomplete and will make sure you're passing the right data types. Magic! 🪄✨
+![VS Code reports two errors on new Person() because the constructor expects a name and an age.](/assets/pushing-further/classes/constructor-arguments.png)
+
+This is quite useful: TypeScript helps us see which parts of our code need updating until everything fits together.
+
+We created just one class, but `john` and `emily` will each have their own `name` and `age`, as shown in the code below. And of course, everything is typed, so the code editor will help you out with autocomplete and will make sure you're passing the right data types. Magic! 🪄✨
 
 You can access class instance properties just like you would with objects, using a `.`.
 
@@ -129,7 +131,7 @@ console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
 
-<OutdatedScreenshot src="/assets/pushing-further/classes/properties.png" alt={"Logging properties."} lang="en" />
+![VS Code showing John and Emily instantiated with their own names and ages, and the terminal output john 30 and emily 35.](/assets/pushing-further/classes/instance-properties.png)
 
 ## Methods
 
@@ -193,7 +195,7 @@ john.makeOlder();
 console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
-<OutdatedScreenshot src="/assets/pushing-further/classes/method.png" alt={"Using methods."} lang="en" />
+![VS Code showing three calls to john.makeOlder(), with john 33 and emily 35 in the terminal.](/assets/pushing-further/classes/make-older.png)
 
 Calling the method `makeOlder` three times is not very convenient. Just like functions, methods can have parameters. Let's update our code to pass a number of years to the method.
 
@@ -223,11 +225,13 @@ john.makeOlder(3);
 console.log(john.name, john.age);
 console.log(emily.name, emily.age);
 ```
-<OutdatedScreenshot src="/assets/pushing-further/classes/method-parameter.png" alt={"Using methods with parameters."} lang="en" />
+![VS Code showing makeOlder(year: number) and john.makeOlder(3), with john 33 and emily 35 in the terminal.](/assets/pushing-further/classes/make-older-parameter.png)
 
 Instead of using `console.log` and manually passing the instance properties, we could also create another method to log the ages.
 
 As you can see, classes, with their properties and methods, can be a great way to organize your code!
+
+You can also create helper functions in a `helpers` folder elsewhere in your project, import them into your class file, and call them from your methods. This helps keep your class organized, even when it does very complex things.
 
 
 ```ts showLineNumbers filename="main.ts" {14-16, 24-25}
@@ -257,7 +261,7 @@ john.makeOlder(3);
 emily.log();
 john.log();
 ```
-<OutdatedScreenshot src="/assets/pushing-further/classes/log-method.png" alt={"Using another method."} lang="en" />
+![VS Code showing the log method and calls to emily.log() and john.log(), with their names and ages in the terminal.](/assets/pushing-further/classes/log-output.png)
 
 ## Exporting and importing
 
@@ -300,6 +304,8 @@ john.makeOlder(3);
 emily.log();
 john.log();
 ```
+
+![VS Code showing main.ts importing the Person class from Person.ts, with both files side by side and the output in the terminal.](/assets/pushing-further/classes/import-person.png)
 
 ## Documentation
 
@@ -353,13 +359,13 @@ export default class Person {
   }
 }
 ```
-<OutdatedScreenshot src="/assets/pushing-further/classes/documentation.png" alt={"Using documentation."} lang="en" />
+![VS Code showing JSDoc documentation for makeOlder when hovering over john.makeOlder(3), alongside its documented definition in Person.ts.](/assets/pushing-further/classes/documentation-hover.png)
 
 ## Conclusion
 
 Congratulations! You wrote your first class! While you might not create a lot of them for your analyses and future projects, you will use a looooooot of them! And as you just saw, using them is very easy. 🤗
 
-There’s a lot more to learn about classes, like inheritance, for example. But if you ever need to dive into that, it’ll mean you’ve become quite a good TypeScript coder! And by then, you’ll be able to read [more technical documentation](https://www.typescripttutorial.net/typescript-tutorial/typescript-inheritance/) and understand it.
+There’s a lot more to learn about classes, like inheritance, for example. But if you ever need to dive into that, it’ll mean you’ve become quite a good TypeScript coder! And by then, you’ll be able to read [more technical documentation](https://www.typescripttutorial.net/typescript-tutorial/typescript-inheritance/) and understand it, or ask your LLM to explain it to you.
 
 And if not, well, you can always [reach out to me](/en/contact). I’ll be happy to write another lesson! 😁
 
