@@ -16,12 +16,7 @@ Il s'agit d'un défi très amusant créé par [Gunnar Morling](https://www.morli
 
 Au lieu d'utiliser un programme en Java, nous allons bien sûr utiliser TypeScript, avec la librairie Simple Data Analysis (SDA) que j'ai créée ([donnez-lui un ⭐](https://github.com/nshiab/simple-data-analysis)). C'est une excellente occasion de tester sa puissance !
 
-Si vous êtes bloqué à un moment donné dans ce projet, il peut être utile de revoir les leçons précédentes du chapitre 3, qui expliquent les bases de SDA :
-- [Données tabulaires](/simple-data-analysis/tabular-data)
-- [Données géospatiales](/simple-data-analysis/geospatial-data)
-- [Visualisation des données](/simple-data-analysis/dataviz)
-
-Nous utiliserons Node.js et VS Code. Consultez la leçon [Installation](/simple-data-analysis/setup) si nécessaire.
+Si vous êtes bloqué à un moment donné dans ce projet, il peut être utile de revoir les leçons précédentes du chapitre 3, particulièrement [Installation](/simple-data-analysis/setup) et [Données tabulaires](/simple-data-analysis/tabular-data), qui expliquent les bases de SDA.
 
 C'est parti !
 
@@ -29,19 +24,36 @@ C'est parti !
 
 ## Installation
 
-Pour tout installer, utilisons [`@nshiab/setup-data-project`](https://github.com/nshiab/setup-data-project), comme dans les leçons précédentes.
+Créez un nouveau dossier vide à un endroit pratique sur votre ordinateur et ouvrez-le dans VS Code. Ouvrez ensuite le terminal dans VS Code.
 
-Créez un nouveau dossier, ouvrez-le avec VS Code et exécutez : `npx @nshiab/setup-data-project`
+Nous utiliserons `@nshiab/setup-data-project`, une librairie que j'ai créée pour installer les librairies et préparer tous les fichiers et réglages nécessaires à un projet. Exécutez cette commande dans le terminal :
 
-Lorsque le choix des librairies s'affiche, utilisez la barre d'espace pour sélectionner `simple-data-analysis`, puis appuyez sur `Entrée`.
+```sh
+npx @nshiab/setup-data-project --sda
+```
 
-<OutdatedScreenshot src="/assets/simple-data-analysis/tabular-data/setup.png" alt={"Une capture d'écran montrant simple-data-analysis sélectionnée dans setup-data-project."} lang="fr" />
+Si on vous demande de confirmer l’installation de la librairie, tapez `y` et appuyez sur Entrée.
 
-Ensuite, lancez `npm run sda` pour surveiller `sda/main.ts` et ses dépendances.
+L'option `--sda` sélectionne automatiquement la librairie **simple-data-analysis** à installer.
 
-Voici ce que vous devriez voir dans votre fichier `sda/main.ts` et votre terminal si tout s'est bien passé.
+Une fois que le terminal affiche `You are all set!`, ouvrez `sda/main.ts`. Vous y trouverez du code de départ.
 
-<OutdatedScreenshot src="/assets/one-billion-row-challenge/setup.png" alt={"Une capture d'écran montrant le fichier main.ts généré et le résultat attendu dans le terminal."} lang="fr" />
+![VS Code montrant les fichiers du projet et le message de fin de configuration.](/assets/simple-data-analysis/setup/installation-complete.png)
+
+Si VS Code vous propose d'installer l'extension recommandée **Oxc**, cliquez sur **Install**. Elle aide à formater votre code et à repérer des problèmes potentiels pendant que vous travaillez.
+
+![VS Code recommandant l'extension Oxc, avec une flèche pointant vers Install.](/assets/simple-data-analysis/setup/oxc-install-prompt.png)
+
+Nous sommes maintenant prêts à surveiller `sda/main.ts`. Exécutez la commande ci-dessous. Chaque fois que vous enregistrez le fichier, votre code sera automatiquement formaté, vérifié et exécuté :
+
+```sh
+npm run sda:watch
+```
+
+Si vous devez arrêter la surveillance, cliquez dans le terminal et appuyez sur **Ctrl+C** sur Mac ou Windows.
+
+Gardez la surveillance active pendant ce projet.
+
 
 ## Les données
 
@@ -66,16 +78,16 @@ await sdb
 
 await sdb.close();
 ```
-<OutdatedScreenshot src="/assets/one-billion-row-challenge/load-data.png" alt={"Une capture d'écran de VS Code après avoir chargé un milliard de lignes de données."} lang="fr" />
+![VS Code montrant measurements.csv chargé dans SDA, avec un milliard de lignes et les dix premières valeurs de ville et de température affichées dans le terminal.](/assets/one-billion-row-challenge/load-data.png)
 
-Félicitations ! Vous venez de charger 1 000 000 000 de lignes de données ! Comme vous pouvez le voir, cela prend environ sept secondes sur mon M4 Max, ce qui est très impressionnant pour un fichier CSV de cette taille. 🥳
+Félicitations ! Vous venez de charger 1 000 000 000 de lignes de données ! Comme vous pouvez le voir, cela prend environ huit secondes sur mon M4 Max, ce qui est très impressionnant pour un fichier CSV de cette taille. 🥳
 
 Selon la RAM disponible sur votre ordinateur, vous pourriez voir un dossier `.tmp` apparaître dans votre projet. Si les données sont plus volumineuses que votre RAM, ce dossier sera utilisé pour traiter toutes les données en stockant des morceaux prétraités.
 
 Ce dossier `.tmp` peut devenir assez volumineux. Mais ne vous inquiétez pas : lorsque vous configurez un projet avec `@nshiab/setup-data-project`, il est automatiquement ajouté à `.gitignore` afin que vous ne le mettiez pas en ligne par erreur sur GitHub ou ailleurs.
 
 <Callout type="info" emoji="💡">
-    Si vous voulez nettoyer votre cache, exécutez `npm run clean`. Cela supprime `.sda-cache`, `.journalism-cache` et `.tmp`, y compris les données mises en cache. Vous pouvez aussi supprimer un seul de ces dossiers manuellement.
+    Vous pouvez supprimer `.tmp` manuellement, même si je ne le fais généralement pas. La commande `npm run clean` le supprime aussi, mais attention : elle supprime également toutes les données mises en cache dans `.sda-cache`.
 </Callout>
 
 ## Le défi
@@ -104,7 +116,7 @@ await sdb
 await sdb.close();
 ```
 
-<OutdatedScreenshot src="/assets/one-billion-row-challenge/summarize.png" alt={"Une capture d'écran de VS Code après avoir agrégé un milliard de lignes de données."} lang="fr" />
+![VS Code montrant les températures minimale, moyenne et maximale par ville après avoir résumé un milliard de lignes, avec 413 villes au total.](/assets/one-billion-row-challenge/summarize.png)
 
 Sur mon ordinateur, ce code s'exécute encore plus rapidement que le simple chargement du fichier CSV, car la table finale est beaucoup plus petite que la table complète d'un milliard de lignes. Tout est traité à la volée, ce qui est assez incroyable. 🚀
 
