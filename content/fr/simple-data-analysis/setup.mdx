@@ -8,7 +8,7 @@ import { Callout } from "nextra/components"
 
 # Configuration pour l'analyse de données
 
-Maintenant que nous sommes au chapitre 3, nous allons travailler sur des projets d'analyse de données plus ambitieux et plus complexes. Pour partir du bon pied, nous utiliserons la librairie `@nshiab/setup-data-project` pour préparer les dossiers de notre projet, installer les librairies et créer les fichiers de configuration nécessaires.
+Maintenant que nous sommes au chapitre 3, nous allons travailler sur des projets d'analyse de données plus ambitieux et plus complexes. Pour partir du bon pied, nous utiliserons la librairie `@nshiab/setup-data-project` pour préparer les dossiers de notre projet, installer les librairies et créer les fichiers de configuration nécessaires. C'est ainsi que je commence tous mes projets.
 
 Assurez-vous d'avoir suivi la [leçon d'installation de VS Code et de Node.js](/first-steps/setup). Nous continuerons à utiliser le même éditeur et le même moteur d'exécution.
 
@@ -38,9 +38,9 @@ Attendez la fin de la configuration et le message `You are all set!`. Le téléc
 
 ![VS Code affichant les nouveaux fichiers du projet dans l'Explorer et le message de fin de configuration You are all set! dans le terminal.](/assets/simple-data-analysis/setup/installation-complete.png)
 
-Il n'y a rien de magique ici : l'outil de configuration a simplement créé des fichiers dans votre dossier. Vous pouvez aussi les voir dans le Finder sur Mac ou l'Explorateur de fichiers sur Windows. Ce sont surtout des fichiers texte de différents formats. VS Code nous offre des outils pratiques pour les modifier et exécuter le code qu'ils contiennent.
+Il n'y a rien de magique ici : l'outil de configuration a simplement créé des fichiers dans votre dossier. Ce sont surtout des fichiers texte de différents formats.
 
-Après quelques secondes, une fenêtre devrait vous proposer d'installer l'extension Oxc. Cliquez sur `Install`. Cette extension nous aidera à repérer les erreurs dans notre code pendant que nous le tapons.
+Après quelques secondes, une fenêtre devrait vous proposer d'installer l'extension Oxc. Cliquez sur `Install`. Cette extension nous aide à formater notre code et à repérer des bogues potentiels dans l’éditeur, en complément des erreurs de types signalées par TypeScript. Cette extension nous aidera aussi à repérer ces problèmes avant l’exécution du code.
 
 ![VS Code recommandant l'extension Oxc, avec des flèches pointant vers la notification et son bouton Install.](/assets/simple-data-analysis/setup/oxc-install-prompt.png)
 
@@ -89,13 +89,13 @@ L'outil crée `sda/main.ts` avec un court exemple SDA. Ouvrez-le dans l'Explorer
 npm run sda
 ```
 
-Les deux lignes bleues dans le terminal indiquent que votre code a été automatiquement formaté et vérifié avec le linting (la recherche de problèmes courants dans le code) et la vérification des types avant l'exécution de l'analyse.
+Les deux lignes bleues dans le terminal indiquent que votre code a été automatiquement formaté, vérifié avec le linting (la recherche de problèmes courants dans le code) et la vérification des types avant l’exécution de l’analyse.
 
 ![VS Code montrant npm run sda, les messages bleus de formatage et de vérification, et le tableau produit par l’exemple SDA.](/assets/simple-data-analysis/setup/run-sda.png)
 
 Par exemple, ajoutons une erreur : remplacez `.log()` par `.logData()`. Cette méthode n'existe pas sur notre table.
 
-```ts showLineNumbers filename="sda/main.ts" {6}
+```ts showLineNumbers filename="sda/main.ts" /logData/
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
@@ -110,35 +110,50 @@ Exécutez à nouveau `npm run sda`. Le terminal vous indique exactement l'erreur
 
 ![VS Code montrant la méthode inexistante logData soulignée dans l’éditeur et npm run sda signalant l’erreur de type sans exécuter l’analyse.](/assets/simple-data-analysis/setup/type-error.png)
 
+<Callout type="info" emoji="💡">
+    La vérification des types depuis le terminal peut faire gagner beaucoup de temps. Votre éditeur signale les erreurs pendant que vous travaillez ; la vérification dans le terminal couvre tous les fichiers de votre projet, ce qui est particulièrement utile lorsque les fonctions et les classes sont réparties dans plusieurs fichiers. Imaginez une analyse de 15 minutes qui échoue à la quatorzième minute à cause d'une erreur de type. Une vérification préalable, souvent réalisée en moins d'une seconde dans un petit projet, peut repérer cette erreur et vous éviter cette attente.
+</Callout>
+
 Remplacez `.logData()` par `.log()` avant de continuer.
 
-Pour relancer automatiquement l'analyse quand vous enregistrez des modifications, utilisez :
+## Exécuter en mode surveillance
+
+Exécuter votre script une seule fois est utile lorsque votre analyse est terminée et fonctionne bien. Pendant que vous la développez, le mode surveillance est plus pratique : chaque fois que vous enregistrez, le code est relancé automatiquement pour voir immédiatement les résultats de vos modifications. Vous n'avez pas besoin de retourner dans le terminal et de taper `npm run sda` chaque fois.
+
+Pour utiliser le mode surveillance, ajoutez `:watch` à la commande :
 
 ```sh
 npm run sda:watch
 ```
 
+Cette commande surveille tout le dossier `sda` et le fichier `.env`, formate et vérifie le code, puis le relance quand ces fichiers changent. Elle ignore les modifications dans `sda/output` pour éviter qu'un enregistrement de résultats déclenche une nouvelle exécution.
+
 ![VS Code montrant l’analyse en mode surveillance avec le formatage, le linting et la vérification des types.](/assets/simple-data-analysis/setup/watch-sda.png)
 
-Cette commande surveille `sda` et `.env`, formate et vérifie le code, puis le relance quand ces fichiers changent. Elle ignore les modifications dans `sda/output` pour éviter qu'un enregistrement de résultats déclenche une nouvelle exécution. Pour l'arrêter, cliquez dans le terminal et appuyez sur `Control` + `C`, sur Mac comme sur Windows.
+Le mode surveillance formate et vérifie aussi les types de votre code à chaque enregistrement. Vous saurez donc immédiatement si une vérification détecte un problème.
 
-<Callout type="info" emoji="💡">
-    Pour un projet de données, la commande est `npm run sda:watch`. Elle ajoute le formatage et les vérifications aux relances automatiques. Dans les premières leçons de TypeScript, nous utilisions `node --watch main.ts` pour exécuter un fichier autonome.
-</Callout>
+À la ligne 6, remplacez le message `Hello simple-data-analysis!` par `Let's have data fun`, puis enregistrez le fichier :
 
-## Vérifier et formater le projet
+```ts showLineNumbers filename="sda/main.ts" /Let's have data fun/
+import { SimpleDB } from "@nshiab/simple-data-analysis";
 
-Pour vérifier le formatage, les règles de linting et les types TypeScript sans exécuter l'analyse, utilisez :
+const sdb = new SimpleDB();
+const table = sdb.newTable();
 
-```sh
-npm run all-tests
+await table.loadArray([{ message: "Let's have data fun" }]).log();
+
+await sdb.close();
 ```
 
-![VS Code montrant npm run all-tests réussissant les vérifications de formatage, de linting et de types.](/assets/simple-data-analysis/setup/all-tests.png)
+Le code est relancé automatiquement et le terminal affiche votre nouveau message.
 
-Malgré son nom, cette commande n'inclut pas de tests automatisés dans un nouveau projet. Nous apprendrons à ajouter des tests plus tard.
+![VS Code montrant le mode surveillance relançant automatiquement l’analyse et affichant Let's have data fun dans le terminal.](/assets/simple-data-analysis/setup/watch-new-message.png)
 
-Pour formater les fichiers et appliquer les corrections automatiques, utilisez :
+Pour arrêter la surveillance, cliquez dans le terminal et appuyez sur `Control` + `C`, sur Mac comme sur Windows.
+
+## Vérifier sans exécuter le code
+
+Parfois, vous voulez vérifier votre code sans lancer une analyse qui pourrait prendre beaucoup de temps. Cette commande formate vos fichiers, vérifie les règles de linting et les types TypeScript, et applique des corrections automatiques :
 
 ```sh
 npm run fix
@@ -148,11 +163,27 @@ npm run fix
 
 Certains problèmes nécessiteront votre intervention. Lisez les messages, faites les modifications et relancez les vérifications.
 
+Les librairies et les outils que vous utilisez peuvent créer des fichiers temporaires dans le dossier de votre projet. Pour supprimer les fichiers et dossiers temporaires ciblés par la commande de nettoyage du projet, exécutez :
+
+```sh
+npm run clean
+```
+
+S'il n'y a rien à supprimer, rien ne se passe. Dans de prochaines leçons, nous mettrons en cache les résultats de calculs ou d'appels à des API. Vous voudrez parfois effacer ces résultats en cache et repartir de zéro ; cette commande vous sera alors utile.
+
+Vous disposez aussi d'une commande pour vérifier le formatage, les règles de linting et les types sans modifier vos fichiers :
+
+```sh
+npm run all-tests
+```
+
+Elle est déjà incluse pour que vous puissiez y ajouter des tests automatisés plus tard, par exemple pour vérifier des calculs précis. Nous aborderons les tests dans de prochaines leçons.
+
 ## Conclusion
 
 Configurer un projet peut être pénible, et il est facile d'oublier un paramètre important. Avec `@nshiab/setup-data-project`, vous pouvez démarrer beaucoup plus vite et passer directement à la partie amusante.
 
-Vous vous demandez pourquoi nous avons installé l'extension Oxc ? Elle ajoute le formatage et le linting automatiques à VS Code, en complément des vérifications TypeScript de l'éditeur, pour vous aider pendant que vous travaillez. Les commandes `npm` utilisent les outils en ligne de commande pour formater et vérifier votre code avant de l'exécuter. Nous découvrirons d'autres extensions utiles dans les prochaines leçons et les prochains projets.
+Vous vous demandez pourquoi nous avons installé l'extension Oxc ? Les outils d'Oxc nous aident à formater et à vérifier notre code, grâce à l'extension dans l'éditeur et aux commandes dans le terminal. Nous découvrirons d'autres extensions utiles dans les prochaines leçons et les prochains projets.
 
 Il est maintenant temps de s'amuser ! Passez à la [leçon sur les données tabulaires](/simple-data-analysis/tabular-data). Vous pouvez conserver la configuration de votre projet actuel pour la suivre.
 

@@ -8,7 +8,7 @@ import { Callout } from "nextra/components"
 
 # Setup for data analysis
 
-Now that we're in Chapter 3, we'll work on bigger and more complex data analysis projects. To get off to a good start, we'll use the `@nshiab/setup-data-project` library to prepare our project folders, install libraries, and create the configuration files we need.
+Now that we're in Chapter 3, we'll work on bigger and more complex data analysis projects. To get off to a good start, we'll use the `@nshiab/setup-data-project` library to prepare our project folders, install libraries, and create the configuration files we need. This is how I start all of my projects.
 
 Make sure you've completed the [VS Code and Node.js setup](/first-steps/setup). We'll keep using the same editor and runtime.
 
@@ -38,9 +38,9 @@ Wait until setup finishes and displays `You are all set!`. It may take a few sec
 
 ![VS Code showing the new project files in Explorer and the setup completion message You are all set! in the terminal.](/assets/simple-data-analysis/setup/installation-complete.png)
 
-There's no magic here: the setup tool just created files in your folder. You can see them in Finder on Mac or File Explorer on Windows, too. Most are text files in different formats. VS Code gives us handy tools to edit them and run the code inside them.
+There's no magic here: the setup tool just created files in your folder. Most are text files in different formats.
 
-After a few seconds, you should see a pop-up recommending the Oxc extension. Click `Install`. This extension will help highlight errors in our code as we type.
+After a few seconds, you should see a pop-up recommending the Oxc extension. Click `Install`. This extension helps us format our code and spot potential bugs in the editor, alongside TypeScript’s type errors. This extension will also help us find these problems before the code runs.
 
 ![VS Code recommending the Oxc extension, with arrows pointing to the pop-up and its Install button.](/assets/simple-data-analysis/setup/oxc-install-prompt.png)
 
@@ -89,13 +89,13 @@ The setup tool creates `sda/main.ts` with a short SDA example. Open it in the Ex
 npm run sda
 ```
 
-The two blue lines in the terminal show that your code was automatically formatted and checked with linting (checks for common code problems) and type checking before the analysis ran.
+The two blue lines in the terminal show that your code was automatically formatted, checked with linting (checks for common code problems) and type checking before the analysis ran.
 
 ![VS Code showing npm run sda, blue formatting and checking messages, and the SDA example's output table.](/assets/simple-data-analysis/setup/run-sda.png)
 
 For example, let's add an error: change `.log()` to `.logData()`. This method doesn't exist on our table.
 
-```ts showLineNumbers filename="sda/main.ts" {6}
+```ts showLineNumbers filename="sda/main.ts" /logData/
 import { SimpleDB } from "@nshiab/simple-data-analysis";
 
 const sdb = new SimpleDB();
@@ -110,35 +110,50 @@ Run `npm run sda` again. The terminal tells you exactly what the error is: `logD
 
 ![VS Code showing the nonexistent logData method underlined in the editor and npm run sda reporting the type error without running the analysis.](/assets/simple-data-analysis/setup/type-error.png)
 
+<Callout type="info" emoji="💡">
+    Type checking from the terminal can save a lot of time. Your editor highlights errors as you work; the terminal check covers all files in your project, which is especially useful when functions and classes are spread across many files. Imagine a 15-minute analysis failing at minute 14 because of a type error. A quick check beforehand, often taking less than a second in a small project, can catch that mistake and save the wait.
+</Callout>
+
 Change `.logData()` back to `.log()` before continuing.
 
-To rerun the analysis automatically when you save changes, use:
+## Run in watch mode
+
+Running your script once is useful when your analysis is finished and working well. While you're developing it, watch mode is more convenient: every time you save, the code reruns automatically so you can see the results of your changes right away. You don't need to return to the terminal and type `npm run sda` each time.
+
+To use watch mode, add `:watch` to the command:
 
 ```sh
 npm run sda:watch
 ```
 
+This watches the whole `sda` folder and the `.env` file, formats and checks the code, then reruns it when those files change. It ignores changes to `sda/output` so saving results doesn't start another run.
+
 ![VS Code showing the analysis running in watch mode with formatting, linting, and type checking.](/assets/simple-data-analysis/setup/watch-sda.png)
 
-This watches `sda` and `.env`, formats and checks the code, then runs it again when those files change. It ignores changes to `sda/output` so saving results doesn't start another run. To stop it, click in the terminal and press `Control` + `C` on Mac or Windows.
+Watch mode also formats and type-checks your code every time you save, so you'll know right away if a check finds a problem.
 
-<Callout type="info" emoji="💡">
-    The command for a data project is `npm run sda:watch`. It includes formatting and checks as well as automatic reruns. In the earlier TypeScript lessons, we used `node --watch main.ts` to run a standalone file.
-</Callout>
+Change the message on line 6 from `Hello simple-data-analysis!` to `Let's have data fun`, then save the file:
 
-## Check and format the project
+```ts showLineNumbers filename="sda/main.ts" /Let's have data fun/
+import { SimpleDB } from "@nshiab/simple-data-analysis";
 
-To check formatting, lint rules, and TypeScript types without running the analysis, use:
+const sdb = new SimpleDB();
+const table = sdb.newTable();
 
-```sh
-npm run all-tests
+await table.loadArray([{ message: "Let's have data fun" }]).log();
+
+await sdb.close();
 ```
 
-![VS Code showing npm run all-tests passing formatting, linting, and type checks.](/assets/simple-data-analysis/setup/all-tests.png)
+The code reruns automatically, and the terminal displays your new message.
 
-Despite its name, this command doesn't include automated tests in a fresh project. We'll learn to add tests later.
+![VS Code showing watch mode automatically rerunning the analysis and displaying Let's have data fun in the terminal.](/assets/simple-data-analysis/setup/watch-new-message.png)
 
-To format files and apply automatic fixes, use:
+To stop watching, click in the terminal and press `Control` + `C` on Mac or Windows.
+
+## Checking without running the code
+
+Sometimes you want to check your code without running an analysis that could take a long time. This command formats your files, checks lint rules and TypeScript types, and applies automatic fixes:
 
 ```sh
 npm run fix
@@ -148,11 +163,27 @@ npm run fix
 
 Some problems will still need a fix from you. Read the messages, make the changes, and run the checks again.
 
+The libraries and tools you use may create temporary files in your project folder. To remove the temporary files and folders targeted by the project's cleanup command, run:
+
+```sh
+npm run clean
+```
+
+If there's nothing to remove, nothing happens. In future lessons, we'll cache the results of computations or API calls. Sometimes you'll want to clear those cached results and start fresh; this command will come in handy.
+
+You also have a command that checks formatting, lint rules, and types without modifying your files:
+
+```sh
+npm run all-tests
+```
+
+It is already included so you can extend it with automated tests later, for example to verify specific calculations. We'll cover tests in later lessons.
+
 ## Conclusion
 
 Setting up a project can be a pain, and it's easy to forget an important setting. With `@nshiab/setup-data-project`, you can get started much faster and jump straight into the fun part.
 
-Wondering why we installed the Oxc extension? It adds automatic formatting and linting to VS Code, alongside the editor's TypeScript checks, to help you while you work. The `npm` commands use the command-line tools to format and check your code before running it. We'll discover more useful extensions in later lessons and projects.
+Wondering why we installed the Oxc extension? Oxc's tools help format and check our code, through the extension in the editor and the commands in the terminal. We'll discover more useful extensions in later lessons and projects.
 
 Now it's time to have fun! Head to the [Tabular data lesson](/simple-data-analysis/tabular-data). You can keep your current project setup to work through it.
 
