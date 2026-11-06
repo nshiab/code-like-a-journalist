@@ -9,8 +9,8 @@ const routes = files.map(toRoute).sort();
 const englishRoutes = routes.filter((route) => route.startsWith("/en"));
 const frenchRoutes = routes.filter((route) => route.startsWith("/fr"));
 
-assert(englishRoutes.length === 41, `Expected 41 English routes, found ${englishRoutes.length}.`);
-assert(frenchRoutes.length === 41, `Expected 41 French routes, found ${frenchRoutes.length}.`);
+assert(englishRoutes.length === 36, `Expected 36 English routes, found ${englishRoutes.length}.`);
+assert(frenchRoutes.length === 36, `Expected 36 French routes, found ${frenchRoutes.length}.`);
 
 const englishPaths = englishRoutes.map((route) => route.slice(3));
 const frenchPaths = frenchRoutes.map((route) => route.slice(3));
@@ -83,6 +83,11 @@ for (const prefix of ["", "/en", "/fr"]) {
 }
 
 const removedPaths = [
+    "advanced-analysis/using-ai",
+    "advanced-analysis/openstreetmap-data",
+    "advanced-analysis/similarity-and-clustering",
+    "advanced-analysis/network-analysis",
+    "advanced-analysis/conclusion",
     "pushing-further/tasks",
     "web-basics/html",
     "web-basics/css",

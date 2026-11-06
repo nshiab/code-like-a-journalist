@@ -7,12 +7,8 @@ export default {
         title: "3. Data analysis with SDA",
         theme: { collapsed: false },
     },
-    "advanced-analysis": {
-        title: "4. Advanced SDA",
-        theme: { collapsed: false },
-    },
-    "git-and-github": "5. Git & GitHub",
-    "ninja-moves": "6. Going further",
+    "git-and-github": "4. Git & GitHub",
+    "ninja-moves": "5. Going further",
     "data-projects": {
         title: "Data projects",
         theme: { collapsed: false },
