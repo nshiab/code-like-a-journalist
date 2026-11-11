@@ -12,7 +12,7 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
 
 You can also create private repositories with a free account, of course. And [you can pay if you need more resources](https://github.com/pricing). But I've been using GitHub for my open-source projects for years (the [SDA](https://github.com/nshiab/simple-data-analysis) and [journalism](https://github.com/nshiab/journalism) libraries, and [this course too](https://github.com/nshiab/code-like-a-journalist)) and I never reached the limits of the free plan!
 
-As its name states: GitHub works with Git. So I strongly suggest you follow the previous lesson [How to use Git?](/git-and-github/git-basics) before diving into this one. Here, we are going to follow the same steps as the previous lesson: building a simple program to retrieve the temperature in Montreal. But we are going to store our code in the cloud, with GitHub!
+GitHub works with Git. I suggest completing [How to use Git?](/git-and-github/git-basics) before starting this lesson. Here, we’ll use the same Git commands on a new project that retrieves the temperature in Montreal, and we’ll store our code on GitHub.
 
 <NoticeIntro />
 
@@ -183,7 +183,7 @@ We are now on our new branch. We can safely work on our code!
 
 <OutdatedScreenshot src="/assets/git-and-github/github-basics/new-branch.png" alt={"Working on the new branch."} lang="en" />
 
-Let's add the code from the previous lesson into our `sda/main.ts`. This script pings the Meteorological Service of Canada API and retrieves data as XML. The `fast-xml-parser` library converts it to JSON. And the rest of the code extracts the temperature and the time before logging them.
+Replace the contents of `sda/main.ts` with the code below. It retrieves XML data from the Meteorological Service of Canada API, uses `fast-xml-parser` to convert it to JSON, and logs the temperature and observation time.
 
 
 ```ts showLineNumbers filename="sda/main.ts"
@@ -253,7 +253,7 @@ GitHub will suggest removing the branch we created. It's safe to delete it now.
 
 <OutdatedScreenshot src="/assets/git-and-github/github-basics/delete-branch.png" alt={"Merged PR and delete branch."} lang="en" />
 <Callout type="info" emoji="💡">
-   Have you noticed the `Revert` button? If you merged something too fast and want to revert the changes, this is the button for it! In the previous lesson, we did it manually, but with GitHub it's easier thanks to the PR interface.
+   Have you noticed the `Revert` button? If you merged something too fast, you can use it to undo the changes from the pull request.
 </Callout>
 
 

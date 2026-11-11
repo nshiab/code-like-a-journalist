@@ -12,7 +12,7 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
 
 Vous pouvez aussi créer des dépôts privés avec un compte gratuit, bien sûr. Et [vous pouvez payer si vous avez besoin de plus de ressources](https://github.com/pricing). Mais j'utilise GitHub pour mes projets en code ouvert depuis des années (les librairies [SDA](https://github.com/nshiab/simple-data-analysis) et [journalism](https://github.com/nshiab/journalism), ainsi que [ce cours aussi](https://github.com/nshiab/code-like-a-journalist)) et je n'ai jamais atteint les limites du plan gratuit !
 
-Comme son nom l'indique, GitHub fonctionne avec Git. Je vous recommande donc fortement de suivre la leçon précédente [Comment utiliser Git ?](/git-and-github/git-basics) avant de vous plonger dans celle-ci. Ici, on va suivre les mêmes étapes que dans la leçon précédente : créer un programme simple pour récupérer la température à Montréal. Mais cette fois, on va stocker notre code dans le nuage, avec GitHub !
+GitHub fonctionne avec Git. Je vous recommande de suivre la leçon [Comment utiliser Git ?](/git-and-github/git-basics) avant de commencer celle-ci. Nous utiliserons les mêmes commandes Git dans un nouveau projet qui récupère la température à Montréal, et nous hébergerons notre code sur GitHub.
 
 <NoticeIntro lang="fr" />
 
@@ -184,7 +184,7 @@ Nous sommes maintenant sur notre nouvelle branche. On peut travailler sur notre 
 
 <OutdatedScreenshot src="/assets/git-and-github/github-basics/new-branch.png" alt={"Travailler sur la nouvelle branche."} lang="fr" />
 
-Ajoutons le code de la leçon précédente dans notre fichier `sda/main.ts`. Ce script interroge l’API du Service météorologique du Canada et récupère les données au format XML. La librairie `fast-xml-parser` les convertit en JSON. Et le reste du code extrait la température et l’heure avant de les afficher dans la console.
+Remplacez le contenu de `sda/main.ts` par le code ci-dessous. Il récupère des données XML depuis l’API du Service météorologique du Canada, les convertit en JSON avec `fast-xml-parser`, puis affiche la température et l’heure de l’observation.
 
 
 
@@ -256,7 +256,7 @@ GitHub va suggérer de supprimer la branche qu’on a créée. Vous pouvez la su
 <OutdatedScreenshot src="/assets/git-and-github/github-basics/delete-branch.png" alt={"PR fusionnée et supprimer la branche."} lang="fr" />
 
 <Callout type="info" emoji="💡">
-   Vous avez remarqué le bouton `Revert` ? Si vous avez fusionné quelque chose un peu trop vite et que vous voulez revenir en arrière, ce bouton est là pour ça ! Dans la leçon précédente, on l’a fait manuellement, mais avec GitHub, c’est plus simple grâce à l’interface des PR.
+   Vous avez remarqué le bouton `Revert` ? Si vous avez fusionné quelque chose un peu trop vite, ce bouton permet d’annuler les changements de la *pull request*.
 </Callout>
 
 Si on regarde la page principale du dépôt, on voit que nos changements sont bien dans `main`. Vous pouvez consulter le fichier `sda/main.ts` si vous êtes curieux. L’issue qu’on avait créée a été automatiquement fermée quand on a fusionné la PR. Pratique, non ? 🥳
