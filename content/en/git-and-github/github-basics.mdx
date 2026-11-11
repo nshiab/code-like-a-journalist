@@ -12,7 +12,7 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
 
 You can also create private repositories with a free account, of course. And [you can pay if you need more resources](https://github.com/pricing). But I've been using GitHub for my open-source projects for years (the [SDA](https://github.com/nshiab/simple-data-analysis) and [journalism](https://github.com/nshiab/journalism) libraries, and [this course too](https://github.com/nshiab/code-like-a-journalist)) and I never reached the limits of the free plan!
 
-GitHub works with Git. I suggest completing [How to use Git?](/git-and-github/git-basics) before starting this lesson. Here, we’ll use the same Git commands on a new project that retrieves the temperature in Montreal, and we’ll store our code on GitHub.
+GitHub works with Git. In [How to use Git?](/git-and-github/git-basics), we used Git to track changes to a small program that prints a greeting. We’ll build the same kind of program from scratch here, push it to GitHub, and translate the greeting into French.
 
 <NoticeIntro />
 
@@ -20,291 +20,378 @@ GitHub works with Git. I suggest completing [How to use Git?](/git-and-github/gi
 
 To work with GitHub, you first need to [create an account](https://github.com/). So start with that.
 
-![GitHub homepage.](/assets/git-and-github/github-basics/github-account.png)
+![The GitHub homepage with arrows pointing to the email field and the Sign up button.](/assets/git-and-github/github-basics/github-account.png)
 
 ## A social network
 
-When you log into GitHub and land on your home page, you'll see a **Feed** section. That's because GitHub is also a social network. For example, you can see my feed below at the time of writing. It's great to stay up to date with open-source projects you are interested in or just to see what people you find interesting are working on.
+When you sign in to GitHub, you can switch between **Home** and **Feed**. [Home](https://github.com/dashboard) is your personal dashboard, where you can find the projects you’re working on.
 
-![GitHub feed.](/assets/git-and-github/github-basics/feed.png)
+GitHub is also a social network. In your [Feed](https://github.com/feed), you can see what people you follow are working on and catch up on open-source projects that interest you. Here’s what my feed looked like when I wrote this lesson.
+
+![GitHub’s Feed page with arrows pointing to its URL, sidebar tab, and heading.](/assets/git-and-github/github-basics/feed.png)
 
 Users have a public profile showing their public activity, and you can follow them to see their activity in your feed. [Here's my profile, for example](https://github.com/nshiab). **Follow me!** 🤗
 
-Personally, I like to follow other computational journalists or maintainers of open-source projects I use.
+Personally, I like to follow other computational journalists or maintainers of open-source projects I use. You can update your profile and settings by clicking on the button in the top right corner.
 
-You can update your profile and settings by clicking on the button in the top right corner.
-
-![GitHub profile.](/assets/git-and-github/github-basics/profile.png)
+![Nael Shiab’s GitHub profile with an arrow pointing to the Follow button.](/assets/git-and-github/github-basics/profile.png)
 
 Public repositories also have a public page. When you like a project, you can give it a star. For example, here's the page for the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis) I maintain and we've been using in previous lessons. **Give it a 🌟!**
 
-You can also **Watch** a project to see its activity in your feed. I usually watch for the releases of new versions of open-source projects I use, just to stay up to date.
+You can also get notified when a project you use has updates. Open the bell menu to choose which updates you want to hear about. I usually subscribe to new releases for open-source projects I use.
 
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/sda-repo.png" alt={"GitHub repository."} lang="en" />
+![The Simple Data Analysis repository with arrows pointing to the Notifications and Star buttons.](/assets/git-and-github/github-basics/sda-repo.png)
 
 ## Creating a repository
 
-Let's create your first repository! Click on the + button in the top right corner.
+Create a new folder named `my-first-repo` and open it in VS Code. Inside that folder, create a file named `main.ts`, add the following line, and save the file.
 
-![Creating a new repository.](/assets/git-and-github/github-basics/new-button.png)
-
-Then give your repository a name and make it private (so you won't be afraid of making mistakes 😉). Leave the options to add a `README` and `.gitignore` unchecked: we will create them locally with the project setup tool. Then hit `Create repository` at the bottom.
-
-![Settings of a new repository.](/assets/git-and-github/github-basics/new-repo-settings.png)
-
-Now, the next page tells you how to connect a repository on your computer with the repository we just created on GitHub.
-
-We are going to follow the steps under *pushing an existing repository from the command line*. Keep this page open.
-
-![The steps to connect an existing repo to a new one.](/assets/git-and-github/github-basics/new-repo-steps.png)
-
-Create a new folder with the same name as the repository and open it with VS Code. Run `npx @nshiab/setup-data-project` and press `Enter` without selecting a library. Replace `sda/main.ts` with this simple log. The generated `.gitignore` keeps `node_modules` and `.env` out of Git; keep `package.json` and `package-lock.json` tracked. Run the terminal commands below from this project folder, which contains `package.json`.
-
-
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 console.log("Hello!");
 ```
 
-Then initialize a new Git repository in it by running `git init`.
+Open the VS Code terminal (`Command` + `J` on Mac or `Control` + `J` on Windows).
 
-Stage the script and all the generated project files with `git add -A`, then commit them with `git commit -m "My first commit"`. Ignored files such as `node_modules` and `.env` stay out of the commit.
+<Callout type="info" emoji="💡">
 
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/first-commit.png" alt={"First commit."} lang="en" />
+If you’re new to Git, [install it first](/git-and-github/git-basics#setup). Then run the commands below once to set your name, email address, and default branch. Replace the example name and email with your own details.
 
-Right now, your code is saved with Git locally, on your computer. It's time to save it remotely, in the cloud, on GitHub!
-
-You can copy the instructions from the GitHub page and paste them into your terminal. Then press Enter to run them! Your URL should be different from mine, but the rest should be similar.
-
-
-```
-git remote add origin https://github.com/nshiab/my-first-repo.git
-git branch -M main
-git push -u origin main
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git config --global init.defaultBranch main
 ```
 
-You'll probably be asked to authenticate. Follow the browser or credential-manager prompt shown by Git. GitHub does not accept your account password for Git operations over HTTPS, so never enter it here. If your setup does not open a browser, GitHub recommends authenticating with [GitHub CLI or Git Credential Manager](https://docs.github.com/en/get-started/git-basics/caching-your-github-credentials-in-git).
+</Callout>
 
-And if you refresh your repository page on GitHub, you'll see your code synced! Your `sda/main.ts` file is there and you see your latest commit.
+Initialize a Git repository with `git init`. Then stage `main.ts` with `git add` and save it to your Git history with your first commit.
 
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/repo-page-sync.png" alt={"The remote repository page."} lang="en" />
+```bash
+git init
+git add main.ts
+git commit -m "Add first greeting"
+```
+
+![VS Code shows Hello! in main.ts and the terminal confirms the first commit.](/assets/git-and-github/github-basics/first-commit.png)
+
+Your greeting is now saved in a commit on your computer. Let’s create a repository on GitHub to push it to.
+
+On GitHub, click the `+` button in the top-right corner and choose `New repository`.
+
+![Arrows point to the plus button and the New repository option on the GitHub dashboard.](/assets/git-and-github/github-basics/new-button.png)
+
+Name the repository `my-first-repo` and make it private so you can practice. Leave the options for adding a README, a `.gitignore` file, and a license off. That gives you an empty repository to push your existing project to. Click `Create repository`.
+
+![The GitHub form shows my-first-repo set to Private, with no README, .gitignore, or license selected.](/assets/git-and-github/github-basics/new-repo-settings.png)
+
+Your repository is now on GitHub. It’s still empty, so GitHub takes you to a page with instructions for pushing the project from your computer to GitHub.
+
+On the `Quick setup` page, select `HTTPS`. Find the block under **push an existing repository from the command line** and click the copy button in its top-right corner to copy all three commands.
+
+![Arrows point to HTTPS and the commands under “push an existing repository from the command line” on GitHub’s Quick setup page.](/assets/git-and-github/github-basics/new-repo-steps.png)
+
+Back in VS Code, open the terminal in your project folder. Paste the commands you copied and press Enter to run them. When the push succeeds, Git confirms that your local `main` is set up to track `origin/main`.
+
+![The VS Code terminal shows the three commands from GitHub and confirms that main now tracks origin/main.](/assets/git-and-github/github-basics/first-push.png)
+
+<Callout type="info" emoji="💡">
+
+To push from your computer, GitHub needs to verify who you are and that your account has permission to send code to the repository you chose. I’ve already signed in on my computer, so you don’t see that step in the screenshot.
+
+On your first push, you may be asked to open a link and sign in to GitHub in your browser. Once you sign in, your computer can save a credential so GitHub can recognize your account automatically the next time you push.
+
+If Git asks for a password in the terminal or you can’t sign in, follow GitHub’s [guide to setting up HTTPS credentials](https://docs.github.com/en/get-started/git-basics/caching-your-github-credentials-in-git), then retry `git push -u origin main`.
+
+</Callout>
+
+These three commands pushed your code to GitHub and connected your local `main` branch to `main` on GitHub. From now on, on `main`, you can use `git push` to send changes from your computer to GitHub and `git pull` to bring changes from GitHub to your computer.
+
+Refresh your repository page on GitHub. You should see `main.ts` on `main`, along with your latest commit.
+
+![The private my-first-repo repository on GitHub shows main.ts on the main branch and the Add first greeting commit.](/assets/git-and-github/github-basics/repo-after-first-push.png)
+
+Click `main.ts` to see your code and the message from the most recent commit that changed the file.
+
+![GitHub shows the Hello! greeting in main.ts, with the Add first greeting commit message above the code.](/assets/git-and-github/github-basics/main-ts-on-github.png)
 
 ## Pushing to the repository
 
-The setup tool created a `README.md` in your repository. GitHub displays its contents on the repository page, so it’s usually the first thing people read. Let’s add a description of our project above the generated documentation.
+When you create a new repository, it’s helpful to describe what the project does.
 
-As the `.md` extension suggests, it's a Markdown file. Markdown is a convenient and simple syntax often used for documentation. The code will be rendered into good-looking text by the tool or platform you are using. You can focus on the content without worrying about the style, which is nice! We will write some Markdown together, but if you want to know more, check this [cheat sheet](https://www.markdownguide.org/cheat-sheet/).
+By convention, projects use a file named `README.md` to introduce the project. As you’ll see, GitHub will recognize this file and use it to present your project.
 
-Open `README.md` in VS Code and add the following project description at the top, above the generated section. As I said at the beginning, our goal will be to fetch the temperature in Montreal.
-
-The `#` is used for titles. The `[text](link)` syntax allows you to add links to your text, and the use of backticks creates code blocks.
-
+In VS Code, create a file named `README.md` next to `main.ts` and add the text below.
 
 ```md showLineNumbers filename="README.md"
 # My first repository
 
-This project retrieves the latest temperature in Montreal from the
-[Meteorological Service of Canada API](https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en/).
-
-Install dependencies with `npm ci`, then run the project with `node sda/main.ts`.
+Run `node main.ts` to see the greeting in the terminal.
 ```
 
-In VS Code, if you right-click on `.md` files, you can preview them.
+<Callout type="info" emoji="💡">
 
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/markdown.png" alt={"The README."} lang="en" />
+The `.md` extension stands for Markdown, a simple way to format text. For example, the `#` followed by a space at the start of the first line makes “My first repository” the title.
 
-Our updated README is on our computer. Let's push the changes to GitHub. We first need to commit them:
-- `git add -A`
-- `git commit -m "Describe the project in README.md"`
+</Callout>
 
-And there is an extra command to push:
-- `git push`
+To see how the Markdown will look, right-click the `README.md` editor tab in VS Code and choose **Open Preview**.
 
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/push.png" alt={"Pushing the README to GitHub."} lang="en" />
+Save the file, then stage, commit, and push it.
 
-Tada! 🪄 It's now on GitHub! And your README is used to welcome visitors!
+```bash
+git add -A
+git commit -m "Describe the project in README.md"
+git push
+```
 
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/readme.png" alt={"The README on GitHub."} lang="en" />
+![VS Code shows the README.md file, its formatted preview, and a successful git push in the terminal.](/assets/git-and-github/github-basics/readme-push.png)
+
+Now if you refresh the repository page on GitHub, you’ll see your formatted README below the file list. You’ll also see `README.md` in the list alongside your other files! 🎉
+
+![Arrows point to README.md in the file list and to the formatted README below it.](/assets/git-and-github/github-basics/readme.png)
 
 ## Creating issues
 
-It's time to fetch and extract the temperature in Montreal!
+Let’s say we’d like our greeting to be in French instead of English. We could change it on the `main` branch, commit the change, and push it directly to GitHub. That would update `main` on GitHub. However, it’s often better to take a step back and write down what we want to do before jumping into the code.
 
-As we saw in the previous lesson, we try to keep the `main` branch clean and functional. We work on new features on **branches** in which we can test and break things without a worry.
+On GitHub, you can do this by creating an **issue**. An issue gives you a place to describe the problem or suggest a change. In many open source projects, users open issues and maintainers discuss them with users before changing the code. This gives everyone a chance to decide whether the change would help and agree on what to do.
 
-In the previous lesson, we created a branch manually in the terminal. But with GitHub there is a better way: using **issues**.
+Open the **Issues** tab near the top left of your repository page. You haven’t created an issue yet. Click the **New issue** button on the right to create your very first issue.
 
-On public repositories, anyone can create an issue. This is how library maintainers are warned about bugs or receive suggestions for new features or improvements. For example, you can create a new issue for [this course](https://github.com/nshiab/code-like-a-journalist/issues) or for the [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis/issues) library!
+![Arrows point to the Issues tab and the New issue button. The list shows zero open and zero closed issues.](/assets/git-and-github/github-basics/issues-tab.png)
 
-Click on your `Issues` tab in your project.
+Then paste this text into the title field.
 
-![The Issues tab on GitHub.](/assets/git-and-github/github-basics/issues-tab.png)
-
-Then click on the `New issue` button.
-
-![The new issue button on GitHub.](/assets/git-and-github/github-basics/issues-button.png)
-
-Add a title and a short description (optional). By the way, the description is Markdown! And you have a button to preview what you wrote. 😏
-
-If you collaborate with people, issues can be assigned, which is a great way to organize work. You can also give them labels.
-
-Hit the `Create` button.
-
-![The title and description of a new issue.](/assets/git-and-github/github-basics/issue-description.png)
-
-Your issue is now created! Each issue has a unique ID (here it's `#1`), and people (or yourself 🥸) can comment on it.
-
-To work on this specific issue on a branch, you can click on `Create a branch`!
-
-![Issue and its branch.](/assets/git-and-github/github-basics/issue-branch.png)
-
-GitHub will automatically generate a name for the branch and will suggest branching out from `main`, which is exactly what we want.
-
-Keep the option `Checkout locally` selected and hit `Create branch`.
-
-![The branch options.](/assets/git-and-github/github-basics/branch-options.png)
-
-Copy the commands and run them in your terminal.
-
-![The branch commands.](/assets/git-and-github/github-basics/branch-command.png)
-
-The branch has been created on GitHub but is not yet on your computer. This is why the first command is `git fetch origin`. It will sync your local repository with your remote one.
-
-The second command is just to switch to your new branch.
-
-Here are my commands. The second one might be a bit different if you wrote a different title.
-
-
-```
-git fetch origin
-git switch 1-return-montreal-temperature
+```text
+Translate greeting to French
 ```
 
-We are now on our new branch. We can safely work on our code!
+Paste this text into the description field.
 
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/new-branch.png" alt={"Working on the new branch."} lang="en" />
-
-Replace the contents of `sda/main.ts` with the code below. It retrieves XML data from the Meteorological Service of Canada API, uses `fast-xml-parser` to convert it to JSON, and logs the temperature and observation time.
-
-
-```ts showLineNumbers filename="sda/main.ts"
-import { XMLParser } from "fast-xml-parser";
-
-const response = await fetch(
-  "https://dd.weather.gc.ca/today/observations/swob-ml/latest/CWTQ-AUTO-minute-swob.xml",
-);
-const xml = await response.text();
-const json = new XMLParser({ ignoreAttributes: false }).parse(xml);
-
-const observation =
-  json["om:ObservationCollection"]["om:member"]["om:Observation"];
-
-const resultTime =
-  observation["om:resultTime"]["gml:TimeInstant"]["gml:timePosition"];
-console.log(resultTime);
-
-const elements = observation["om:result"]["elements"]["element"];
-type element = {
-  "@_name": string;
-  "@_value": string;
-};
-const temp = elements
-  .find((d: element) => d["@_name"] === "air_temp")["@_value"];
-console.log(temp);
+```md
+`main.ts` should print `Bonjour!` instead of `Hello!`.
 ```
 
-Install the `fast-xml-parser` dependency by running `npm install fast-xml-parser`.
+![The new issue form shows the title, the Markdown description, and the Create button.](/assets/git-and-github/github-basics/issue-description.png)
 
-And now the temperature should be logged in the terminal when you run `node sda/main.ts`.
+<Callout type="info" emoji="💡">
 
-Finally, commit and push your work:
-- `git add -A`
-- `git commit -m "Fetching and extracting temperature"`
-- `git push`
+The description uses Markdown, just like your README. I put backticks around `main.ts`, `Bonjour!`, and `Hello!` to format them as inline code. You can click **Preview** to see how the description will look.
 
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/branch-push.png" alt={"Pushing the new code from the new branch."} lang="en" />
+</Callout>
 
-Now, if you refresh your repository page on GitHub, you'll see that `main` is selected. Open the branch selector or the `Branches` page to explore both branches.
+Click **Create** to save the issue. GitHub gives it a number, such as `#1`.
 
-But we also have a big banner suggesting to create a **pull request**! Interesting... 😏
+You can now see your first GitHub issue!
 
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/pr-suggestion.png" alt={"GitHub suggesting to create a pull request."} lang="en" />
+![GitHub shows issue #1, Translate greeting to French, marked Open, with the formatted description below.](/assets/git-and-github/github-basics/first-issue.png)
+
+## Creating branches
+
+Let’s say we’re ready to work on the issue we just opened. It’s a good idea to work on a branch. A separate branch lets us make and test changes while keeping the code on `main` untouched. We’ll create the branch from the issue so GitHub links them.
+
+Near the bottom of the issue’s right sidebar, find **Development** and click **Create a branch**.
+
+![An arrow points to Create a branch under Development in the issue’s right sidebar.](/assets/git-and-github/github-basics/create-branch-from-issue.png)
+
+GitHub suggests a branch name based on the issue number and title. For issue `#1`, that’s `1-translate-greeting-to-french`. The dialog also shows which repository will contain the new branch and which branch it will start from. Keep your repository as the destination and `main` as the source.
+
+Under **What's next?**, choose **Checkout locally** so you can work on the branch on your computer. Then click **Create branch**.
+
+![The branch creation dialog shows the suggested name, destination repository, main as the source, Checkout locally selected, and the Create branch button.](/assets/git-and-github/github-basics/issue-branch.png)
+
+GitHub now shows two commands. Use the copy button, then paste the commands into the VS Code terminal for your project and run them.
+
+![The Checkout in your local repository dialog shows git fetch origin, git checkout 1-translate-greeting-to-french, and a copy button.](/assets/git-and-github/github-basics/branch-command.png)
+
+The new branch is on GitHub, and your local Git repository hasn’t heard about it yet. The first command, `git fetch origin`, gets the latest commits and branch information from GitHub without changing the files you’re working on. The second command, `git checkout` followed by the branch name, creates a local copy of that branch and switches you to it so you can start working.
+
+After you run these commands in your project’s VS Code terminal, look at the bottom left of VS Code. You should see the name of the branch you just created, `1-translate-greeting-to-french`.
+
+![The terminal confirms the switch to the new branch, and the VS Code status bar shows its name in the bottom left.](/assets/git-and-github/github-basics/checked-out-issue-branch.png)
+
+Now that we’re on the new branch on our computer, we can start making changes. In `main.ts`, change `Hello!` to `Bonjour!` and save the file.
+
+```ts showLineNumbers filename="main.ts"
+console.log("Bonjour!");
+```
+
+Then stage and commit the change, and push it to GitHub.
+
+```bash
+git add -A
+git commit -m "Translate greeting to French"
+git push
+```
+
+<Callout type="info" emoji="💡">
+
+In the previous lesson, we used `git add` to choose which changes to include and `git commit` to save a snapshot on our computer. Here, `git push` sends the new commits from our current branch to the matching branch in our GitHub repository. That’s how the French greeting gets saved on GitHub.
+
+</Callout>
+
+![VS Code shows the French greeting in main.ts and the terminal confirms the push to the issue branch on GitHub.](/assets/git-and-github/github-basics/branch-push.png)
+
+On GitHub, open your repository and select `1-translate-greeting-to-french` in the branch selector. GitHub shows that this branch is one commit ahead of `main`.
+
+![The GitHub branch selector shows the issue branch, which is one commit ahead of main.](/assets/git-and-github/github-basics/issue-branch-on-github.png)
+
+<Callout type="info" emoji="💡">
+
+You might have noticed the orange banner saying your branch had recent pushes, with a **Compare & pull request** button. You can ignore it for now. We’ll come back to it in the next section.
+
+</Callout>
+
+Click `main.ts` to see the French greeting, `Bonjour!`, saved on GitHub.
+
+![GitHub shows Bonjour! in main.ts on the issue branch.](/assets/git-and-github/github-basics/french-greeting-on-github.png)
+
+Now use the branch selector to switch back to `main`. You’ll see that `main.ts` still has the original English greeting, `Hello!`.
+
+![GitHub shows Hello! in main.ts on the main branch.](/assets/git-and-github/github-basics/english-greeting-on-main.png)
+
+Branches let you keep several versions of your project on GitHub as you work on different changes. They also let people work in parallel on different issues, features, or bug fixes.
+
+Checking what changed one file at a time can get tedious. When you’re ready to review your changes together, you can open a pull request, as we’ll do in the next section.
 
 ## Creating pull requests
 
-**Pull requests** are a request to **merge** a branch into another. Before approving the merge, the code is compared and the changes must be approved. Hit the `Compare & pull request` button on the banner.
+A **pull request** proposes merging changes from one branch into another. To create one, open the **Pull requests** tab in your repository and click **New pull request** on the right.
 
-You can then add a title and a description (optional). You can scroll down to see all the commits and changes between the two branches.
+![Arrows point to the Pull requests tab and the New pull request button on GitHub.](/assets/git-and-github/github-basics/new-pull-request.png)
 
-Click on the `Create pull request`.
-
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/pr-create.png" alt={"Creating a new PR on Github."} lang="en" />
-
-You created your first PR! This is a great place to review what this request is adding to the project. Here, you can review the commits, the files, and the code. If you work with other people, you can tag them on specific lines to discuss the changes.
-
-GitHub will check that you can actually merge the two branches and that there are no conflicts between them. You can also add automatically triggered tests to check that core features or functions of your project are not getting broken by the changes.
-
-Here, everything looks good, so you can click on the `Merge pull request` button and then confirm the merge.
-
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/pr-merge.png" alt={"Creating a new PR on Github."} lang="en" />
-
-Once the merge is confirmed, the changes are brought to the `main` branch!
-
-GitHub will suggest removing the branch we created. It's safe to delete it now.
-
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/delete-branch.png" alt={"Merged PR and delete branch."} lang="en" />
 <Callout type="info" emoji="💡">
-   Have you noticed the `Revert` button? If you merged something too fast, you can use it to undo the changes from the pull request.
+
+Clicking **Compare & pull request** in the orange banner is a shortcut. Bear with me and follow the manual steps below this time. That way, you’ll know what the shortcut does the next time you use it.
+
 </Callout>
 
+Keep `main` as the **base** branch, which will receive the change. In the **compare** menu, select `1-translate-greeting-to-french`, the branch with your change.
 
-If we check the main page of the repository, we see that our changes are on `main`. You can check the `sda/main.ts` file if you are curious. The issue we created has been automatically closed when we merged the PR. It's convenient, isn't it? 🥳
+![The compare menu is open with 1-translate-greeting-to-french available to select and main set as the base.](/assets/git-and-github/github-basics/pull-request-branch-selector.png)
 
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/changes-main.png" alt={"The main page of the repo with the changes."} lang="en" />
+Once you select the branch, GitHub shows the changes in the code. The line with `Hello!` is marked as removed in red, and the line with `Bonjour!` is marked as added in green. Click **Create pull request** to open the form.
 
-This all happened in the cloud, on GitHub's platform. To bring the changes to your local repository, first switch to the `main` branch:
-- `git switch main`
+![GitHub shows one commit, the greeting change in main.ts, and the Create pull request button.](/assets/git-and-github/github-basics/pull-request-comparison.png)
 
-Then **pull** the changes:
-- `git pull`
+The form asks for a title and gives you the option to add a description. If you’re working with a team, you can request a review from a teammate. You can also add labels or link the pull request to a project or milestone.
 
-And now your `main` branch on your computer is synced with the remote repository!
+For this example, just use **Translate greeting to French** as the title and click **Create pull request**.
+
+![The pull request form shows the title Translate greeting to French, an empty description, and the Create pull request button.](/assets/git-and-github/github-basics/pr-create.png)
+
+Your pull request is open! The **Pull requests** tab at the top of the repository lists all the project’s pull requests. On your pull request’s page, you can see its number and the commits that will go into `main`. You can leave comments under **Conversation** to discuss the changes.
+
+![The open pull request shows its title and number, the linked issue, the Merge pull request button, and the comment box.](/assets/git-and-github/github-basics/pull-request-open.png)
+
+You can see all the commits in the pull request under **Commits**. Most of the time, you’ll want to open **Files changed**, where you can review the changes across all affected files in one place.
+
+![The Files changed tab shows Hello! in red on the left and Bonjour! in green on the right in main.ts.](/assets/git-and-github/github-basics/pull-request-files-changed.png)
+
+Return to **Conversation**. GitHub shows that there are no merge conflicts in this example. A conflict can happen when both branches change the same line of the same file in different ways and Git can’t decide what to keep. Here, you can click the green **Merge pull request** button.
+
+![Arrows point to the Conversation tab, the message confirming there are no conflicts, and the green Merge pull request button.](/assets/git-and-github/github-basics/pull-request-merge-button.png)
+
+GitHub suggests a message for the new merge commit. You can edit the message and its optional extended description, or keep the suggested text. Then click **Confirm merge**.
+
+![The merge form shows the suggested commit message, the extended description, and the Confirm merge button.](/assets/git-and-github/github-basics/pull-request-confirm-merge.png)
+
+GitHub now marks the pull request as **Merged** and the linked issue as **Closed**. Click **Delete branch** to remove the branch from GitHub. You can also set GitHub to delete branches automatically after merging.
+
+![The pull request is marked Merged, the linked issue is marked Closed, and GitHub offers to delete the branch.](/assets/git-and-github/github-basics/pull-request-merged.png)
+
+Go back to the **Code** tab. On `main`, you’ll see the new merge commit above the file list.
+
+![The Code tab on main shows the new merge commit above README.md and main.ts.](/assets/git-and-github/github-basics/merge-commit-on-main.png)
+
+Open `main.ts`. The greeting on `main` now says `Bonjour!` 🎉
+
+![On the main branch, main.ts now contains a console.log that prints Bonjour!.](/assets/git-and-github/github-basics/french-greeting-on-main.png)
+
+<Callout type="info" emoji="💡">
+   If you need to undo a merged pull request, GitHub’s `Revert` button can open a new pull request that reverses the changes.
+</Callout>
+
+Back in VS Code, switch to `main` and pull the changes.
+
+```bash
+git switch main
+git pull
+```
+
+Open `main.ts` on your computer. It should now contain `Bonjour!`.
+
+![In VS Code, the terminal shows git switch main and git pull, and main.ts now says Bonjour! on the main branch.](/assets/git-and-github/github-basics/pull-merged-changes.png)
+
+<Callout type="info" emoji="💡">
+
+`git pull` brings changes from GitHub to your computer. Since you merged the pull request on GitHub, you need to pull to update your local `main` branch.
+
+</Callout>
+
+Congrats! You now know how to open an issue, create a branch linked to it, and open a pull request that connects the two so you can review your changes before merging them into `main`. 🎉
+
+## Updating `.gitignore`
+
+Sometimes you want to share part of a project on GitHub and keep certain files on your computer, such as files containing passwords or other credentials, or very large data files.
+
+That’s why Git repositories often include a `.gitignore` file. This is where you list the files and folders you want Git to ignore so they stay out of your commits and off GitHub.
+
+To see how this works, create a file named `password.txt` in your project folder with some made-up text, such as `potato`.
+
+![VS Code shows the new password.txt file containing potato and marked U for untracked.](/assets/git-and-github/github-basics/password.png)
+
+In VS Code, `password.txt` is green with a **U** next to its name. **U** stands for *untracked*. Git sees the new file. To tell Git to ignore it, create a file named `.gitignore` in your project folder, add `password.txt` on its own line, and save the file.
+
+```text
+password.txt
+```
+
+![In VS Code, .gitignore lists password.txt, which is now dimmed in the Explorer.](/assets/git-and-github/github-basics/gitignore.png)
+
+After a few seconds, `password.txt` should turn gray in VS Code. Git is now ignoring it. The `.gitignore` file itself is green with a **U** because it’s new. Stage, commit, and push `.gitignore` so Git keeps ignoring `password.txt` as you work on the project.
+
+```bash
+git add .gitignore
+git commit -m "Ignore password.txt"
+git push
+```
+
+![The VS Code terminal shows .gitignore being committed and pushed to GitHub. The ignored password.txt file is still visible in the Explorer.](/assets/git-and-github/github-basics/gitignore-push.png)
+
+Refresh the repository page. You should see `.gitignore` on GitHub. Your `password.txt` file stayed on your computer the whole time. Anyone who clones the repository or pulls the latest changes gets the same `.gitignore` rules.
+
+![The GitHub repository shows the Ignore password.txt commit and .gitignore in the file list.](/assets/git-and-github/github-basics/repo-gitignore.png)
+
+<Callout type="info" emoji="💡">
+   If you accidentally push sensitive information, follow [GitHub’s steps for removing it from a repository](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository).
+</Callout>
 
 ## Cloning repositories
 
-Now, let's imagine that your computer caught fire and is completely destroyed. 🔥
+One nice thing about GitHub is that when you push your work to it, it’s saved in the cloud. This means that if you remove a project from your computer or get a new computer, you can get a copy from GitHub. It also makes it easy to check a colleague’s code on your computer if they ask you for a review or for help. Because the project uses Git, you get a full copy of the repository’s history, including its branches.
 
-How can you retrieve all of your precious work from the cloud? By **cloning** the repository.
+Creating a copy of a repository on your computer is called **cloning**.
 
-Delete the folder you worked on so far. Yes, delete it! Trust me!
+To clone a repository, open its page on GitHub, click `Code`, choose your clone options (the defaults are usually fine), and copy the URL.
 
-On your repository page, click on the `<> Code` button. This is where you'll find options to clone your code.
+![Arrows point to the Code button, the HTTPS option, and the copy button next to the clone URL.](/assets/git-and-github/github-basics/clone-https-url.png)
 
-Copy the URL.
+Then, on your computer, create a new, empty folder with the same name as the repository. Open a terminal in that folder and type `git clone`, followed by a space, the URL you copied, another space, and a period.
 
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/clone-command.png" alt={"The command to clone a repository."} lang="en" />
+```bash
+git clone YOUR-REPOSITORY-URL .
+```
 
-Next, create a new folder with the same name as your repo and open it with VS Code. Then start typing `git clone`, paste the URL you copied (don't forget a space between `clone` and the URL), then add a space and `.`.
+The period means “this folder.” Git puts the repository’s files and history directly in the folder you created.
 
-For me, the command looks like this:
-- `git clone https://github.com/nshiab/my-first-repo.git .`
-
-The dot at the end is important. It tells Git to clone the repo in the current folder. Without it, it will create a new folder inside your folder.
-
-And just like that, you have recovered all of your code.
-
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/cloned.png" alt={"A cloned repository."} lang="en" />
-
-Of course, cloning is also great when you are collaborating with other people. They can easily retrieve your latest code, with all the branches and commits.
-
-After cloning this project, run `npm ci` to install the exact dependency versions in `package-lock.json`. If a different project has no lockfile, use `npm install` instead. For projects created with `setup-data-project`, also run `npm run docs` to restore the local documentation, which is ignored by Git.
-
-And then you are good to go to keep working on your amazing project!
+That’s it. You’re ready to go!
 
 ## Forking a repository
 
 If everyone can clone a public repository (or a private one if they were invited to collaborate on it), not everyone is allowed to push to it and merge into it. And this is a good thing! Imagine the mess and the critical security problems! 😈
 
-When you want to create your own copy of a repository, you can **fork** it. It will create a copy of the project in your account. You can then work on it and modify whatever you want.
+However, if a repository is public, you can **fork** it. This creates your own copy of the repository in your GitHub account. You can then clone your fork to your computer, add or edit files in your local copy, and push your changes to your fork.
 
 It works kind of like a *branch of a repository*. There is no impact on the original repository, but if you want, you can create a pull request aimed at the owners of the original repository.
 
@@ -312,7 +399,7 @@ For example, several GitHub users have forked the [Simple Data Analysis library]
 
 If you are curious, feel free to fork it too!
 
-![Forking SDA.](/assets/git-and-github/github-basics/forking.png)
+![An arrow points to the Fork button on the Simple Data Analysis repository page.](/assets/git-and-github/github-basics/forking.png)
 
 Forking is how a lot of open-source contributions and collaborations happen:
 - Someone creates an open-source project.
@@ -320,47 +407,15 @@ Forking is how a lot of open-source contributions and collaborations happen:
 - The owner checks the PR and, if happy, merges it.
 - The contribution is now part of the project and everyone can benefit from it!
 
-## Updating `.gitignore`
-
-People can clone and fork your repositories but... what if you want something locally on your computer but don't want to share it with anyone?
-
-For example, let's create a new `password.txt` file in our repo.
-
-```
-This is a very important password: potato. Don't share it.
-```
-
-![Password in the repository.](/assets/git-and-github/github-basics/password.png)
-
-**You absolutely don't want to commit this!** 🫣
-
-If you commit it, it will be in your Git history **forever**. And, of course, you don't want to push it.
-
-The setup tool already created `.gitignore`, which excludes installed packages, `.env`, and other local files. Git uses its rules to ignore files that have not already been tracked. Those files appear greyed out in VS Code and are excluded from `git add -A`. Adding a file that is already tracked to `.gitignore` does not remove it from Git or its history.
-
-Open the existing `.gitignore` and add `password.txt` on its own line. Keep all the rules generated by the setup tool.
-
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/gitignore.png" alt={"Adding a gitignore file."} lang="en" />
-
-Now, the file `password.txt` will be ignored, but you still need to commit and push your updated `.gitignore` file:
-- `git add -A`
-- `git commit -m "Ignore password.txt"`
-- `git push`
-
-On your repository page, you can now see the updated `.gitignore`, while `password.txt` remains local and is not in the repository!
-
-<OutdatedScreenshot src="/assets/git-and-github/github-basics/repo-gitignore.png" alt={"A gitignore file has been added to the repository."} lang="en" />
-
-<Callout type="info" emoji="💡">
-   If you committed and pushed sensitive information by mistake (like so many of us 😬), [follow these steps](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)!
-</Callout>
-
 ## Conclusion
 
-Git and GitHub work amazingly well together. With Git, you can keep track of your work while GitHub adds a useful interface to help you organize your work and collaborate with others.
+Wow, that was a lot! Knowing how Git and GitHub work helps you stay organized, whether you’re working alone or with others. When you commit and push regularly, you have more saved versions to go back to if you introduce a bug or make a mistake. Think of all the `project_final_v1`, `project_final_v2`, and `project_final_final` files you’ve probably made over the years. With Git, you can keep that history in one place.
 
 In this lesson, you've learned new important Git commands:
+- `git remote add origin URL` to connect a local repository to GitHub
 - `git push` to push code to a remote repository saved in the cloud
+- `git fetch origin` to get commits and branch information from GitHub
+- `git checkout BRANCH` to switch to a branch, including one you just fetched from GitHub
 - `git pull` to retrieve the latest changes from a remote repository
 - `git clone` to copy a whole repository onto your computer
 
@@ -369,6 +424,10 @@ You have also learned about GitHub issues, pull requests, forks and `.gitignore`
 But... you might be tempted to keep creating branches locally and merging directly on your computer when working alone. Or even just to work in the `main` branch! 🤠
 
 And that's totally fine. Just find the recipe that works for you. But keep in mind that creating issues and reviewing pull requests are great ways to stay focused and review your own work! It's also an opportunity to be comfortable with tools used by many teams and companies around the world.
+
+For example, when I release a new version of the Simple Data Analysis library, the release notes automatically reuse the titles of my pull requests. That helps users see what changed since the previous version.
+
+![The Simple Data Analysis v6.0.19 release notes list a change to the README and link to pull request #1274.](/assets/git-and-github/github-basics/release-notes.png)
 
 Also, when we learn about GitHub Actions to automate tasks like testing, web scraping, and publishing libraries, you'll be amazed by everything this workflow has to offer.
 
