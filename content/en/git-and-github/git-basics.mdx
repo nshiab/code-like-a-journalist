@@ -25,18 +25,8 @@ If you need to install Git, follow [the steps for your operating system on the o
 ![Git installation steps.](/assets/git-and-github/git-basics/install.png)
 
 <Callout type="info" emoji="💡">
-    If you’re on macOS, you may already have Git installed. Run `git --version` in your terminal to check. If it prints a version number, you can skip the installation and configure Git below.
+    If you’re on macOS, you may already have Git installed. Run `git --version` in your terminal to check. If it prints a version number, you can skip the installation and continue to Initialization.
 </Callout>
-
-Once Git is installed, open a terminal and run these commands. Replace `Your Name` and `you@example.com` with the name and email address you want attached to your commits.
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "you@example.com"
-git config --global init.defaultBranch main
-```
-
-You only need to do this once for your user account. The `--global` flag saves these settings for your Git projects, and the last command tells Git to name the first branch `main` in new repositories.
 
 ## Initialization
 
@@ -46,7 +36,25 @@ If you click on `Source Control` in the left sidebar, you'll see that there is n
 
 ![Message in VS Code saying that there is no Git repository.](/assets/git-and-github/git-basics/no-repo.png)
 
-To initialize a new Git repository, open the terminal (`Command` + `J` on Mac or `Control` + `J` on Windows) and run `git init`.
+Open the terminal in VS Code (`Command` + `J` on Mac or `Control` + `J` on Windows).
+
+<Callout type="info" emoji="💡">
+
+**If this is your first time using Git**, run the commands below. Replace `Your Name` and `you@example.com` with the details you want attached to your projects.
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git config --global init.defaultBranch main
+```
+
+The `--global` flag saves these settings for all your Git projects. The last command tells Git to name the first branch `main` in new repositories (more about branches below).
+
+To update a global setting, rerun its command with a new value. For one project, replace `--global` with `--local` in the name or email command and run it inside that project’s repository.
+
+</Callout>
+
+To initialize a new Git repository, run `git init` in the terminal.
 
 Your project is now a Git repository! 🎉 That was easy, right?
 

@@ -25,18 +25,8 @@ Si vous devez installer Git, suivez [les étapes pour votre système d’exploit
 ![Étapes d’installation de Git.](/assets/git-and-github/git-basics/install.png)
 
 <Callout type="info" emoji="💡">
-    Si vous utilisez macOS, Git est peut-être déjà installé. Pour le vérifier, exécutez `git --version` dans votre terminal. Si un numéro de version s’affiche, vous pouvez passer directement à la configuration ci-dessous.
+    Si vous utilisez macOS, Git est peut-être déjà installé. Pour le vérifier, exécutez `git --version` dans votre terminal. Si un numéro de version s’affiche, vous pouvez passer directement à la section Initialisation.
 </Callout>
-
-Une fois Git installé, ouvrez un terminal et exécutez les commandes suivantes. Remplacez `Your Name` et `you@example.com` par le nom et l’adresse courriel que vous voulez associer à vos commits.
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "you@example.com"
-git config --global init.defaultBranch main
-```
-
-Il suffit de faire cette configuration une fois pour votre compte utilisateur. L’option `--global` enregistre ces paramètres pour vos projets Git, et la dernière commande indique à Git de nommer `main` la première branche des nouveaux dépôts.
 
 ## Initialisation
 
@@ -46,7 +36,25 @@ Si vous cliquez sur `Source Control` dans la barre latérale gauche, vous verrez
 
 ![Message dans VS Code indiquant qu’il n’y a pas de dépôt Git.](/assets/git-and-github/git-basics/no-repo.png)
 
-Pour initialiser un nouveau dépôt Git, ouvrez le terminal (`Command` + `J` sur Mac ou `Control` + `J` sur Windows) et exécutez `git init`.
+Ouvrez le terminal dans VS Code (`Command` + `J` sur Mac ou `Control` + `J` sur Windows).
+
+<Callout type="info" emoji="💡">
+
+**Si vous utilisez Git pour la première fois**, exécutez les commandes ci-dessous. Remplacez `Your Name` et `you@example.com` par les renseignements que vous voulez associer à vos projets.
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git config --global init.defaultBranch main
+```
+
+L’option `--global` enregistre ces paramètres pour tous vos projets Git. La dernière commande indique à Git de nommer `main` la première branche des nouveaux dépôts (nous verrons les branches plus loin).
+
+Pour modifier un paramètre global, relancez la commande avec une nouvelle valeur. Pour un seul projet, remplacez `--global` par `--local` dans la commande qui définit le nom ou l’adresse courriel et exécutez-la depuis le dépôt du projet.
+
+</Callout>
+
+Pour initialiser un nouveau dépôt Git, exécutez `git init` dans le terminal.
 
 Votre projet est maintenant un dépôt Git ! 🎉 C’était facile, non ?
 
