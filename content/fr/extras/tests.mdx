@@ -3,6 +3,7 @@ title: Utiliser des tests dans vos projets
 description: Dans cette leçon, nous apprenons à implémenter et utiliser des tests dans notre code.
 ---
 
+import { Callout } from 'nextra/components'
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Utiliser des tests dans vos projets
@@ -19,14 +20,22 @@ Dans cette leçon, nous allons coder une fonction simple pour calculer des pourc
 
 ## Configuration
 
-Créez un nouveau dossier, ouvrez-le dans VS Code et utilisez la dernière version LTS de Node.js. Dans le terminal, exécutez `npx @nshiab/setup-data-project` et ne sélectionnez aucune librairie optionnelle. Vous obtenez la même structure et les mêmes outils que dans la [leçon d’installation](/simple-data-analysis/setup).
+Créez un nouveau dossier vide, ouvrez-le dans VS Code et créez-y un fichier nommé `main.ts`. Ajoutez cette ligne et enregistrez le fichier.
 
-Nous écrirons notre script dans `sda/main.ts`. Exécutez `npm run sda` pour le lancer et le relancer automatiquement lorsque vous sauvegardez vos modifications. Utilisez `npm run all-tests` pour vérifier la mise en forme, les règles de lint, les types et les tests; `npm run fix` peut appliquer les corrections automatiques de mise en forme et de lint.
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
 
-Utilisez le dossier `sda/helpers` (créez-le au besoin) et placez-y le fichier `getPercentage.ts` avec ce code. C’est la fonction que nous voulons tester. Elle s'attend à recevoir deux nombres et retourne le pourcentage sous forme de texte.
+![VS Code affiche main.ts dans l’explorateur et console.log("Hello!") dans l’éditeur.](/assets/extras/tests/hello.png)
+
+Nous utiliserons l’outil de test intégré à Node. Une fois notre premier test écrit, nous le lancerons avec `node --test`.
+
+## Écrire la fonction à tester
+
+Créez un dossier `helpers` et placez-y le fichier `getPercentage.ts` avec ce code. C’est la fonction que nous voulons tester. Elle s'attend à recevoir deux nombres et retourne le pourcentage sous forme de texte.
 
 
-```ts showLineNumbers filename="sda/helpers/getPercentage.ts"
+```ts showLineNumbers filename="helpers/getPercentage.ts"
 export default function getPercentage(
     current: number,
     total: number,
@@ -36,124 +45,271 @@ export default function getPercentage(
 }
 ```
 
-Mettez maintenant à jour `sda/main.ts` pour utiliser la fonction.
+Mettez maintenant à jour `main.ts` pour utiliser la fonction.
 
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import getPercentage from "./helpers/getPercentage.ts";
 
 console.log(getPercentage(50, 100));
 ```
 
-La commande `npm run sda` exécute le script lorsque vous le sauvegardez.
+Enregistrez le fichier et exécutez la commande ci-dessous dans le terminal de VS Code.
+
+```sh
+node main.ts
+```
 
 Tout fonctionne comme prévu ! La fonction retourne `50%`.
 
-<OutdatedScreenshot src="/assets/extras/tests/setup.png" alt={"Un script principal affichant une valeur dans le terminal."} lang="fr" />
+![VS Code affiche main.ts et getPercentage.ts côte à côte. La commande node main.ts affiche 50% dans le terminal.](/assets/extras/tests/setup.png)
 
 ## Créer des tests
 
 Est-ce que notre fonction fonctionne vraiment comme prévu ? Vérifions !
 
-Notre projet inclut déjà [Vitest](https://vitest.dev/guide/) grâce à Vite+. Nous utiliserons `test` pour décrire chaque test et `expect(...).toBe(...)` pour comparer les valeurs retournées par notre fonction avec celles que nous attendons. Il n’y a rien d’autre à installer !
+Créer un test, c’est simple. Nous avons besoin de deux choses.
 
-Créons maintenant le fichier de test. Une bonne manière d’organiser les tests dans un projet est de garder la même structure de fichiers que le reste du code.
+1. `test`, du module `node:test`, nous permet de nommer un test et d’indiquer à Node quel code exécuter.
+2. `assert`, du module `node:assert/strict`, nous permet de vérifier le résultat. Nous utiliserons `assert.strictEqual` pour comparer le résultat du code que nous testons à la valeur attendue.
 
-Ici, on pourrait créer un dossier `sda/tests` avec un fichier `getPercentage.test.ts` à l’intérieur. Remarquez que ce fichier est un fichier TypeScript classique puisqu’il se termine par `.ts`. La partie `.test` permet à Vitest de reconnaître ce fichier comme un fichier de test.
+Ces deux modules sont intégrés à Node, donc vous n’avez rien d’autre à installer.
 
-Voici ce que fait le code ci-dessous :
-- `test` crée un nouveau test.
-- Le premier paramètre est une description du test.
-- Le second paramètre est une fonction. On y exécute ce que l’on veut tester (ici `getPercentage`) et on vérifie que le résultat est bien celui attendu avec `expect(...).toBe(...)`.
-- Si le résultat est celui attendu, le test réussira. Sinon, il échouera !
+Créons maintenant le fichier de test. J’aime organiser mes tests selon la même structure que le reste du code. Créez un dossier `tests` à la racine du projet, ajoutez-y un dossier `helpers`, puis créez le fichier `getPercentage.test.ts` dans ce dossier. Le suffixe `.test.ts` aide Node à trouver le fichier lorsque vous lancez les tests.
 
+Ajoutez le code suivant dans `tests/helpers/getPercentage.test.ts`.
 
-```ts showLineNumbers filename="sda/tests/getPercentage.test.ts"
-import { test, expect } from "vitest";
-import getPercentage from "../helpers/getPercentage.ts";
+```ts showLineNumbers filename="tests/helpers/getPercentage.test.ts"
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import getPercentage from "../../helpers/getPercentage.ts";
 
 test("should return 50% for 50 out of 100", () => {
   const result = getPercentage(50, 100);
-  expect(result).toBe("50%");
+  assert.strictEqual(result, "50%");
 });
 ```
 
+Voici ce que fait ce code.
+
+- La ligne 5 crée un nouveau test avec une description. Vous pouvez écrire ce que vous voulez. Gardez la description simple et claire.
+- Les lignes 6 et 7 contiennent le code exécuté par le test. La ligne 6 appelle `getPercentage(50, 100)` et stocke la valeur retournée dans `result`. La ligne 7 utilise `assert.strictEqual` pour comparer `result` au texte attendu, `"50%"`.
+
+Si `result` contient exactement le texte `"50%"`, le test réussit. Sinon, il échoue.
+
 ## Exécuter les tests
 
-Exécutez `npm run all-tests`. Cette commande vérifie la mise en forme, les règles de lint et les types TypeScript, puis exécute les tests du projet. Si une vérification de mise en forme ou de lint échoue, lancez `npm run fix`, examinez les modifications et réessayez.
-
-<OutdatedScreenshot src="/assets/extras/tests/run-tests.png" alt={"Exécution des tests avec Deno."} lang="fr" />
-
-Pendant que vous codez, il est pratique de relancer automatiquement un seul fichier de test lorsque ce fichier ou ses dépendances changent. Utilisez :
+Ouvrez le terminal dans VS Code et lancez la commande ci-dessous. Node cherche les fichiers de test qui se terminent par `.test.ts` ou `.test.js` dans votre projet, y compris dans les sous-dossiers, et les exécute.
 
 ```sh
-npx vp test sda/tests/getPercentage.test.ts --watch
+node --test
 ```
 
-Laissez cette commande tourner pour le reste de la leçon. Appuyez sur `CTRL` + `C` pour l’arrêter. Cette commande exécute les tests; `npm run all-tests` exécute aussi les autres vérifications du projet, donc utilisez-la à nouveau avant de terminer vos modifications.
+Vous devriez voir une coche à côté du nom de votre test pour indiquer qu’il a réussi.
 
-La [documentation de Vitest](https://vitest.dev/guide/) présente d’autres options.
+![VS Code affiche tests/helpers/getPercentage.test.ts et le terminal indique qu’un test a réussi.](/assets/extras/tests/run-tests.png)
 
-<OutdatedScreenshot src="/assets/extras/tests/watch-tests.png" alt={"Surveillance des tests avec Deno."} lang="fr" />
+<Callout type="info" emoji="💡">
+    Vous verrez peut-être des erreurs de type aux lignes 1 et 2 dans VS Code. Vous pouvez les ignorer pour cette leçon. Les deux modules sont intégrés à Node et le test s’exécutera quand même.
+</Callout>
 
 ## Ajouter des tests
 
 Selon votre contexte, le test que nous venons d’écrire peut être suffisant. Par exemple, peut-être que vous vouliez simplement vérifier le résultat d’une étape dans votre analyse de données et que vous voulez que cela reste comme ça à l’avenir.
 
-Mais pour les besoins de cette leçon, ajoutons quelques tests supplémentaires. Testons des cas limites.
+Ajoutons deux autres tests.
 
-Par exemple, que doit-il se passer si le premier nombre est `0` ? Et si le second est `0` ? Peut-être que nous voulons que notre fonction retourne `0%` dans les deux cas.
+- Le premier vérifie que `getPercentage(1, 3)` retourne `"33.33%"`, avec deux décimales.
+- Le second vérifie que `getPercentage(1, 0)` déclenche une erreur, puisque la division par zéro est indéfinie. Nous utilisons `assert.throws` pour vérifier le message `Total must not be zero.`
 
-Modifiez le fichier avec le code ci-dessous. Dès que vous enregistrerez le fichier modifié, les tests se relanceront automatiquement.
+Écrivons les deux tests avec la version actuelle de `getPercentage`. Modifiez le fichier de test avec le code ci-dessous.
 
 
-```ts showLineNumbers filename="sda/tests/getPercentage.test.ts" {9-17}
-import { test, expect } from "vitest";
-import getPercentage from "../helpers/getPercentage.ts";
+```ts showLineNumbers filename="tests/helpers/getPercentage.test.ts" {10-17}
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import getPercentage from "../../helpers/getPercentage.ts";
 
 test("should return 50% for 50 out of 100", () => {
   const result = getPercentage(50, 100);
-  expect(result).toBe("50%");
+  assert.strictEqual(result, "50%");
 });
 
-test("should return 0% for 0 out of 100", () => {
-  const result = getPercentage(0, 100);
-  expect(result).toBe("0%");
+test("should round 1 out of 3 to two decimal places", () => {
+  const result = getPercentage(1, 3);
+  assert.strictEqual(result, "33.33%");
 });
 
-test("should return 0% for 1 out of 0", () => {
-  const result = getPercentage(1, 0);
-  expect(result).toBe("0%");
+test("should throw an error when the total is zero", () => {
+  assert.throws(() => getPercentage(1, 0), { message: "Total must not be zero." });
 });
 ```
-<OutdatedScreenshot src="/assets/extras/tests/fail.png" alt={"Un test a échoué."} lang="fr" />
 
-On peut voir que le deuxième test est passé, mais que le troisième a échoué !
+Enregistrez le fichier de test et relancez les tests.
 
-Quand `total` vaut `0`, notre fonction retourne `Infinity%` au lieu de ce que nous voulons, c’est-à-dire `0%`.
+```sh
+node --test
+```
 
-Mettons à jour notre fichier `getPercentage.ts` pour corriger cela. Modifiez le fichier avec le code ci-dessous. Dès que vous enregistrerez le fichier, les tests se relanceront automatiquement.
+Vous verrez que les deux nouveaux tests échouent. Le premier réussit toujours.
 
+![Le terminal de VS Code montre un test réussi et deux tests échoués, sur l’arrondi et la division par zéro.](/assets/extras/tests/fail.png)
 
-```ts showLineNumbers filename="sda/helpers/getPercentage.ts" {5-7, 10}
+Faites défiler le terminal vers le bas pour voir pourquoi chaque test a échoué. Le test d’arrondi attendait `"33.33%"`, mais `getPercentage(1, 3)` a retourné `"33.33333333333333%"` avec beaucoup plus de décimales.
+
+```text {17-18}
+test at tests/helpers/getPercentage.test.ts:10:1
+✖ should round 1 out of 3 to two decimal places (0.44575ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  actual expected
+
+  '33.33333333333333%'
+
+      at TestContext.<anonymous> (file:///Users/nael/Desktop/test/tests/helpers/getPercentage.test.ts:12:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '33.33333333333333%',
+    expected: '33.33%',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+```
+
+Pour le test de division par zéro, le message `Missing expected exception` indique que `getPercentage(1, 0)` s’est exécuté sans déclencher d’erreur.
+
+```text {3, 13-14}
+test at tests/helpers/getPercentage.test.ts:15:1
+✖ should throw an error when the total is zero (0.097542ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///Users/nael/Desktop/test/tests/helpers/getPercentage.test.ts:16:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { message: 'Total must not be zero.' },
+    operator: 'throws',
+    diff: 'simple'
+  }
+```
+
+Corrigeons `getPercentage` pour que tous nos tests réussissent. 👷
+
+### Ajouter l’arrondi
+
+Commençons par l’arrondi. Modifiez `helpers/getPercentage.ts` comme ci-dessous pour ajouter un paramètre facultatif nommé `decimals`. Si vous l’omettez, la fonction se comporte comme avant. Si vous passez un nombre, `toFixed` arrondit le pourcentage au nombre de décimales indiqué.
+
+```ts showLineNumbers filename="helpers/getPercentage.ts" {4, 7-10}
 export default function getPercentage(
   current: number,
   total: number,
+  decimals?: number,
 ): string {
-  if (total === 0) {
-    return "0%";
-  } else {
-    const percentage = (current / total) * 100;
-    return `${percentage}%`;
-  }
+  const percentage = (current / total) * 100;
+  const formatted = decimals === undefined
+    ? percentage.toString()
+    : percentage.toFixed(decimals);
+  return `${formatted}%`;
 }
 ```
 
-Et maintenant, on peut voir que le troisième test est passé.
+Dans le test d’arrondi, ajoutez `2` comme troisième argument de `getPercentage` pour demander deux décimales. La ligne modifiée est surlignée ci-dessous.
 
-On sait aussi que le comportement précédent est toujours là puisque les deux premiers tests sont également passés !
+```ts showLineNumbers filename="tests/helpers/getPercentage.test.ts" {11}
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import getPercentage from "../../helpers/getPercentage.ts";
 
-<OutdatedScreenshot src="/assets/extras/tests/all-passed.png" alt={"Tous les tests sont passés."} lang="fr" />
+test("should return 50% for 50 out of 100", () => {
+  const result = getPercentage(50, 100);
+  assert.strictEqual(result, "50%");
+});
+
+test("should round 1 out of 3 to two decimal places", () => {
+  const result = getPercentage(1, 3, 2);
+  assert.strictEqual(result, "33.33%");
+});
+
+test("should throw an error when the total is zero", () => {
+  assert.throws(() => getPercentage(1, 0), { message: "Total must not be zero." });
+});
+```
+
+Enregistrez les deux fichiers et relancez les tests avec la commande ci-dessous.
+
+```sh
+node --test
+```
+
+Le premier test réussit toujours sans l’argument `decimals`. Le deuxième réussit maintenant aussi, donc notre modification pour l’arrondi a fonctionné ! 🎉
+
+Le troisième test échoue encore. C’est normal, puisque nous n’avons pas encore géré la division par zéro.
+
+![VS Code affiche la modification pour l’arrondi et les résultats des tests. Les deux premiers réussissent et celui sur la division par zéro échoue encore.](/assets/extras/tests/rounding-passed.png)
+
+### Gérer la division par zéro
+
+Pour gérer la division par zéro, ajoutez une vérification avant de diviser. Utilisez une condition `if` pour vérifier si `total` vaut zéro. Si c’est le cas, déclenchez tout de suite une erreur avec le message attendu par le test.
+
+Modifiez `getPercentage` comme ci-dessous et enregistrez le fichier.
+
+```ts showLineNumbers filename="helpers/getPercentage.ts" {6-8}
+export default function getPercentage(
+  current: number,
+  total: number,
+  decimals?: number,
+): string {
+  if (total === 0) {
+    throw new Error("Total must not be zero.");
+  }
+
+  const percentage = (current / total) * 100;
+  const formatted = decimals === undefined
+    ? percentage.toString()
+    : percentage.toFixed(decimals);
+  return `${formatted}%`;
+}
+```
+
+Relancez les tests avec cette commande.
+
+```sh
+node --test
+```
+
+Tous nos tests réussissent maintenant ! 🎉
+
+![VS Code affiche la vérification du total et le terminal indique que les trois tests réussissent.](/assets/extras/tests/all-passed.png)
+
+## Exécuter et surveiller les tests
+
+Vous n’avez pas besoin d’exécuter tous vos tests chaque fois que vous modifiez votre code. Pour exécuter un fichier de tests précis, indiquez son chemin à Node.
+
+```sh
+node --test tests/helpers/getPercentage.test.ts
+```
+
+Pour exécuter un test précis, donnez sa description à `--test-name-pattern`.
+
+```sh
+node --test --test-name-pattern="should round 1 out of 3 to two decimal places"
+```
+
+Comme avec `node --watch main.ts`, vous pouvez surveiller vos tests avec la commande ci-dessous. Node relance automatiquement les tests concernés quand vous enregistrez une modification dans un fichier de test ou dans l’une de ses dépendances.
+
+```sh
+node --test --watch
+```
 
 ## Tests automatisés
 
@@ -161,21 +317,21 @@ Vous pouvez bien sûr toujours lancer les tests localement. Vous pouvez même d�
 
 Mais si vous utilisez GitHub, vous pouvez configurer des tests automatisés dans vos projets. C’est une configuration courante pour les librairies en code ouvert, mais vous pouvez l’utiliser pour n’importe quel projet.
 
-Par exemple, j’ai des centaines de tests en place pour la [librairie Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Vous pouvez [les explorer ici](https://github.com/nshiab/simple-data-analysis/tree/main/test/unit/methods).
+Par exemple, j’ai des centaines de tests pour la librairie Simple Data Analysis. Vous pouvez les explorer [ici](https://github.com/nshiab/simple-data-analysis-core/tree/main/test/unit/methods).
 
-J’utilise GitHub Actions (consultez [la leçon à ce sujet](/git-and-github/github-actions)) pour les déclencher automatiquement lorsqu’une *pull request* est ouverte ou mise à jour vers la branche `main`.
+J’utilise GitHub Actions pour exécuter ces tests automatiquement avant de publier une nouvelle version de la librairie. La configuration est simple. [Un petit fichier](https://github.com/nshiab/simple-data-analysis-core/blob/main/.github/workflows/all-tests.yml) indique à GitHub d’exécuter les tests dans le nuage.
 
-La *pull request* indique si les tests ont réussi. Si un ou plusieurs échouent, il faut continuer à travailler avant de fusionner. Les règles du dépôt peuvent aussi exiger la réussite de ces vérifications et bloquer le bouton de fusion tant que ce n’est pas le cas. Vous pouvez consulter [le *workflow* ici](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
+## Tester des pages web et des visualisations
 
-Ce ne sont que quelques lignes de code, mais cela garantit que la librairie fonctionne comme prévu. Et ça m’a évité plusieurs fois de publier une nouvelle version cassée de la librairie ! 😇
+Dans cette leçon, nous avons exécuté des tests simples en local pour vérifier que notre fonction renvoyait les valeurs attendues.
 
-## Tester des visualisations
+Vous pouvez aussi tester quelque chose de plus complexe, comme une page web. Est-ce que la page affiche le bon résultat quand vous cliquez sur un bouton ou sélectionnez une option ? Une librairie comme [Playwright](https://github.com/microsoft/playwright) peut exécuter ces tests dans un navigateur et vérifier ce qui s’affiche.
 
-Les tests sont faciles à mettre en place lorsque votre code **retourne** quelque chose comme un texte, un nombre, une date, une liste ou un objet.
+Vous pouvez aussi tester les graphiques que vous exportez avec [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Disons que votre script enregistre un graphique au format SVG. En poursuivant votre analyse, vous pouvez comparer le texte du nouveau SVG à celui d’une version que vous avez conservée pour repérer les changements inattendus dans le graphique, y compris dans les données qu’il affiche.
 
-Mais vous pouvez aussi utiliser des tests pour comparer des éléments d’une page web, comme des graphiques, et plus encore, avec [Playwright](https://playwright.dev/). Nous avons utilisé Playwright dans la [leçon sur le web scraping](/data-projects/web-scraping), mais à la base, il a été créé pour faire des tests !
+Si votre script enregistre le graphique au format PNG, vous pouvez le comparer octet par octet à un fichier de référence ou utiliser une librairie de traitement d’images pour comparer les pixels.
 
-La [documentation](https://playwright.dev/docs/intro) est très bien faite. Il y a même une section sur la [comparaison automatique de visuels avec des captures d’écran](https://playwright.dev/docs/test-snapshots).
+Rappelez-vous que presque tout peut être testé !
 
 ## Conclusion
 

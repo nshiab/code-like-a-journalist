@@ -3,6 +3,7 @@ title: Using tests in your projects
 description: In this lesson, we learn how to implement tests in our code and use them.
 ---
 
+import { Callout } from 'nextra/components'
 import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 # Using tests in your projects
@@ -19,14 +20,22 @@ In this lesson, we will code a simple function to calculate percentages and we w
 
 ## Setup
 
-Create a new folder, open it in VS Code, and use the latest Node.js LTS. In the terminal, run `npx @nshiab/setup-data-project` and choose no optional libraries. This creates the same project structure and tools as in the [setup lesson](/simple-data-analysis/setup).
+Create a new, empty folder, open it in VS Code, and create a file named `main.ts` inside it. Add this line and save the file.
 
-We will write our script in `sda/main.ts`. Run `npm run sda` to execute it and rerun it automatically when you save changes. Run `npm run all-tests` to check formatting, lint rules, types, and tests; `npm run fix` can apply automatic formatting and lint fixes.
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
 
-Use the `sda/helpers` folder (create it if needed) and put the `getPercentage.ts` file inside it with this code. It's the function we want to test. It expects two numbers and returns the percentage as a string.
+![VS Code showing main.ts in the Explorer and console.log("Hello!") in the editor.](/assets/extras/tests/hello.png)
+
+We’ll use Node’s built-in test runner. Once we’ve written a test, we’ll run it with `node --test`.
+
+## Writing the function to test
+
+Create a `helpers` folder and put the `getPercentage.ts` file inside it with this code. It's the function we want to test. It expects two numbers and returns the percentage as a string.
 
 
-```ts showLineNumbers filename="sda/helpers/getPercentage.ts"
+```ts showLineNumbers filename="helpers/getPercentage.ts"
 export default function getPercentage(
     current: number,
     total: number,
@@ -36,120 +45,269 @@ export default function getPercentage(
 }
 ```
 
-Update `sda/main.ts` to use the function.
+Update `main.ts` to use the function.
 
-```ts showLineNumbers filename="sda/main.ts"
+```ts showLineNumbers filename="main.ts"
 import getPercentage from "./helpers/getPercentage.ts";
 
 console.log(getPercentage(50, 100));
 ```
 
-The running `npm run sda` command executes the script when you save it.
+Save the file and run the command below in the VS Code terminal.
+
+```sh
+node main.ts
+```
 
 Everything looks fine! The function returns `50%` as expected.
 
-<OutdatedScreenshot src="/assets/extras/tests/setup.png" alt={"A main script logging a value in the terminal."} lang="en" />
+![VS Code showing main.ts and getPercentage.ts side by side, with node main.ts printing 50% in the terminal.](/assets/extras/tests/setup.png)
 
 ## Creating tests
 
 Is our function really working as expected? Let's check!
 
-Our generated project already includes [Vitest](https://vitest.dev/guide/) through Vite+. We will use `test` to describe each test and `expect(...).toBe(...)` to compare what our function returns with what we expect. There is nothing else to install!
+Creating a test is simple. We need two things.
 
-Now, let's create the test file. One way to keep tests organized in a project is to keep the same file structure for the tests as for the rest of the code.
+1. `test` from `node:test` lets us name a test and tell Node what code to run for it.
+2. `assert` from `node:assert/strict` lets us check the result. We’ll use `assert.strictEqual` to compare the result from the code we’re testing with the value we expect.
 
-Here, we could create a folder `sda/tests` with a new file `getPercentage.test.ts` in it. Note that this file is a regular TypeScript file since it ends with `.ts`. The `.test` part lets Vitest recognize it as a test file.
+Both come with Node, so you don’t have to install anything else.
 
-Here's what the code below does:
-- `test` creates a new test.
-- The first parameter is a description of the test.
-- The second parameter is a function. We run what we want in it (here `getPercentage`) and we check that the result is what we expect with `expect(...).toBe(...)`.
-- If the result is what is expected, the test will pass. Otherwise, it will fail!
+Now let’s create the test file. I like to mirror the structure of the rest of the code in my tests. Create a `tests` folder at the root of the project, put a `helpers` folder inside it, and create `getPercentage.test.ts` there. The `.test.ts` ending helps Node find it when you run the tests.
 
-```ts showLineNumbers filename="sda/tests/getPercentage.test.ts"
-import { test, expect } from "vitest";
-import getPercentage from "../helpers/getPercentage.ts";
+Add the following code to `tests/helpers/getPercentage.test.ts`.
+
+```ts showLineNumbers filename="tests/helpers/getPercentage.test.ts"
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import getPercentage from "../../helpers/getPercentage.ts";
 
 test("should return 50% for 50 out of 100", () => {
   const result = getPercentage(50, 100);
-  expect(result).toBe("50%");
+  assert.strictEqual(result, "50%");
 });
 ```
 
+Here’s what this code is doing.
+
+- Line 5 creates a new test with a description. You can write whatever you want there. Keep it simple and clear.
+- Lines 6 and 7 are the code the test runs. Line 6 calls `getPercentage(50, 100)` and stores the returned value in `result`. Line 7 uses `assert.strictEqual` to compare `result` with the expected string, `"50%"`.
+
+If `result` is exactly the string `"50%"`, the test passes. Otherwise, it fails.
+
 ## Running tests
 
-Run `npm run all-tests`. This checks formatting, lint rules, and TypeScript types, then runs the project's tests. If a formatting or lint check fails, run `npm run fix`, review the changes, and try again.
-
-<OutdatedScreenshot src="/assets/extras/tests/run-tests.png" alt={"Running tests with Deno."} lang="en" />
-
-While writing code, it's convenient to rerun a single test file automatically whenever it or its dependencies change. Use:
+Open the terminal in VS Code and run the command below. Node looks for test files ending in `.test.ts` or `.test.js` in your project, including in subfolders, and runs them.
 
 ```sh
-npx vp test sda/tests/getPercentage.test.ts --watch
+node --test
 ```
 
-Keep that command running for the rest of the lesson. Press `CTRL` + `C` to stop it. The watch command runs tests; `npm run all-tests` also runs the other project checks, so use it again before finishing your changes.
+You should see your test name with a check mark beside it, showing that it passed.
 
-The [Vitest documentation](https://vitest.dev/guide/) explains more options.
+![VS Code showing tests/helpers/getPercentage.test.ts and one passing test in the terminal.](/assets/extras/tests/run-tests.png)
 
-<OutdatedScreenshot src="/assets/extras/tests/watch-tests.png" alt={"Watching tests with Deno."} lang="en" />
+<Callout type="info" emoji="💡">
+    You might see type errors on lines 1 and 2 in VS Code. You can ignore them for this lesson. Both modules come with Node, and the test will still run.
+</Callout>
 
 ## Adding tests
 
 Depending on your context, the test we wrote just above might be sufficient. For example, maybe you just wanted to double-check the result of one step in your data analysis and you want it to stay this way going forward.
 
-But for the sake of this lesson, let's add more tests here. Let's test edge cases.
+Let’s add two more tests.
 
-For example, what is supposed to happen when the first number is `0`? And when the second is `0`? Maybe we want our function to return `0%` in both cases.
+- One checks that `getPercentage(1, 3)` returns `"33.33%"`, with two decimal places.
+- The other checks that `getPercentage(1, 0)` throws an error because division by zero is undefined. We use `assert.throws` to check for the message `Total must not be zero.`
 
-Update the file with the code below. When you save the modified file, the tests will be automatically rerun.
+Write both tests against the current version of `getPercentage`. Update the test file with the code below.
 
-```ts showLineNumbers filename="sda/tests/getPercentage.test.ts" {9-17}
-import { test, expect } from "vitest";
-import getPercentage from "../helpers/getPercentage.ts";
+```ts showLineNumbers filename="tests/helpers/getPercentage.test.ts" {10-17}
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import getPercentage from "../../helpers/getPercentage.ts";
 
 test("should return 50% for 50 out of 100", () => {
   const result = getPercentage(50, 100);
-  expect(result).toBe("50%");
+  assert.strictEqual(result, "50%");
 });
 
-test("should return 0% for 0 out of 100", () => {
-  const result = getPercentage(0, 100);
-  expect(result).toBe("0%");
+test("should round 1 out of 3 to two decimal places", () => {
+  const result = getPercentage(1, 3);
+  assert.strictEqual(result, "33.33%");
 });
 
-test("should return 0% for 1 out of 0", () => {
-  const result = getPercentage(1, 0);
-  expect(result).toBe("0%");
+test("should throw an error when the total is zero", () => {
+  assert.throws(() => getPercentage(1, 0), { message: "Total must not be zero." });
 });
 ```
-<OutdatedScreenshot src="/assets/extras/tests/fail.png" alt={"A test failed."} lang="en" />
 
-We can see that the second test passed but the third one failed!
+Save the test file and run the tests again.
 
-When the `total` is `0`, our function is returning `Infinity%` instead of what we want, which is `0%`.
+```sh
+node --test
+```
 
-Let's update our `getPercentage.ts` to fix that. Update the file with the code below. When you save the file, the tests will rerun automatically.
+You’ll see the two new tests fail. The first test still passes.
 
-```ts showLineNumbers filename="sda/helpers/getPercentage.ts" {5-7, 10}
+![The VS Code terminal shows one passing test and two failing tests for rounding and division by zero.](/assets/extras/tests/fail.png)
+
+Scroll down in your terminal to see why each test failed. The rounding test expected `"33.33%"`, but `getPercentage(1, 3)` returned `"33.33333333333333%"` with many more decimal places.
+
+```text {17-18}
+test at tests/helpers/getPercentage.test.ts:10:1
+✖ should round 1 out of 3 to two decimal places (0.44575ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  actual expected
+
+  '33.33333333333333%'
+
+      at TestContext.<anonymous> (file:///Users/nael/Desktop/test/tests/helpers/getPercentage.test.ts:12:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '33.33333333333333%',
+    expected: '33.33%',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+```
+
+For the division-by-zero test, `Missing expected exception` tells us that `getPercentage(1, 0)` ran without throwing an error.
+
+```text {3, 13-14}
+test at tests/helpers/getPercentage.test.ts:15:1
+✖ should throw an error when the total is zero (0.097542ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///Users/nael/Desktop/test/tests/helpers/getPercentage.test.ts:16:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { message: 'Total must not be zero.' },
+    operator: 'throws',
+    diff: 'simple'
+  }
+```
+
+Let’s fix `getPercentage` so all our tests pass. 👷
+
+### Add rounding
+
+Let’s start with rounding. Update `helpers/getPercentage.ts` as shown below to add an optional `decimals` parameter. If you leave it out, the function behaves as before. If you pass a number, `toFixed` rounds the percentage to that many decimal places.
+
+```ts showLineNumbers filename="helpers/getPercentage.ts" {4, 7-10}
 export default function getPercentage(
   current: number,
   total: number,
+  decimals?: number,
 ): string {
-  if (total === 0) {
-    return "0%";
-  } else {
-    const percentage = (current / total) * 100;
-    return `${percentage}%`;
-  }
+  const percentage = (current / total) * 100;
+  const formatted = decimals === undefined
+    ? percentage.toString()
+    : percentage.toFixed(decimals);
+  return `${formatted}%`;
 }
 ```
 
-And now, we can see that the third test passed.
+In the rounding test, add `2` as the third argument to `getPercentage` to ask for two decimal places. The changed line is highlighted below.
 
-We also know that the previous behavior is still there because the first two tests passed too!
+```ts showLineNumbers filename="tests/helpers/getPercentage.test.ts" {11}
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import getPercentage from "../../helpers/getPercentage.ts";
 
-<OutdatedScreenshot src="/assets/extras/tests/all-passed.png" alt={"All tests passed."} lang="en" />
+test("should return 50% for 50 out of 100", () => {
+  const result = getPercentage(50, 100);
+  assert.strictEqual(result, "50%");
+});
+
+test("should round 1 out of 3 to two decimal places", () => {
+  const result = getPercentage(1, 3, 2);
+  assert.strictEqual(result, "33.33%");
+});
+
+test("should throw an error when the total is zero", () => {
+  assert.throws(() => getPercentage(1, 0), { message: "Total must not be zero." });
+});
+```
+
+Save both files and run the tests again with the command below.
+
+```sh
+node --test
+```
+
+The first test still passes without the `decimals` argument. The second now passes too, so our rounding change worked! 🎉
+
+The third test still fails. That’s expected because we haven’t handled division by zero yet.
+
+![VS Code shows the rounding change and the test results. The first two tests pass, and the division-by-zero test still fails.](/assets/extras/tests/rounding-passed.png)
+
+### Handle division by zero
+
+To handle division by zero, add a check before dividing. Use an `if` statement to check whether `total` is zero. If it is, throw an error right away with the message the test expects.
+
+Update `getPercentage` as shown below and save the file.
+
+```ts showLineNumbers filename="helpers/getPercentage.ts" {6-8}
+export default function getPercentage(
+  current: number,
+  total: number,
+  decimals?: number,
+): string {
+  if (total === 0) {
+    throw new Error("Total must not be zero.");
+  }
+
+  const percentage = (current / total) * 100;
+  const formatted = decimals === undefined
+    ? percentage.toString()
+    : percentage.toFixed(decimals);
+  return `${formatted}%`;
+}
+```
+
+Run the tests once more with this command.
+
+```sh
+node --test
+```
+
+Now all our tests pass! 🎉
+
+![VS Code shows the check for a zero total and all three tests passing in the terminal.](/assets/extras/tests/all-passed.png)
+
+## Running and watching tests
+
+You don’t need to run your whole test suite every time you change your code. To run a specific test file, pass its path to Node.
+
+```sh
+node --test tests/helpers/getPercentage.test.ts
+```
+
+To run a specific test, pass its description to `--test-name-pattern`.
+
+```sh
+node --test --test-name-pattern="should round 1 out of 3 to two decimal places"
+```
+
+Just like with `node --watch main.ts`, you can watch your tests with the command below. Node automatically reruns the affected tests when you save a change to a test file or one of its dependencies.
+
+```sh
+node --test --watch
+```
 
 ## Automated tests
 
@@ -157,21 +315,21 @@ You can always run tests locally, of course. You can even define an [npm command
 
 But if you are using GitHub, you can set up automated tests in your projects. This is a common setup for open-source libraries, but you can use it for anything you want.
 
-For example, I have hundreds of tests in place for the [Simple Data Analysis library](https://github.com/nshiab/simple-data-analysis). You can [explore them here](https://github.com/nshiab/simple-data-analysis/tree/main/test/unit/methods).
+For example, I have hundreds of tests for the Simple Data Analysis library. You can explore them [here](https://github.com/nshiab/simple-data-analysis-core/tree/main/test/unit/methods).
 
-I use GitHub Actions (check the [lesson about it](/git-and-github/github-actions)) to trigger them automatically when a pull request is opened or updated against the `main` branch.
+I use GitHub Actions to run these tests automatically before publishing a new version of the library. The setup is simple. [One small file](https://github.com/nshiab/simple-data-analysis-core/blob/main/.github/workflows/all-tests.yml) tells GitHub to run the tests in the cloud.
 
-The pull request shows whether the tests passed. If one or more fail, more work is needed before merging. Repository rules can also require these status checks to pass and block the merge button until they do. You can check the [workflow here](https://github.com/nshiab/simple-data-analysis/blob/main/.github/workflows/all-tests.yml).
+## Testing web pages and data visualizations
 
-It's just a few lines of code, but it guarantees that the library is working as expected. And it has saved me many times from publishing a new broken version of the library! 😇
+In this lesson, we ran simple tests locally to check that our function returned the values we expected.
 
-## Testing dataviz
+You can also test something more complex, like a web page. Does clicking a button or selecting an option display the right thing on the page? A library like [Playwright](https://github.com/microsoft/playwright) can run those tests in a browser and check what appears.
 
-Tests are easy to set up when your code **returns** something like a string, number, date, array, or object.
+You can also test charts you export with [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Say your script saves a chart as an SVG. As you keep working on your analysis, you can compare the new SVG’s text with a version you’ve saved to catch unexpected changes to the chart, including changes in the data it shows.
 
-But you can also use tests to compare web page elements, like charts, and more, with [Playwright](https://playwright.dev/). We used Playwright in the [web scraping lesson](/data-projects/web-scraping), but it was actually created for tests!
+If your script saves the chart as a PNG, you can compare it byte for byte with a reference file or use an image library to compare the pixels.
 
-The [docs](https://playwright.dev/docs/intro) are well done. There is even a section about automatically [comparing visuals with screenshots](https://playwright.dev/docs/test-snapshots).
+Just remember, pretty much anything is testable!
 
 ## Conclusion
 
