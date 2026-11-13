@@ -9,8 +9,8 @@ const routes = files.map(toRoute).sort();
 const englishRoutes = routes.filter((route) => route.startsWith("/en"));
 const frenchRoutes = routes.filter((route) => route.startsWith("/fr"));
 
-assert(englishRoutes.length === 35, `Expected 35 English routes, found ${englishRoutes.length}.`);
-assert(frenchRoutes.length === 35, `Expected 35 French routes, found ${frenchRoutes.length}.`);
+assert(englishRoutes.length === 33, `Expected 33 English routes, found ${englishRoutes.length}.`);
+assert(frenchRoutes.length === 33, `Expected 33 French routes, found ${frenchRoutes.length}.`);
 
 const englishPaths = englishRoutes.map((route) => route.slice(3));
 const frenchPaths = frenchRoutes.map((route) => route.slice(3));
@@ -54,11 +54,6 @@ for (const language of ["en", "fr"]) {
 await expectResponse("/en/does-not-exist", 404);
 await expectResponse("/de/does-not-exist", 404);
 await expectResponse(
-    "/git-and-github/github-actions",
-    307,
-    "/en/git-and-github/github-actions",
-);
-await expectResponse(
     "/git-and-github/github-basics",
     307,
     "/fr/git-and-github/github-basics",
@@ -71,7 +66,6 @@ for (const prefix of ["", "/en", "/fr"]) {
         "stock-market-simulator",
         "stats-can-census",
         "one-billion-row-challenge",
-        "web-scraping",
     ]) {
         await expectResponse(
             `${prefix}/${project}?source=bookmark`,
@@ -96,8 +90,11 @@ const removedPaths = [
     "d3-chart",
     "d3-map",
     "git-and-github/github-pages",
+    "git-and-github/github-actions",
+    "data-projects/web-scraping",
     "ninja-moves/publishing-library",
     "extras/publishing-library",
+    "web-scraping",
     "inspirations",
     "more",
     "simple-data-analysis/sda-and-ai",

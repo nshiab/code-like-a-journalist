@@ -12,7 +12,6 @@ export default withNextra({
             "stock-market-simulator",
             "stats-can-census",
             "one-billion-row-challenge",
-            "web-scraping",
         ];
         return ["", "/en", "/fr"].flatMap((prefix) =>
             projects.map((project) => ({
