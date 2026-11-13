@@ -16,65 +16,123 @@ By default, an error stops your script. But sometimes, you know how your code sh
 
 ## Setup
 
-Create a new folder, open it in VS Code, and use the latest Node.js LTS. In the terminal, run `npx @nshiab/setup-data-project` and choose no optional libraries. This creates the same project structure and tools as in the [setup lesson](/simple-data-analysis/setup).
+Create a new, empty folder, open it in VS Code, and create a file named `main.ts` inside it. Add this line and save the file.
 
-We will write our script in `sda/main.ts`. Run `npm run sda` to execute it and rerun it automatically when you save changes. Run `npm run all-tests` to check formatting, lint rules, types, and tests; `npm run fix` can apply automatic formatting and lint fixes.
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
+
+Open the VS Code terminal (`Command` + `J` on Mac or `Control` + `J` on Windows) and run this command.
+
+```sh
+node --watch main.ts
+```
+
+You should see `Hello!` in the terminal. Leave the command running so Node reruns `main.ts` each time you save a change during the lesson.
+
+![VS Code showing main.ts and the Hello! output from node --watch main.ts.](/assets/extras/try-catch/setup.png)
 
 ## Catching an error
 
-The following code tries to read a file that doesn't exist. The path is relative to the project folder where the command runs:
+Let's write some code that will fail on purpose. The code below tries to read `article.txt`, a file that doesn't exist in our project folder.
 
-```ts showLineNumbers filename="sda/main.ts"
+Put this code in `main.ts` and save the file. Node will rerun the script automatically, and you'll see the result in your terminal.
+
+```ts showLineNumbers filename="main.ts"
 import { readFile } from "node:fs/promises";
 
-const text = await readFile("./article.txt", "utf8");
+await readFile("./article.txt", "utf8");
 
-console.log(text);
+console.log("End of the script");
 ```
 
-When Node can't find `article.txt`, it triggers an error and stops the script.
+Node can't find `article.txt`, so it reports an `ENOENT` error.
 
-The `"utf8"` argument asks `readFile` to return text instead of a binary buffer. `node:fs/promises` is built into Node, so there is nothing to install.
+The error stops the script at line 3, so the code after that line never runs. That’s why we don’t see `End of the script` in the terminal.
 
-We can handle that error with `try` and `catch`:
+Sometimes we want the rest of the script to keep running even if one or more operations fail. For that, we need to catch the error and decide how to handle it.
 
-```ts showLineNumbers filename="sda/main.ts"
+![VS Code showing the ENOENT error on line 3 and no End of the script message in the terminal.](/assets/extras/try-catch/missing-file.png)
+
+<Callout type="info" emoji="💡">
+    You may have noticed the type error on line 1 in VS Code. You can ignore it for this lesson. `node:fs/promises` is built into Node, and Node will still run the code.
+</Callout>
+
+To catch errors, we can use `try` and `catch`.
+
+- **`try`** is followed by curly braces. Node tries to run the code between them first.
+- **`catch`** runs if an error occurs inside `try`. Inside the curly braces after `catch (error)`, you can inspect the error. It may include a code or message that helps you decide how to handle it.
+
+If `try` succeeds, Node skips `catch`. If `try` fails, Node runs `catch`. In both cases, Node continues with the rest of the script unless an error in `catch` goes unhandled.
+
+Put this code in `main.ts` and save it. This time, the terminal shows `Oops! Something went wrong!` followed by `End of the script`.
+
+```ts showLineNumbers filename="main.ts" {3, 5-7}
 import { readFile } from "node:fs/promises";
 
 try {
-  const text = await readFile("./article.txt", "utf8");
-  console.log(text);
+    await readFile("./article.txt", "utf8");
 } catch (error) {
-  console.log("The file could not be read.");
-  console.log(error);
+    console.log("Oops! Something went wrong!");
 }
+
+console.log("End of the script");
 ```
 
-Node first runs the code inside the `try` block. If the code works, the `catch` block is skipped. If an error occurs, Node stops running the `try` block and moves to `catch`.
+The file read fails on line 4, so `catch` runs and prints the message on line 6. The terminal also shows `End of the script`, which tells us line 9 ran. With this code, we still don’t know what the error was.
 
-The `error` parameter contains information about what went wrong. Logging it can help you understand and fix the problem.
+![VS Code terminal showing Oops! Something went wrong! followed by End of the script.](/assets/extras/try-catch/caught-error.png)
 
-<Callout type="info" emoji="💡">
-    Catch only errors that your code can handle meaningfully. Other errors should stop the script so you notice and fix them.
-</Callout>
+The `Oops!` message tells us something went wrong. Often, you’ll want to log the error itself to understand what happened. Add `console.log(error)` right after the message and save `main.ts` again.
 
-## Returning a fallback value
+```ts showLineNumbers filename="main.ts" {7}
+import { readFile } from "node:fs/promises";
 
-Sometimes, you only need a fallback value when an asynchronous operation fails. In this example, `stat()` returns information about a file when it exists. If the operation fails, `.catch()` returns `null`:
-
-```ts showLineNumbers filename="sda/main.ts"
-import { stat } from "node:fs/promises";
-
-const path = "./article.txt";
-const fileInfo = await stat(path).catch(() => null);
-
-if (fileInfo) {
-  console.log("The file exists!");
-} else {
-  console.log("The file information is unavailable.");
+try {
+    await readFile("./article.txt", "utf8");
+} catch (error) {
+    console.log("Oops! Something went wrong!");
+    console.log(error);
 }
+
+console.log("End of the script");
 ```
 
-This shorter `.catch()` syntax is useful when you can replace an error with a simple fallback value. In this case, `null` tells the rest of our code that file information could not be read. This also catches errors other than a missing file, such as a permissions problem. Use a `try`/`catch` block and inspect the error if you need to distinguish them.
+![VS Code showing console.log(error) on line 7 and the terminal printing the ENOENT error for article.txt, followed by End of the script.](/assets/extras/try-catch/logged-error.png)
+
+## Using `finally`
+
+Sometimes you need to do something whether `try` succeeds or `catch` handles an error. For that, you can use `finally`. The code between the curly braces after `finally` runs in either case.
+
+For example, if you open a database connection before `try`, you can close it in `finally` whether the query succeeds or fails.
+
+Add the highlighted lines to `main.ts` and save. The terminal will show `I tried!` just before `End of the script`.
+
+```ts showLineNumbers filename="main.ts" {8-9}
+import { readFile } from "node:fs/promises";
+
+try {
+    await readFile("./article.txt", "utf8");
+} catch (error) {
+    console.log("Oops! Something went wrong!");
+    console.log(error);
+} finally {
+    console.log("I tried!");
+}
+
+console.log("End of the script");
+```
+
+![VS Code showing the finally block and the terminal printing I tried! after the ENOENT error.](/assets/extras/try-catch/finally.png)
+
+With `article.txt` missing, Node runs `catch` and then `finally`. If you create `article.txt` in the project folder and save `main.ts` again, Node skips `catch` and still prints `I tried!`.
+
+## Conclusion
+
+Congrats! You now know how to handle errors in TypeScript. 💃
+
+Handling errors makes your scripts more robust. When a problem you’ve planned for comes up, your code can respond and keep going.
+
+However, it can be tempting to wrap your whole script in `try` and `catch`. That can hide bugs. Catch the errors you know how to handle. Let unexpected errors stop the script so you can see what went wrong and fix it.
 
 <NoticeEnd />

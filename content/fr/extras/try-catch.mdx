@@ -16,65 +16,123 @@ Par défaut, une erreur arrête votre script. Mais parfois, vous savez comment v
 
 ## Configuration
 
-Créez un nouveau dossier, ouvrez-le dans VS Code et utilisez la dernière version LTS de Node.js. Dans le terminal, exécutez `npx @nshiab/setup-data-project` et ne sélectionnez aucune librairie optionnelle. Vous obtenez la même structure et les mêmes outils que dans la [leçon d’installation](/simple-data-analysis/setup).
+Créez un nouveau dossier vide, ouvrez-le dans VS Code et créez-y un fichier nommé `main.ts`. Ajoutez cette ligne et enregistrez le fichier.
 
-Nous écrirons notre script dans `sda/main.ts`. Exécutez `npm run sda` pour le lancer et le relancer automatiquement lorsque vous sauvegardez vos modifications. Utilisez `npm run all-tests` pour vérifier la mise en forme, les règles de lint, les types et les tests; `npm run fix` peut appliquer les corrections automatiques de mise en forme et de lint.
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
+
+Ouvrez le terminal de VS Code (`Command` + `J` sur Mac ou `Control` + `J` sur Windows) et exécutez cette commande.
+
+```sh
+node --watch main.ts
+```
+
+Vous devriez voir `Hello!` dans le terminal. Laissez la commande tourner pour que Node relance `main.ts` chaque fois que vous enregistrez une modification pendant la leçon.
+
+![VS Code montrant main.ts et le message Hello! affiché par node --watch main.ts.](/assets/extras/try-catch/setup.png)
 
 ## Capturer une erreur
 
-Le code suivant essaie de lire un fichier qui n'existe pas. Le chemin est relatif au dossier du projet où la commande s’exécute :
+Faisons volontairement échouer notre code. Le code ci-dessous essaie de lire `article.txt`, un fichier qui n’existe pas dans le dossier de notre projet.
 
-```ts showLineNumbers filename="sda/main.ts"
+Mettez ce code dans `main.ts` et enregistrez le fichier. Node relancera automatiquement le script et vous verrez le résultat dans votre terminal.
+
+```ts showLineNumbers filename="main.ts"
 import { readFile } from "node:fs/promises";
 
-const text = await readFile("./article.txt", "utf8");
+await readFile("./article.txt", "utf8");
 
-console.log(text);
+console.log("Fin du script");
 ```
 
-Lorsque Node ne trouve pas `article.txt`, il déclenche une erreur et arrête le script.
+Node ne trouve pas `article.txt`, alors il affiche une erreur `ENOENT`.
 
-L’argument `"utf8"` demande à `readFile` de retourner du texte plutôt qu’un tampon binaire. Le module `node:fs/promises` est inclus dans Node : il n’y a rien à installer.
+L’erreur arrête le script à la ligne 3, donc le code qui suit ne s’exécute jamais. C’est pourquoi `Fin du script` ne s’affiche pas dans le terminal.
 
-Nous pouvons gérer cette erreur avec `try` et `catch` :
+Parfois, on veut que le reste du script continue de s’exécuter même si une ou plusieurs opérations échouent. Pour cela, il faut capturer l’erreur et décider comment la gérer.
 
-```ts showLineNumbers filename="sda/main.ts"
+![Le terminal de VS Code indique une erreur ENOENT à la ligne 3, sans afficher le message de fin du script.](/assets/extras/try-catch/missing-file.png)
+
+<Callout type="info" emoji="💡">
+    Vous avez peut-être remarqué l’erreur de type à la ligne 1 dans VS Code. Vous pouvez l’ignorer pour cette leçon. Le module `node:fs/promises` est inclus dans Node, qui exécutera quand même le code.
+</Callout>
+
+Pour capturer les erreurs, on peut utiliser `try` et `catch`.
+
+- **`try`** est suivi d’accolades. Node essaie d’abord d’exécuter le code entre ces accolades.
+- **`catch`** s’exécute si une erreur survient dans le bloc `try`. Entre les accolades qui suivent `catch (error)`, vous pouvez examiner l’erreur. Elle peut contenir un code ou un message qui vous aide à décider comment la gérer.
+
+Si tout se passe bien dans `try`, Node saute le bloc `catch`. Si une erreur survient dans `try`, Node exécute `catch`. Dans les deux cas, Node poursuit l’exécution du script, sauf si une erreur survient dans `catch` et reste sans traitement.
+
+Mettez ce code dans `main.ts` et enregistrez le fichier. Cette fois, le terminal affiche `Oups ! Quelque chose s’est mal passé !`, puis `Fin du script`.
+
+```ts showLineNumbers filename="main.ts" {3, 5-7}
 import { readFile } from "node:fs/promises";
 
 try {
-  const text = await readFile("./article.txt", "utf8");
-  console.log(text);
+    await readFile("./article.txt", "utf8");
 } catch (error) {
-  console.log("Le fichier n'a pas pu être lu.");
-  console.log(error);
+    console.log("Oups ! Quelque chose s’est mal passé !");
 }
+
+console.log("Fin du script");
 ```
 
-Node exécute d'abord le code à l'intérieur du bloc `try`. Si le code fonctionne, le bloc `catch` est ignoré. Si une erreur survient, Node cesse d'exécuter le bloc `try` et passe à `catch`.
+La lecture du fichier échoue à la ligne 4. Le bloc `catch` s’exécute et affiche le message de la ligne 6. Le terminal affiche aussi le message de fin du script, ce qui nous montre que la ligne 9 a été exécutée. Avec ce code, on ne sait toujours pas de quelle erreur il s’agit.
 
-Le paramètre `error` contient de l'information sur ce qui s'est mal passé. L'afficher peut vous aider à comprendre et à corriger le problème.
+![Le terminal de VS Code affiche le message d’erreur, puis le message de fin du script, en anglais.](/assets/extras/try-catch/caught-error.png)
 
-<Callout type="info" emoji="💡">
-    Capturez uniquement les erreurs que votre code peut gérer de manière utile. Les autres erreurs devraient arrêter le script afin que vous puissiez les remarquer et les corriger.
-</Callout>
+Le message `Oups !` nous indique qu’il y a eu un problème. Souvent, vous voudrez afficher l’erreur elle-même pour mieux comprendre ce qui s’est passé. Ajoutez `console.log(error)` juste après ce message et enregistrez de nouveau `main.ts`.
 
-## Retourner une valeur de repli
+```ts showLineNumbers filename="main.ts" {7}
+import { readFile } from "node:fs/promises";
 
-Parfois, vous avez seulement besoin d'une valeur de repli lorsqu'une opération asynchrone échoue. Dans cet exemple, `stat()` retourne de l'information sur un fichier lorsqu'il existe. Si l’opération échoue, `.catch()` retourne `null` :
-
-```ts showLineNumbers filename="sda/main.ts"
-import { stat } from "node:fs/promises";
-
-const path = "./article.txt";
-const fileInfo = await stat(path).catch(() => null);
-
-if (fileInfo) {
-  console.log("Le fichier existe!");
-} else {
-  console.log("Les informations sur le fichier sont indisponibles.");
+try {
+    await readFile("./article.txt", "utf8");
+} catch (error) {
+    console.log("Oups ! Quelque chose s’est mal passé !");
+    console.log(error);
 }
+
+console.log("Fin du script");
 ```
 
-Cette syntaxe raccourcie avec `.catch()` est utile lorsque vous pouvez remplacer une erreur par une simple valeur de repli. Ici, `null` indique au reste de notre code que les informations sur le fichier n’ont pas pu être lues. Cela capture aussi d’autres erreurs, comme un problème de permissions. Utilisez un bloc `try`/`catch` et examinez l’erreur si vous devez faire la distinction.
+![VS Code montre console.log(error) à la ligne 7. Le terminal affiche l’erreur ENOENT pour article.txt, puis le message de fin du script en anglais.](/assets/extras/try-catch/logged-error.png)
+
+## Utiliser `finally`
+
+Parfois, une action doit avoir lieu que le bloc `try` réussisse ou que `catch` gère une erreur. Pour cela, vous pouvez utiliser `finally`. Le code entre les accolades qui suivent `finally` s’exécute dans les deux cas.
+
+Par exemple, si vous ouvrez une connexion à une base de données avant `try`, vous pouvez la fermer dans `finally`, que la requête réussisse ou échoue.
+
+Ajoutez les lignes surlignées à `main.ts` et enregistrez le fichier. Le terminal affichera `J’ai essayé !` juste avant `Fin du script`.
+
+```ts showLineNumbers filename="main.ts" {8-9}
+import { readFile } from "node:fs/promises";
+
+try {
+    await readFile("./article.txt", "utf8");
+} catch (error) {
+    console.log("Oups ! Quelque chose s’est mal passé !");
+    console.log(error);
+} finally {
+    console.log("J’ai essayé !");
+}
+
+console.log("Fin du script");
+```
+
+![VS Code montre le bloc finally. Le terminal affiche I tried! après l’erreur ENOENT.](/assets/extras/try-catch/finally.png)
+
+Quand `article.txt` est absent, Node exécute `catch`, puis `finally`. Si vous créez `article.txt` dans le dossier du projet et enregistrez de nouveau `main.ts`, Node saute `catch` et affiche quand même `J’ai essayé !`.
+
+## Conclusion
+
+Bravo ! Vous savez maintenant gérer les erreurs en TypeScript. 💃
+
+La gestion des erreurs rend vos scripts plus robustes. Lorsqu’un problème prévu survient, votre code peut y réagir et poursuivre son exécution.
+
+Cependant, il peut être tentant d’entourer tout votre script d’un `try` et d’un `catch`. Cela peut masquer des bogues. Capturez les erreurs que vous savez gérer. Laissez les erreurs inattendues arrêter le script pour repérer et corriger le problème.
 
 <NoticeEnd lang="fr" />
