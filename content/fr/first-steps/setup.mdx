@@ -1,0 +1,178 @@
+---
+title: Installation de VS Code, Node.js et TypeScript
+description: Installons tout ce dont nous avons besoin.
+---
+
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Installation
+
+Tout d'abord, installons tout ce dont nous avons besoin.
+
+Vous pourriez avoir besoin de droits administrateur sur votre ordinateur. Si vous êtes sur votre ordinateur de travail et que vous ne les avez pas, demandez l'aide de votre service informatique.
+
+<NoticeIntro lang="fr" />
+
+## Éditeur de code
+
+Le code n'est que du texte. Vous pouvez écrire votre code dans n'importe quel éditeur de texte, mais il est plus pratique d'utiliser un éditeur de code qui offre de nombreuses fonctionnalités utiles.
+
+Vous avez de nombreuses options gratuites et intéressantes, mais la plus populaire est [Visual Studio Code](https://code.visualstudio.com/), et c'est ce que nous allons utiliser. C'est un [projet en code ouvert](https://github.com/microsoft/vscode) maintenu par Microsoft.
+
+Téléchargez-le à partir du [site web](https://code.visualstudio.com/) et installez-le.
+
+Une fois installé, ouvrez-le. Il devrait ressembler à ceci. Ce n'est pas grave si vous avez différents onglets ouverts.  
+
+![Une capture d'écran de l'éditeur de code Visual Studio Code.](/assets/first-steps/setup/vscode.png)
+
+Personnellement, je trouve que l'interface est trop petite (👴 c'est peut-être un signe que je vieillis), et je l'ajuste toujours pour qu'elle soit un peu plus grande lorsque je configure une nouvelle machine. Pour ce faire, cliquez sur le menu `View => Appearance => Zoom In`.
+
+![Une capture d'écran du menu Affichage dans VS Code.](/assets/first-steps/setup/vscode-zoom.png)
+
+Ajustons quelques paramètres utiles.
+
+Pour ouvrir les paramètres sur Mac, cliquez sur `Code => Preferences => Settings`, comme ci-dessous. Sur Windows, utilisez `File => Preferences => Settings`. Vous pouvez aussi appuyer sur `Command` + `,` sur Mac ou sur `Control` + `,` sur Windows.
+
+![VS Code sur Mac avec les menus Code et Preferences ouverts et une flèche pointant vers Settings.](/assets/first-steps/setup/vscode-open-settings.png)
+
+Dans la barre de recherche des paramètres, tapez `format`, puis cochez `Editor: Format On Save`.
+
+Juste en dessous, réglez `Editor: Default Formatter` sur `JavaScript and TypeScript Language Features`.
+
+Avec ces paramètres, chaque fois que vous enregistrez, VS Code organise les espaces et les retraits de votre code pour le rendre plus facile à lire.
+
+Vous n'avez pas besoin de cliquer sur un bouton pour enregistrer vos paramètres. Les changements s'appliquent dès que vous les faites.
+
+![Les paramètres de VS Code avec des flèches pointant vers la recherche format, la case cochée Format On Save et JavaScript and TypeScript Language Features sélectionné comme outil de mise en forme par défaut.](/assets/first-steps/setup/vscode-format-on-save.png)
+
+Pendant que vous êtes dans les paramètres, recherchez `wrap` et réglez `Editor: Word Wrap` sur `on`. Les longues lignes continueront automatiquement à la ligne suivante à l'écran, sans avoir à faire défiler horizontalement pour les lire.
+
+![Les paramètres de VS Code avec des flèches pointant vers la barre de recherche et Editor: Word Wrap réglé sur on.](/assets/first-steps/setup/vscode-word-wrap.png)
+
+Cliquez sur le X en haut à droite de la fenêtre des paramètres pour la fermer.
+
+![Les paramètres de VS Code avec une flèche pointant vers le X en haut à droite pour fermer la fenêtre.](/assets/first-steps/setup/vscode-close-settings.png)
+
+## Moteur d'exécution (runtime)
+
+Pour exécuter notre code TypeScript, nous avons besoin d'un moteur d'exécution. Nous utiliserons [Node.js](https://nodejs.org/), un moteur gratuit qui existe depuis 2009. Je trouve que c'est l'un des projets en code ouvert les plus impressionnants : des milliers de personnes y ont contribué au fil des années pour le rendre plus rapide, plus fiable et plus sécuritaire.
+
+Pour ce cours, nous installerons la dernière version LTS. LTS signifie long-term support, soit soutien à long terme : cette version sera maintenue pendant longtemps.
+
+Visitez la [page de téléchargement de Node.js](https://nodejs.org/en/download), sélectionnez la dernière version LTS et votre système d'exploitation, puis suivez les instructions d'installation.
+
+Ce n'est pas grave si la version LTS qui vous est proposée n'est pas exactement la même que celle de ma capture d'écran.
+
+![La page de téléchargement de Node.js, avec des flèches pointant vers la version LTS et l'installateur macOS.](/assets/first-steps/setup/node-download.png)
+
+Après l'installation de Node.js, quittez complètement VS Code et rouvrez-le pour qu'il trouve la nouvelle installation. Sur Mac, appuyez sur `Command` + `Q` ; sur Windows, utilisez `File => Exit`.
+
+Pour nous assurer que Node.js est bien installé, nous allons vérifier sa version dans le terminal.
+
+Pour ouvrir le terminal dans VS Code, cliquez sur le menu `View`, puis sur `Terminal`, ou appuyez sur `Command` + `J` sur Mac ou sur `Control` + `J` sur Windows.
+
+![VS Code avec le menu View ouvert et des flèches pointant vers View et l'option Terminal.](/assets/first-steps/setup/vscode-terminal.png)
+
+Pour vérifier l'installation, tapez la commande suivante dans le terminal et appuyez sur Entrée :
+
+```sh
+node --version
+```
+
+Cette commande doit afficher la version de Node.js que vous venez d'installer.
+
+![Le terminal de VS Code affichant la version installée de Node.js après l'exécution de node --version.](/assets/first-steps/setup/node-version.png)
+
+## Exécutons un script
+
+Maintenant que la configuration est terminée, il est temps d'exécuter du code ! Au fait, les fichiers qui contiennent du code sont souvent appelés des scripts. 🤓
+
+D'abord, choisissez où ranger vos fichiers de code. Créez un nouveau dossier vide à un endroit facile d'accès sur votre ordinateur. Ensuite, dans VS Code, cliquez sur l'onglet Explorer en haut à gauche, puis sur le bouton `Open Folder`, et sélectionnez ce dossier.
+
+![VS Code avec des flèches pointant vers l'onglet Explorer et le bouton Open Folder.](/assets/first-steps/setup/vscode-open-folder.png)
+
+Pour cette leçon, j'ai appelé mon nouveau dossier `test`. Je vois maintenant son nom dans l'Explorer à gauche, ce qui indique que c'est le dossier que j'ai ouvert.
+
+Dans mon terminal, je vois aussi `test`. Cela signifie que les commandes que j'y lance s'exécuteront également depuis ce dossier.
+
+Au fait, si l'onglet `Welcome` est encore ouvert, vous pouvez maintenant le fermer en cliquant sur le X à côté de son titre.
+
+![VS Code avec des flèches pointant vers le dossier test dans l'Explorer, test dans l'invite du terminal et le bouton de fermeture de l'onglet Welcome.](/assets/first-steps/setup/vscode-project-folder.png)
+
+Dans l'Explorer à gauche, faites un clic droit dans votre dossier et choisissez `New File`. Nommez le fichier `main.ts` et appuyez sur Entrée. L'extension `.ts` indique que ce fichier contient du code TypeScript. Nous utiliserons ce fichier dans les prochaines leçons.
+
+![VS Code avec le menu contextuel de l'Explorer ouvert et une flèche pointant vers New File.](/assets/first-steps/setup/vscode-new-file.png)
+
+Cliquez sur `main.ts` pour l'ouvrir. Un nouvel onglet apparaît avec le contenu du fichier. Pour l'instant, il est vide. Tapez-y cette ligne :
+
+```ts showLineNumbers filename="main.ts"
+console.log("This is going to be fun!");
+```
+
+À côté de `main.ts` dans le titre de l'onglet, vous verrez un point blanc. Il indique que le fichier a été modifié, mais qu'il n'a pas encore été enregistré.
+
+![VS Code montrant main.ts avec une ligne de code et un point blanc dans le titre de l'onglet indiquant des modifications non enregistrées.](/assets/first-steps/setup/vscode-unsaved-file.png)
+
+Pour enregistrer le fichier, assurez-vous d'être dedans et appuyez sur `Command` + `S` sur Mac ou sur `Control` + `S` sur Windows. Le point blanc disparaît et est remplacé par un X quand vous enregistrez.
+
+![VS Code montrant le fichier main.ts enregistré avec un X à la place du point blanc dans le titre de l'onglet.](/assets/first-steps/setup/vscode-saved-file.png)
+
+Nous avons maintenant du code dans `main.ts`. Ce code est très simple : il va afficher `This is going to be fun!` dans le terminal.
+
+Pour exécuter le code, nous avons besoin du terminal. Si vous l'avez fermé ou s'il n'est pas ouvert, cliquez sur le menu `View`, puis sur `Terminal`, ou appuyez sur `Command` + `J` sur Mac ou sur `Control` + `J` sur Windows.
+
+Exécuter le code est très simple. Tapez d'abord `node` pour indiquer que vous voulez utiliser le moteur d'exécution Node.js, puis le nom du fichier que vous voulez exécuter avec Node.js : `main.ts`.
+
+Tapez cette commande dans le terminal et appuyez sur Entrée :
+
+```sh
+node main.ts
+```
+
+Vous devriez maintenant voir `This is going to be fun!` dans le terminal. Félicitations ! Vous venez d'exécuter votre première ligne de TypeScript ! 🎉
+
+![VS Code montrant la commande node main.ts dans le terminal et le message This is going to be fun!.](/assets/first-steps/setup/node-run-main.png)
+
+## Relancer automatiquement un script à chaque enregistrement
+
+Quand vous travaillez sur un projet, vous voulez généralement exécuter votre script plus d'une fois. Voir le résultat au fur et à mesure que vous écrivez le code vous aide à vérifier que vous allez dans la bonne direction. C'est pourquoi nous codons souvent en mode surveillance, ou « watch mode ».
+
+Pour exécuter votre script en mode surveillance, utilisez cette commande dans le terminal :
+
+```sh
+node --watch main.ts
+```
+
+L'option `--watch` indique à Node.js de continuer à surveiller le fichier. Chaque fois que vous enregistrez une modification, il efface automatiquement le contenu du terminal et relance le code.
+
+Quand vous exécutez cette commande, vous verrez que le code est relancé. Une nouvelle ligne bleue apparaît aussi dans le terminal : elle indique que Node.js attend des modifications du fichier avant de redémarrer.
+
+![VS Code montrant node --watch main.ts et un message bleu indiquant que Node.js attend des modifications du fichier avant de redémarrer.](/assets/first-steps/setup/node-watch-main.png)
+
+Essayons ! Remplacez le texte dans `main.ts` par un autre message :
+
+```ts showLineNumbers filename="main.ts"
+console.log("Hello again!");
+```
+
+Enregistrez le fichier (`Command` + `S` sur Mac ou `Control` + `S` sur Windows).
+
+Dès que vous enregistrez, le terminal s'efface et Node.js vous indique qu'il a détecté une modification dans votre script et l'a relancé. Vous pouvez voir `Hello again!` dans le terminal, suivi d'un message indiquant que Node.js continue de surveiller le fichier au cas où vous le modifieriez à nouveau.
+
+![VS Code montrant Hello again! dans main.ts et les messages du terminal confirmant la détection de la modification, le redémarrage du script et l'attente de nouvelles modifications.](/assets/first-steps/setup/node-watch-restart.png)
+
+Vous savez maintenant créer un fichier, écrire du code TypeScript, l'exécuter dans le terminal et utiliser le mode surveillance pendant que vous travaillez. Nous utiliserons cette configuration simple dans les prochaines leçons. Félicitations ! 🎉
+
+Pour arrêter la surveillance, cliquez dans le terminal et appuyez sur `Control` + `C`, sur Mac comme sur Windows. Dans les prochaines leçons, vous pouvez garder ce dossier et remplacer le code dans `main.ts`.
+
+## À propos de l'IA
+
+Vous avez peut-être remarqué que nous n'avons pas installé d'outils basés sur l'intelligence artificielle, comme [GitHub Copilot](https://github.com/features/copilot).
+
+Ces outils sont de plus en plus populaires pour les tâches de programmation et peuvent améliorer considérablement la productivité. Cependant, ils ne sont pas sans défauts. Ils peuvent introduire des erreurs et des bogues.
+
+Pour les programmeurs expérimentés, ce n’est pas un gros problème. Quand vous savez ce que vous faites, vous pouvez facilement vérifier et ajuster ce que l'IA vous donne.
+
+Pour les débutants, cependant, il est préférable de s'en passer. Prenez le temps de maîtriser les bases. Avec des fondations solides, vous pourrez alors exploiter pleinement le potentiel de ces outils.
+
+<NoticeEnd lang="fr" />

@@ -11,26 +11,26 @@ export default function NoticeIntro({ lang } = { lang: "en" }) {
 function pickLanguage(lang) {
     if (lang === "fr") {
         return (
-            <Callout emoji="">
+            <Callout emoji="" style={{ lineHeight: 1.7 }}>
                 Vous voulez être prévenu quand de nouvelles leçons sont
                 publiées ? Abonnez-vous à{" "}
                 <a
-                    style={{ textDecoration: "underline", fontWeight: "bold" }}
+                    style={{ textDecoration: "underline" }}
                     href="https://mailchi.mp/0db676437a2f/code-like-a-journalist"
                 >
                     l'infolettre ✉️
                 </a>{" "}
                 et donnez une ⭐ au cours sur{" "}
                 <a
-                    style={{ textDecoration: "underline", fontWeight: "bold" }}
+                    style={{ textDecoration: "underline" }}
                     href="https://github.com/nshiab/code-like-a-journalist"
                 >
                     GitHub
                 </a>{" "}
                 pour me garder motivé !{" "}
                 <a
-                    style={{ textDecoration: "underline", fontWeight: "bold" }}
-                    href="/contact"
+                    style={{ textDecoration: "underline" }}
+                    href="/fr/contact"
                 >
                     Cliquez ici
                 </a>{" "}
@@ -39,26 +39,26 @@ function pickLanguage(lang) {
         );
     } else {
         return (
-            <Callout emoji="">
+            <Callout emoji="" style={{ lineHeight: 1.7 }}>
                 Want to know when new lessons are available? Subscribe to the
                 {" "}
                 <a
-                    style={{ textDecoration: "underline", fontWeight: "bold" }}
+                    style={{ textDecoration: "underline" }}
                     href="https://mailchi.mp/0db676437a2f/code-like-a-journalist"
                 >
                     newsletter ✉️
                 </a>{" "}
                 and give a ⭐ to the{" "}
                 <a
-                    style={{ textDecoration: "underline", fontWeight: "bold" }}
+                    style={{ textDecoration: "underline" }}
                     href="https://github.com/nshiab/code-like-a-journalist"
                 >
                     GitHub repository
                 </a>{" "}
                 to keep me motivated!{" "}
                 <a
-                    style={{ textDecoration: "underline", fontWeight: "bold" }}
-                    href="/contact"
+                    style={{ textDecoration: "underline" }}
+                    href="/en/contact"
                 >
                     Click here
                 </a>{" "}

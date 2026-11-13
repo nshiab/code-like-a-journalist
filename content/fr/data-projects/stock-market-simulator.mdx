@@ -1,0 +1,444 @@
+---
+title: Simulateur de marché boursier 📈
+description: Apprenez à récupérer des données boursières et à coder un simulateur de rendements avec TypeScript.
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
+
+# Simulateur de marché boursier 📈
+
+Bienvenue dans ce nouveau projet ! Nous allons récupérer des données historiques du marché boursier et les utiliser pour estimer combien nous aurions gagné ou perdu en investissant dans des entreprises cotées en bourse.
+
+Avant de commencer, assurez-vous d'avoir suivi la [leçon Installation du chapitre 1](/first-steps/setup), ainsi que les sections **Fondamentaux de TypeScript** et **Bâtir avec TypeScript**. Ce projet est conçu pour vous aider à pratiquer tout ce que nous avons couvert jusqu'à présent dans ce cours.
+
+<NoticeIntro lang="fr" />
+
+## Quelle est la question ?
+
+Il est toujours important d'identifier clairement la question à laquelle nous voulons répondre avant de plonger trop vite dans un océan de données.
+
+Aujourd'hui, notre question est :
+- Combien aurions-nous gagné ou perdu en investissant dans une entreprise cotée en bourse à une date précise ?
+
+Pour y répondre, nous devons calculer la différence entre le montant initial et le montant final.
+
+Nous pouvons également identifier trois variables qui influenceront le résultat :
+- L'entreprise choisie
+- Le montant initial investi
+- La date de l'investissement
+
+Avec cela en tête, commençons !
+
+## Configuration
+
+Créez un nouveau dossier vide sur votre ordinateur, ouvrez-le avec VS Code et créez-y un fichier nommé `main.ts`.
+
+Tapez ce code dans `main.ts` et enregistrez le fichier :
+
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
+
+Configurons maintenant notre projet.
+
+Créez un fichier `package.json` dans le dossier de votre projet avec ce contenu pour que VS Code sache que nous utiliserons la syntaxe moderne des modules TypeScript :
+
+```json filename="package.json"
+{
+  "type": "module"
+}
+```
+
+Créez ensuite un fichier `tsconfig.json` dans le même dossier pour que TypeScript vérifie notre code selon ces règles modernes de modules :
+
+```json filename="tsconfig.json"
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "types": ["node"],
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  }
+}
+```
+
+La dernière chose à faire est d’installer les types de Node.js. Ouvrez le terminal (`Command` + `J` sur Mac ou `Control` + `J` sur Windows) et exécutez :
+
+```sh
+npm install --save-dev @types/node
+```
+
+Exécutez maintenant cette commande dans le terminal :
+
+```sh
+node --watch main.ts
+```
+
+Cette commande exécute notre code et le relance automatiquement chaque fois que nous enregistrons une modification, pour voir les résultats au fur et à mesure que nous travaillons.
+
+![VS Code montrant les fichiers de configuration du projet, l’installation des types de Node et main.ts exécuté en mode surveillance.](/assets/stock-market-simulator/setup.png)
+
+## Les données
+
+### Yahoo Finance
+
+Pour notre simulateur, nous avons besoin des prix historiques du marché boursier. L'une des sources les plus courantes de données financières est [Yahoo Finance](https://finance.yahoo.com/).
+
+Sur la [page d'accueil](https://finance.yahoo.com/), vous pouvez rechercher une entreprise cotée en bourse. Par exemple, recherchez Apple et cliquez sur le résultat correspondant.
+
+![Une capture d'écran montrant le site Yahoo Finance.](/assets/stock-market-simulator/search-apple.png)
+
+Vous arriverez sur la page de l'action Apple. Ces données sont très intéressantes ! Mais comment pouvons-nous les récupérer dans notre script ? 🤔
+
+![Une capture d'écran montrant le site Yahoo Finance.](/assets/stock-market-simulator/apple-page.png)
+
+### Récupération des données
+
+Ne vous inquiétez pas, j'ai créé une fonction juste pour cela !
+
+Nous allons installer ma librairie libre [Journalism Finance](https://github.com/nshiab/journalism-finance) et utiliser la fonction [`getYahooFinanceData`](https://nshiab.github.io/journalism-finance/functions/getYahooFinanceData.html). Elle récupère les données de Yahoo Finance sous la forme d'une liste propre d'objets contenant des timestamps et des valeurs.
+
+Mais attention : `getYahooFinanceData` utilise un point d'accès non documenté de Yahoo Finance et n'est ni affiliée à Yahoo ni approuvée par Yahoo. Il en va de même pour de nombreuses autres librairies libres que vous pourriez trouver pour récupérer ce type de données. Avant de l'utiliser, consultez les [conditions d'utilisation de Yahoo](https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html) et les [restrictions du fournisseur de données](https://help.yahoo.com/kb/finance/SLN2310.html) qui pourraient s'appliquer.
+
+Pour l'instant, arrêtons de surveiller et d'exécuter `main.ts`. Cliquez dans le terminal et appuyez sur `CTRL` + `C`. Installez ensuite la librairie en exécutant cette commande dans le terminal :
+
+```sh
+npm install @nshiab/journalism-finance
+```
+
+La dépendance figure maintenant dans `package.json` et est installée dans `node_modules`. npm met aussi à jour `package-lock.json`, qui enregistre les versions exactes des dépendances.
+
+![VS Code montrant Journalism Finance installée avec npm et listée dans package.json.](/assets/stock-market-simulator/install-journalism-finance.png)
+
+Nous allons d'abord recueillir les données, puis les utiliser. Pour garder le projet bien organisé, nous placerons les fonctions utilitaires réutilisables dans leurs propres fichiers. Créez un dossier `helpers` dans votre projet et ajoutez-y `getData.ts`. Cette fonction récupérera les données d'une entreprise cotée en bourse.
+
+Dans cette première fonction utilitaire, nous importons `getYahooFinanceData` depuis `@nshiab/journalism-finance`, nous l'appelons avec les paramètres expliqués ci-dessous, puis nous retournons les données. `getData` attend un paramètre de type chaîne de caractères, `symbol`. Comme la fonction est générale, nous pourrons la réutiliser pour n'importe quelle entreprise si nécessaire.
+
+L'ajout de `export default` nous permet d'importer la fonction là où nous en avons besoin, soit dans `main.ts` dans notre cas.
+
+```ts showLineNumbers filename="helpers/getData.ts"
+import { getYahooFinanceData } from "@nshiab/journalism-finance";
+
+export default async function getData(symbol: string) {
+  const dailyStockData = await getYahooFinanceData(
+    symbol,
+    new Date("1970-01-01"),
+    new Date(),
+    "adjclose",
+    "1d",
+  );
+
+  return dailyStockData;
+}
+```
+
+![VS Code montrant helpers/getData.ts important getYahooFinanceData et retournant les données boursières historiques.](/assets/stock-market-simulator/get-data-helper.png)
+
+Voici les arguments que nous passons à `getYahooFinanceData` :
+
+- `symbol` est le symbole boursier. Nous utiliserons `AAPL` pour Apple.
+- Les deux dates définissent la période. Nous commençons en 1970 et terminons aujourd'hui afin d'obtenir tous les prix disponibles.
+- `"adjclose"` sélectionne le prix ajusté de clôture. Celui-ci tient compte d'événements comme les fractionnements d'actions et les dividendes, ce qui le rend utile pour estimer le rendement d'un investissement.
+- `"1d"` demande la valeur à la fin de chaque journée.
+
+Notez que `getYahooFinanceData` est asynchrone parce qu'elle récupère des données sur Internet. Nous utilisons le mot-clé `await` pour nous assurer que toutes les données sont reçues avant de poursuivre l'exécution du script.
+
+<Callout type="info" emoji="💡">
+    En arrière-plan, `getYahooFinanceData` récupère des données depuis une API de Yahoo Finance. Une API, ou *Application Programming Interface*, permet à des programmes d'échanger des données.
+</Callout>
+
+Nous pouvons maintenant mettre à jour `main.ts` pour importer et appeler notre nouvelle fonction utilitaire, tout en gardant notre code bien organisé.
+
+À la ligne 3, nous créons la variable `symbol` et lui attribuons le symbole boursier d'Apple, `AAPL`. Nous passons cette variable à `getData`, qui attend un paramètre `symbol`. Là encore, nous utilisons `await` pour nous assurer de recevoir toutes les données avant de continuer. À la ligne 6, nous affichons les dix premiers résultats sous forme de tableau.
+
+```ts showLineNumbers filename="main.ts"
+import getData from "./helpers/getData.ts";
+
+const symbol = "AAPL";
+const dailyStockData = await getData(symbol);
+
+console.table(dailyStockData.slice(0, 10));
+```
+
+![VS Code montrant main.ts important getData, demandant les données AAPL et affichant les dix premières lignes avec console.table.](/assets/stock-market-simulator/main-get-data.png)
+
+Mais avant d'exécuter ce code, nous devons nous occuper d'une dernière chose.
+
+## Mise en cache
+
+Si nous exécutions `main.ts` maintenant, les données seraient récupérées à nouveau chaque fois que le code est exécuté.
+
+Nous ne voulons pas surcharger les serveurs de Yahoo avec nos requêtes. Nous devons respecter leur infrastructure. Nous ne voulons pas non plus être mis sur une liste noire... 🫣 Mettons donc les données en cache.
+
+L'idée est assez simple. La première fois que nous récupérons les données, nous les écrivons dans un fichier. Ensuite, chaque fois que le code s'exécute à nouveau, si le fichier existe, ce qui sera le cas, nous l'utilisons au lieu de récupérer les données une nouvelle fois.
+
+Créez un dossier `data` dans votre projet pour les données mises en cache.
+
+![VS Code montrant le nouveau dossier data à côté de helpers et main.ts, prêt à stocker les données boursières en cache.](/assets/stock-market-simulator/create-data-folder.png)
+
+Nous allons maintenant mettre à jour `getData` pour vérifier si un fichier mis en cache existe. Pour cela, nous utilisons `existsSync()` du module `node:fs`, qui retourne `true` si le fichier existe et `false` sinon. Nous pouvons ensuite utiliser des branches `if` et `else` pour lire les données depuis le fichier s'il existe, ou récupérer de nouvelles données s'il n'existe pas.
+
+```ts showLineNumbers filename="helpers/getData.ts" {2-3, 6-13, 21-23}
+import { getYahooFinanceData } from "@nshiab/journalism-finance";
+import { existsSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
+
+export default async function getData(symbol: string) {
+  const path = `./data/${symbol}.json`;
+  let dailyStockData;
+
+  if (existsSync(path)) {
+    console.log(`=> Cached data found at ${path}. Reading it...`);
+    dailyStockData = JSON.parse(await readFile(path, "utf8"));
+  } else {
+    console.log("=> No cached data found. Fetching it from Yahoo Finance...");
+    dailyStockData = await getYahooFinanceData(
+      symbol,
+      new Date("1970-01-01"),
+      new Date(),
+      "adjclose",
+      "1d",
+    );
+    console.log(`=> Data fetched. Writing it to ${path} for the next run...`);
+    await writeFile(path, JSON.stringify(dailyStockData));
+  }
+
+  return dailyStockData;
+}
+```
+
+Voici ce qui se passe lorsque vous exécutez ce code :
+
+- `path` contient le symbole boursier pour que chaque entreprise ait son propre fichier cache.
+- `existsSync()` vérifie si le fichier existe. Si oui, `readFile(path, "utf8")` le lit comme du texte et `JSON.parse()` reconstitue la liste.
+- Sinon, nous récupérons les prix, convertissons la liste en JSON et l’enregistrons avec `writeFile()`.
+- Enfin, la fonction retourne les données, quelle que soit leur source.
+
+Exécutez maintenant `main.ts` et surveillez les changements :
+
+```sh
+node --watch main.ts
+```
+
+La première fois, le fichier cache n’existe pas. Le bloc `else` récupère les données et écrit `AAPL.json` dans `data`.
+
+![VS Code montrant la première exécution récupérant les données boursières d’Apple, les enregistrant dans data/AAPL.json et affichant les premières lignes dans le terminal.](/assets/stock-market-simulator/data-fetched-aapl.png)
+
+<Callout type="info" emoji="💡">
+    Vous vous demandez ce que signifie `timestamp` ? Cet énorme nombre correspond au nombre de millisecondes écoulées depuis le 1er janvier 1970. C'est ainsi que JavaScript suit les dates et les heures en arrière-plan. Ici, la librairie nous fournit directement le timestamp plutôt qu'une date, mais comme nous le verrons, JavaScript permet de passer facilement des dates aux timestamps et vice versa.
+</Callout>
+
+Exécutez de nouveau `main.ts` en l'enregistrant (`CMD` + `S` sur Mac ou `CTRL` + `S` sur PC). Cette fois, la condition est remplie, car Node.js trouve `AAPL.json`. Le bloc `if` est exécuté, tandis que tout ce qui se trouve sous `else` est ignoré. Nous n'avons pas besoin de récupérer les données à nouveau. Nous les lisons plutôt depuis notre fichier local. C'est plus rapide et cela évite d'importuner les serveurs de Yahoo avec une autre requête.
+
+![VS Code montrant une exécution suivante lisant les données boursières d’Apple en cache dans data/AAPL.json et les affichant dans le terminal.](/assets/stock-market-simulator/data-cached-aapl.png)
+
+Vous pouvez conserver des données en cache pour plusieurs entreprises. Par exemple, remplacez `AAPL` dans la variable `symbol` par `GOOG` pour obtenir les prix historiques de l'action d'Alphabet, anciennement Google, puis exécutez le code.
+
+```ts showLineNumbers filename="main.ts" {3}
+import getData from "./helpers/getData.ts";
+
+const symbol = "GOOG";
+const dailyStockData = await getData(symbol);
+
+console.table(dailyStockData.slice(0, 10));
+```
+
+Vous verrez qu'un autre fichier, `GOOG.json`, est créé dans `data`.
+
+![VS Code montrant les données boursières GOOG récupérées depuis Yahoo Finance, enregistrées dans data/GOOG.json et affichées dans le terminal.](/assets/stock-market-simulator/data-fetched-goog.png)
+
+Si vous revenez à `AAPL`, les données sont toujours là. Plus besoin de les récupérer à nouveau !
+
+Et si vous voulez des prix plus récents, supprimez simplement les fichiers dans `data` et exécutez votre code de nouveau. Facile !
+
+```ts showLineNumbers filename="main.ts" {3}
+import getData from "./helpers/getData.ts";
+
+const symbol = "AAPL";
+const dailyStockData = await getData(symbol);
+
+console.table(dailyStockData.slice(0, 10));
+```
+
+![VS Code montrant le retour au symbole AAPL et la lecture des données boursières d’Apple depuis le cache existant.](/assets/stock-market-simulator/switch-back-to-aapl.png)
+
+<Callout type="info" emoji="💡">
+    Ici, nous utilisons la mise en cache pour éviter de solliciter trop souvent les serveurs de Yahoo. Mais la mise en cache est aussi très couramment utilisée pour améliorer les performances. Lire un fichier local est beaucoup plus rapide que de récupérer des données sur Internet. Par exemple, un script peut effectuer des calculs complexes qui prennent beaucoup de temps. Au lieu de les répéter à chaque exécution du script, vous pouvez mettre les résultats en cache et les lire directement lors des exécutions suivantes.
+</Callout>
+
+## Calcul des rendements
+
+Nous avons maintenant tout ce qu'il nous faut pour calculer les rendements !
+
+Créons une autre fonction, `calculateFinalAmount`, dans `helpers`. Cette fonction aura besoin de trois paramètres :
+- Le montant investi, `amount`, qui doit être un `number`
+- La date de l'investissement, `startDate`, qui est une `Date`
+- Les données `dailyStockData` retournées par `getYahooFinanceData`, soit une liste d'objets associant un `timestamp` à une `value`
+
+```ts showLineNumbers filename="helpers/calculateFinalAmount.ts"
+export default function calculateFinalAmount(
+  amount: number,
+  startDate: Date,
+  dailyStockData: { timestamp: number; value: number }[],
+) {
+  console.log("=> Calculating final amount...");
+
+  const filteredDailyStockData = dailyStockData.filter((dailyData) =>
+    dailyData.timestamp >= startDate.getTime()
+  );
+
+  const initialValue = filteredDailyStockData[0].value;
+  const finalValue = filteredDailyStockData[filteredDailyStockData.length - 1]
+    .value;
+  const rateOfReturn = (finalValue - initialValue) / initialValue;
+
+  return amount + amount * rateOfReturn;
+}
+```
+
+Voici ce qui se passe lorsque nous appelons cette fonction :
+
+- La ligne 6 indique dans le terminal que la fonction est appelée.
+- Les lignes 8 à 10 conservent uniquement les données à partir de la date de l'investissement.
+- La ligne 12 récupère la valeur initiale de l'action.
+- Les lignes 13 et 14 récupèrent sa valeur la plus récente.
+- La ligne 15 calcule le taux de rendement, qui peut être positif ou négatif.
+- La ligne 17 calcule le montant final : le montant initial auquel s'ajoute le montant multiplié par le taux de rendement.
+
+Si nous exécutons notre code maintenant, rien ne se produira. Nous devons encore appeler notre nouvelle fonction dans `main.ts`.
+
+Nous importons d'abord `calculateFinalAmount`. Ensuite, nous créons les variables `amount` et `startDate`, puis nous les passons à la fonction avec `dailyStockData`. Enfin, nous stockons son résultat dans une nouvelle variable nommée `finalAmount`.
+
+```ts showLineNumbers filename="main.ts" {2, 5-6, 10, 12}
+import getData from "./helpers/getData.ts";
+import calculateFinalAmount from "./helpers/calculateFinalAmount.ts";
+
+const symbol = "AAPL";
+const amount = 1000;
+const startDate = new Date("2020-01-01");
+
+const dailyStockData = await getData(symbol);
+
+const finalAmount = calculateFinalAmount(amount, startDate, dailyStockData);
+
+console.log(finalAmount);
+```
+
+Et voici le résultat ! Ça fonctionne ! Vous auriez environ 4 764 $ aujourd'hui, en octobre 2026, si vous aviez investi 1 000 $ dans Apple en janvier 2020.
+
+![VS Code montrant main.ts appelant calculateFinalAmount et le montant final de l’investissement dans le terminal.](/assets/stock-market-simulator/final-amount.png)
+
+## Affichage du résultat
+
+Créons une fonction pour afficher le résultat plus clairement.
+
+Dans `helpers`, créez une fonction appelée `logResult`.
+
+Pour rendre le message plus facile à lire, nous formatons `startDate` avec `.toLocaleDateString("en-US")`. `"en-US"` est ce que nous appelons une locale. Elle précise que la date doit être formatée en anglais pour les États-Unis, mais vous pouvez utiliser la locale de votre choix, comme `"fr-CA"` pour le français au Canada. Nous arrondissons également `finalAmount` avec `Math.round()`.
+
+Nous précisons `timeZone: "UTC"` parce qu’une date sans heure comme `"2020-01-01"` est interprétée en UTC. La date affichée reste ainsi identique quel que soit votre fuseau horaire.
+
+```ts showLineNumbers filename="helpers/logResult.ts"
+export default function logResult(
+  amount: number,
+  symbol: string,
+  startDate: Date,
+  finalAmount: number,
+) {
+  const formattedDate = startDate.toLocaleDateString("en-US", { timeZone: "UTC" });
+  const roundedAmount = Math.round(finalAmount);
+
+  console.log(
+    `\nIf you had invested $${amount} in ${symbol} on ${formattedDate}, you would have $${roundedAmount} today.\n`,
+  );
+}
+```
+
+Nous pouvons maintenant utiliser cette fonction dans `main.ts`.
+
+```ts showLineNumbers filename="main.ts" {3, 13}
+import getData from "./helpers/getData.ts";
+import calculateFinalAmount from "./helpers/calculateFinalAmount.ts";
+import logResult from "./helpers/logResult.ts";
+
+const symbol = "AAPL";
+const amount = 1000;
+const startDate = new Date("2020-01-01");
+
+const dailyStockData = await getData(symbol);
+
+const finalAmount = calculateFinalAmount(amount, startDate, dailyStockData);
+
+logResult(amount, symbol, startDate, finalAmount);
+```
+
+![VS Code montrant main.ts appelant logResult et le résultat formaté de l’investissement de 4 764 $ dans le terminal.](/assets/stock-market-simulator/log-result.png)
+
+Magnifique, n'est-ce pas ? 😍
+
+## Un instant...
+
+Tout fonctionne bien avec une `startDate` en janvier 2020... Mais que se passerait-il si la date de début était en 1970, avant l'entrée en bourse d'Apple ?
+
+C'est impossible ! Notre code devrait avertir la personne qui l'utilise.
+
+Remplacez `startDate` par `"1950-01-01"` pour faire un test... Le code retourne un montant, alors qu'il devrait déclencher une erreur ! 😱
+
+![VS Code montrant une date d’investissement en 1950 et un résultat impossible avant l’entrée en bourse d’Apple.](/assets/stock-market-simulator/impossible-result.png)
+
+Écrasons ce bogue ! 🐛
+
+Nous pouvons mettre à jour `calculateFinalAmount`, qui reçoit déjà `startDate` et `dailyStockData`. Les lignes que nous ajoutons ci-dessous comparent la date de l'investissement au premier prix disponible. Si la date de l'investissement est antérieure, la fonction déclenche une erreur accompagnée d'un message.
+
+```ts showLineNumbers filename="helpers/calculateFinalAmount.ts" {8-12}
+export default function calculateFinalAmount(
+  amount: number,
+  startDate: Date,
+  dailyStockData: { timestamp: number; value: number }[],
+) {
+  console.log("=> Calculating final amount...");
+
+  if (startDate.getTime() < dailyStockData[0].timestamp) {
+    throw new Error(
+      "The company was not public at that time. Please choose a later date.",
+    );
+  }
+
+  const filteredDailyStockData = dailyStockData.filter((dailyData) =>
+    dailyData.timestamp >= startDate.getTime()
+  );
+
+  const initialValue = filteredDailyStockData[0].value;
+  const finalValue = filteredDailyStockData[filteredDailyStockData.length - 1]
+    .value;
+  const rateOfReturn = (finalValue - initialValue) / initialValue;
+
+  return amount + amount * rateOfReturn;
+}
+```
+
+![VS Code montrant calculateFinalAmount déclenchant une erreur lorsque la date d’investissement précède l’entrée en bourse de l’entreprise.](/assets/stock-market-simulator/error.png)
+
+<Callout type="info" emoji="💡">
+    Déclencher une erreur arrête le script et fournit, espérons-le, un message utile. L'erreur indique également son origine. Dans la capture d'écran ci-dessus, `calculateFinalAmount.ts:9:15` désigne la ligne 9 et le caractère 15 de ce fichier. Dans VS Code, faites `CMD` + clic sur cette référence pour accéder directement à l'erreur, ce qui est très pratique pour déboguer.
+</Callout>
+
+C'est mieux. Nous ne retournerons plus de résultats impossibles ! Vous pouvez maintenant essayer différentes valeurs pour `startDate` en toute sécurité.
+
+Mais sommes-nous complètement à l'abri ? Que se passe-t-il si vous fournissez une date dans le futur ? 🤔 Essayez de trouver un moyen de déclencher une autre erreur dans ce cas. Voici un indice : `Date.now()` vous donne la date et l'heure actuelles sous la forme d'un nombre de millisecondes.
+
+## Conclusion
+
+Félicitations ! Vous avez appris beaucoup de choses dans ce projet. Nous avons utilisé une librairie pour récupérer des données propres, nous les avons mises en cache localement et nous avons calculé le rendement d'un montant investi à une date précise. Ce n'est pas rien !
+
+Vous pouvez maintenant continuer à expérimenter avec ce script. Recherchez d'autres entreprises sur le site de Yahoo et copiez-collez leurs symboles. Essayez différents montants et différentes dates d'investissement !
+
+Vous pouvez aussi modifier le code pour ajouter d'autres fonctionnalités. Voici quelques idées :
+- Comparer les rendements de plusieurs entreprises
+- Investir dans plusieurs entreprises à la fois
+- Acheter et vendre des actions à différentes dates
+
+Amusez-vous ! 💃🕺
+
+<NoticeEnd lang="fr" />

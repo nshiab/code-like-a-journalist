@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site and search index
+        run: npm run build
+
+      - name: Smoke test routes
+        run: |
+          npm run start &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          curl --fail --retry 30 --retry-delay 1 --retry-connrefused \
+            http://localhost:3000/en --output /dev/null
+          npm run smoke
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high

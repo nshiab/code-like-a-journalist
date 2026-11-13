@@ -1,0 +1,320 @@
+---
+title: What is Git and how to use it?
+description: In this lesson, we learn the basics of using Git.
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
+
+# What is Git and how to use it?
+
+Programming is hard. You have a lot of code in many files, making it difficult to keep track of everything you're doing. It's even harder if you're collaborating with other people!
+
+This is why [Git](https://git-scm.com/) was released in 2005 and is now used by millions of coders around the world. It's an open source **version control system**. It's the kind of tool that, once you start using it, you wonder how you ever worked without it!
+
+In this lesson, we’ll write a small program that prints a greeting and use Git to track how it changes.
+
+Note that I'll show you how to use Git in the terminal. I think it's important to understand how this tool works. But the next lesson will be more visual thanks to GitHub’s interface.
+
+<NoticeIntro />
+
+## Setup
+
+If you need to install Git, follow [the steps for your operating system on the official Git website](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+
+![Git installation steps.](/assets/git-and-github/git-basics/install.png)
+
+<Callout type="info" emoji="💡">
+    If you’re on macOS, you may already have Git installed. Run `git --version` in your terminal to check. If it prints a version number, you can skip the installation and continue to Initialization.
+</Callout>
+
+## Initialization
+
+Once Git is installed, create a new folder and open it with VS Code.
+
+If you click on `Source Control` in the left sidebar, you'll see that there is no Git repository in this project.
+
+![Message in VS Code saying that there is no Git repository.](/assets/git-and-github/git-basics/no-repo.png)
+
+Open the terminal in VS Code (`Command` + `J` on Mac or `Control` + `J` on Windows).
+
+<Callout type="info" emoji="💡">
+
+**If this is your first time using Git**, run the commands below. Replace `Your Name` and `you@example.com` with the details you want attached to your projects.
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git config --global init.defaultBranch main
+```
+
+The `--global` flag saves these settings for all your Git projects. The last command tells Git to name the first branch `main` in new repositories (more about branches below).
+
+To update a global setting, rerun its command with a new value. For one project, replace `--global` with `--local` in the name or email command and run it inside that project’s repository.
+
+</Callout>
+
+To initialize a new Git repository, run `git init` in the terminal.
+
+Your project is now a Git repository! 🎉 That was easy, right?
+
+![Message in VS Code saying that there is a Git repository.](/assets/git-and-github/git-basics/repo-init.png)
+
+Git stores your project’s history in a hidden `.git` folder. VS Code hides this folder in Explorer by default, so if you switch back to `Explorer` in the left sidebar, your project will still look empty. The difference is that Git can now track changes. We’ll see what that looks like when we add a file in the next section.
+
+![VS Code’s Explorer looks empty after running git init.](/assets/git-and-github/git-basics/explorer-after-init.png)
+
+<Callout type="info" emoji="💡">
+    To see the `.git` folder, open your project folder in Finder on macOS or File Explorer on Windows and turn on the option to show hidden files.
+</Callout>
+
+## New files
+
+Create a file named `main.ts` directly in your project folder. Add this line and save the file.
+
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
+
+You’ll notice that `main.ts` is now green with a `U` next to it in Explorer and in the editor tab. Green shows that Git detected a new file. The `U` stands for `Untracked`, which means Git can see the file but hasn’t started tracking it yet.
+
+On the far left, the `1` on the `Source Control` icon means one file has changes waiting to be committed. Here, that file is the new `main.ts`.
+
+![VS Code shows main.ts in green with a U and a 1 on the Source Control icon.](/assets/git-and-github/git-basics/new-file.png)
+
+You can keep writing and running your code while you work with Git. For example, you can run `main.ts` while it’s still untracked. Open the terminal in your project folder and run this command.
+
+```bash
+node main.ts
+```
+
+![The terminal prints Hello! while main.ts is still marked U in VS Code.](/assets/git-and-github/git-basics/first-greeting.png)
+
+## Tracking and committing
+
+To start tracking changes in your project with Git, save a version of your project in two steps.
+
+1. **Stage** the changes you want to include. This tells Git which new files, edits, and deletions to include in the next version. Run `git add -A` to stage all changes in the project.
+2. **Commit** the staged changes. A commit is a snapshot of your project saved in Git’s history with a message and a unique ID. Run `git commit -m "Add first greeting"`. The `-m` flag lets you write the message in quotes.
+
+After the commit, `main.ts` is white again and the `U` disappears. The file now matches the version saved in Git.
+
+![After the first commit, main.ts is white in Explorer and the terminal shows the commit result.](/assets/git-and-github/git-basics/first-commit-explorer.png)
+
+Open the `Source Control` panel. The `Graph` section shows your Git history, including your first commit, `Add first greeting`.
+
+![The Source Control Graph shows the first commit, Add first greeting.](/assets/git-and-github/git-basics/first-commit.png)
+
+## Updating files
+
+In `main.ts`, add `Nael` to the greeting and save the file.
+
+```ts showLineNumbers filename="main.ts"
+console.log("Hello, Nael!");
+```
+
+In Explorer, `main.ts` now appears in orange with an `M` for `Modified`. The blue bar beside line 1 shows where the file differs from your last commit.
+
+![VS Code marks main.ts with an orange M and shows a blue bar beside line 1.](/assets/git-and-github/git-basics/changes.png)
+
+Click the blue bar to inspect the edit. The green highlight shows exactly what you added to the line: the comma, the space, and `Nael`.
+
+![The inline comparison highlights the added comma, space, and name in green.](/assets/git-and-github/git-basics/inspecting-changes.png)
+
+Click the `Source Control` icon in the Activity Bar on the far left. Under `Changes`, click `main.ts` to open the **Working Tree** comparison. If your editor is wide enough to show the versions side by side, the version from your last commit is on the left and your current version is on the right.
+
+![The Working Tree comparison shows Hello! on the left and Hello, Nael! on the right.](/assets/git-and-github/git-basics/working-tree.png)
+
+This is why Git is so useful. It lets you see exactly what changed and where. Here we changed one line in one file. Now imagine reviewing changes across hundreds of files, each with hundreds of lines of code. Git helps you find a specific edit without reading through every line.
+
+Let’s save this version too. Stage the change and make another commit.
+
+```bash
+git add -A
+git commit -m "Add name to greeting"
+```
+
+Close the `Working Tree` tab. In `Graph`, you’ll see `Add name to greeting` above your first commit. The new version is now part of your Git history.
+
+![Graph shows Add name to greeting above Add first greeting.](/assets/git-and-github/git-basics/second-commit.png)
+
+## Resetting to an earlier commit
+
+Let’s say adding `Nael` was a mistake and you want to go back to the previous version. Open `Graph` in VS Code or run `git log` in the terminal. Both show the two commits you’ve made so far.
+
+We want to restore the snapshot saved by `Add first greeting`, when the message was just `Hello!`. In `Graph`, right-click `Add first greeting` and choose `Copy Commit Hash`. You can also copy the yellow hash for `Add first greeting` directly from the `git log` output. Both give you the same hash.
+
+![Graph and git log show both commits. The arrows point to Add first greeting, the version we want to restore.](/assets/git-and-github/git-basics/copy-id.png)
+
+Now that you have the commit hash, Git’s unique ID for that snapshot, replace `COMMIT_HASH` in the command below with the hash you copied.
+
+```bash
+git reset --hard COMMIT_HASH
+```
+
+With `--hard`, Git restores your tracked files to the state they were in when you made the chosen commit. Git can remove files you added later or bring back files you deleted. However, any changes to those files that you haven’t saved with Git will be lost.
+
+Later commits disappear from `Graph`. Here, `Add name to greeting` is gone and `Add first greeting` is back at the top. Open `main.ts` and you’ll see just `Hello!` in the greeting, exactly as it was in your first commit.
+
+![After the reset, Graph shows only Add first greeting and main.ts contains the original Hello! message.](/assets/git-and-github/git-basics/reset-to-first-commit.png)
+
+<Callout type="info" emoji="💡">
+    `git reset --hard` is like going back in time. You can often return to a commit you already made. **Be careful, though.** Changes you haven’t saved with Git can be lost forever. Double-check your work and make a copy of any changes you want to keep before running the command.
+</Callout>
+
+## Branches
+
+When you ran `git init`, Git set up your first branch. It’s called `main` because of the setting you added earlier. You can see your current branch in the bottom-left corner of VS Code.
+
+![The bottom-left corner of VS Code shows main as the current branch.](/assets/git-and-github/git-basics/main-branch.png)
+
+The `main` branch usually holds the version of the project that works well, has been tested, and is ready to share.
+
+When you want to add a feature, fix a bug, or try an idea, you’ll usually create a new branch. You can make commits and test your changes there while leaving `main` untouched. Once your change is ready, you can bring it into `main`. We’ll try that with a French greeting.
+
+Branches also let several people work on different changes in the same project at the same time. We’ll see how that works later.
+
+### Adding a branch
+
+To create a branch and switch to it in one step, use `git switch` with `-c`, short for `--create`.
+
+```bash
+git switch -c french-greeting
+```
+
+This command creates a new branch called `french-greeting` and switches you to it.
+
+![The terminal confirms the switch to french-greeting, and VS Code shows the branch name in Graph and in the bottom-left corner.](/assets/git-and-github/git-basics/new-branch.png)
+
+Your code looks exactly as it did on `main` because `french-greeting` starts from the same commit. VS Code now shows `french-greeting` in `Graph` and in the bottom-left corner.
+
+To see your branches, click the branch name in the bottom-left corner of VS Code. A list opens at the top of the window. You can also run `git branch` in the terminal to list your local branches. The `*` marks the branch you’re on.
+
+![VS Code lists both branches at the top, and git branch marks french-greeting with an asterisk in the terminal.](/assets/git-and-github/git-basics/list-branches.png)
+
+### Working on a branch
+
+In `main.ts`, change `Hello` to `Bonjour` and save the file.
+
+```ts showLineNumbers filename="main.ts"
+console.log("Bonjour!");
+```
+
+Just like before, `main.ts` turns orange in the editor tab and gets an `M` for `Modified`. You’ll also see it under `Changes` in `Source Control`.
+
+![VS Code marks main.ts as modified after Hello changes to Bonjour on french-greeting.](/assets/git-and-github/git-basics/french-greeting-modified.png)
+
+Stage and commit the change. Since you’re on `french-greeting`, the commit goes on that branch and leaves `main` untouched.
+
+```bash
+git add -A
+git commit -m "Translate greeting to French"
+```
+
+![Graph shows the translation commit on french-greeting.](/assets/git-and-github/git-basics/commit-new-branch.png)
+
+Let’s say you need to pause work on `french-greeting` and check something on `main`. Use `git switch` to go back.
+
+```bash
+git switch main
+```
+
+![After git switch main, VS Code shows main as the current branch and main.ts contains Hello!.](/assets/git-and-github/git-basics/checkout-main.png)
+
+Your files now show the version saved in the latest commit on `main`, so `main.ts` contains `Hello!` again. It looks like the French greeting has disappeared from the project. But Git still has your translation saved on `french-greeting`. Switch back to that branch to pick up where you left off.
+
+```bash
+git switch french-greeting
+```
+
+Now `main.ts` contains `Bonjour!` again. You can switch between branches like this to work on several changes while keeping a version on `main` that’s always ready to share or publish.
+
+![After git switch french-greeting, VS Code shows french-greeting as the current branch and main.ts contains Bonjour!.](/assets/git-and-github/git-basics/switch-to-french-greeting.png)
+
+<Callout type="info" emoji="💡">
+    In the VS Code terminal, you can use autocomplete. Try typing `git switch fr` and pressing `Tab` to complete the branch name `french-greeting`.
+</Callout>
+
+### Merging branches
+
+Let’s say we’re happy with the French greeting and want to make it part of the final project. We can bring that change into `main`. First, switch back to `main`.
+
+```bash
+git switch main
+```
+
+![The terminal confirms the switch to main, and main.ts shows the English greeting before the merge.](/assets/git-and-github/git-basics/switch-to-main-before-merge.png)
+
+To bring changes from one branch into another, first switch to the branch that should receive the changes. Now that you’re on `main`, you can merge `french-greeting` into it.
+
+```bash
+git merge french-greeting
+```
+
+After the merge, `main.ts` contains `Bonjour!`.
+
+The terminal summarizes what changed in the merge. Only one file changed, `main.ts`. The `2` beside its name counts two line changes: Git removed the line with `Hello!` (`-`) and added the line with `Bonjour!` (`+`). That’s one deletion and one insertion.
+
+![The terminal shows one insertion and one deletion after the merge, and main.ts contains Bonjour!](/assets/git-and-github/git-basics/merge-terminal.png)
+
+Open **Source Control** and look under **Graph**. The **Translate greeting to French** commit is now part of `main`’s history.
+
+![Graph shows the translation commit on main, the terminal reports a fast-forward merge, and main.ts contains Bonjour!](/assets/git-and-github/git-basics/merge-french-greeting.png)
+
+<Callout type="info" emoji="💡">
+    When you merge a branch, Git brings its existing commits and their changes into the branch you’re on. Here, the French greeting is already saved on `main`, so you can skip staging and committing it again.
+</Callout>
+
+### Deleting branches
+
+Now that the translation is part of `main`, delete the branch you used to develop it.
+
+```bash
+git branch -d french-greeting
+```
+
+The `-d` flag lets you delete a branch once Git confirms its work has been merged. The terminal confirms that Git deleted `french-greeting`.
+
+![The terminal confirms that french-greeting was deleted, and main.ts still contains Bonjour! on main.](/assets/git-and-github/git-basics/delete-french-greeting.png)
+
+You can create as many branches as you need. However, deleting branches once you’ve merged their changes keeps the branch list tidy and makes it easier to see what’s still in progress, whether you’re working alone or with a team.
+
+Now, if you run `git branch`, you’ll see that only `main` is listed. The translation commit is still in its history.
+
+![The terminal lists main as the only remaining branch, with an asterisk marking it as the current branch.](/assets/git-and-github/git-basics/list-branches-after-deletion.png)
+
+## Removing Git
+
+The hidden `.git` folder contains the files Git uses to keep track of your project’s history and branches. VS Code uses that information to show your commits and current branch, even though it hides the folder in Explorer by default.
+
+To remove Git tracking from a project, open the project folder in Finder or File Explorer and show hidden items if needed. Select only the hidden `.git` folder and move it to the trash. This removes the project’s Git history and configuration while leaving `main.ts` in place.
+
+![In Finder, an arrow points to the hidden .git folder above main.ts.](/assets/git-and-github/git-basics/git-folder-in-finder.png)
+
+
+## Conclusion
+
+Congratulations! You now know how to use Git. Think of all the `project_final_v1`, `project_final_v2`, and `project_final_final` files you’ve probably made over the years. With Git, a single file can have a whole history. Commit often so you have a version to go back to if you make a mistake.
+
+Here are the Git commands you learned.
+
+- `git init` to start a new Git repository
+- `git add -A` to stage new, modified, and deleted files
+- `git commit -m "A message"` to save the staged changes in a commit with a message
+- `git log` to view the commit history and find commit hashes
+- `git reset --hard COMMIT_HASH` to restore your branch and tracked files to an earlier commit
+- `git switch -c my-new-branch` to create and switch to a new branch
+- `git switch my-new-branch` to switch to an existing branch
+- `git branch` to list local branches and see which one you’re on
+- `git merge my-new-branch` to bring changes from that branch into your current branch
+- `git branch -d my-new-branch` to delete a branch
+
+Of course, our use case here was quite simple. Things can get more complicated when multiple people work at the same time on different branches and conflicts between branches can happen. But this should be enough to get you started on your Git journey!
+
+By the way, Git is great with any text-based files, but you can also track images, videos, and more!
+
+Always assume your commit messages are public. You never know when you'll be asking a colleague for help! And if you're working on an open-source project, well, everyone will see your commits! 😅
+
+Now, using Git is great, but so far we've kept everything on our computer. In the next lesson, we'll talk about GitHub, which can store your code in the cloud for free!
+
+<NoticeEnd />

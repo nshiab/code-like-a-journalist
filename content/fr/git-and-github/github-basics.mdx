@@ -1,0 +1,428 @@
+---
+title: Qu'est-ce que GitHub et comment l'utiliser ?
+description: Dans cette leçon, on apprend les bases de l'utilisation de GitHub.
+---
+
+import { Callout } from "nextra/components";
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx";
+
+# Qu'est-ce que GitHub et comment l'utiliser ?
+
+[GitHub](https://github.com/) est une plateforme appartenant à Microsoft. Elle est devenue le lieu de prédilection pour de nombreux développeurs et entreprises travaillant sur des projets en code ouvert. Vous pouvez héberger des projets publics gratuitement sur GitHub et profiter de nombreuses fonctionnalités qui facilitent la vie des programmeurs.
+
+Vous pouvez aussi créer des dépôts privés avec un compte gratuit, bien sûr. Et [vous pouvez payer si vous avez besoin de plus de ressources](https://github.com/pricing). Mais j'utilise GitHub pour mes projets en code ouvert depuis des années (les librairies [SDA](https://github.com/nshiab/simple-data-analysis) et [journalism](https://github.com/nshiab/journalism), ainsi que [ce cours aussi](https://github.com/nshiab/code-like-a-journalist)) et je n'ai jamais atteint les limites du plan gratuit !
+
+GitHub fonctionne avec Git. Dans la leçon [Comment utiliser Git ?](/git-and-github/git-basics), nous avons utilisé Git pour suivre les modifications d’un petit programme qui affiche une salutation. Ici, nous repartirons de zéro avec le même genre de programme. Nous le pousserons sur GitHub, puis nous traduirons la salutation en français.
+
+<NoticeIntro lang="fr" />
+
+## Compte GitHub
+
+Pour utiliser GitHub, il faut d'abord [créer un compte](https://github.com/). Commencez donc par là.
+
+![La page d’accueil de GitHub avec des flèches qui pointent vers le champ de l’adresse courriel et le bouton Sign up.](/assets/git-and-github/github-basics/github-account.png)
+
+## Un réseau social
+
+Une fois connecté à GitHub, vous pouvez passer de **Home** à **Feed**. [Home](https://github.com/dashboard) est votre tableau de bord personnel. Vous y trouverez les projets sur lesquels vous travaillez.
+
+GitHub est aussi un réseau social. Dans votre fil d’actualité, [Feed](https://github.com/feed), vous pouvez voir sur quoi travaillent les personnes que vous suivez et découvrir les nouveautés des projets en code ouvert qui vous intéressent. Voici à quoi ressemblait mon fil quand j’ai écrit cette leçon.
+
+![La page Feed de GitHub avec des flèches qui pointent vers son URL, son onglet dans la barre latérale et son titre.](/assets/git-and-github/github-basics/feed.png)
+
+Les utilisateurs ont un profil public qui montre leur activité publique. Vous pouvez les suivre pour voir leur activité dans votre fil. [Voici mon profil, par exemple](https://github.com/nshiab). **Suivez-moi !** 🤗
+
+Personnellement, j’aime suivre d’autres journalistes computationnels ou les mainteneurs de projets en code ouvert que j’utilise. Vous pouvez mettre à jour votre profil et vos paramètres en cliquant sur le bouton en haut à droite.
+
+![Le profil GitHub de Nael Shiab avec une flèche qui pointe vers le bouton Follow.](/assets/git-and-github/github-basics/profile.png)
+
+Les dépôts publics ont aussi une page publique. Quand vous aimez un projet, vous pouvez lui attribuer une étoile. Par exemple, voici la page de la librairie [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) que je maintiens et qu’on utilise dans les leçons précédentes. **Ajoutez-lui une 🌟 !**
+
+Vous pouvez aussi recevoir des notifications quand un projet que vous utilisez est mis à jour. Ouvrez le menu de la cloche pour choisir les mises à jour qui vous intéressent. En général, je m’abonne aux nouvelles versions des projets en code ouvert que j’utilise.
+
+![Le dépôt Simple Data Analysis avec des flèches qui pointent vers les boutons Notifications et Star.](/assets/git-and-github/github-basics/sda-repo.png)
+
+## Créer un dépôt
+
+Créez un dossier nommé `my-first-repo` et ouvrez-le dans VS Code. Dans ce dossier, créez un fichier nommé `main.ts`, ajoutez la ligne suivante et enregistrez le fichier.
+
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
+
+Ouvrez le terminal de VS Code (`Command` + `J` sur Mac ou `Control` + `J` sur Windows).
+
+<Callout type="info" emoji="💡">
+
+Si vous utilisez Git pour la première fois, [installez-le d’abord](/git-and-github/git-basics#installation). Exécutez ensuite les commandes ci-dessous une seule fois pour configurer votre nom, votre adresse courriel et votre branche par défaut. Remplacez le nom et l’adresse d’exemple par vos propres renseignements.
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git config --global init.defaultBranch main
+```
+
+</Callout>
+
+Initialisez un dépôt Git avec `git init`. Préparez ensuite `main.ts` avec `git add`, puis enregistrez-le dans votre historique Git avec votre premier commit.
+
+```bash
+git init
+git add main.ts
+git commit -m "Add first greeting"
+```
+
+![VS Code affiche Hello! dans main.ts et le terminal confirme le premier commit.](/assets/git-and-github/github-basics/first-commit.png)
+
+Votre salutation est maintenant enregistrée dans un commit sur votre ordinateur. Créons un dépôt sur GitHub pour y pousser ce commit.
+
+Sur GitHub, cliquez sur le bouton `+` en haut à droite et sélectionnez `New repository`.
+
+![Des flèches pointent vers le bouton plus et l’option New repository dans le tableau de bord GitHub.](/assets/git-and-github/github-basics/new-button.png)
+
+Nommez le dépôt `my-first-repo` et rendez-le privé pour vous exercer. Laissez désactivées les options pour ajouter un README, un fichier `.gitignore` et une licence. Vous aurez ainsi un dépôt vide où pousser votre projet existant. Cliquez sur `Create repository`.
+
+![Le formulaire GitHub montre my-first-repo avec la visibilité Private, sans README, fichier .gitignore ni licence.](/assets/git-and-github/github-basics/new-repo-settings.png)
+
+Votre dépôt est maintenant sur GitHub. Il est encore vide, alors GitHub vous redirige vers une page qui explique comment pousser votre projet depuis votre ordinateur vers GitHub.
+
+Sur la page `Quick setup`, sélectionnez `HTTPS`. Repérez le bloc sous **push an existing repository from the command line** et cliquez sur le bouton de copie en haut à droite du bloc pour copier les trois commandes.
+
+![Des flèches pointent vers HTTPS et les commandes sous « push an existing repository from the command line » sur la page Quick setup de GitHub.](/assets/git-and-github/github-basics/new-repo-steps.png)
+
+De retour dans VS Code, ouvrez le terminal dans le dossier du projet. Collez les commandes que vous avez copiées et appuyez sur Entrée pour les exécuter. Une fois l’envoi réussi, Git confirme que votre branche locale `main` suit la branche `origin/main`.
+
+![Le terminal de VS Code affiche les trois commandes de GitHub et confirme que main suit maintenant origin/main.](/assets/git-and-github/github-basics/first-push.png)
+
+<Callout type="info" emoji="💡">
+
+Pour envoyer du code depuis votre ordinateur, GitHub doit vérifier votre identité et s’assurer que votre compte a accès en écriture au dépôt choisi. J’ai déjà ouvert une session sur mon ordinateur, alors cette étape n’apparaît pas dans la capture d’écran.
+
+Lors de votre premier envoi, on pourrait vous demander d’ouvrir un lien et de vous connecter à GitHub dans votre navigateur. Une fois la connexion établie, votre ordinateur peut enregistrer un identifiant pour que GitHub reconnaisse automatiquement votre compte au prochain envoi.
+
+Si Git vous demande un mot de passe dans le terminal ou si vous n’arrivez pas à vous connecter, suivez le [guide de GitHub pour configurer vos identifiants HTTPS](https://docs.github.com/fr/get-started/git-basics/caching-your-github-credentials-in-git), puis relancez `git push -u origin main`.
+
+</Callout>
+
+Ces trois commandes ont envoyé votre code sur GitHub et relié votre branche locale `main` à la branche `main` sur GitHub. Désormais, sur `main`, vous pouvez utiliser `git push` pour envoyer vos changements de votre ordinateur vers GitHub et `git pull` pour récupérer les changements de GitHub sur votre ordinateur.
+
+Actualisez la page du dépôt sur GitHub. Vous devriez voir `main.ts` sur `main`, ainsi que votre dernier commit.
+
+![Le dépôt privé my-first-repo sur GitHub affiche main.ts sur la branche main ainsi que le commit Add first greeting.](/assets/git-and-github/github-basics/repo-after-first-push.png)
+
+Cliquez sur `main.ts` pour voir votre code et le message du dernier commit qui a modifié ce fichier.
+
+![GitHub affiche le message Hello! dans main.ts et le message de commit Add first greeting au-dessus du code.](/assets/git-and-github/github-basics/main-ts-on-github.png)
+
+## Pousser vers le dépôt
+
+Quand vous créez un dépôt, c’est utile de décrire ce que fait votre projet.
+
+Par convention, on utilise un fichier nommé `README.md` pour présenter un projet. Comme vous le verrez, GitHub reconnaîtra ce fichier et l’utilisera pour présenter votre projet.
+
+Dans VS Code, créez un fichier nommé `README.md` à côté de `main.ts` et ajoutez le texte ci-dessous.
+
+```md showLineNumbers filename="README.md"
+# Mon premier dépôt
+
+Exécutez `node main.ts` pour voir la salutation dans le terminal.
+```
+
+<Callout type="info" emoji="💡">
+
+L’extension `.md` désigne un fichier Markdown. Markdown permet de mettre du texte en forme avec une syntaxe simple. Par exemple, le `#` suivi d’une espace au début de la première ligne fait de « Mon premier dépôt » le titre.
+
+</Callout>
+
+Pour voir le rendu du Markdown, faites un clic droit sur l’onglet `README.md` dans l’éditeur de VS Code et choisissez **Open Preview**.
+
+Enregistrez le fichier, préparez les changements, créez un commit, puis poussez-le sur GitHub.
+
+```bash
+git add -A
+git commit -m "Describe the project in README.md"
+git push
+```
+
+![VS Code montre le fichier README.md, son aperçu mis en forme et la confirmation de l’envoi dans le terminal.](/assets/git-and-github/github-basics/readme-push.png)
+
+Si vous actualisez maintenant la page du dépôt sur GitHub, vous verrez votre README mis en forme sous la liste des fichiers. Vous verrez aussi `README.md` dans la liste, à côté des autres fichiers ! 🎉
+
+![Des flèches pointent vers README.md dans la liste des fichiers et vers le README mis en forme sous la liste.](/assets/git-and-github/github-basics/readme.png)
+
+## Créer des *issues*
+
+Imaginons que nous voulions afficher notre salutation en français plutôt qu’en anglais. Nous pourrions la modifier sur la branche `main`, enregistrer le changement dans un commit et l’envoyer directement sur GitHub. La branche `main` serait alors mise à jour sur GitHub. Cependant, il vaut souvent mieux prendre du recul et mettre par écrit ce qu’on veut faire avant de se lancer dans le code.
+
+Sur GitHub, vous pouvez le faire en créant une **issue**. Une issue permet de décrire un problème ou de proposer un changement. Dans de nombreux projets à code source ouvert, les utilisateurs créent des issues et les responsables du projet en discutent avec eux avant de modifier le code. Tout le monde peut ainsi déterminer si le changement serait utile et s’entendre sur la suite.
+
+Ouvrez l’onglet **Issues** en haut à gauche de la page de votre dépôt. Vous n’avez pas encore créé d’issue. Cliquez sur le bouton **New issue** à droite pour créer votre toute première issue.
+
+![Des flèches pointent vers l’onglet Issues et le bouton New issue. La liste indique zéro issue ouverte et zéro issue fermée.](/assets/git-and-github/github-basics/issues-tab.png)
+
+Collez ensuite ce texte dans le champ du titre.
+
+```text
+Translate greeting to French
+```
+
+Collez ce texte dans le champ de la description.
+
+```md
+`main.ts` devrait afficher `Bonjour!` à la place de `Hello!`.
+```
+
+![Le formulaire de création d’une issue montre le titre, la description en Markdown et le bouton Create.](/assets/git-and-github/github-basics/issue-description.png)
+
+<Callout type="info" emoji="💡">
+
+La description utilise le Markdown, comme votre README. J’ai placé des accents graves autour de `main.ts`, de `Bonjour!` et de `Hello!` pour les afficher comme du code dans la phrase. Vous pouvez cliquer sur **Preview** pour voir le rendu de la description.
+
+</Callout>
+
+Cliquez sur **Create** pour enregistrer l’issue. GitHub lui attribue un numéro, par exemple `#1`.
+
+Vous pouvez maintenant voir votre première issue sur GitHub !
+
+![GitHub affiche l’issue nº 1, Translate greeting to French, avec le statut Open et la description mise en forme en dessous.](/assets/git-and-github/github-basics/first-issue.png)
+
+## Créer des branches
+
+Imaginons que nous soyons prêts à travailler sur l’issue que nous venons d’ouvrir. C’est une bonne idée de travailler sur une branche. Une branche à part nous permet de faire et de tester des changements sans toucher au code sur `main`. Nous allons créer la branche à partir de l’issue pour que GitHub les relie.
+
+Vers le bas de la barre latérale droite de l’issue, repérez **Development** et cliquez sur **Create a branch**.
+
+![Une flèche pointe vers Create a branch sous Development dans la barre latérale droite de l’issue.](/assets/git-and-github/github-basics/create-branch-from-issue.png)
+
+GitHub propose un nom de branche à partir du numéro et du titre de l’issue. Pour l’issue `#1`, c’est `1-translate-greeting-to-french`. La fenêtre indique aussi dans quel dépôt la branche sera créée et de quelle branche elle partira. Gardez votre dépôt comme destination et `main` comme branche source.
+
+Sous **What's next?**, choisissez **Checkout locally** pour pouvoir travailler sur la branche sur votre ordinateur. Cliquez ensuite sur **Create branch**.
+
+![La fenêtre de création affiche le nom proposé, le dépôt de destination, main comme branche source, l’option Checkout locally sélectionnée et le bouton Create branch.](/assets/git-and-github/github-basics/issue-branch.png)
+
+GitHub affiche maintenant deux commandes. Utilisez le bouton de copie, puis collez les commandes dans le terminal de votre projet dans VS Code et exécutez-les.
+
+![La fenêtre Checkout in your local repository affiche git fetch origin, git checkout 1-translate-greeting-to-french et un bouton de copie.](/assets/git-and-github/github-basics/branch-command.png)
+
+La nouvelle branche existe sur GitHub, et votre dépôt local ne la connaît pas encore. La première commande, `git fetch origin`, récupère les derniers commits et les informations sur les branches de GitHub sans modifier les fichiers sur lesquels vous travaillez. La deuxième commande, `git checkout` suivie du nom de la branche, crée une copie locale de cette branche et vous y place pour que vous puissiez commencer à travailler.
+
+Après avoir exécuté ces commandes dans le terminal de votre projet dans VS Code, regardez en bas à gauche de la fenêtre. Vous devriez y voir le nom de la branche que vous venez de créer, `1-translate-greeting-to-french`.
+
+![Le terminal confirme le passage à la nouvelle branche et la barre d’état de VS Code affiche son nom en bas à gauche.](/assets/git-and-github/github-basics/checked-out-issue-branch.png)
+
+Maintenant que nous sommes sur la nouvelle branche sur notre ordinateur, nous pouvons commencer à modifier le code. Dans `main.ts`, remplacez `Hello!` par `Bonjour!` et enregistrez le fichier.
+
+```ts showLineNumbers filename="main.ts"
+console.log("Bonjour!");
+```
+
+Préparez ensuite le changement, créez un commit et poussez-le sur GitHub.
+
+```bash
+git add -A
+git commit -m "Translate greeting to French"
+git push
+```
+
+<Callout type="info" emoji="💡">
+
+Dans la leçon précédente, nous avons utilisé `git add` pour choisir les changements à inclure et `git commit` pour enregistrer une version du code sur notre ordinateur. Ici, `git push` envoie les nouveaux commits de notre branche actuelle vers la branche correspondante dans notre dépôt GitHub. C’est ainsi que la salutation en français est enregistrée sur GitHub.
+
+</Callout>
+
+![VS Code affiche la salutation en français dans main.ts et le terminal confirme l’envoi vers la branche de l’issue sur GitHub.](/assets/git-and-github/github-basics/branch-push.png)
+
+Sur GitHub, ouvrez votre dépôt et sélectionnez `1-translate-greeting-to-french` dans le sélecteur de branches. GitHub indique que cette branche a un commit d’avance sur `main`.
+
+![Le sélecteur de branches sur GitHub affiche la branche de l’issue, qui a un commit d’avance sur main.](/assets/git-and-github/github-basics/issue-branch-on-github.png)
+
+<Callout type="info" emoji="💡">
+
+Vous avez peut-être remarqué le bandeau orange qui indique que vous avez récemment poussé des changements sur votre branche, avec le bouton **Compare & pull request**. Vous pouvez l’ignorer pour le moment. Nous y reviendrons dans la prochaine section.
+
+</Callout>
+
+Cliquez sur `main.ts` pour voir la salutation en français, `Bonjour!`, enregistrée sur GitHub.
+
+![GitHub affiche Bonjour! dans main.ts sur la branche de l’issue.](/assets/git-and-github/github-basics/french-greeting-on-github.png)
+
+Revenez maintenant à `main` à l’aide du sélecteur de branches. Vous verrez que `main.ts` contient toujours la salutation d’origine en anglais, `Hello!`.
+
+![GitHub affiche Hello! dans main.ts sur la branche main.](/assets/git-and-github/github-basics/english-greeting-on-main.png)
+
+Les branches vous permettent de conserver plusieurs versions de votre projet sur GitHub pendant que vous travaillez sur différents changements. Elles permettent aussi à plusieurs personnes de travailler en parallèle sur différentes issues, fonctionnalités ou corrections de bogues.
+
+Examiner les changements un fichier à la fois peut vite devenir fastidieux. Quand vous voulez examiner tous vos changements au même endroit, vous pouvez ouvrir une pull request, comme nous le ferons dans la prochaine section.
+
+## Créer une *pull request*
+
+Une **pull request** propose de fusionner les changements d’une branche dans une autre. Pour en créer une, ouvrez l’onglet **Pull requests** de votre dépôt et cliquez sur **New pull request** à droite.
+
+![Des flèches pointent vers l’onglet Pull requests et le bouton New pull request sur GitHub.](/assets/git-and-github/github-basics/new-pull-request.png)
+
+<Callout type="info" emoji="💡">
+
+Le bouton **Compare & pull request** dans le bandeau orange est un raccourci. Suivez avec moi les étapes ci-dessous cette fois-ci. Vous saurez ainsi ce que fait le raccourci la prochaine fois que vous l’utiliserez.
+
+</Callout>
+
+Gardez `main` comme branche **base**, celle qui recevra le changement. Dans le menu **compare**, sélectionnez `1-translate-greeting-to-french`, la branche qui contient votre changement.
+
+![Le menu compare est ouvert et propose la branche 1-translate-greeting-to-french. La branche de base est main.](/assets/git-and-github/github-basics/pull-request-branch-selector.png)
+
+Une fois la branche sélectionnée, GitHub affiche les changements dans le code. La ligne supprimée avec `Hello!` apparaît en rouge et la ligne ajoutée avec `Bonjour!` apparaît en vert. Cliquez sur **Create pull request** pour ouvrir le formulaire.
+
+![GitHub affiche un commit, le changement dans main.ts et le bouton Create pull request.](/assets/git-and-github/github-basics/pull-request-comparison.png)
+
+Le formulaire vous demande un titre et vous permet d’ajouter une description. Si vous travaillez en équipe, vous pouvez demander à un membre de l’équipe de relire les changements. Vous pouvez aussi ajouter des étiquettes ou associer la pull request à un projet ou à un jalon.
+
+Pour cet exemple, utilisez simplement **Translate greeting to French** comme titre, puis cliquez sur **Create pull request**.
+
+![Le formulaire affiche le titre Translate greeting to French, un champ de description vide et le bouton Create pull request.](/assets/git-and-github/github-basics/pr-create.png)
+
+Votre pull request est ouverte! L’onglet **Pull requests**, en haut de la page du dépôt, liste toutes les pull requests du projet. Sur la page de votre pull request, vous pouvez voir son numéro et les commits qui seront intégrés à `main`. Vous pouvez laisser des commentaires dans l’onglet **Conversation** pour discuter des changements.
+
+![La pull request ouverte affiche son titre et son numéro, l’issue liée, le bouton Merge pull request et le champ de commentaire.](/assets/git-and-github/github-basics/pull-request-open.png)
+
+L’onglet **Commits** affiche tous les commits de la pull request. La plupart du temps, vous voudrez ouvrir l’onglet **Files changed**, où vous pouvez examiner au même endroit les changements apportés à tous les fichiers modifiés.
+
+![L’onglet Files changed montre Hello! en rouge à gauche et Bonjour! en vert à droite dans main.ts.](/assets/git-and-github/github-basics/pull-request-files-changed.png)
+
+Revenez à l’onglet **Conversation**. GitHub indique qu’il n’y a aucun conflit de fusion dans cet exemple. Un conflit peut survenir quand les deux branches modifient différemment la même ligne du même fichier et que Git ne sait pas quelle version garder. Ici, vous pouvez cliquer sur le bouton vert **Merge pull request**.
+
+![Des flèches pointent vers l’onglet Conversation, le message confirmant l’absence de conflits et le bouton vert Merge pull request.](/assets/git-and-github/github-basics/pull-request-merge-button.png)
+
+GitHub propose un message pour le nouveau commit de fusion. Vous pouvez modifier le message et sa description facultative, ou conserver le texte proposé. Cliquez ensuite sur **Confirm merge**.
+
+![Le formulaire de fusion affiche le message de commit proposé, la description détaillée et le bouton Confirm merge.](/assets/git-and-github/github-basics/pull-request-confirm-merge.png)
+
+GitHub affiche maintenant le statut **Merged** sur la pull request et **Closed** sur l’issue liée. Cliquez sur **Delete branch** pour supprimer la branche sur GitHub. Vous pouvez aussi configurer GitHub pour supprimer automatiquement les branches après leur fusion.
+
+![La pull request porte le statut Merged, l’issue liée porte le statut Closed et GitHub propose de supprimer la branche.](/assets/git-and-github/github-basics/pull-request-merged.png)
+
+Revenez à l’onglet **Code**. Sur `main`, vous verrez le nouveau commit de fusion au-dessus de la liste des fichiers.
+
+![L’onglet Code sur main affiche le nouveau commit de fusion au-dessus de README.md et de main.ts.](/assets/git-and-github/github-basics/merge-commit-on-main.png)
+
+Ouvrez `main.ts`. La salutation sur `main` est maintenant `Bonjour!` 🎉
+
+![Sur la branche main, main.ts contient maintenant un console.log qui affiche Bonjour!.](/assets/git-and-github/github-basics/french-greeting-on-main.png)
+
+<Callout type="info" emoji="💡">
+   Pour annuler les changements d’une pull request fusionnée, le bouton `Revert` de GitHub peut ouvrir une nouvelle pull request qui inverse les changements.
+</Callout>
+
+De retour dans VS Code, revenez sur `main` et récupérez les changements avec `git pull`.
+
+```bash
+git switch main
+git pull
+```
+
+Ouvrez `main.ts` sur votre ordinateur. Vous devriez y voir `Bonjour!`.
+
+![Dans VS Code, le terminal affiche git switch main et git pull, et main.ts contient maintenant Bonjour! sur la branche main.](/assets/git-and-github/github-basics/pull-merged-changes.png)
+
+<Callout type="info" emoji="💡">
+
+`git pull` récupère les changements de GitHub sur votre ordinateur. Comme vous avez fusionné la pull request sur GitHub, vous devez lancer cette commande pour mettre à jour votre branche locale `main`.
+
+</Callout>
+
+Bravo! Vous savez maintenant ouvrir une issue, créer une branche liée à cette issue et ouvrir une pull request qui relie les deux pour examiner vos changements avant de les fusionner dans `main`. 🎉
+
+## Modifier `.gitignore`
+
+Parfois, vous voulez partager une partie d’un projet sur GitHub et garder certains fichiers sur votre ordinateur, par exemple des fichiers contenant des mots de passe ou d’autres identifiants, ou des fichiers de données très volumineux.
+
+C’est pour cette raison que les dépôts Git contiennent souvent un fichier `.gitignore`. C’est là que vous indiquez les fichiers et dossiers que Git doit ignorer pour qu’ils restent hors de vos commits et de GitHub.
+
+Pour voir comment ça fonctionne, créez un fichier nommé `password.txt` dans le dossier de votre projet avec du texte fictif, comme `potato`.
+
+![VS Code affiche le nouveau fichier password.txt, qui contient potato et porte la lettre U pour indiquer qu’il n’est pas suivi.](/assets/git-and-github/github-basics/password.png)
+
+Dans VS Code, `password.txt` apparaît en vert avec un **U** à côté de son nom. **U** signifie *untracked*, c’est-à-dire « non suivi ». Git détecte ce nouveau fichier. Pour lui dire de l’ignorer, créez un fichier nommé `.gitignore` dans le dossier du projet, ajoutez `password.txt` sur une ligne à part et enregistrez le fichier.
+
+```text
+password.txt
+```
+
+![Dans VS Code, .gitignore contient password.txt, dont le nom apparaît maintenant en gris dans l’Explorateur.](/assets/git-and-github/github-basics/gitignore.png)
+
+Après quelques secondes, `password.txt` devrait apparaître en gris dans VS Code. Git l’ignore désormais. Le fichier `.gitignore` lui-même apparaît en vert avec un **U**, puisqu’il est nouveau. Préparez `.gitignore`, créez un commit et poussez-le sur GitHub pour que Git continue d’ignorer `password.txt` pendant que vous travaillez sur le projet.
+
+```bash
+git add .gitignore
+git commit -m "Ignore password.txt"
+git push
+```
+
+![Le terminal de VS Code montre le commit de .gitignore et son envoi sur GitHub. Le fichier ignoré password.txt reste visible dans l’Explorateur.](/assets/git-and-github/github-basics/gitignore-push.png)
+
+Actualisez la page du dépôt. Vous devriez voir `.gitignore` sur GitHub. Votre fichier `password.txt` est resté sur votre ordinateur tout ce temps. Toute personne qui clone le dépôt ou récupère les derniers changements obtient les mêmes règles dans `.gitignore`.
+
+![Le dépôt sur GitHub affiche le commit Ignore password.txt et le fichier .gitignore dans la liste.](/assets/git-and-github/github-basics/repo-gitignore.png)
+
+<Callout type="info" emoji="💡">
+   Si vous poussez des renseignements sensibles par erreur, suivez [les étapes de GitHub pour les retirer d’un dépôt](https://docs.github.com/fr/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository).
+</Callout>
+
+## Cloner un dépôt
+
+Ce qui est pratique avec GitHub, c’est que votre travail est enregistré dans le nuage quand vous le poussez sur la plateforme. Cela veut dire que si vous supprimez un projet de votre ordinateur ou si vous changez d’ordinateur, vous pouvez en récupérer une copie depuis GitHub. Ça permet aussi de consulter facilement le code d’un collègue sur votre ordinateur si cette personne vous demande de le relire ou de l’aider. Puisque le projet utilise Git, vous obtenez une copie complète de l’historique du dépôt, avec ses branches.
+
+Créer une copie d’un dépôt sur votre ordinateur, c’est ce qu’on appelle **cloner un dépôt**.
+
+Pour cloner un dépôt, ouvrez sa page sur GitHub, cliquez sur `Code`, choisissez les options de clonage (les options par défaut conviennent généralement) et copiez l’URL.
+
+![Des flèches pointent vers le bouton Code, l’option HTTPS et le bouton pour copier l’URL de clonage.](/assets/git-and-github/github-basics/clone-https-url.png)
+
+Ensuite, sur votre ordinateur, créez un nouveau dossier vide qui porte le même nom que le dépôt. Ouvrez un terminal dans ce dossier et tapez `git clone`, suivi d’une espace, de l’URL copiée, d’une autre espace et d’un point.
+
+```bash
+git clone URL-DU-DEPOT .
+```
+
+Le point signifie « ce dossier ». Git place les fichiers du dépôt et son historique directement dans le dossier que vous avez créé.
+
+C’est tout. Vous pouvez maintenant vous mettre au travail!
+
+## *Forker* un dépôt
+
+Tout le monde peut cloner un dépôt public. Pour cloner un dépôt privé, il faut y avoir accès. Il faut aussi des droits d’écriture pour pousser du code vers un dépôt ou y fusionner des changements. Et c’est une bonne chose ! Imaginez le chaos et les problèmes de sécurité ! 😈
+
+Par contre, si un dépôt est public, vous pouvez le **forker**. Cela crée votre propre copie du dépôt dans votre compte GitHub. Vous pouvez ensuite cloner votre fork sur votre ordinateur, ajouter ou modifier des fichiers dans votre copie locale et pousser vos changements vers votre fork.
+
+Ça fonctionne un peu comme une *branche d’un dépôt*. Il n’y a aucun impact sur le dépôt original, mais si vous le souhaitez, vous pouvez créer une *pull request* à destination des propriétaires du dépôt original.
+
+Par exemple, plusieurs utilisateurs GitHub ont *forké* la librairie [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Je n’ai aucune idée de ce qu’ils en font, et c’est très bien comme ça !
+
+Si vous êtes curieux, n’hésitez pas à la *forker* aussi !
+
+![Une flèche pointe vers le bouton Fork sur la page du dépôt Simple Data Analysis.](/assets/git-and-github/github-basics/forking.png)
+
+Le *forking* est au cœur de nombreuses contributions et collaborations en code ouvert :
+- Quelqu’un crée un projet en code ouvert.
+- Une autre personne le trouve intéressant mais veut y apporter des modifications ou corriger quelque chose. Elle le *fork*, modifie le code, et envoie une PR au propriétaire du dépôt original.
+- Le propriétaire examine la PR et, s’il est satisfait, la fusionne.
+- La contribution fait désormais partie du projet, et tout le monde peut en bénéficier !
+
+## Conclusion
+
+Ouf, on en a vu des choses! Comprendre le fonctionnement de Git et de GitHub vous aide à garder votre travail bien organisé, que vous travailliez seul ou en équipe. En faisant des commits et en les poussant régulièrement, vous avez plus de versions enregistrées auxquelles revenir si vous introduisez un bogue ou faites une erreur. Pensez à tous les fichiers `projet_final_v1`, `projet_final_v2` et `projet_final_final` que vous avez probablement créés au fil des ans. Avec Git, vous pouvez garder cet historique au même endroit.
+
+Dans cette leçon, vous avez appris de nouvelles commandes Git importantes :
+- `git remote add origin URL` pour associer un dépôt local à GitHub
+- `git push` pour pousser du code vers un dépôt distant enregistré dans le nuage
+- `git fetch origin` pour récupérer les commits et les informations sur les branches de GitHub
+- `git checkout BRANCHE` pour passer à une branche, y compris une branche que vous venez de récupérer depuis GitHub
+- `git pull` pour récupérer les dernières modifications depuis un dépôt distant
+- `git clone` pour copier un dépôt entier sur votre ordinateur
+
+Vous avez aussi découvert les *issues* GitHub, les *pull requests*, les *forks* et le fichier `.gitignore`.
+
+Mais… vous pourriez être tenté de simplement créer des branches localement et de fusionner directement sur votre ordinateur lorsque vous travaillez seul. Ou même de tout faire dans la branche `main` ! 🤠
+
+Et c’est parfaitement acceptable. Trouvez la méthode qui fonctionne pour vous. Mais gardez en tête que créer des *issues* et passer par des *pull requests* sont d’excellentes façons de rester concentré et de revoir votre propre travail ! C’est aussi une opportunité de vous familiariser avec des outils utilisés dans de nombreuses équipes et entreprises à travers le monde.
+
+<NoticeEnd lang="fr" />

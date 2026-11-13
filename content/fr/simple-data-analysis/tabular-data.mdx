@@ -1,0 +1,1024 @@
+---
+title: Analyse de données avec la librairie Simple Data Analysis
+description: Dans cette leçon, nous apprenons à utiliser SDA en traitant des données historiques de température.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Analyse de données avec la librairie Simple Data Analysis
+
+Dans cette leçon, nous allons apprendre à utiliser la librairie en code ouvert que j'ai créée : [simple-data-analysis](https://github.com/nshiab/simple-data-analysis). Nous analyserons des données historiques de température moyenne quotidienne dans trois villes canadiennes à titre d'exemple. Notre objectif sera de répondre à cette question :
+
+- À quelle vitesse les températures ont-elles augmenté ces dernières décennies ?
+
+Pour ce faire, nous calculerons la température moyenne par période de 30 ans et examinerons les tendances.
+
+Si vous avez une minute, ajoutez un ⭐ à la [page GitHub](https://github.com/nshiab/simple-data-analysis) de la librairie. C'est toujours agréable de savoir que son travail en code ouvert est apprécié. 😊
+
+Avant de commencer cette leçon, assurez-vous d’avoir terminé le **chapitre 1 : Fondamentaux de TypeScript** et le **chapitre 2 : Bâtir avec TypeScript**.
+
+Vous devriez également avoir terminé la [leçon de configuration de ce chapitre](/simple-data-analysis/setup).
+
+
+<NoticeIntro lang="fr" />
+
+## Installation
+
+Créez un nouveau dossier vide à un endroit pratique sur votre ordinateur et ouvrez-le dans VS Code. Ouvrez ensuite le terminal dans VS Code.
+
+Nous utiliserons `@nshiab/setup-data-project`, une librairie que j'ai créée pour installer les librairies et préparer tous les fichiers et réglages nécessaires à un projet. Exécutez cette commande dans le terminal :
+
+```sh
+npx @nshiab/setup-data-project --sda
+```
+
+Si on vous demande de confirmer l’installation de la librairie, tapez `y` et appuyez sur Entrée.
+
+L'option `--sda` sélectionne automatiquement la librairie **simple-data-analysis** à installer.
+
+Une fois que le terminal affiche `You are all set!`, ouvrez `sda/main.ts`. Vous y trouverez du code de départ.
+
+![VS Code montrant les fichiers du projet et le message de fin de configuration.](/assets/simple-data-analysis/setup/installation-complete.png)
+
+Si VS Code vous propose d'installer l'extension recommandée **Oxc**, cliquez sur **Install**. Elle aide à formater votre code et à repérer des problèmes potentiels pendant que vous travaillez.
+
+![VS Code recommandant l'extension Oxc, avec une flèche pointant vers Install.](/assets/simple-data-analysis/setup/oxc-install-prompt.png)
+
+Nous sommes maintenant prêts à surveiller `sda/main.ts`. Exécutez la commande ci-dessous. Chaque fois que vous enregistrez le fichier, votre code sera automatiquement formaté, vérifié et exécuté :
+
+```sh
+npm run sda:watch
+```
+
+Si vous devez arrêter la surveillance, cliquez dans le terminal et appuyez sur **Ctrl+C** sur Mac ou Windows.
+
+Gardez la surveillance active pendant cette leçon.
+
+## Création d'une table
+
+Laissez-moi vous expliquer le code actuel dans `./sda/main.ts`.
+
+Lorsque vous utilisez SDA, vous créez une **base de données en mémoire**. C'est ce qui se passe à la ligne 3 avec `const sdb = new SimpleDB()`. Une fois nos calculs terminés, nous fermons la base de données à la ligne 10 avec `await sdb.close()`.
+
+
+```ts showLineNumbers filename="main.ts" {3, 10}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+const table = sdb.newTable();
+
+await table
+  .loadArray([{ message: "Hello simple-data-analysis!" }])
+  .log();
+
+await sdb.close();
+```
+
+Comme dans une base de données classique, avec SimpleDB, les données sont stockées dans des **tables**. Si vous êtes plus familier avec Excel ou Google Sheets, les tables peuvent être comprises comme des onglets.
+
+Le code de départ crée une table à la ligne 4, charge un tableau contenant un message d’exemple avec `.loadArray()` et l’affiche avec `.log()`.
+
+```ts showLineNumbers filename="main.ts" {4, 6-8}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+const table = sdb.newTable();
+
+await table
+  .loadArray([{ message: "Hello simple-data-analysis!" }])
+  .log();
+
+await sdb.close();
+```
+
+C’est pourquoi la commande `npm run sda:watch` affiche dans le terminal une table nommée `table1`, avec une colonne `message` et une seule cellule contenant `Hello simple-data-analysis!`.
+
+![VS Code montrant le code de départ de SDA et sa table contenant un seul message dans le terminal.](/assets/simple-data-analysis/tabular-data/starter-table.png)
+
+Remplaçons cet exemple par une table pour les températures quotidiennes. Mettez à jour `./sda/main.ts` avec le code ci-dessous.
+
+Pour ajouter une table à la base de données (`SimpleDB`), vous pouvez utiliser sa méthode `.newTable()`. Vous pouvez lui donner un nom (bien que ce soit optionnel) et stocker la table dans une variable. En général, je nomme la variable et la table de la même façon.
+
+
+Nous utilisons également la méthode `.log()` pour afficher les données de la table dans le terminal.
+
+```ts showLineNumbers filename="main.ts" {5, 7}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.log();
+
+await sdb.close();
+```
+
+Pour le moment, le terminal indique que notre table ne contient aucune donnée.
+
+![VS Code montrant la création et l’affichage de la table temperatures, sans données dans le terminal.](/assets/simple-data-analysis/tabular-data/empty-table.png)
+
+<Callout type="info">
+Nous utilisons `await temperatures.log()` parce que SDA doit récupérer les données de la table dans la base de données en mémoire avant de les afficher. Il s’agit d’une opération asynchrone.
+</Callout>
+
+Maintenant que nous avons une table, nous pouvons explorer ses méthodes ! Placez votre curseur entre `temperatures` et `.log()` à la ligne 7, puis tapez un autre `.` pour voir toutes les méthodes disponibles. Utilisez les flèches haut et bas de votre clavier pour parcourir leur documentation et leurs exemples. Il y en a beaucoup !
+
+Dans la capture d’écran ci-dessous, je me suis arrêté sur `loadData`, qui est la méthode que nous allons utiliser dans un instant.
+
+![VS Code montrant les méthodes disponibles pour la table et la documentation de loadData.](/assets/simple-data-analysis/tabular-data/load-data-doc.png)
+
+## Chargement des données
+
+J’ai téléversé les températures quotidiennes historiques de trois villes canadiennes sur GitHub. C'est un fichier CSV que [vous pouvez voir ici](https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv). Il provient des [Données climatiques canadiennes ajustées et homogénéisées](https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/climate-trends-variability/adjusted-homogenized-canadian-data.html) d'Environnement Canada.
+
+Utilisons la méthode `loadData` pour le récupérer. Notez que cette méthode peut aussi bien récupérer des fichiers distants que lire des fichiers locaux. Elle peut charger des fichiers CSV, JSON, Excel et Parquet. Plutôt pratique !
+
+Gardez l’appel à `log` et ajoutez `loadData` avant celui-ci pour charger les données, puis les afficher dans le terminal.
+
+```ts showLineNumbers filename="main.ts" {7-11}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+  )
+  .log();
+
+await sdb.close();
+```
+
+<Callout type="info" emoji="💡">
+    SDA possède deux types de méthodes. Les **méthodes synchrones**, comme `loadData()`, ajoutent des instructions à une liste d’étapes à exécuter. Vous pouvez les enchaîner avec `.` pour construire votre analyse. Les **méthodes asynchrones**, comme `log()`, exécutent les étapes précédentes avant d’afficher, d’écrire ou d’envoyer les résultats.
+
+    C’est l’un des avantages de SDA : vous pouvez écrire vos étapes de traitement dans l’ordre, ce qui rend le code facile à écrire et à suivre. Plus loin dans cette leçon, nous enchaînerons plusieurs étapes pour voir à quel point cela peut être pratique.
+</Callout>
+
+Et voici le résultat ! Nous pouvons voir que les données du fichier CSV ont été intégrées dans la table `temperatures`, qui contient désormais trois colonnes et 131 192 lignes.
+
+![VS Code montrant les températures quotidiennes chargées depuis GitHub et affichées dans le terminal, avec trois colonnes et 131 192 lignes.](/assets/simple-data-analysis/tabular-data/data-loaded.png)
+
+## Assembler des tables
+
+Ce serait mieux de remplacer les identifiants (`id`) par les noms des villes. Les identifiants et les noms des villes se trouvent dans un autre fichier que [j’ai également téléversé sur GitHub](https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv).
+
+Créons une nouvelle table appelée `cities` et chargeons-y également les données de ce fichier.
+
+
+```ts showLineNumbers filename="main.ts" {13, 15-19}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+  )
+  .log();
+
+const cities = sdb.newTable("cities");
+
+await cities
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+  )
+  .log();
+
+await sdb.close();
+```
+
+Comme vous pouvez le voir, la colonne `id` est présente dans les tables `cities` et `temperatures`, mais les noms des villes se trouvent uniquement dans la table `cities`.
+
+![VS Code montrant les villes chargées depuis GitHub et les tables temperatures et cities affichées dans le terminal.](/assets/simple-data-analysis/tabular-data/cities-loaded.png)
+
+Ce serait très pratique d’avoir aussi la colonne `city` de la table `cities` dans la table `temperatures`. Pour cela, nous pouvons utiliser la méthode `.join()`.
+
+Par défaut, cette méthode recherche une colonne commune dans deux tables et associe les lignes en fonction des valeurs de cette colonne.
+
+Ainsi, lorsque nous écrivons `temperatures.join(cities)`, nous demandons à SDA de trouver une colonne commune (qui est `id`) dans `temperatures` et `cities`, puis d'ajouter les valeurs de `cities` correspondant au même `id` aux lignes correspondantes dans `temperatures`.
+
+
+```ts showLineNumbers filename="main.ts" {21-23}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB();
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+  )
+  .log();
+
+const cities = sdb.newTable("cities");
+
+await cities
+  .loadData(
+    "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+  )
+  .log();
+
+await temperatures
+  .join(cities)
+  .log();
+
+await sdb.close();
+```
+
+Et maintenant, nous avons les noms des villes dans la table `temperatures` !
+
+![VS Code montrant la jointure entre temperatures et cities et la colonne city ajoutée à la table temperatures dans le terminal.](/assets/simple-data-analysis/tabular-data/join.png)
+
+## Mise en cache
+
+Actuellement, à chaque fois que nous enregistrons `main.ts`, les deux fichiers CSV sont téléchargés à nouveau à partir de GitHub. Cela est lent et inutile puisque les données ne changent pas.
+
+Réutilisons les données que nous avons déjà téléchargées grâce à la méthode `.cache()`.
+
+Nous pouvons passer une fonction à la méthode `.cache()`. La première fois qu’elle s’exécute, SDA effectue toutes les étapes qu’elle contient, y compris le téléchargement des données et les calculs, puis enregistre le résultat dans le dossier `.sda-cache`, qui est créé s’il n’existe pas déjà.
+
+Si nous relançons le script sans modifier la fonction, SDA réutilise le résultat enregistré au lieu de télécharger les données et de refaire les calculs.
+
+Ici, nous mettons en cache le téléchargement des données depuis GitHub pour `temperatures` et `cities`. Nous définissons aussi l’option `cacheVerbose` à `true` pour afficher davantage d’informations sur le cache dans le terminal.
+
+
+```ts showLineNumbers filename="main.ts" {7-12, 16-21} /{ cacheVerbose: true }/
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    );
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .log();
+
+await sdb.close();
+```
+
+Voici le résultat lors de la première exécution.
+
+Comme indiqué dans le terminal, SDA n’a rien trouvé en cache pour le code dans les deux fonctions passées à `.cache()`, donc il a tout exécuté. Cela a pris 1 sec, 578 ms avec ma connexion Internet et mon ordinateur. Le dossier `.sda-cache` a été créé, et les données y sont maintenant mises en cache.
+
+![VS Code montrant l’absence de cache pour temperatures et cities, avec une durée totale de 1 seconde et 578 millisecondes.](/assets/simple-data-analysis/tabular-data/nothing-in-cache.png)
+
+Quand j’enregistre `main.ts` à nouveau (`CMD` + `S` sur Mac et `CTRL` + `S` sur PC), le comportement change.
+
+SDA vérifie si le code dans les deux fonctions passées à `.cache()` a été modifié. Comme il est exactement le même, SDA charge simplement les résultats de l’exécution précédente stockés dans `.sda-cache`.
+
+Au lieu de 1 sec, 578 ms, l’exécution du script n’a pris que... 24 ms ! C'est environ 66 fois plus rapide ! 😱
+
+Ici, la majeure partie du temps gagné provient de la récupération des données qui se fait par le Web. Mais comme nous le verrons dans d’autres leçons, vous pouvez également mettre en cache les résultats de calculs lourds qui prennent du temps à s’exécuter, ce qui peut améliorer considérablement votre productivité.
+
+![VS Code montrant les données de temperatures et cities récupérées du cache, avec une durée totale de 24 millisecondes.](/assets/simple-data-analysis/tabular-data/in-cache.png)
+
+<Callout type="info" emoji="💡">
+    Appelez toujours `await sdb.close()` à la fin du script. Cette méthode supprime les données en cache inutilisées ; sinon, le dossier `.sda-cache` pourrait grossir indéfiniment. Pour vider le cache manuellement, supprimez le dossier `.sda-cache` ou exécutez `npm run clean`.
+</Callout>
+
+## Explorer les données
+
+Pour explorer les données, nous pouvons utiliser la méthode `.summarize()`. Elle agrège les données contenues dans la table. Nous commencerons par explorer la colonne `time`, avec les résultats répartis par `city`.
+
+Comme il s'agit simplement d'une exploration rapide, nous pouvons enchaîner `.summarize()` juste après `.join()` et avant `.log()`. Avec seulement quelques lignes ajoutées à notre script, tout sera traité et affiché dans le terminal.
+
+```ts showLineNumbers filename="main.ts" {25-28}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    );
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .summarize({
+    columns: "time",
+    by: "city",
+  })
+  .log();
+
+await sdb.close();
+```
+
+Les valeurs `min` et `max` montrent que nous avons plus d’un siècle de températures quotidiennes pour nos trois villes. C’est plutôt bien pour analyser les tendances !
+
+Mais il y a un problème... La colonne `count` affiche des valeurs différentes pour chaque ville. Théoriquement, nous devrions avoir environ 44 195 jours en 121 ans. Nous en voyons moins ici, ce qui signifie que nous allons devoir gérer des données manquantes...
+
+Au fait, avez-vous remarqué à quel point c’était rapide ? Nous avons résumé plus de 130 000 lignes en un instant. SDA est vraiiiment rapide ! ⚡
+
+![VS Code montrant summarize pour la colonne time regroupée par ville, avec les nombres de lignes et les dates minimales et maximales dans le terminal.](/assets/simple-data-analysis/tabular-data/time.png)
+
+<Callout type="info" emoji="💡">
+    Si l'affichage de la table semble étrange dans votre terminal, c'est parce que la largeur de la table est plus grande que celle de votre terminal. Faites un clic droit sur le terminal et cherchez `Toggle size with content width`. Il existe aussi un raccourci très pratique que j’utilise tout le temps pour cela : `OPTION` + `Z` sur Mac et `ALT` + `Z` sur PC.
+</Callout>
+
+Voyons maintenant ce que nous avons dans `t`, qui représente la *température*. Remplacez `"time"` par `"t"` comme ci-dessous.
+
+```ts showLineNumbers filename="main.ts" {26}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    );
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .summarize({
+    columns: "t",
+    by: "city",
+  })
+  .log();
+
+await sdb.close();
+```
+
+Hmm... Non seulement nous avons des lignes manquantes dans nos données, comme nous l’avons vu juste au-dessus, mais nous avons aussi certaines lignes avec des valeurs `null`.
+
+![VS Code montrant les résumés de température par ville, avec 8 valeurs null pour Montréal, 6 pour Toronto et 0 pour Vancouver.](/assets/simple-data-analysis/tabular-data/t.png)
+
+Occupons-nous de ce problème immédiatement en utilisant la méthode `.removeMissing()`. Elle supprime toutes les lignes contenant une valeur `null`. Vous pouvez aussi spécifier des colonnes précises si nécessaire, mais ce n'est pas utile ici.
+
+Nous pouvons enchaîner `.removeMissing()` directement après `.loadData()`. Ici, j’ai choisi de l’ajouter à l’intérieur de la méthode `.cache()`.
+
+
+```ts showLineNumbers filename="main.ts" {12}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .summarize({
+    columns: "t",
+    by: "city",
+  })
+  .log();
+
+await sdb.close();
+```
+
+Et voilà ! Plus aucune température `null`.
+
+Comme nous avons modifié le code dans la fonction passée à `temperatures.cache()`, SDA exécute à nouveau ces étapes et supprime automatiquement l’ancienne entrée du cache. Le cache de `cities` est réutilisé, car nous n’avons rien changé pour cette table. Plutôt malin, non ? 😉
+
+![VS Code montrant removeMissing, une nouvelle entrée du cache pour temperatures, le cache de cities réutilisé et aucune valeur null dans le résumé.](/assets/simple-data-analysis/tabular-data/remove-missing.png)
+
+## Regrouper les années en intervalles
+
+L'une de mes ressources préférées lorsque j'analyse des données climatiques est [climatedata.ca](https://climatedata.ca/). Ils ont une excellente section expliquant pourquoi il est important d'utiliser des [moyennes sur 30 ans](https://climatedata.ca/interactive/30-years-data/) pour identifier des tendances climatiques.
+
+C’est exactement ce que nous allons faire ici !
+
+Tout d’abord, extrayons l’année de la colonne `time` avec la méthode `.extractDatePart()`. Cette méthode permet d’extraire facilement l’année, le mois, le numéro de semaine ou d’autres éléments d’une date à partir d’une colonne contenant des dates.
+
+```ts showLineNumbers filename="main.ts" {26}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .log();
+
+await sdb.close();
+```
+
+
+![VS Code montrant extractDatePart extrayant l’année de time dans une nouvelle colonne year.](/assets/simple-data-analysis/tabular-data/year.png)
+
+Par défaut, `.extractDatePart()` crée une nouvelle colonne portant le nom de la partie de date demandée : ici, `year`.
+
+Maintenant, nous pouvons regrouper les années en intervalles avec la méthode `.bins()`. Comme vous commencez à le comprendre, SDA propose une méthode pour presque tout ce dont vous avez besoin lors de l'analyse de données. 😎
+
+La méthode `.bins()` nécessite quatre arguments :
+
+- La colonne contenant les valeurs à regrouper
+- L’intervalle des groupes
+- Le nom de la nouvelle colonne contenant le début de chaque intervalle
+- Le nom de la nouvelle colonne contenant la fin de chaque intervalle
+
+Ici, nous regroupons les valeurs de `year` en périodes de 30 ans et stockons leurs limites dans deux nouvelles colonnes nommées `yearStart` et `yearEnd`.
+
+```ts showLineNumbers filename="main.ts" {27}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .log();
+
+await sdb.close();
+```
+
+C'est parfait !
+
+![VS Code montrant la méthode bins créant les colonnes yearStart et yearEnd pour des périodes de 30 ans.](/assets/simple-data-analysis/tabular-data/bins.png)
+
+Vérifions rapidement les intervalles créés. Remplacez `.log()` par `.logUniques(["yearStart", "yearEnd"])` pour afficher chaque combinaison unique de ces deux colonnes dans le terminal.
+
+```ts showLineNumbers filename="main.ts" {28}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .logUniques(["yearStart", "yearEnd"]);
+
+await sdb.close();
+```
+
+Tout semble parfait, et les intervalles sont cohérents. L’intervalle 2020–2050 sera bien sûr incomplet, mais nous nous en occuperons plus tard.
+
+![VS Code montrant logUniques affichant les cinq combinaisons uniques de yearStart et yearEnd.](/assets/simple-data-analysis/tabular-data/bins-unique.png)
+
+## Résumer et filtrer les données
+
+Maintenant que nos températures quotidiennes sont bien regroupées en intervalles, nous pouvons facilement calculer la température moyenne par période de 30 ans pour chaque ville.
+
+Utilisons à nouveau la méthode `.summarize()`. Mais cette fois, nous allons utiliser plus d'options :
+
+- Les valeurs restent nos températures dans la colonne `t`.
+- Nous regroupons les valeurs par `city` ainsi que par les colonnes `yearStart` et `yearEnd` qui définissent chaque intervalle.
+- Nous voulons calculer la `mean` et un `count` des valeurs pour chaque ville et chaque intervalle.
+- Nous arrondissons les valeurs à deux décimales.
+
+De plus, la table contient maintenant 15 lignes, mais par défaut, `.log()` n'affiche que les 10 premières. Nous allons donc lui demander d'en afficher 15 pour mieux voir le résultat.
+
+
+```ts showLineNumbers filename="main.ts" {28-33} /15/
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .log(15);
+
+await sdb.close();
+```
+
+Voilà qui est intéressant... Grâce à la colonne `count`, nous pouvons clairement voir où il manque des données.
+
+Bien sûr, les intervalles dont le `yearStart` est 2020 et le `yearEnd` est 2050 sont incomplets, mais c’est aussi le cas de l’intervalle de `MONTREAL` dont le `yearStart` est 1990 et le `yearEnd` est 2020. Théoriquement, chaque intervalle de 30 ans devrait contenir environ 10 957 jours.
+
+![VS Code montrant les nombres de températures et leurs moyennes par ville et période de 30 ans, avec les 15 lignes affichées.](/assets/simple-data-analysis/tabular-data/summary.png)
+
+Nous pourrions exclure les intervalles qui ont moins de 90 % du nombre de jours attendu. Notre seuil serait donc de 9 861 jours.
+
+Pour cela, utilisons la méthode `.filter()`, qui prend une expression SQL comme condition. Comme vous pouvez le voir ci-dessous, c’est très simple.
+
+
+```ts showLineNumbers filename="main.ts" {34}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .log(15);
+
+await sdb.close();
+```
+<Callout type="info" emoji="💡">
+    La méthode `.filter()` et quelques autres méthodes de SDA attendent des expressions SQL. Ci-dessus, `count >= 9861` signifie « conserver les lignes où `count` est supérieur ou égal à 9 861 ». SQL signifie *Structured Query Language*, un langage pour travailler avec des bases de données. Avec SDA, nous n’aurons besoin que des bases, et nous les apprendrons au fur et à mesure.
+
+    J’aime écrire les expressions SQL entre des *backticks* pour les reconnaître rapidement, mais les guillemets simples ou doubles fonctionnent aussi : ces méthodes attendent simplement une chaîne de caractères. Les *backticks* permettent aussi d’utiliser des *template literals* pour insérer des variables dans les expressions, ce qui peut être pratique, comme nous le verrons plus tard.
+</Callout>
+
+Avant le filtrage, la table contenait 15 lignes. Il n’en reste maintenant que 11.
+
+![VS Code montrant le filtre sur count conservant 11 résumés par ville et période avec au moins 9 861 températures quotidiennes.](/assets/simple-data-analysis/tabular-data/filter.png)
+
+## À la recherche de tendances
+
+### Visualisation dans le terminal
+
+Nous pouvons maintenant facilement visualiser nos données !
+
+Avec SDA, vous pouvez créer des graphiques de base directement dans votre terminal. Ici, nous utilisons `.logDotChart()`, et nous pouvons clairement voir comment les températures ont augmenté au cours du siècle dernier.
+
+
+```ts showLineNumbers filename="main.ts" {33}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .logDotChart("yearStart", "mean", { smallMultiples: "city" });
+
+await sdb.close();
+```
+
+L’option `smallMultiples: "city"` nous donne un graphique distinct pour chaque ville.
+
+![VS Code montrant logDotChart affichant les températures moyennes selon yearStart dans des graphiques distincts pour Montréal, Toronto et Vancouver dans le terminal.](/assets/simple-data-analysis/tabular-data/dot-charts.png)
+
+### Visualisation avec Plot
+
+Les visualisations dans le terminal sont assez limitées. Si vous voulez créer des graphiques plus élaborés, vous pouvez utiliser [Observable Plot](https://github.com/observablehq/plot), qui a été installé lors de la configuration avec [setup-data-project](https://github.com/nshiab/setup-data-project).
+
+Nous ferons une leçon complète sur Plot plus tard. Cela peut sembler compliqué pour l’instant, mais une fois que vous aurez assimilé les bases, vous verrez que c'est une librairie de visualisation de données exceptionnelle.
+
+Dans l’exemple ci-dessous, nous écrivons un graphique sous forme de fichier PNG dans notre dossier `./sda/output`.
+
+```ts showLineNumbers filename="main.ts" {2, 34, 36-65}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+import { dot, line, plot } from "@observablehq/plot";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .log("all");
+
+await temperatures.writeChart((data) =>
+  plot({
+    inset: 20,
+    marginLeft: 50,
+    marginBottom: 40,
+    grid: true,
+    y: { tickFormat: (d) => `${d}°C`, label: "Temperature", ticks: 5 },
+    x: {
+      tickFormat: (d) => `${d}-${d + 29}`,
+      ticks: [1900, 1930, 1960, 1990],
+      label: "Year",
+    },
+    color: { legend: true },
+    marks: [
+      line(data, {
+        x: "yearStart",
+        y: "mean",
+        stroke: "city",
+        curve: "natural",
+      }),
+      dot(data, {
+        x: "yearStart",
+        y: "mean",
+        fill: "white",
+        stroke: "city",
+        strokeWidth: 2,
+        r: 4,
+      }),
+    ],
+  }), "./sda/output/temperatures.png");
+
+await sdb.close();
+```
+
+Nous aurions pu remplacer `.logDotChart()`, utilisé à l’étape précédente, en enchaînant directement `.writeChart()`. Il est toutefois parfois utile de voir les données dans le terminal tout en écrivant un graphique.
+
+C’est pourquoi, par commodité, nous affichons les données dans une première chaîne et écrivons le graphique dans une autre chaîne avec `await`.
+
+Au fait, passer `"all"` à `.log()` indique à SDA d’afficher toutes les lignes de la table, peu importe leur nombre. C’est une petite option bien pratique !
+
+Avec ce nouveau graphique, il est assez clair que les températures ont augmenté dans les trois villes analysées. Bien sûr, nous avons exclu la période complète de 30 ans la plus récente pour Montréal, car elle ne contenait pas suffisamment de données. 📈
+
+![VS Code affichant temperatures.png, un graphique en lignes des températures moyennes par ville et période de 30 ans.](/assets/simple-data-analysis/tabular-data/plot.png)
+
+<Callout type="info" emoji="💡">
+    Vous pouvez ouvrir toutes sortes de fichiers avec VS Code, y compris les images. Comme nous surveillons `main.ts`, chaque fois que nous mettons à jour le code générant le graphique, `temperatures.png` est réécrit et mis à jour dans son onglet. Autre astuce : vous pouvez déplacer l’onglet `temperatures.png` où vous le souhaitez, y compris sur un deuxième écran si vous en avez un.
+</Callout>
+
+### Corrélations et régressions linéaires
+
+Les visualisations sont utiles, mais leur interprétation peut être subjective.
+
+Pour analyser les tendances, vous pouvez aussi vous appuyer sur des indicateurs statistiques comme les corrélations et les régressions linéaires. Si vous souhaitez en savoir plus sur ces concepts, consultez la leçon [**Maths pour les journalistes**](/extras/math-for-journalists).
+
+Commençons par les corrélations. Notez que j’ai supprimé le code générant le graphique.
+
+```ts showLineNumbers filename="main.ts" {37-44}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .log("all");
+
+await temperatures
+  .correlations({
+    x: "yearStart",
+    y: "mean",
+    by: "city",
+    outputTable: "correlations",
+  })
+  .log();
+
+await sdb.close();
+```
+
+Comme `.summarize()`, la méthode `.correlations()` remplace les données de la table par les résultats de ses calculs. Dans le code ci-dessus, pour éviter d’écraser la table `temperatures`, nous définissons `outputTable: "correlations"`. Cela crée une nouvelle table nommée `correlations` et conserve intactes les données de `temperatures`.
+
+Comme nous pouvons le voir, les corrélations sont proches de 1, ce qui signifie qu'il existe une forte relation entre les années et la température. Quand l'une augmente, l'autre aussi.
+
+![VS Code montrant les corrélations entre yearStart et la température moyenne pour Montréal, Toronto et Vancouver.](/assets/simple-data-analysis/tabular-data/correlation.png)
+
+Nous pouvons également calculer des régressions linéaires, qui sont plus descriptives. Ici, nous remplaçons `.correlations()` par `.linearRegressions()`, arrondissons les résultats à deux décimales et les stockons dans une nouvelle table nommée `linearRegressions`.
+
+```ts showLineNumbers filename="main.ts" {37-45}
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .log("all");
+
+await temperatures
+  .linearRegressions({
+    x: "yearStart",
+    y: "mean",
+    by: "city",
+    decimals: 2,
+    outputTable: "linearRegressions",
+  })
+  .log();
+
+await sdb.close();
+```
+
+Encore une fois, le r<sup>2</sup> est proche de 1, ce qui signifie que les deux variables sont liées. La *slope* nous indique aussi que la température a augmenté de 0,02°C par an en moyenne.
+
+Ces trois villes canadiennes se sont réchauffées ! 🌡️🌡️🌡️
+
+![VS Code montrant les régressions linéaires de la température moyenne selon yearStart pour chaque ville, avec les pentes, les ordonnées à l’origine et les valeurs de R carré.](/assets/simple-data-analysis/tabular-data/linear-regressions.png)
+
+## Écriture des données
+
+Pour finir en beauté, écrivons nos résultats dans des fichiers. Avec la méthode `.writeData()`, vous pouvez enregistrer des fichiers au format CSV, JSON et Parquet. Si vous travaillez avec de gros fichiers, des options sont disponibles pour les compresser.
+
+```ts showLineNumbers filename="main.ts" {47-48} /const linearRegressions =/
+import { SimpleDB } from "@nshiab/simple-data-analysis";
+
+const sdb = new SimpleDB({ cacheVerbose: true });
+
+const temperatures = sdb.newTable("temperatures");
+
+await temperatures.cache(() => {
+  temperatures
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis/refs/heads/main/test/data/files/dailyTemperatures.csv",
+    )
+    .removeMissing();
+});
+
+const cities = sdb.newTable("cities");
+
+await cities.cache(() => {
+  cities
+    .loadData(
+      "https://raw.githubusercontent.com/nshiab/simple-data-analysis-core/refs/heads/main/test/data/files/cities.csv",
+    );
+});
+
+await temperatures
+  .join(cities)
+  .extractDatePart("time", "year")
+  .bins("year", 30, "yearStart", "yearEnd")
+  .summarize({
+    columns: "t",
+    by: ["city", "yearStart", "yearEnd"],
+    stats: ["count", "mean"],
+    decimals: 2,
+  })
+  .filter(`count >= 9861`)
+  .log("all");
+
+const linearRegressions = await temperatures
+  .linearRegressions({
+    x: "yearStart",
+    y: "mean",
+    by: "city",
+    decimals: 2,
+    outputTable: "linearRegressions",
+  })
+  .log();
+
+await temperatures.writeData("sda/output/temperatures.csv");
+await linearRegressions.writeData("sda/output/linearRegressions.csv");
+
+await sdb.close();
+```
+
+Dans le code ci-dessus, nous avons créé la variable `linearRegressions` pour stocker la table créée avec `outputTable: "linearRegressions"`. Nous pouvons ainsi appeler facilement `.writeData()` sur cette table à la ligne 48.
+
+Maintenant, si vous ouvrez le dossier `output` dans l’Explorateur à gauche, vous verrez vos deux fichiers CSV.
+
+![VS Code montrant writeData exportant temperatures.csv et linearRegressions.csv dans le dossier sda/output.](/assets/simple-data-analysis/tabular-data/write-data.png)
+
+## Conclusion
+
+Eh bien, quelle aventure ! 🎉 C'était votre premier projet avec SDA !
+
+J'espère que vous voyez l'intérêt de cette librairie. Avec ses méthodes simples à utiliser, vous pouvez réaliser des analyses complexes.
+
+Vous êtes maintenant prêt à vous attaquer à des jeux de données plus complexes. Vous pouvez vous amuser avec [Le défi du milliard de lignes 😱](/data-projects/one-billion-row-challenge). Oui, vraiment, un milliard de lignes ! Ce projet met en pratique ce que vous avez appris ici et va plus loin en vous faisant découvrir de nouvelles méthodes pour traiter sans effort d’énormes volumes de données.
+
+Après avoir essayé le défi du milliard de lignes, vous pourrez passer à la prochaine leçon sur les données géospatiales. C'est une autre force de SDA : vous pouvez aussi l’utiliser avec des géométries, des coordonnées et des cartes ! 🌎
+
+
+<NoticeEnd lang="fr"/>

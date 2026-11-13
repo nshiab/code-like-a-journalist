@@ -1,0 +1,160 @@
+---
+title: Récupérer des données avec TypeScript
+description: Apprenez à récupérer et sauvegarder des données avec Node.js, y compris les fichiers JSON, CSV et HTML.
+---
+
+import { Callout } from 'nextra/components'
+import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
+
+# Récupérer des données
+
+Le Web est omniprésent et une source extraordinaire de données. Dans cette leçon, nous explorerons comment récupérer et télécharger des données.
+
+Je suppose que vous avez terminé le chapitre 1 et toutes les leçons précédentes du chapitre 2 avant de vous lancer dans celle-ci. Assurez-vous notamment d’avoir suivi la [leçon d’installation](/first-steps/setup).
+
+<NoticeIntro lang="fr"/>
+
+## Configuration
+
+Créez un nouveau dossier vide sur votre ordinateur, ouvrez-le avec VS Code et créez-y un fichier nommé `main.ts`.
+
+Tapez ce code dans `main.ts` et enregistrez le fichier :
+
+```ts showLineNumbers filename="main.ts"
+console.log("Hello!");
+```
+
+Ouvrez le terminal (`Command` + `J` sur Mac ou `Control` + `J` sur Windows) et exécutez cette commande :
+
+```sh
+node --watch main.ts
+```
+
+Cette commande exécute notre code et le relance automatiquement chaque fois que nous enregistrons une modification, pour voir les résultats au fur et à mesure que nous travaillons.
+
+![VS Code montrant console.log("Hello!") dans main.ts et Hello! dans le terminal exécutant node --watch main.ts.](/assets/first-steps/variables/run.png)
+
+## Récupérer un fichier JSON
+
+Récupérons ce fichier [temp.json](https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json). Il contient les températures quotidiennes à Montréal de 2000 à 2020. Je l’ai téléversé sur GitHub spécifiquement pour cette leçon.
+
+Si vous l'ouvrez, vous remarquerez qu'il s'agit d'une liste d'objets, chaque objet stockant une date sous forme de chaîne de caractères et une température.
+
+![Une capture d'écran montrant VS Code exécutant et surveillant un fichier TypeScript.](/assets/pushing-further/fetch/json-file.png)
+
+Pour le récupérer, vous pouvez utiliser la fonction `fetch()`. Elle est disponible globalement, donc vous pouvez l'appeler directement dans votre code. Elle nécessite l'URL correspondante en tant que texte.
+
+```ts showLineNumbers filename="main.ts"
+// @ts-ignore
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
+);
+
+console.log(response);
+```
+
+<Callout type="info" emoji="💡">
+    Vous vous demandez peut-être ce que signifie `// @ts-ignore`. Ce commentaire indique à VS Code d’ignorer les erreurs de type sur la ligne suivante. Je l’ai ajouté parce qu’appeler `fetch` avec `await` de cette façon demande une configuration supplémentaire pour TypeScript. Je ne veux pas vous embêter avec cela pour le moment : je veux simplement que vous vous concentriez sur `fetch`.
+</Callout>
+Comme vous pouvez le voir dans le code ci-dessus, `fetch()` est une fonction **asynchrone**, et nous utilisons `await` pour attendre son résultat.
+
+Comme nous l’avons vu dans la leçon [Écrire et lire des fichiers](/pushing-further/files), les fonctions synchrones terminent leur travail avant que l’instruction suivante soit exécutée. Les fonctions asynchrones permettent à une opération de se poursuivre pendant que le code passe à la suite. Ici, `await` fait attendre notre code jusqu’à l’arrivée de la réponse avant de l’afficher.
+
+Le fonctionnement asynchrone de `fetch()` est très utile : vous pouvez commencer à récupérer plusieurs fichiers en même temps, au lieu d’attendre que chaque téléchargement se termine avant de lancer le suivant. Faire ces requêtes en parallèle peut rendre votre script beaucoup plus rapide.
+
+Si vous survolez `fetch` dans VS Code, vous verrez que cette fonction retourne une `Promise<Response>`. Une promesse représente un résultat qui sera disponible plus tard ; `await` nous permet de récupérer ce résultat lorsqu’il est prêt.
+
+![VS Code affiche la documentation de fetch au survol, avec une promesse de réponse comme type de retour.](/assets/pushing-further/fetch/fetch-promise.png)
+
+Maintenant, concentrons-nous sur ce qui apparaît dans le terminal. Comme vous pouvez le voir, cette réponse contient beaucoup d’informations, et c’est normal. Votre ordinateur et le serveur hébergeant le fichier échangent beaucoup d'informations pour s'assurer que la connexion fonctionne correctement.
+
+Dans notre cas, nous savons que le contenu que nous cherchons à récupérer est un fichier JSON, nous pouvons donc appeler la méthode asynchrone `.json()` pour convertir les données de la réponse en JSON.
+
+```ts showLineNumbers filename="main.ts" {7}
+// @ts-ignore
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
+);
+
+// @ts-ignore
+const data = await response.json();
+
+console.log(data);
+```
+
+![VS Code montre response.json() analysant la réponse récupérée et les données de température affichées dans le terminal.](/assets/pushing-further/fetch/parsed-response.png)
+
+Et voilà ! Nous avons récupéré les données, et nous pouvons maintenant travailler avec elles !
+
+Au lieu de les récupérer à chaque fois, nous pourrions écrire les données dans un fichier pour une utilisation future.
+
+```ts showLineNumbers filename="main.ts" {2, 10}
+// @ts-ignore
+import { writeFile } from "node:fs/promises";
+
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.json",
+);
+
+const data = await response.json();
+
+await writeFile("./temp.json", JSON.stringify(data));
+```
+
+![VS Code montre writeFile enregistrant les données de température récupérées dans temp.json, ouvert à côté du script.](/assets/pushing-further/fetch/save-json.png)
+
+Félicitations ! Vous savez maintenant comment récupérer et enregistrer des fichiers JSON. C'était facile, n'est-ce pas ? 😄
+
+## Récupérer un fichier texte/CSV
+
+Au lieu d’un fichier JSON, vous pourriez vouloir récupérer et enregistrer un fichier CSV, qui est un fichier texte brut.
+
+C’est assez simple : au lieu d’appeler `.json()` pour convertir la réponse, utilisez `.text()`.
+
+J’ai téléversé [temp.csv](https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv) sur GitHub pour cette leçon.
+
+Voici le code mis à jour pour le récupérer et le sauvegarder. Nous explorerons comment analyser les données des fichiers CSV dans une autre leçon.
+
+```ts showLineNumbers filename="main.ts"
+// @ts-ignore
+import { writeFile } from "node:fs/promises";
+
+const response = await fetch(
+  "https://raw.githubusercontent.com/nshiab/data-fetch-lesson/refs/heads/main/temp.csv",
+);
+
+const data = await response.text();
+
+await writeFile("./temp.csv", data);
+```
+<Callout type="info" emoji="💡">
+    Pour écrire les données JSON, nous avons dû utiliser `JSON.stringify()` car ici `writeFile` attend du texte plutôt qu’une liste, et les données JSON étaient une liste d'objets. Cependant, les données CSV sont déjà du texte, donc nous pouvons les passer directement à `writeFile`.
+</Callout>
+
+![VS Code montre response.text() lisant le CSV récupéré et writeFile l’enregistrant dans temp.csv, ouvert à côté du script.](/assets/pushing-further/fetch/save-csv.png)
+
+## Récupérer le HTML d'une page web
+
+Vous pouvez également récupérer le code source d'une page web. Par exemple, voici comment récupérer le HTML de la page d'accueil de Codez comme un journaliste.
+
+```ts showLineNumbers filename="main.ts"
+// @ts-ignore
+const response = await fetch(
+  "https://www.code-like-a-journalist.com/en",
+);
+
+// @ts-ignore
+const html = await response.text();
+
+console.log(html);
+```
+
+![VS Code montre fetch récupérant le HTML de la page d’accueil et l’affichant dans le terminal.](/assets/pushing-further/fetch/fetched-html.png)
+
+## Conclusion
+
+Vous savez maintenant comment récupérer et sauvegarder des données avec Node.js.
+
+Mais il y a autre chose d'extrêmement utile et publié sur le Web : les bibliothèques TypeScript. Consultez la prochaine leçon pour découvrir ce qu'elles sont ! 👀
+
+<NoticeEnd lang="fr"/>
