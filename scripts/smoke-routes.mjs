@@ -9,8 +9,8 @@ const routes = files.map(toRoute).sort();
 const englishRoutes = routes.filter((route) => route.startsWith("/en"));
 const frenchRoutes = routes.filter((route) => route.startsWith("/fr"));
 
-assert(englishRoutes.length === 36, `Expected 36 English routes, found ${englishRoutes.length}.`);
-assert(frenchRoutes.length === 36, `Expected 36 French routes, found ${frenchRoutes.length}.`);
+assert(englishRoutes.length === 35, `Expected 35 English routes, found ${englishRoutes.length}.`);
+assert(frenchRoutes.length === 35, `Expected 35 French routes, found ${frenchRoutes.length}.`);
 
 const englishPaths = englishRoutes.map((route) => route.slice(3));
 const frenchPaths = frenchRoutes.map((route) => route.slice(3));
@@ -96,6 +96,8 @@ const removedPaths = [
     "d3-chart",
     "d3-map",
     "git-and-github/github-pages",
+    "ninja-moves/publishing-library",
+    "extras/publishing-library",
     "inspirations",
     "more",
     "simple-data-analysis/sda-and-ai",

@@ -161,7 +161,7 @@ This type description is important. In our code, we rely on the `balance`. This 
 
 To find the proper type, I just hovered over `results` in `main.ts` and copied the inferred type. No need to write it yourself! I removed the `year`, `interestRate`, and `gainsOrLosses` keys, since we don’t use them in the function.
 
-![VS Code showing the inferred type of results.](/assets/ninja-moves/refactoring/inferred-types.png)
+![VS Code showing the inferred type of results.](/assets/extras/refactoring/inferred-types.png)
 
 Now, we can update our `main.ts`. We import our new functions and use them. Our script is now simpler and easier to understand.
 
@@ -200,7 +200,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
 logAnswer(initialAmount, results);
 ```
 
-![The updated main.ts importing and using getRandomInterestRate and logAnswer.](/assets/ninja-moves/refactoring/main-with-helpers.png)
+![The updated main.ts importing and using getRandomInterestRate and logAnswer.](/assets/extras/refactoring/main-with-helpers.png)
 
 We could even go one step further by wrapping everything in `main.ts` inside a function named `runSimulation`.
 
@@ -255,7 +255,7 @@ import runSimulation from "./helpers/runSimulation.ts";
 runSimulation(5000, 2, 20, 2025, 10);
 ```
 
-![VS Code running a single simulation from main.ts.](/assets/ninja-moves/refactoring/run-simulation-once.png)
+![VS Code running a single simulation from main.ts.](/assets/extras/refactoring/run-simulation-once.png)
 
 Our code is now very modular. While our original script could only run one simulation at a time, we can now easily run a thousand or more!
 
@@ -268,7 +268,7 @@ for (let i = 1; i <= 1000; i++) {
 }
 ```
 
-![VS Code running a thousand simulations in a loop.](/assets/ninja-moves/refactoring/run-simulation.png)
+![VS Code running a thousand simulations in a loop.](/assets/extras/refactoring/run-simulation.png)
 
 <Callout type="info" emoji="💡">
     You might think that creating multiple files makes it more difficult to navigate your code. But if you press `CMD` on Mac or `CTRL` on PC and click on a function in your code, VS Code will automatically take you to the function’s file by opening a new tab.

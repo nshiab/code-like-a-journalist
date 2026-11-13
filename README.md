@@ -35,7 +35,7 @@ current compatible packages selected by `setup-data-project`.
 
 Validation covers the generated starter, representative runtime examples,
 TypeScript checks of lesson examples, library packaging, the production build,
-and all 72 English/French routes. Live scrapes, the full census analysis, and the
+and all 70 English/French routes. Live scrapes, the full census analysis, and the
 one-billion-row workload are not part of this validation.
 
 ## Screenshots awaiting replacement

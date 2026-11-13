@@ -49,7 +49,7 @@ La commande `npm run sda` exécute le script lorsque vous le sauvegardez.
 
 Tout fonctionne comme prévu ! La fonction retourne `50%`.
 
-<OutdatedScreenshot src="/assets/ninja-moves/tests/setup.png" alt={"Un script principal affichant une valeur dans le terminal."} lang="fr" />
+<OutdatedScreenshot src="/assets/extras/tests/setup.png" alt={"Un script principal affichant une valeur dans le terminal."} lang="fr" />
 
 ## Créer des tests
 
@@ -82,7 +82,7 @@ test("should return 50% for 50 out of 100", () => {
 
 Exécutez `npm run all-tests`. Cette commande vérifie la mise en forme, les règles de lint et les types TypeScript, puis exécute les tests du projet. Si une vérification de mise en forme ou de lint échoue, lancez `npm run fix`, examinez les modifications et réessayez.
 
-<OutdatedScreenshot src="/assets/ninja-moves/tests/run-tests.png" alt={"Exécution des tests avec Deno."} lang="fr" />
+<OutdatedScreenshot src="/assets/extras/tests/run-tests.png" alt={"Exécution des tests avec Deno."} lang="fr" />
 
 Pendant que vous codez, il est pratique de relancer automatiquement un seul fichier de test lorsque ce fichier ou ses dépendances changent. Utilisez :
 
@@ -94,7 +94,7 @@ Laissez cette commande tourner pour le reste de la leçon. Appuyez sur `CTRL` + 
 
 La [documentation de Vitest](https://vitest.dev/guide/) présente d’autres options.
 
-<OutdatedScreenshot src="/assets/ninja-moves/tests/watch-tests.png" alt={"Surveillance des tests avec Deno."} lang="fr" />
+<OutdatedScreenshot src="/assets/extras/tests/watch-tests.png" alt={"Surveillance des tests avec Deno."} lang="fr" />
 
 ## Ajouter des tests
 
@@ -126,7 +126,7 @@ test("should return 0% for 1 out of 0", () => {
   expect(result).toBe("0%");
 });
 ```
-<OutdatedScreenshot src="/assets/ninja-moves/tests/fail.png" alt={"Un test a échoué."} lang="fr" />
+<OutdatedScreenshot src="/assets/extras/tests/fail.png" alt={"Un test a échoué."} lang="fr" />
 
 On peut voir que le deuxième test est passé, mais que le troisième a échoué !
 
@@ -153,7 +153,7 @@ Et maintenant, on peut voir que le troisième test est passé.
 
 On sait aussi que le comportement précédent est toujours là puisque les deux premiers tests sont également passés !
 
-<OutdatedScreenshot src="/assets/ninja-moves/tests/all-passed.png" alt={"Tous les tests sont passés."} lang="fr" />
+<OutdatedScreenshot src="/assets/extras/tests/all-passed.png" alt={"Tous les tests sont passés."} lang="fr" />
 
 ## Tests automatisés
 

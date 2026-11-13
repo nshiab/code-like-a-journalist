@@ -8,7 +8,7 @@ export default {
         theme: { collapsed: false },
     },
     "git-and-github": "4. Git & GitHub",
-    "ninja-moves": "5. Going further",
+    "extras": "5. Extras",
     "data-projects": {
         title: "Data projects",
         theme: { collapsed: false },

@@ -48,7 +48,7 @@ The running `npm run sda` command executes the script when you save it.
 
 Everything looks fine! The function returns `50%` as expected.
 
-<OutdatedScreenshot src="/assets/ninja-moves/tests/setup.png" alt={"A main script logging a value in the terminal."} lang="en" />
+<OutdatedScreenshot src="/assets/extras/tests/setup.png" alt={"A main script logging a value in the terminal."} lang="en" />
 
 ## Creating tests
 
@@ -80,7 +80,7 @@ test("should return 50% for 50 out of 100", () => {
 
 Run `npm run all-tests`. This checks formatting, lint rules, and TypeScript types, then runs the project's tests. If a formatting or lint check fails, run `npm run fix`, review the changes, and try again.
 
-<OutdatedScreenshot src="/assets/ninja-moves/tests/run-tests.png" alt={"Running tests with Deno."} lang="en" />
+<OutdatedScreenshot src="/assets/extras/tests/run-tests.png" alt={"Running tests with Deno."} lang="en" />
 
 While writing code, it's convenient to rerun a single test file automatically whenever it or its dependencies change. Use:
 
@@ -92,7 +92,7 @@ Keep that command running for the rest of the lesson. Press `CTRL` + `C` to stop
 
 The [Vitest documentation](https://vitest.dev/guide/) explains more options.
 
-<OutdatedScreenshot src="/assets/ninja-moves/tests/watch-tests.png" alt={"Watching tests with Deno."} lang="en" />
+<OutdatedScreenshot src="/assets/extras/tests/watch-tests.png" alt={"Watching tests with Deno."} lang="en" />
 
 ## Adding tests
 
@@ -123,7 +123,7 @@ test("should return 0% for 1 out of 0", () => {
   expect(result).toBe("0%");
 });
 ```
-<OutdatedScreenshot src="/assets/ninja-moves/tests/fail.png" alt={"A test failed."} lang="en" />
+<OutdatedScreenshot src="/assets/extras/tests/fail.png" alt={"A test failed."} lang="en" />
 
 We can see that the second test passed but the third one failed!
 
@@ -149,7 +149,7 @@ And now, we can see that the third test passed.
 
 We also know that the previous behavior is still there because the first two tests passed too!
 
-<OutdatedScreenshot src="/assets/ninja-moves/tests/all-passed.png" alt={"All tests passed."} lang="en" />
+<OutdatedScreenshot src="/assets/extras/tests/all-passed.png" alt={"All tests passed."} lang="en" />
 
 ## Automated tests
 

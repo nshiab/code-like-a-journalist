@@ -161,7 +161,7 @@ Cette description de type est importante. Dans notre code, nous utilisons `balan
 
 Pour trouver le type approprié, j'ai simplement survolé `results` dans `main.ts` et copié le type inféré. Pas besoin de l'écrire vous-même ! J'ai supprimé les clés `year`, `interestRate` et `gainsOrLosses`, car nous ne les utilisons pas dans la fonction.
 
-![VS Code montrant le type inféré de results.](/assets/ninja-moves/refactoring/inferred-types.png)
+![VS Code montrant le type inféré de results.](/assets/extras/refactoring/inferred-types.png)
 
 Nous pouvons maintenant mettre à jour notre `main.ts`. Nous importons nos nouvelles fonctions et les utilisons. Notre script est maintenant plus simple et plus facile à comprendre.
 
@@ -200,7 +200,7 @@ for (let year = startingYear; year < startingYear + years; year++) {
 logAnswer(initialAmount, results);
 ```
 
-![Le fichier main.ts mis à jour, qui importe et utilise getRandomInterestRate et logAnswer.](/assets/ninja-moves/refactoring/main-with-helpers.png)
+![Le fichier main.ts mis à jour, qui importe et utilise getRandomInterestRate et logAnswer.](/assets/extras/refactoring/main-with-helpers.png)
 
 Nous pourrions même aller plus loin en enveloppant tout le contenu de `main.ts` dans une fonction nommée `runSimulation`.
 
@@ -255,7 +255,7 @@ import runSimulation from "./helpers/runSimulation.ts";
 runSimulation(5000, 2, 20, 2025, 10);
 ```
 
-![VS Code exécutant une seule simulation depuis main.ts.](/assets/ninja-moves/refactoring/run-simulation-once.png)
+![VS Code exécutant une seule simulation depuis main.ts.](/assets/extras/refactoring/run-simulation-once.png)
 
 Notre code est maintenant très modulaire. Alors que notre script initial ne pouvait exécuter qu'une seule simulation à la fois, nous pouvons désormais en exécuter facilement un millier ou plus !
 
@@ -268,7 +268,7 @@ for (let i = 1; i <= 1000; i++) {
 }
 ```
 
-![VS Code exécutant mille simulations dans une boucle.](/assets/ninja-moves/refactoring/run-simulation.png)
+![VS Code exécutant mille simulations dans une boucle.](/assets/extras/refactoring/run-simulation.png)
 
 <Callout type="info" emoji="💡">
     Vous pourriez penser que créer plusieurs fichiers rend votre code plus difficile à naviguer. Mais si vous appuyez sur `CMD` sur Mac ou `CTRL` sur PC et cliquez sur une fonction dans votre code, VS Code vous amènera automatiquement au fichier de la fonction en ouvrant un nouvel onglet.
