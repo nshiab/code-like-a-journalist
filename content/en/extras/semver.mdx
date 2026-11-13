@@ -9,7 +9,7 @@ import { NoticeIntro, NoticeEnd } from "../../../components/Notices.jsx"
 
 You may have noticed that library versions on npm and in your `package.json` have numbers attached to them.
 
-For example, the [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) library could have a version such as `6.0.1`. This numbering convention is called **semantic versioning**, or **SemVer** for short.
+For example, the [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis) library has a release numbered `6.0.21`. This numbering convention is called **semantic versioning**, or **SemVer** for short.
 
 When library maintainers update these numbers, there is (usually 😅) a good reason why, and in this lesson, I’m going to explain what that reason is!
 
@@ -19,27 +19,27 @@ When library maintainers update these numbers, there is (usually 😅) a good re
 
 ### Major
 
-The first number indicates major versions. When this number changes, it means that breaking changes were introduced. If you are using an older version and update the library, your code will probably need to be updated too. Some classes, methods, functions, and others may have been changed or even removed.
+The first number is the major version. In `6.0.21`, the `6` tells you this release belongs to the library’s sixth major version. When this number changes, it means that breaking changes were introduced. For example, if you’re using `5.21.1` and want to upgrade to `6.0.21`, you’ll probably need to update your code too. Some classes, methods, functions, and others may have been changed or even removed.
 
 So if you plan on updating to a major version, always plan some extra time to adjust your project. And always ask yourself if it's actually worth it!
 
-For example, if you are using `@nshiab/simple-data-analysis@6.0.0` and there is a new version `@nshiab/simple-data-analysis@7.0.0`, check the [release notes](https://github.com/nshiab/simple-data-analysis/releases) to weigh the pros and cons of updating your project with it.
-
-There’s also an extra thing to know about major versions: when it’s a `v0.x.x` version, it usually means that the library is not ready for production. The maintainers will probably introduce a lot of breaking changes before it reaches `v1.0.0`, as they’re trying to figure out the best way to build everything. A lot of bugs are to be expected too.
+One more thing about major versions. If a library’s version starts with `0`, it’s still in early development. The code you use from that library can change at any time, even in a minor or patch update.
 
 ### Minor
 
-Minor versions are usually used to notify about new features.
+The second number is the minor version. In `6.0.21`, it’s `0`.
 
-For example, if you are using `@nshiab/simple-data-analysis@6.0.0` and there’s a new `@nshiab/simple-data-analysis@6.1.0`, it probably means that there is a new class, new methods, or new functions available. The old ones are still there and should still work as before.
+For example, going from `6.0.21` to `6.1.0` is a minor update. A minor release can add new features while keeping existing code working.
 
-It's much safer to update to a minor version, since you shouldn't have to recode parts of your project. But this is code, and maintainers are humans (for now 🤖), so there are always some surprises! 😬
+From `1.0.0` onward, a minor update should keep your existing code working. But maintainers are human (for now 🤖), so surprises can still happen! 😬
 
 ### Patch
 
-Patch versions are usually used to fix bugs and improve things under the hood. They usually don't bring anything new to the table; they just make the library work better.
+The third number is the patch version. In `6.0.21`, it’s `21`.
 
-Patch versions are the safest versions to update to. You shouldn't have to recode anything in your project when updating to a patch version.
+For example, going from `6.0.20` to `6.0.21` is a patch update. The last number goes from `20` to `21`. Patch releases are usually small updates that fix bugs while keeping existing code working.
+
+From `1.0.0` onward, patch updates are usually the safest. They fix bugs, and you shouldn’t have to change your code to use them.
 
 ### Other versions
 
@@ -59,13 +59,9 @@ For versions starting at `1.0.0`, `^` allows compatible minor and patch updates 
 
 For example, `@nshiab/simple-data-analysis@^6.0.0` means that the project can use compatible versions before `v7.0.0`. So `@nshiab/simple-data-analysis@6.1.0` and `@nshiab/simple-data-analysis@6.1.1` would be acceptable.
 
-For `0.x.x` releases, caret ranges are narrower: `^0.1.0` allows versions before `0.2.0`, and `^0.0.1` allows only `0.0.1`.
-
 ### `~` (Tilde)
 
-The `~` is stricter, meaning that the project should stick to a major **and** minor version, but can use any patch version.
-
-For example, `@nshiab/simple-data-analysis@~6.1.0` means that the project can use patch releases before `v6.2.0`, like `@nshiab/simple-data-analysis@6.1.1`.
+The tilde (`~`) keeps the major and minor numbers the same and lets you use the patch you specify or a newer one. For example, `~6.0.21` allows `6.0.21` and later `6.0.x` releases. It leaves out `6.0.20` and `6.1.0`.
 
 ## Updating dependencies
 
@@ -77,16 +73,20 @@ Run `npm outdated` in the project terminal. Its main columns are:
 - `Wanted`: the newest version allowed by your `package.json` range.
 - `Latest`: the version marked `latest` on npm, which may fall outside that range.
 
-Run `npm update` to update installed dependencies within their ranges. This updates `package-lock.json`; by default, it leaves the ranges in `package.json` as they are. See the [npm update documentation](https://docs.npmjs.com/cli/v11/commands/npm-update).
+Run `npm update` to update installed dependencies within their ranges. This updates `package-lock.json`; by default, it leaves the ranges in `package.json` as they are.
 
-To deliberately install a release outside the current range, use a command such as `npm install @nshiab/simple-data-analysis@7.0.0`, after reading its release notes. This also updates the dependency entry in `package.json`.
+To install a specific release, run a command such as `npm install @nshiab/simple-data-analysis@6.0.21`. This also updates the dependency entry in `package.json`.
 
-After updating, run `npm run all-tests` and the project itself. Save both `package.json` and `package-lock.json` in Git so collaborators can reproduce the installation with `npm ci`.
+To pin a dependency to an exact version, use `"6.0.21"` in `package.json` without a caret (`^`) or tilde (`~`).
 
 ## Conclusion
 
 SemVer is important to understand the potential consequences of updating a library. But remember that it's a convention. Nothing forces anyone to follow it.
 
-Not every project follows SemVer in exactly the same way. Before updating an important dependency, read that project's versioning policy and release notes instead of relying on the numbers alone.
+TypeScript is a well-known exception. The team increments the middle number for each feature release and rolls over after `9`, as it did from `5.9` to `6.0`, regardless of whether there are breaking changes. That means a minor update can include breaking changes! 😱 However, the team does a lot of work to keep older code working and usually gives users a heads-up about big breaking changes.
+
+So before updating a library your code depends on, check what’s changed since the version you’re using. Make sure to give yourself a little time in case everything breaks.
+
+One last bit of advice: avoid updating libraries right before a deadline or a production deployment. If it works and you don’t need a security update, don’t touch it. 😅
 
 <NoticeEnd />
