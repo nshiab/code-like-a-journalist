@@ -34,17 +34,9 @@ changes. Lessons should use unversioned setup commands so learners receive the
 current compatible packages selected by `setup-data-project`.
 
 Validation covers the generated starter, representative runtime examples,
-TypeScript checks of lesson examples, library packaging, the production build,
-and all 66 English/French routes. The full census analysis and the
-one-billion-row workload are not part of this validation.
-
-## Screenshots awaiting replacement
-
-Outdated screenshots remain visible inside `OutdatedScreenshot` components,
-with a red border and a localized warning. The original image assets are kept
-so they can be replaced while reviewing the rendered lessons. Once a capture
-matches the Node instructions, replace its component with a regular Markdown
-image. The shared component is registered in `mdx-components.jsx`.
+TypeScript checks of lesson examples, the production build, and all 66
+English/French routes. The full census analysis and the one-billion-row
+workload are not part of this validation.
 
 Thanks to the support of the
 [Michener Awards Foundation](https://www.michenerawards.ca/media-release/michener-awards-foundation-announces-its-2024-fellowships-winners/),

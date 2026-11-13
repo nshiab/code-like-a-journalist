@@ -12,9 +12,9 @@ import {
 import "nextra-theme-docs/style.css";
 import "../nextra-3-callouts.css";
 
+import { isSupportedLanguage, LOCALES } from "../../locales.mjs";
 import {
     COPY,
-    isSupportedLanguage,
     SHARING_IMAGE,
     SITE_URL,
 } from "../site-config";
@@ -104,10 +104,7 @@ export default async function RootLayout({ children, params }) {
                         link: FEEDBACK_URL,
                     }}
                     footer={footer}
-                    i18n={[
-                        { locale: "en", name: "English" },
-                        { locale: "fr", name: "Français" },
-                    ]}
+                    i18n={LOCALES}
                     lastUpdated={
                         <LastUpdated locale={lang}>
                             {copy.lastUpdated}

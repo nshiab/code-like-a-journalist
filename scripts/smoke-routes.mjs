@@ -50,6 +50,7 @@ for (const language of ["en", "fr"]) {
         `/${language}/pushing-further/commands-with-npm`,
         { "accept-language": language },
     );
+    await expectLocalizedLinks(language);
 }
 await expectResponse("/en/does-not-exist", 404);
 await expectResponse("/de/does-not-exist", 404);
@@ -60,21 +61,35 @@ await expectResponse(
     { "accept-language": "fr-CA,fr;q=0.9" },
 );
 
-for (const prefix of ["", "/en", "/fr"]) {
-    for (const project of [
+const legacyRedirects = [
+    ...[
         "saving-account-calculator",
         "stock-market-simulator",
         "stats-can-census",
         "one-billion-row-challenge",
-    ]) {
-        await expectResponse(
-            `${prefix}/${project}?source=bookmark`,
-            308,
-            `${prefix}/data-projects/${project}?source=bookmark`,
-        );
-    }
-
-}
+    ].map((project) => [`/${project}`, `/data-projects/${project}`]),
+    ...["refactoring", "math-for-journalists", "semver", "tests"].map(
+        (lesson) => [`/ninja-moves/${lesson}`, `/extras/${lesson}`],
+    ),
+    ["/pushing-further/tasks", "/pushing-further/commands-with-npm"],
+];
+await Promise.all(
+    ["", "/en", "/fr"].flatMap((prefix) =>
+        legacyRedirects.map(([source, destination]) =>
+            expectResponse(
+                `${prefix}${source}?source=bookmark`,
+                308,
+                `${prefix}${destination}?source=bookmark`,
+            ),
+        ),
+    ),
+);
+await expectResponse(
+    "/extras/refactoring?source=bookmark",
+    307,
+    "/fr/extras/refactoring?source=bookmark",
+    { cookie: "NEXT_LOCALE=fr" },
+);
 
 const removedPaths = [
     "advanced-analysis/using-ai",
@@ -82,7 +97,6 @@ const removedPaths = [
     "advanced-analysis/similarity-and-clustering",
     "advanced-analysis/network-analysis",
     "advanced-analysis/conclusion",
-    "pushing-further/tasks",
     "web-basics/html",
     "web-basics/css",
     "web-basics/javascript",
@@ -112,6 +126,30 @@ if (failures.length) {
 }
 
 console.log(`Smoke checked ${routes.length} localized content routes.`);
+
+async function expectLocalizedLinks(language) {
+    const route = `/${language}/pushing-further/fetch`;
+    const otherLanguage = language === "en" ? "fr" : "en";
+    const response = await fetch(`${BASE_URL}${route}`, {
+        headers: { cookie: `NEXT_LOCALE=${otherLanguage}` },
+    });
+    const html = await response.text();
+    const hrefs = Array.from(html.matchAll(/<a\s[^>]*\bhref="([^"]+)"/g),
+        ([, href]) => href,
+    );
+
+    // The previous lesson also appears in the sidebar and in the lesson text.
+    for (const [path, occurrences] of [
+        ["/pushing-further/files", 3],
+        ["/pushing-further/libraries", 2],
+    ]) {
+        const localized = hrefs.filter((href) => href === `/${language}${path}`);
+        if (localized.length < occurrences || hrefs.includes(path) ||
+            hrefs.includes(`/${otherLanguage}${path}`)) {
+            failures.push(`${route} contains incorrect lesson links for ${path}`);
+        }
+    }
+}
 
 async function expectResponse(route, expectedStatus, expectedLocation, headers) {
     const response = await fetch(`${BASE_URL}${route}`, {

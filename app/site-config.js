@@ -1,4 +1,4 @@
-export const LANGUAGES = ["en", "fr"];
+import { DEFAULT_LANGUAGE, LANGUAGES } from "../locales.mjs";
 
 export const SITE_URL = "https://www.code-like-a-journalist.com";
 export const SHARING_IMAGE = `${SITE_URL}/assets/sharing-v1.jpg`;
@@ -49,10 +49,6 @@ export const COPY = {
     },
 };
 
-export function isSupportedLanguage(lang) {
-    return LANGUAGES.includes(lang);
-}
-
 export function getLocalizedPath(lang, mdxPath = []) {
     return `/${[lang, ...mdxPath].filter(Boolean).join("/")}`;
 }
@@ -62,7 +58,10 @@ export function getPageMetadata(lang, mdxPath, pageMetadata) {
     const title = pageMetadata.title || copy.title;
     const description = pageMetadata.description || copy.description;
     const canonical = getLocalizedPath(lang, mdxPath);
-    const contentPath = mdxPath || [];
+    const localizedAlternates = LANGUAGES.map((locale) => [
+        locale,
+        getLocalizedPath(locale, mdxPath),
+    ]);
 
     return {
         title,
@@ -70,9 +69,8 @@ export function getPageMetadata(lang, mdxPath, pageMetadata) {
         alternates: {
             canonical,
             languages: {
-                en: getLocalizedPath("en", contentPath),
-                fr: getLocalizedPath("fr", contentPath),
-                "x-default": getLocalizedPath("en", contentPath),
+                ...Object.fromEntries(localizedAlternates),
+                "x-default": getLocalizedPath(DEFAULT_LANGUAGE, mdxPath),
             },
         },
         openGraph: {

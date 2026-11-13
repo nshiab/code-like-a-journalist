@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { proxy as localeProxy } from "nextra/locales";
+import { isSupportedLanguage } from "./locales.mjs";
 
-const SUPPORTED_LOCALES = new Set(["en", "fr"]);
 // Only treat a short language code (optionally with a region) as a locale.
 // Section slugs such as "git-and-github" must reach Nextra's locale redirect.
 const LOCALE_SEGMENT = /^[a-z]{2,3}(?:-[a-z]{2}|-[0-9]{3})?$/i;
@@ -14,7 +14,7 @@ export function proxy(request) {
     if (
         firstSegment &&
         LOCALE_SEGMENT.test(firstSegment) &&
-        !SUPPORTED_LOCALES.has(firstSegment)
+        !isSupportedLanguage(firstSegment)
     ) {
         return new NextResponse("Not Found", {
             status: 404,
@@ -22,7 +22,14 @@ export function proxy(request) {
         });
     }
 
-    return localeProxy(request);
+    const response = localeProxy(request);
+    const location = response?.headers.get("location");
+    if (location && request.nextUrl.search) {
+        const destination = new URL(location);
+        destination.search = request.nextUrl.search;
+        response.headers.set("location", destination.href);
+    }
+    return response;
 }
 
 export const config = {

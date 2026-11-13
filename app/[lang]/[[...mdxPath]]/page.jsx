@@ -3,11 +3,12 @@ import { getPageMap } from "nextra/page-map";
 import { generateStaticParamsFor, importPage } from "nextra/pages";
 import { LastUpdated } from "nextra-theme-docs";
 
+import { isSupportedLanguage } from "../../../locales.mjs";
 import { useMDXComponents as getMDXComponents } from "../../../mdx-components";
 import {
     COPY,
+    getLocalizedPath,
     getPageMetadata,
-    isSupportedLanguage,
 } from "../../site-config";
 
 export const generateStaticParams = generateStaticParamsFor("mdxPath");
@@ -20,12 +21,11 @@ export async function generateMetadata({ params }) {
     return getPageMetadata(lang, mdxPath, metadata);
 }
 
-const Wrapper = getMDXComponents().wrapper;
-const Heading = getMDXComponents().h1;
+const { wrapper: Wrapper, h1: Heading, a: LessonLink } = getMDXComponents();
 
 export default async function Page(props) {
     const params = await props.params;
-    await ensurePageExists(params.lang, params.mdxPath);
+    const pageMap = await ensurePageExists(params.lang, params.mdxPath);
     const { default: MDXContent, toc, metadata, sourceCode } = await importPage(
         params.mdxPath,
         params.lang,
@@ -38,6 +38,12 @@ export default async function Page(props) {
                 {...props}
                 params={params}
                 components={{
+                    a: ({ href, ...linkProps }) => (
+                        <LessonLink
+                            {...linkProps}
+                            href={localizeLessonLink(href, params.lang, pageMap)}
+                        />
+                    ),
                     h1: (headingProps) => (
                         <>
                             <Heading {...headingProps} />
@@ -75,16 +81,29 @@ export default async function Page(props) {
     );
 }
 
-async function ensurePageExists(lang, mdxPath = []) {
+function localizeLessonLink(href, lang, pageMap) {
+    if (typeof href !== "string" || !href.startsWith("/") || href.startsWith("//")) {
+        return href;
+    }
+
+    const [pathname] = href.split(/[?#]/, 1);
+    const localizedPath = `/${lang}${pathname === "/" ? "" : pathname}`;
+    return pageMapHasRoute(pageMap, localizedPath)
+        ? localizedPath + href.slice(pathname.length)
+        : href;
+}
+
+async function ensurePageExists(lang, mdxPath) {
     if (!isSupportedLanguage(lang)) {
         notFound();
     }
 
-    const route = `/${mdxPath.join("/")}`;
+    const route = getLocalizedPath(lang, mdxPath);
     const pageMap = await getPageMap(`/${lang}`);
     if (!pageMapHasRoute(pageMap, route)) {
         notFound();
     }
+    return pageMap;
 }
 
 function pageMapHasRoute(pageMap, route) {
