@@ -111,7 +111,7 @@ Exécutez à nouveau `npm run sda`. Le terminal vous indique exactement l'erreur
 ![VS Code montrant la méthode inexistante logData soulignée dans l’éditeur et npm run sda signalant l’erreur de type sans exécuter l’analyse.](/assets/simple-data-analysis/setup/type-error.png)
 
 <Callout type="info" emoji="💡">
-    La vérification des types depuis le terminal peut faire gagner beaucoup de temps. Votre éditeur signale les erreurs pendant que vous travaillez ; la vérification dans le terminal couvre tous les fichiers de votre projet, ce qui est particulièrement utile lorsque les fonctions et les classes sont réparties dans plusieurs fichiers. Imaginez une analyse de 15 minutes qui échoue à la quatorzième minute à cause d'une erreur de type. Une vérification préalable, souvent réalisée en moins d'une seconde dans un petit projet, peut repérer cette erreur et vous éviter cette attente.
+    La vérification des types depuis le terminal peut faire gagner beaucoup de temps. Votre éditeur signale les erreurs pendant que vous travaillez. La vérification dans le terminal couvre le code dans `sda/`, ce qui est particulièrement utile lorsque les fonctions et les classes sont réparties dans plusieurs fichiers. Imaginez une analyse de 15 minutes qui échoue à la quatorzième minute à cause d'une erreur de type. Une vérification préalable, souvent réalisée en moins d'une seconde dans un petit projet, peut repérer cette erreur et vous éviter cette attente.
 </Callout>
 
 Remplacez `.logData()` par `.log()` avant de continuer.
@@ -153,31 +153,31 @@ Pour arrêter la surveillance, cliquez dans le terminal et appuyez sur `Control`
 
 ## Vérifier sans exécuter le code
 
-Parfois, vous voulez vérifier votre code sans lancer une analyse qui pourrait prendre beaucoup de temps. Cette commande formate vos fichiers, vérifie les règles de linting et les types TypeScript, et applique des corrections automatiques :
+Parfois, vous voulez vérifier votre code sans lancer une analyse qui pourrait prendre beaucoup de temps. La commande ci-dessous formate votre code dans `sda/`, vérifie les règles de linting et les types TypeScript, et applique des corrections automatiques.
 
 ```sh
-npm run fix
+npm run sda:fix
 ```
 
-![VS Code montrant npm run fix formatant les fichiers et appliquant les corrections automatiques.](/assets/simple-data-analysis/setup/fix.png)
+Avec l’exemple de départ, vous devriez voir le message `Found 0 warnings and 0 errors.` dans le terminal.
 
 Certains problèmes nécessiteront votre intervention. Lisez les messages, faites les modifications et relancez les vérifications.
 
-Les librairies et les outils que vous utilisez peuvent créer des fichiers temporaires dans le dossier de votre projet. Pour supprimer les fichiers et dossiers temporaires ciblés par la commande de nettoyage du projet, exécutez :
+Les librairies et les outils que vous utilisez peuvent créer des fichiers temporaires dans le dossier de votre projet. Pour effacer les fichiers temporaires et les caches ciblés par la commande de nettoyage du projet, exécutez la commande ci-dessous.
 
 ```sh
-npm run clean
+npm run sda:clean
 ```
 
 S'il n'y a rien à supprimer, rien ne se passe. Dans de prochaines leçons, nous mettrons en cache les résultats de calculs ou d'appels à des API. Vous voudrez parfois effacer ces résultats en cache et repartir de zéro ; cette commande vous sera alors utile.
 
-Vous disposez aussi d'une commande pour vérifier le formatage, les règles de linting et les types sans modifier vos fichiers :
+La commande ci-dessous vérifie le formatage, les règles de linting et les types dans `sda/`, puis lance les tests que vous y avez ajoutés.
 
 ```sh
-npm run all-tests
+npm run sda:test
 ```
 
-Elle est déjà incluse pour que vous puissiez y ajouter des tests automatisés plus tard, par exemple pour vérifier des calculs précis. Nous aborderons les tests dans de prochaines leçons.
+Avec le projet de départ, le terminal affiche `tests 0`. Nous ajouterons des tests pour vérifier des calculs précis dans la [leçon sur les tests](/extras/tests).
 
 ## Conclusion
 

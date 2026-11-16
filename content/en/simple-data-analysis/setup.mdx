@@ -111,7 +111,7 @@ Run `npm run sda` again. The terminal tells you exactly what the error is: `logD
 ![VS Code showing the nonexistent logData method underlined in the editor and npm run sda reporting the type error without running the analysis.](/assets/simple-data-analysis/setup/type-error.png)
 
 <Callout type="info" emoji="💡">
-    Type checking from the terminal can save a lot of time. Your editor highlights errors as you work; the terminal check covers all files in your project, which is especially useful when functions and classes are spread across many files. Imagine a 15-minute analysis failing at minute 14 because of a type error. A quick check beforehand, often taking less than a second in a small project, can catch that mistake and save the wait.
+    Type checking from the terminal can save a lot of time. Your editor highlights errors as you work. The terminal check covers the code under `sda/`, which is especially useful when functions and classes are spread across many files. Imagine a 15-minute analysis failing at minute 14 because of a type error. A quick check beforehand, often taking less than a second in a small project, can catch that mistake and save the wait.
 </Callout>
 
 Change `.logData()` back to `.log()` before continuing.
@@ -153,31 +153,31 @@ To stop watching, click in the terminal and press `Control` + `C` on Mac or Wind
 
 ## Checking without running the code
 
-Sometimes you want to check your code without running an analysis that could take a long time. This command formats your files, checks lint rules and TypeScript types, and applies automatic fixes:
+Sometimes you want to check your code without running an analysis that could take a long time. The command below formats your code under `sda/`, checks lint rules and TypeScript types, and applies automatic fixes.
 
 ```sh
-npm run fix
+npm run sda:fix
 ```
 
-![VS Code showing npm run fix formatting files and applying automatic fixes.](/assets/simple-data-analysis/setup/fix.png)
+With the starter example, you should see `Found 0 warnings and 0 errors.` in the terminal.
 
 Some problems will still need a fix from you. Read the messages, make the changes, and run the checks again.
 
-The libraries and tools you use may create temporary files in your project folder. To remove the temporary files and folders targeted by the project's cleanup command, run:
+The libraries and tools you use may create temporary files in your project folder. To clear the caches and temporary files targeted by the project's cleanup command, run the command below.
 
 ```sh
-npm run clean
+npm run sda:clean
 ```
 
 If there's nothing to remove, nothing happens. In future lessons, we'll cache the results of computations or API calls. Sometimes you'll want to clear those cached results and start fresh; this command will come in handy.
 
-You also have a command that checks formatting, lint rules, and types without modifying your files:
+The command below checks formatting, lint rules, and types under `sda/`, then runs any tests you’ve added there.
 
 ```sh
-npm run all-tests
+npm run sda:test
 ```
 
-It is already included so you can extend it with automated tests later, for example to verify specific calculations. We'll cover tests in later lessons.
+With the starter project, the terminal reports `tests 0`. We’ll add tests for specific calculations in the [testing lesson](/extras/tests).
 
 ## Conclusion
 
