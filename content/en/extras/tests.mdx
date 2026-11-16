@@ -311,7 +311,9 @@ node --test --watch
 
 ## Using `setup-data-project`
 
-The easiest way to start a data project is with `@nshiab/setup-data-project`, the library we use in the SDA lessons. If you haven’t set up an SDA project yet, take a look at the [SDA setup lesson](/simple-data-analysis/setup).
+So far, I’ve shown you how to write and run tests in a project you set up from scratch. However, the easiest way to start a data project is with `@nshiab/setup-data-project`, the library we use in the SDA lessons.
+
+It creates the folders and configuration files you need to get started, including a `sda/test/` folder. If you haven’t set up an SDA project yet, take a look at the [SDA setup lesson](/simple-data-analysis/setup).
 
 Create a new, empty folder, open it in VS Code, and run the command below in the terminal.
 
@@ -321,31 +323,74 @@ npx @nshiab/setup-data-project --sda
 
 If prompted to install the library, type `y` and press Enter.
 
-The library creates the folders and configuration files you need to get started, including a `sda/test/` folder. Put your test files there and give them names ending in `.test.ts`.
+![VS Code showing the completed setup in the terminal and an arrow pointing to the sda/test folder in the Explorer.](/assets/extras/tests/sda-test-folder.png)
 
-Try it with the final versions of the two files we wrote earlier. Copy `getPercentage.ts` into `sda/helpers/`. Inside `sda/test/`, create a `helpers` folder and copy `getPercentage.test.ts` into it.
+<Callout type="info" emoji="💡">
+    If VS Code asks you to install the recommended **Oxc** extension, click **Install**. It helps format your code and find potential problems as you work.
+</Callout>
 
-```text
-sda/
-├── helpers/
-│   └── getPercentage.ts
-└── test/
-    └── helpers/
-        └── getPercentage.test.ts
+Let’s bring back the `getPercentage` function we wrote earlier. Create `getPercentage.ts` in `sda/helpers/` and paste in the code below.
+
+```ts showLineNumbers filename="sda/helpers/getPercentage.ts"
+export default function getPercentage(current: number, total: number, decimals?: number): string {
+  if (total === 0) {
+    throw new Error("Total must not be zero.");
+  }
+
+  const percentage = (current / total) * 100;
+  const formatted = decimals === undefined ? percentage.toString() : percentage.toFixed(decimals);
+  return `${formatted}%`;
+}
 ```
 
-From the test file, `../../helpers/getPercentage.ts` still points to the function, so you can reuse the same import and all three tests. Change each `test(...)` call to `await test(...)` so the linter can see that you're waiting for Node to finish the test.
+Now let’s add the tests we wrote earlier. Create `getPercentage.test.ts` directly in `sda/test/` and paste in the code below.
 
-From the project root, run `npm run fix` to format the files you copied. Then run the command below. It checks formatting, lint rules, and TypeScript types before running the tests in `sda/test/`.
+We updated the import on line 3 to match the new folder structure. We also put `await` before each `test(...)` call because the tools that check our code recommend it. The type errors you may have seen earlier for `node:assert/strict` and `node:test` are gone because `setup-data-project` installs the Node.js types for us automatically.
 
-```sh
-npm run sda:tests
+```ts showLineNumbers filename="sda/test/getPercentage.test.ts" {3} /await/
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import getPercentage from "../helpers/getPercentage.ts";
+
+await test("should return 50% for 50 out of 100", () => {
+  const result = getPercentage(50, 100);
+  assert.strictEqual(result, "50%");
+});
+
+await test("should round 1 out of 3 to two decimal places", () => {
+  const result = getPercentage(1, 3, 2);
+  assert.strictEqual(result, "33.33%");
+});
+
+await test("should throw an error when the total is zero", () => {
+  assert.throws(() => getPercentage(1, 0), { message: "Total must not be zero." });
+});
 ```
 
-You should see the same three tests pass. To rerun the checks and tests as you save changes to the function or its tests, use watch mode.
+If you installed the recommended extension, VS Code formatted and checked the files when you saved them. Just in case, let’s do this manually by running the command below from the project root.
 
 ```sh
-npm run sda:tests:watch
+npm run sda:fix
+```
+
+![VS Code showing getPercentage.ts in sda/helpers, getPercentage.test.ts in sda/test, and npm run sda:fix completing with no warnings or errors.](/assets/extras/tests/sda-fix.png)
+
+We’re ready to run our tests. Just run the command below.
+
+```sh
+npm run sda:test
+```
+
+Before running the tests, this command checks your TypeScript types and formatting and looks for common coding mistakes. These extra checks from `setup-data-project` help you catch problems early.
+
+In the terminal, you should see the results of these checks, followed by all three tests passing.
+
+![The VS Code terminal shows npm run sda:test completing its checks and all three tests passing.](/assets/extras/tests/sda-tests-passed.png)
+
+To rerun the checks and tests as you save changes to the function or its tests, use watch mode.
+
+```sh
+npm run sda:test:watch
 ```
 
 Press `Control` + `C` to stop watching.
