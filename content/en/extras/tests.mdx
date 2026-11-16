@@ -309,29 +309,7 @@ Just like with `node --watch main.ts`, you can watch your tests with the command
 node --test --watch
 ```
 
-## Automated tests
-
-You can always run tests locally, of course. You can even define an [npm command](/pushing-further/commands-with-npm) to make it easier to run them.
-
-But if you are using GitHub, you can set up automated tests in your projects. This is a common setup for open-source libraries, but you can use it for anything you want.
-
-For example, I have hundreds of tests for the Simple Data Analysis library. You can explore them [here](https://github.com/nshiab/simple-data-analysis-core/tree/main/test/unit/methods).
-
-I use GitHub Actions to run these tests automatically before publishing a new version of the library. The setup is simple. [One small file](https://github.com/nshiab/simple-data-analysis-core/blob/main/.github/workflows/all-tests.yml) tells GitHub to run the tests in the cloud.
-
-## Testing web pages and data visualizations
-
-In this lesson, we ran simple tests locally to check that our function returned the values we expected.
-
-You can also test something more complex, like a web page. Does clicking a button or selecting an option display the right thing on the page? A library like [Playwright](https://github.com/microsoft/playwright) can run those tests in a browser and check what appears.
-
-You can also test charts you export with [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Say your script saves a chart as an SVG. As you keep working on your analysis, you can compare the new SVG’s text with a version you’ve saved to catch unexpected changes to the chart, including changes in the data it shows.
-
-If your script saves the chart as a PNG, you can compare it byte for byte with a reference file or use an image library to compare the pixels.
-
-Just remember, pretty much anything is testable!
-
-## Testing with Setup Data Project
+## Using Setup Data Project
 
 When you start a project with `@nshiab/setup-data-project`, as in the [SDA setup lesson](/simple-data-analysis/setup), it creates a `sda/test/` folder for you. Put your test files there and give them names ending in `.test.ts`.
 
@@ -361,6 +339,28 @@ npm run sda:tests:watch
 ```
 
 Press `Control` + `C` to stop watching.
+
+## Automated tests
+
+You can always run tests locally, of course. You can even define an [npm command](/pushing-further/commands-with-npm) to make it easier to run them.
+
+But if you are using GitHub, you can set up automated tests in your projects. This is a common setup for open-source libraries, but you can use it for anything you want.
+
+For example, I have hundreds of tests for the Simple Data Analysis library. You can explore them [here](https://github.com/nshiab/simple-data-analysis-core/tree/main/test/unit/methods).
+
+I use GitHub Actions to run these tests automatically before publishing a new version of the library. The setup is simple. [One small file](https://github.com/nshiab/simple-data-analysis-core/blob/main/.github/workflows/all-tests.yml) tells GitHub to run the tests in the cloud.
+
+## Testing web pages and data visualizations
+
+In this lesson, we ran simple tests locally to check that our function returned the values we expected.
+
+You can also test something more complex, like a web page. Does clicking a button or selecting an option display the right thing on the page? A library like [Playwright](https://github.com/microsoft/playwright) can run those tests in a browser and check what appears.
+
+You can also test charts you export with [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Say your script saves a chart as an SVG. As you keep working on your analysis, you can compare the new SVG’s text with a version you’ve saved to catch unexpected changes to the chart, including changes in the data it shows.
+
+If your script saves the chart as a PNG, you can compare it byte for byte with a reference file or use an image library to compare the pixels.
+
+Just remember, pretty much anything is testable!
 
 ## Conclusion
 

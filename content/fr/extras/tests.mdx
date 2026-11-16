@@ -311,29 +311,7 @@ Comme avec `node --watch main.ts`, vous pouvez surveiller vos tests avec la comm
 node --test --watch
 ```
 
-## Tests automatisés
-
-Vous pouvez bien sûr toujours lancer les tests localement. Vous pouvez même définir une [commande npm](/pushing-further/commands-with-npm) pour les exécuter plus facilement.
-
-Mais si vous utilisez GitHub, vous pouvez configurer des tests automatisés dans vos projets. C’est une configuration courante pour les librairies en code ouvert, mais vous pouvez l’utiliser pour n’importe quel projet.
-
-Par exemple, j’ai des centaines de tests pour la librairie Simple Data Analysis. Vous pouvez les explorer [ici](https://github.com/nshiab/simple-data-analysis-core/tree/main/test/unit/methods).
-
-J’utilise GitHub Actions pour exécuter ces tests automatiquement avant de publier une nouvelle version de la librairie. La configuration est simple. [Un petit fichier](https://github.com/nshiab/simple-data-analysis-core/blob/main/.github/workflows/all-tests.yml) indique à GitHub d’exécuter les tests dans le nuage.
-
-## Tester des pages web et des visualisations
-
-Dans cette leçon, nous avons exécuté des tests simples en local pour vérifier que notre fonction renvoyait les valeurs attendues.
-
-Vous pouvez aussi tester quelque chose de plus complexe, comme une page web. Est-ce que la page affiche le bon résultat quand vous cliquez sur un bouton ou sélectionnez une option ? Une librairie comme [Playwright](https://github.com/microsoft/playwright) peut exécuter ces tests dans un navigateur et vérifier ce qui s’affiche.
-
-Vous pouvez aussi tester les graphiques que vous exportez avec [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Disons que votre script enregistre un graphique au format SVG. En poursuivant votre analyse, vous pouvez comparer le texte du nouveau SVG à celui d’une version que vous avez conservée pour repérer les changements inattendus dans le graphique, y compris dans les données qu’il affiche.
-
-Si votre script enregistre le graphique au format PNG, vous pouvez le comparer octet par octet à un fichier de référence ou utiliser une librairie de traitement d’images pour comparer les pixels.
-
-Rappelez-vous que presque tout peut être testé !
-
-## Tester avec Setup Data Project
+## Utiliser Setup Data Project
 
 Quand vous démarrez un projet avec `@nshiab/setup-data-project`, comme dans la [leçon de configuration de SDA](/simple-data-analysis/setup), la commande crée un dossier `sda/test/`. Placez-y vos fichiers de test et donnez-leur des noms qui se terminent par `.test.ts`.
 
@@ -363,6 +341,28 @@ npm run sda:tests:watch
 ```
 
 Appuyez sur `Control` + `C` pour arrêter la surveillance.
+
+## Tests automatisés
+
+Vous pouvez bien sûr toujours lancer les tests localement. Vous pouvez même définir une [commande npm](/pushing-further/commands-with-npm) pour les exécuter plus facilement.
+
+Mais si vous utilisez GitHub, vous pouvez configurer des tests automatisés dans vos projets. C’est une configuration courante pour les librairies en code ouvert, mais vous pouvez l’utiliser pour n’importe quel projet.
+
+Par exemple, j’ai des centaines de tests pour la librairie Simple Data Analysis. Vous pouvez les explorer [ici](https://github.com/nshiab/simple-data-analysis-core/tree/main/test/unit/methods).
+
+J’utilise GitHub Actions pour exécuter ces tests automatiquement avant de publier une nouvelle version de la librairie. La configuration est simple. [Un petit fichier](https://github.com/nshiab/simple-data-analysis-core/blob/main/.github/workflows/all-tests.yml) indique à GitHub d’exécuter les tests dans le nuage.
+
+## Tester des pages web et des visualisations
+
+Dans cette leçon, nous avons exécuté des tests simples en local pour vérifier que notre fonction renvoyait les valeurs attendues.
+
+Vous pouvez aussi tester quelque chose de plus complexe, comme une page web. Est-ce que la page affiche le bon résultat quand vous cliquez sur un bouton ou sélectionnez une option ? Une librairie comme [Playwright](https://github.com/microsoft/playwright) peut exécuter ces tests dans un navigateur et vérifier ce qui s’affiche.
+
+Vous pouvez aussi tester les graphiques que vous exportez avec [Simple Data Analysis](https://github.com/nshiab/simple-data-analysis). Disons que votre script enregistre un graphique au format SVG. En poursuivant votre analyse, vous pouvez comparer le texte du nouveau SVG à celui d’une version que vous avez conservée pour repérer les changements inattendus dans le graphique, y compris dans les données qu’il affiche.
+
+Si votre script enregistre le graphique au format PNG, vous pouvez le comparer octet par octet à un fichier de référence ou utiliser une librairie de traitement d’images pour comparer les pixels.
+
+Rappelez-vous que presque tout peut être testé !
 
 ## Conclusion
 
