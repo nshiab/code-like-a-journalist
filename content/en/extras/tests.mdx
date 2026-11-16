@@ -331,6 +331,37 @@ If your script saves the chart as a PNG, you can compare it byte for byte with a
 
 Just remember, pretty much anything is testable!
 
+## Testing with Setup Data Project
+
+When you start a project with `@nshiab/setup-data-project`, as in the [SDA setup lesson](/simple-data-analysis/setup), it creates a `sda/test/` folder for you. Put your test files there and give them names ending in `.test.ts`.
+
+Try it with the final versions of the two files we wrote earlier. Copy `getPercentage.ts` into `sda/helpers/`. Inside `sda/test/`, create a `helpers` folder and copy `getPercentage.test.ts` into it.
+
+```text
+sda/
+├── helpers/
+│   └── getPercentage.ts
+└── test/
+    └── helpers/
+        └── getPercentage.test.ts
+```
+
+From the test file, `../../helpers/getPercentage.ts` still points to the function, so you can reuse the same import and all three tests. Change each `test(...)` call to `await test(...)` so the linter can see that you're waiting for Node to finish the test.
+
+From the project root, run `npm run fix` to format the files you copied. Then run the command below. It checks formatting, lint rules, and TypeScript types before running the tests in `sda/test/`.
+
+```sh
+npm run sda:tests
+```
+
+You should see the same three tests pass. To rerun the checks and tests as you save changes to the function or its tests, use watch mode.
+
+```sh
+npm run sda:tests:watch
+```
+
+Press `Control` + `C` to stop watching.
+
 ## Conclusion
 
 You don't always need tests, but when you start working on a long-term or complex project, taking the time to write simple tests each time you are creating a new method or function can become time well invested.

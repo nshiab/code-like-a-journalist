@@ -333,6 +333,37 @@ Si votre script enregistre le graphique au format PNG, vous pouvez le comparer o
 
 Rappelez-vous que presque tout peut être testé !
 
+## Tester avec Setup Data Project
+
+Quand vous démarrez un projet avec `@nshiab/setup-data-project`, comme dans la [leçon de configuration de SDA](/simple-data-analysis/setup), la commande crée un dossier `sda/test/`. Placez-y vos fichiers de test et donnez-leur des noms qui se terminent par `.test.ts`.
+
+Essayez avec les versions finales des deux fichiers que nous avons écrits plus haut. Copiez `getPercentage.ts` dans `sda/helpers/`. Dans `sda/test/`, créez un dossier `helpers` et copiez-y `getPercentage.test.ts`.
+
+```text
+sda/
+├── helpers/
+│   └── getPercentage.ts
+└── test/
+    └── helpers/
+        └── getPercentage.test.ts
+```
+
+Depuis le fichier de test, `../../helpers/getPercentage.ts` pointe toujours vers la fonction. Vous pouvez donc réutiliser la même instruction d’importation et les trois tests. Remplacez chaque appel à `test(...)` par `await test(...)` pour indiquer au linter que vous attendez que Node termine le test.
+
+À la racine du projet, exécutez `npm run fix` pour formater les fichiers que vous avez copiés. Exécutez ensuite la commande ci-dessous. Elle vérifie le formatage, les règles de lint et les types TypeScript avant de lancer les tests dans `sda/test/`.
+
+```sh
+npm run sda:tests
+```
+
+Les trois mêmes tests devraient réussir. Pour relancer les vérifications et les tests à chaque fois que vous enregistrez une modification dans la fonction ou ses tests, utilisez le mode de surveillance.
+
+```sh
+npm run sda:tests:watch
+```
+
+Appuyez sur `Control` + `C` pour arrêter la surveillance.
+
 ## Conclusion
 
 Vous n’avez pas toujours besoin de tests, mais dès que vous travaillez sur un projet à long terme ou complexe, prendre le temps d’écrire de simples tests à chaque fois que vous créez une nouvelle méthode ou fonction peut s’avérer être un excellent investissement.
