@@ -311,6 +311,92 @@ Comme avec `node --watch main.ts`, vous pouvez surveiller vos tests avec la comm
 node --test --watch
 ```
 
+## Utiliser `setup-data-project`
+
+Jusqu’ici, je vous ai montré comment écrire et lancer des tests dans un projet que vous avez configuré vous-même. Cela dit, le plus simple pour démarrer un projet de données, c’est d’utiliser `@nshiab/setup-data-project`, la librairie que nous utilisons dans les leçons sur SDA.
+
+Elle crée les dossiers et les fichiers de configuration dont vous avez besoin pour démarrer, y compris un dossier `sda/test/`. Si vous n’avez pas encore configuré de projet SDA, allez voir la [leçon de configuration de SDA](/simple-data-analysis/setup).
+
+Créez un nouveau dossier vide, ouvrez-le dans VS Code, puis exécutez la commande ci-dessous dans le terminal.
+
+```sh
+npx @nshiab/setup-data-project --sda
+```
+
+Si on vous demande de confirmer l’installation de la librairie, tapez `y` et appuyez sur Entrée.
+
+![Dans VS Code, le terminal confirme que la configuration est terminée et une flèche pointe vers le dossier sda/test dans l’explorateur.](/assets/extras/tests/sda-test-folder.png)
+
+<Callout type="info" emoji="💡">
+    Si VS Code vous propose d’installer l’extension recommandée **Oxc**, cliquez sur **Install**. Elle aide à formater votre code et à repérer des problèmes potentiels pendant que vous travaillez.
+</Callout>
+
+Reprenons la fonction `getPercentage` que nous avons écrite plus haut. Créez `getPercentage.ts` dans `sda/helpers/` et collez-y le code ci-dessous.
+
+```ts showLineNumbers filename="sda/helpers/getPercentage.ts"
+export default function getPercentage(current: number, total: number, decimals?: number): string {
+  if (total === 0) {
+    throw new Error("Total must not be zero.");
+  }
+
+  const percentage = (current / total) * 100;
+  const formatted = decimals === undefined ? percentage.toString() : percentage.toFixed(decimals);
+  return `${formatted}%`;
+}
+```
+
+Ajoutons maintenant les tests que nous avons écrits plus haut. Créez `getPercentage.test.ts` directement dans `sda/test/` et collez-y le code ci-dessous.
+
+Nous avons modifié le chemin d’importation à la ligne 3 pour l’adapter à la nouvelle structure des dossiers. Nous avons aussi ajouté `await` devant chaque appel à `test(...)` parce que les outils qui vérifient notre code le recommandent. Les erreurs de types que vous avez peut-être vues plus haut pour `node:assert/strict` et `node:test` disparaissent parce que `setup-data-project` installe automatiquement les types de Node.js pour nous.
+
+```ts showLineNumbers filename="sda/test/getPercentage.test.ts" {3} /await/
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import getPercentage from "../helpers/getPercentage.ts";
+
+await test("should return 50% for 50 out of 100", () => {
+  const result = getPercentage(50, 100);
+  assert.strictEqual(result, "50%");
+});
+
+await test("should round 1 out of 3 to two decimal places", () => {
+  const result = getPercentage(1, 3, 2);
+  assert.strictEqual(result, "33.33%");
+});
+
+await test("should throw an error when the total is zero", () => {
+  assert.throws(() => getPercentage(1, 0), { message: "Total must not be zero." });
+});
+```
+
+Si vous avez installé l’extension recommandée, VS Code a formaté et vérifié les fichiers quand vous les avez enregistrés. Au cas où, faisons-le aussi manuellement en exécutant la commande ci-dessous à la racine du projet.
+
+```sh
+npm run sda:fix
+```
+
+![VS Code montre getPercentage.ts dans sda/helpers et getPercentage.test.ts dans sda/test. La commande npm run sda:fix se termine sans avertissement ni erreur.](/assets/extras/tests/sda-fix.png)
+
+Nous sommes prêts à lancer nos tests. Il suffit d’exécuter la commande ci-dessous.
+
+```sh
+npm run sda:test
+```
+
+Avant de lancer les tests, cette commande vérifie les types TypeScript et le formatage, et cherche des erreurs courantes dans le code. Ces vérifications supplémentaires de `setup-data-project` vous aident à repérer les problèmes plus tôt.
+
+Dans le terminal, vous devriez voir les résultats de ces vérifications, puis les trois tests marqués comme réussis.
+
+![Dans le terminal de VS Code, npm run sda:test termine les vérifications et les trois tests réussissent.](/assets/extras/tests/sda-tests-passed.png)
+
+Pour relancer les vérifications et les tests à chaque fois que vous enregistrez une modification dans la fonction ou ses tests, utilisez le mode de surveillance.
+
+```sh
+npm run sda:test:watch
+```
+
+Appuyez sur `Control` + `C` pour arrêter la surveillance.
+
 ## Tests automatisés
 
 Vous pouvez bien sûr toujours lancer les tests localement. Vous pouvez même définir une [commande npm](/pushing-further/commands-with-npm) pour les exécuter plus facilement.
