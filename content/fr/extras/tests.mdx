@@ -315,6 +315,14 @@ node --test --watch
 
 Le plus simple pour démarrer un projet de données, c’est d’utiliser `@nshiab/setup-data-project`, la librairie que nous utilisons dans les leçons sur SDA. Si vous n’avez pas encore configuré de projet SDA, allez voir la [leçon de configuration de SDA](/simple-data-analysis/setup).
 
+Créez un nouveau dossier vide, ouvrez-le dans VS Code, puis exécutez la commande ci-dessous dans le terminal.
+
+```sh
+npx @nshiab/setup-data-project --sda
+```
+
+Si on vous demande de confirmer l’installation de la librairie, tapez `y` et appuyez sur Entrée.
+
 La librairie crée les dossiers et les fichiers de configuration dont vous avez besoin pour démarrer, y compris un dossier `sda/test/`. Placez-y vos fichiers de test et donnez-leur des noms qui se terminent par `.test.ts`.
 
 Essayez avec les versions finales des deux fichiers que nous avons écrits plus haut. Copiez `getPercentage.ts` dans `sda/helpers/`. Dans `sda/test/`, créez un dossier `helpers` et copiez-y `getPercentage.test.ts`.
